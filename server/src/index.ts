@@ -3,8 +3,12 @@ dotenv.config();
 
 import express from 'express';
 import prisma from './services/prisma';
+import authRoutes from './routes/auth'; 
 
 const app = express();
+
+app.use(express.json());
+app.use('/api/auth', authRoutes);
 
 app.get('/api/health', async (req, res) => {
   const userCount = await prisma.user.count();
