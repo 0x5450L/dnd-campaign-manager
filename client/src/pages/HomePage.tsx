@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 function HomePage() {
   const [health, setHealth] = useState<string | null>(null);
   const [userCount, setUserCount] = useState<number>(0);
-  const [loginData, setLoginData] = useState<{ email: string; name: string; id: string } | null>(null);
+  const [loginData, setLoginData] = useState<{ email: string; name: string; id: string; token: string } | null>(null);
 
   const userInfo = () => {
     return (
@@ -44,7 +44,17 @@ function HomePage() {
       .then((res) => res.json())
       .then((data) => {
         console.log("loginData", data);
-        setLoginData(data.user);
+        setLoginData({ ...data.user, token: data.token });
+
+        fetch("/api/me", {
+          headers: {
+            Authorization: `Bearer ${data.token}`,
+          },
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            console.log("meData", data);
+          });
       });
   }, []);
 

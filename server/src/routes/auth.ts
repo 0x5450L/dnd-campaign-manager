@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import bcrypt from 'bcrypt';
 import prisma from '../services/prisma';
+import { generateToken } from '../utils/jwt';
 
 const router = Router();
 
@@ -8,6 +9,7 @@ router.post('/register', async (req, res) => {
   try {
     const { email, password, name } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
+
     const createdUser = await prisma.user.create({
       data: {
         email,
@@ -15,7 +17,8 @@ router.post('/register', async (req, res) => {
         displayName: name,
       },
     });
-    res.json({ status: 'ok', message: 'User created successfully', user: { email, name, id: createdUser.id } });
+    const token = generateToken(createdUser.id);
+    res.json({ status: 'ok', message: 'User created successfully', user: { email, name, id: createdUser.id }, token });
   } catch (error: any) {
     switch (error.code) {
       case 'P2002':
@@ -46,7 +49,9 @@ router.post('/login', async (req, res) => {
       return;
     }
 
-    res.json({ status: 'ok', message: 'Login successful', user: { email, name: user.displayName, id: user.id } });
+    const token = generateToken(user.id);
+
+    res.json({ status: 'ok', message: 'Login successful', user: { email, name: user.displayName, id: user.id }, token });
 
   } catch (error: any) {
     res.status(500).json({ status: 'error', message: 'Login failed', error: error.message });
