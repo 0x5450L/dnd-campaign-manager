@@ -1,5 +1,7 @@
+import { ApiError } from "./errors";
+
 export const apiClient = async <T>(url: string, options: RequestInit): Promise<T> => {
-  const token = localStorage.getItem('jwtToken');
+  const token = localStorage.getItem('jwt');
   if (token) {
     options.headers = {
       ...options.headers,
@@ -10,8 +12,12 @@ export const apiClient = async <T>(url: string, options: RequestInit): Promise<T
   options.headers = { ...options.headers, 'Content-Type': 'application/json' };
 
   const response = await fetch(url, options);
+
+  const data = await response.json();
+
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    throw new ApiError(response.status, data);
   }
-  return response.json() as T;
+
+  return data as T;
 }

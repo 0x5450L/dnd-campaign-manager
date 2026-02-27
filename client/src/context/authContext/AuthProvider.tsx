@@ -1,0 +1,41 @@
+import { useEffect, useState } from "react";
+import type { MeResponse, User } from "../../types/auth";
+import { me } from "../../services/api/auth";
+import { AuthContext } from "./AuthContext";
+
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(localStorage.getItem("jwt"));
+  const [isLoading, setIsLoading] = useState(!!token);
+
+  useEffect(() => {
+    if (!token) return;
+    me()
+      .then((data: MeResponse) => {
+        setUser(data.user);
+      })
+      .catch((error: Error) => {
+        console.error("Error fetching user:", error);
+        localStorage.removeItem("jwt");
+        setUser(null);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const setAuth = (user: User, token: string) => {
+    localStorage.setItem("jwt", token);
+    setUser(user);
+    setToken(token);
+  };
+
+  const logout = () => {
+    localStorage.removeItem("jwt");
+    setUser(null);
+    setToken(null);
+  };
+
+  return <AuthContext.Provider value={{ user, token, setAuth, logout, isLoading }}>{children}</AuthContext.Provider>;
+};
