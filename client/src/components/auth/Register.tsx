@@ -26,13 +26,20 @@ function Register() {
       });
   };
   return (
-    <div>
-      <h1>Register</h1>
+    <div className="flex flex-col items-center justify-center fit-content mg-auto">
+      <h1 className="text-2xl font-bold">Register</h1>
       <form onSubmit={handleSubmit}>
-        <input type="email" name="email" placeholder="Email" />
-        <input type="password" name="password" placeholder="Password" />
-        <input type="text" name="name" placeholder="Name" />
-        <button type="submit">Register</button>
+        <input type="email" name="email" placeholder="Email" className="border-2 border-gray-300 rounded-md p-2" />
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          className="border-2 border-gray-300 rounded-md p-2"
+        />
+        <input type="text" name="name" placeholder="Name" className="border-2 border-gray-300 rounded-md p-2" />
+        <button type="submit" className="bg-blue-500 text-white p-2 rounded-md cursor-pointer">
+          Register
+        </button>
         {registerError && <p className="text-red-500">{registerError}</p>}
       </form>
     </div>

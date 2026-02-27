@@ -9,12 +9,12 @@ function HomePage() {
     logout();
     navigate("/auth");
   };
-  
+
   return (
-    <div>
-      <h1>Home Page</h1>
+    <div className="flex flex-col items-center justify-center h-screen">
+      <h1 className="text-2xl font-bold">Home Page</h1>
       {user && (
-        <div className="userInfo">
+        <div className="userInfo flex flex-col items-start justify-center fit-content mg-auto">
           <ul className="flex flex-col items-start justify-center fit-content mg-auto">
             <li className="text-sm text-gray-500">
               Email: <span className="text-gray-600">{user.email}</span>
@@ -27,7 +27,7 @@ function HomePage() {
             </li>
           </ul>
 
-          <button onClick={handleLogout}>Logout</button>
+          <button onClick={handleLogout} className="bg-green-500 text-white p-2 rounded-md cursor-pointer">Logout</button>
         </div>
       )}
     </div>
