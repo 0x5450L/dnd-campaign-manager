@@ -15,7 +15,11 @@ function Register() {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
     const name = formData.get("name") as string;
-
+    if (!email || !password || !name) {
+      setRegisterError("Email, password and name are required");
+      return;
+    }
+    
     register(email, password, name)
       .then((data) => {
         setAuth(data.user, data.token);
