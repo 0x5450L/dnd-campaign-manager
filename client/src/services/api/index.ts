@@ -1,7 +1,8 @@
 import { ApiError } from "./errors";
 
 export const apiClient = async <T>(url: string, options: RequestInit): Promise<T> => {
-  const token = localStorage.getItem('jwt');
+  const token = localStorage.getItem('dndCampaignManagerJWT');
+  
   if (token) {
     options.headers = {
       ...options.headers,
