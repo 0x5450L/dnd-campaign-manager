@@ -4,7 +4,7 @@ import { Router } from "express";
 
 const router = Router();
 
-router.post('/campaigns', authMiddleware, async (req, res) => {
+router.post('/create', authMiddleware, async (req, res) => {
   try {
     const userId = req.userId;
     if (!userId) {
@@ -17,6 +17,8 @@ router.post('/campaigns', authMiddleware, async (req, res) => {
       res.status(400).json({ status: 'error', message: 'Campaign name is required' });
       return;
     }
+
+    
 
     const { id, dm } = await prisma.$transaction(async (tx) => {
       const { id } = await tx.campaign.create({
