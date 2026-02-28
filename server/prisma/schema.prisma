@@ -13,6 +13,36 @@ model User {
   displayName  String   @map("display_name")
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
-
+  memberships CampaignMember[] @relation("UsersCampaigns")
+  dmCampaigns Campaign[] @relation("CampaignDM")
   @@map("users")
+}
+
+model Campaign {
+  id String @id @default(uuid())
+  name String
+  description String?
+  setting String?
+  imageUrl String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  dmId String
+
+  dm User @relation("CampaignDM", fields: [dmId], references: [id])
+  members CampaignMember[] @relation("CampaignMembership")
+
+  @@map("campaigns")
+}
+
+model CampaignMember {
+  id String @id @default(uuid())
+  role String @map("role") @default("player")
+  joinedAt DateTime @default(now()) @map("joined_at")
+  userId String
+  campaignId String
+
+  user User @relation("UsersCampaigns", fields: [userId], references: [id])
+  campaign Campaign @relation ("CampaignMembership", fields: [campaignId], references: [id])
+  @@unique([userId, campaignId])
+  @@map("campaign_members")
 }
