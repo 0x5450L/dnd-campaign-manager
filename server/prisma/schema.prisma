@@ -31,6 +31,7 @@ model Campaign {
   dm User @relation("CampaignDM", fields: [dmId], references: [id])
   members CampaignMember[] @relation("CampaignMembership")
 
+  @@unique([dmId, name])
   @@map("campaigns")
 }
 
