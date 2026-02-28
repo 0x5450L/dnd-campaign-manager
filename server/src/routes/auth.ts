@@ -26,7 +26,7 @@ router.post('/register', async (req, res) => {
   } catch (error: any) {
     switch (error.code) {
       case 'P2002':
-        res.status(409).json({ status: 'error', message: 'User already exists' });
+        res.status(409).json({ status: 'error', message: 'User already exists', error: error.message });
         break;
       default:
         res.status(500).json({ status: 'error', message: 'User creation failed', error: error.message });
