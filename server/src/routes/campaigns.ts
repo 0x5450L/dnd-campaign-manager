@@ -88,7 +88,7 @@ router.get('/', authMiddleware, async (req, res) => {
   }
 });
 
-router.delete('delete/:id', authMiddleware, async (req, res) => {
+router.delete('/delete/:id', authMiddleware, async (req, res) => {
   try {
     const campaignId = req.params.id as string;
     if (!campaignId) {
