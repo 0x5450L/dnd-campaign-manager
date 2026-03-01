@@ -7,8 +7,8 @@ const router = Router();
 
 router.post('/register', async (req, res) => {
   try {
-    const { email, password, name } = req.body;
-    if (!email || !password || !name) {
+    const { email, password, displayName } = req.body;
+    if (!email || !password || !displayName) {
       res.status(400).json({ status: 'error', message: 'Email, password and name are required' });
       return;
     }
@@ -18,11 +18,11 @@ router.post('/register', async (req, res) => {
       data: {
         email,
         passwordHash: hashedPassword,
-        displayName: name,
+        displayName: displayName,
       },
     });
     const token = generateToken(createdUser.id);
-    res.json({ status: 'ok', message: 'User created successfully', user: { email, name, id: createdUser.id }, token });
+    res.json({ status: 'ok', message: 'User created successfully', user: { email, displayName, id: createdUser.id }, token });
   } catch (error: any) {
     switch (error.code) {
       case 'P2002':
@@ -55,7 +55,7 @@ router.post('/login', async (req, res) => {
 
     const token = generateToken(user.id);
 
-    res.json({ status: 'ok', message: 'Login successful', user: { email, name: user.displayName, id: user.id }, token });
+    res.json({ status: 'ok', message: 'Login successful', user: { email, displayName: user.displayName, id: user.id }, token });
 
   } catch (error: any) {
     res.status(500).json({ status: 'error', message: 'Login failed', error: error.message });

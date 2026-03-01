@@ -4,7 +4,7 @@ import type { LoginResponse, MeResponse, RegisterResponse } from "../../types/au
 export const register = async (email: string, password: string, name: string) => {
   return apiClient<RegisterResponse>('/api/auth/register', {
     method: 'POST',
-    body: JSON.stringify({ email, password, name }),
+    body: JSON.stringify({ email, password, displayName: name }),
   })
 };
 
