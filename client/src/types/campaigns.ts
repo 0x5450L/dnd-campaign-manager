@@ -6,6 +6,11 @@ export type CreateCampaignResponse = {
   campaign: Campaign;
 }
 
+export type DeleteCampaignResponse = {
+  status: 'ok' | 'error';
+  message: string;
+}
+
 export type GetCampaignsResponse = {
   status: 'ok' | 'error';
   message: string;

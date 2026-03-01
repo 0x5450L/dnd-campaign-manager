@@ -9,6 +9,7 @@ type CampaignsContextType = {
   message: string | null;
   setMessage: (message: string) => void;
   clearMessage: () => void;
+  deleteCampaign: (id: string) => Promise<void>;
 };
 
 export const CampaignsContext = createContext<CampaignsContextType | null>(null);

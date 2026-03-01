@@ -88,4 +88,37 @@ router.get('/', authMiddleware, async (req, res) => {
   }
 });
 
+router.delete('delete/:id', authMiddleware, async (req, res) => {
+  try {
+    const campaignId = req.params.id as string;
+    if (!campaignId) {
+      res.status(400).json({ status: 'error', message: 'Campaign ID is required' });
+      return;
+    }
+
+    const userId = req.userId;
+    if (!userId) {
+      res.status(401).json({ status: 'error', message: 'Unauthorized', error: 'Unauthorized' });
+      return;
+    }
+
+    await prisma.$transaction(async (tx) => {
+      await tx.campaignMember.deleteMany({ where: { campaignId } });
+      await tx.campaign.delete({ where: { dmId: userId, id: campaignId } });
+    });
+
+
+    res.json({ status: 'ok', message: 'Campaign deleted successfully' });
+  } catch (error: any) {
+    switch (error.code) {
+      case 'P2025':
+        res.status(404).json({ status: 'error', message: 'Campaign not found', error: error.message });
+        break;
+      default:
+        res.status(500).json({ status: 'error', message: 'Campaign deletion failed', error: error.message });
+        break;
+    }
+  }
+});
+
 export default router;
