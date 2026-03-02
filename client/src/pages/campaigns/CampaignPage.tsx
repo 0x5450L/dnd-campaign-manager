@@ -89,7 +89,7 @@ function CampaignPage() {
               key={member.id}
               className="flex items-center justify-between bg-gray-700/30 px-4 py-2 rounded-lg"
             >
-              <span className="text-gray-300">{member.userId}</span>
+              <span className="text-gray-300">{member.user.displayName}</span>
               <span
                 className={`text-xs font-semibold px-2 py-0.5 rounded ${
                   member.role === "DM"

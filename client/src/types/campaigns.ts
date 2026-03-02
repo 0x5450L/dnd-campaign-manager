@@ -32,6 +32,7 @@ export type Campaign = {
 
 type CampaignMember = {
   id: string;
+  user: User;
   userId: string;
   campaignId: string;
   role: 'DM' | 'PLAYER';

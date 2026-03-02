@@ -78,7 +78,17 @@ router.get('/', authMiddleware, async (req, res) => {
             email: true,
           },
         },
-        members: true,
+        members: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                displayName: true,
+                email: true,
+              },
+            },
+          },
+        },
       },
     });
 
