@@ -98,6 +98,61 @@ router.get('/', authMiddleware, async (req, res) => {
   }
 });
 
+router.get('/:id', authMiddleware, async (req, res) => {
+  try {
+    const userId = req.userId;
+    if (!userId) {
+      res.status(401).json({ status: 'error', message: 'Unauthorized', error: 'Unauthorized' });
+      return;
+    }
+
+    const campaignId = req.params.id as string;
+    if (!campaignId) {
+      res.status(400).json({ status: 'error', message: 'Campaign ID is required', error: 'Campaign ID is required' });
+      return;
+    }
+
+    const campaign = await prisma.campaign.findUnique({
+      where: {
+        id: campaignId,
+        dmId: userId,
+      },
+      include: {
+        dm: {
+          select: {
+            id: true,
+            displayName: true,
+            email: true,
+          },
+        },
+        members: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                displayName: true,
+                email: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    res.json({ status: 'ok', message: !campaign ? 'Campaign not found' : 'Campaign retrieved successfully', campaign });
+  } catch (error: any) {
+    switch (error.code) {
+      case 'P2025':
+        res.status(404).json({ status: 'error', message: 'Campaign not found', error: error.message });
+        break;
+      default:
+        res.status(500).json({ status: 'error', message: 'Campaign retrieval failed', error: error.message });
+        break;
+    }
+  }
+});
+
+
 router.delete('/delete/:id', authMiddleware, async (req, res) => {
   try {
     const campaignId = req.params.id as string;

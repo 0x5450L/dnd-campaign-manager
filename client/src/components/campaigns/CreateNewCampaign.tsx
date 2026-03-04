@@ -5,7 +5,7 @@ import { useCampaigns } from "../../hooks/useCampaigns";
 import { useAuth } from "../../hooks/useAuth";
 
 function CreateNewCampaign() {
-  const { fetchAndUpdateCampaigns } = useCampaigns();
+  const { fetchCampaigns } = useCampaigns();
   const { user } = useAuth();
   const [nameError, setNameError] = useState<string | null>(null);
   const [createCampaignError, setCreateCampaignError] = useState<string | null>(null);
@@ -28,7 +28,7 @@ function CreateNewCampaign() {
 
     createCampaign(name, description, setting, imageUrl)
       .then(async () => {
-        await fetchAndUpdateCampaigns();
+        await fetchCampaigns();
       })
       .catch((error: ApiError) => {
         setCreateCampaignError(error.data.message);

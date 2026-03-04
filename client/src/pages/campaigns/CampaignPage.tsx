@@ -1,14 +1,23 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useCampaigns } from "../../hooks/useCampaigns";
 import { useAuth } from "../../hooks/useAuth";
+import { useEffect, useState } from "react";
+import type { Campaign } from "../../types/campaigns";
 
 function CampaignPage() {
   const { id } = useParams();
-  const { campaigns, deleteCampaign } = useCampaigns();
+  const { deleteCampaign, fetchCampaign, message } = useCampaigns();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [campaign, setCampaign] = useState<Campaign | null>(null);
 
-  const campaign = campaigns?.find((c) => c.id === id);
+  useEffect(() => {
+    if (id) {
+      fetchCampaign(id)
+        .then((campaign) => setCampaign(campaign))
+        .catch((error) => console.error("Error fetching campaign:", error));
+    }
+  }, [id, fetchCampaign]);
 
   const handleDeleteCampaign = () => {
     if (!id) return;
@@ -18,7 +27,7 @@ function CampaignPage() {
   if (!campaign) {
     return (
       <div className="max-w-3xl mx-auto p-6">
-        <p className="text-gray-400">Campaign not found.</p>
+        (message? <p className="text-red-400">{message}</p> : <p className="text-gray-400">Campaign not found.</p>)
         <button
           onClick={() => navigate("/campaigns")}
           className="text-amber-300 hover:text-amber-100 underline mt-2 cursor-pointer"
@@ -29,7 +38,7 @@ function CampaignPage() {
     );
   }
 
-  const isDM = user?.id === campaign.dmId;
+  const isDM = user?.id === campaign?.dmId;
 
   return (
     <div className="max-w-3xl mx-auto p-6 flex flex-col gap-6">
@@ -56,9 +65,7 @@ function CampaignPage() {
         <h1 className="text-2xl font-bold text-amber-400">{campaign.name}</h1>
         <p className="text-sm text-gray-400 mt-1">DM: {campaign.dm.displayName}</p>
 
-        {campaign.description && (
-          <p className="text-gray-300 mt-4">{campaign.description}</p>
-        )}
+        {campaign.description && <p className="text-gray-300 mt-4">{campaign.description}</p>}
 
         {campaign.setting && (
           <div className="mt-4">
@@ -80,21 +87,14 @@ function CampaignPage() {
 
       {/* Members */}
       <div className="bg-gray-800/50 p-6 rounded-xl border border-gray-700">
-        <h2 className="text-lg font-semibold text-gray-200 mb-3">
-          Members ({campaign.members.length})
-        </h2>
+        <h2 className="text-lg font-semibold text-gray-200 mb-3">Members ({campaign.members.length})</h2>
         <ul className="flex flex-col gap-2">
           {campaign.members.map((member) => (
-            <li
-              key={member.id}
-              className="flex items-center justify-between bg-gray-700/30 px-4 py-2 rounded-lg"
-            >
+            <li key={member.id} className="flex items-center justify-between bg-gray-700/30 px-4 py-2 rounded-lg">
               <span className="text-gray-300">{member.user.displayName}</span>
               <span
                 className={`text-xs font-semibold px-2 py-0.5 rounded ${
-                  member.role === "DM"
-                    ? "bg-amber-600/20 text-amber-300"
-                    : "bg-blue-600/20 text-blue-300"
+                  member.role === "DM" ? "bg-amber-600/20 text-amber-300" : "bg-blue-600/20 text-blue-300"
                 }`}
               >
                 {member.role}

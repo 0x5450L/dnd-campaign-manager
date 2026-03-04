@@ -17,6 +17,8 @@ export type GetCampaignsResponse = {
   campaigns: Campaign[];
 }
 
+export type GetCampaignResponse = CreateCampaignResponse;
+
 export type Campaign = {
   id: string;
   dm: User;

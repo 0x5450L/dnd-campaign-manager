@@ -3,7 +3,8 @@ import type { Campaign } from "../../types/campaigns";
 
 type CampaignsContextType = {
   campaigns: Campaign[] | null;
-  fetchAndUpdateCampaigns: () => Promise<void>;
+  fetchCampaigns: () => Promise<void>;
+  fetchCampaign: (id: string) => Promise<Campaign | null>;
   setCampaigns: (campaigns: Campaign[]) => void;
   isLoading: boolean;
   message: string | null;

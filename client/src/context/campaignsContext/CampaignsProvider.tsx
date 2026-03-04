@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { deleteCampaign as deleteCampaignApi, getCampaigns } from "../../services/api/campaigns";
+import { deleteCampaign as deleteCampaignApi, getCampaign, getCampaigns } from "../../services/api/campaigns";
 import type { Campaign, GetCampaignsResponse } from "../../types/campaigns";
 import { CampaignsContext } from "./CampaignsContext";
 import { Outlet, useNavigate } from "react-router-dom";
@@ -14,8 +14,9 @@ export const CampaignsProvider = () => {
     setMessage(null);
   };
 
-  const fetchAndUpdateCampaigns = useCallback(async () => {
+  const fetchCampaigns = useCallback(async () => {
     if (!token) return;
+    setIsLoading(true);
     getCampaigns()
       .then((data: GetCampaignsResponse) => {
         setCampaigns(data.campaigns);
@@ -31,11 +32,28 @@ export const CampaignsProvider = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const fetchCampaign = useCallback(async (id: string): Promise<Campaign | null> => {
+    if (!token) return null;
+    setIsLoading(true);
+    try {
+      const data = await getCampaign(id);
+      setMessage(data.message);
+      return data.campaign;
+    } catch (error: unknown) {
+      console.error("Error fetching campaign:", error);
+      setMessage((error as Error).message);
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const deleteCampaign = async (id: string) => {
     if (!token) return;
     deleteCampaignApi(id)
       .then(async () => {
-        await fetchAndUpdateCampaigns();
+        await fetchCampaigns();
         navigate(`/campaigns`);
       })
       .catch((error: Error) => {
@@ -45,15 +63,16 @@ export const CampaignsProvider = () => {
   };
 
   useEffect(() => {
-    fetchAndUpdateCampaigns();
-  }, [fetchAndUpdateCampaigns]);
+    fetchCampaigns();
+  }, [fetchCampaigns]);
 
   return (
     <CampaignsContext.Provider
       value={{
         campaigns,
         setCampaigns,
-        fetchAndUpdateCampaigns,
+        fetchCampaigns,
+        fetchCampaign,
         isLoading,
         message,
         setMessage,
