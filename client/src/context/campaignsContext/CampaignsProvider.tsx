@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import { deleteCampaign as deleteCampaignApi, getCampaign, getCampaigns } from "../../services/api/campaigns";
-import type { Campaign, GetCampaignsResponse } from "../../types/campaigns";
+import { deleteCampaign as deleteCampaignApi, getCampaign, getCampaigns, updateCampaign as updateCampaignApi } from "../../services/api/campaigns";
+import type { Campaign, GetCampaignsResponse, UpdateCampaignPayload } from "../../types/campaigns";
 import { CampaignsContext } from "./CampaignsContext";
 import { Outlet, useNavigate } from "react-router-dom";
 
@@ -62,6 +62,28 @@ export const CampaignsProvider = () => {
       });
   };
 
+  const updateCampaign = useCallback(async (id: string, payload: UpdateCampaignPayload) => {
+    if (!token) return null;
+    setIsLoading(true);
+    try {
+      const data = await updateCampaignApi(id, payload);
+      setMessage(data.message);
+      const campaignToUpdate = campaigns?.find((campaign) => campaign.id === id);
+      if (campaignToUpdate) {
+        const updatedCampaign = { ...campaignToUpdate, ...data.campaign };
+        setCampaigns(campaigns!.map((campaign) => campaign.id === id ? updatedCampaign : campaign));
+      }
+      return data.campaign;
+    } catch (error: unknown) {
+      console.error("Error updating campaign:", error);
+      setMessage((error as Error).message);
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     fetchCampaigns();
   }, [fetchCampaigns]);
@@ -73,6 +95,7 @@ export const CampaignsProvider = () => {
         setCampaigns,
         fetchCampaigns,
         fetchCampaign,
+        updateCampaign,
         isLoading,
         message,
         setMessage,

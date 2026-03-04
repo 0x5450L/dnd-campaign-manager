@@ -1,10 +1,11 @@
 import { createContext } from "react";
-import type { Campaign } from "../../types/campaigns";
+import type { Campaign, UpdateCampaignPayload } from "../../types/campaigns";
 
 type CampaignsContextType = {
   campaigns: Campaign[] | null;
   fetchCampaigns: () => Promise<void>;
   fetchCampaign: (id: string) => Promise<Campaign | null>;
+  updateCampaign: (id: string, payload: UpdateCampaignPayload) => Promise<Campaign | null>;
   setCampaigns: (campaigns: Campaign[]) => void;
   isLoading: boolean;
   message: string | null;

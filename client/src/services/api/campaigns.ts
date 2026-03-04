@@ -1,5 +1,5 @@
 import { apiClient } from ".";
-import type { CreateCampaignResponse, DeleteCampaignResponse, GetCampaignResponse, GetCampaignsResponse } from "../../types/campaigns";
+import type { CreateCampaignResponse, DeleteCampaignResponse, GetCampaignResponse, GetCampaignsResponse, UpdateCampaignResponse } from "../../types/campaigns";
 
 export const createCampaign = async (name: string, description?: string, setting?: string, imageUrl?: string) => {
   return apiClient<CreateCampaignResponse>('/api/campaigns/create', {
@@ -23,5 +23,12 @@ export const getCampaigns = async () => {
 export const getCampaign = async (id: string) => {
   return apiClient<GetCampaignResponse>(`/api/campaigns/${id}`, {
     method: 'GET',
+  })
+};
+
+export const updateCampaign = async (id: string, payload: { name?: string, description?: string, setting?: string, imageUrl?: string }) => {
+  return apiClient<UpdateCampaignResponse>(`/api/campaigns/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
   })
 };

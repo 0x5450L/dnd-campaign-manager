@@ -115,7 +115,11 @@ router.get('/:id', authMiddleware, async (req, res) => {
     const campaign = await prisma.campaign.findUnique({
       where: {
         id: campaignId,
-        dmId: userId,
+        members: {
+          some: {
+            userId,
+          },
+        },
       },
       include: {
         dm: {
@@ -152,7 +156,6 @@ router.get('/:id', authMiddleware, async (req, res) => {
   }
 });
 
-
 router.delete('/delete/:id', authMiddleware, async (req, res) => {
   try {
     const campaignId = req.params.id as string;
@@ -183,6 +186,39 @@ router.delete('/delete/:id', authMiddleware, async (req, res) => {
         res.status(500).json({ status: 'error', message: 'Campaign deletion failed', error: error.message });
         break;
     }
+  }
+});
+
+router.patch('/:id', authMiddleware, async (req, res) => {
+  try {
+    const userId = req.userId;
+    if (!userId) {
+      res.status(401).json({ status: 'error', message: 'Unauthorized', error: 'Unauthorized' });
+      return;
+    }
+
+    const campaignId = req.params.id as string;
+    if (!campaignId) {
+      res.status(400).json({ status: 'error', message: 'Campaign ID is required', error: 'Campaign ID is required' });
+      return;
+    }
+
+    const { name, description, setting, imageUrl } = req.body;
+
+    const updatedCampaign = await prisma.campaign.update({
+      where: { id: campaignId, dmId: userId },
+      data: {
+        ...(name?.trim() && { name: name.trim() }),
+        ...(description !== undefined && { description }),
+        ...(setting !== undefined && { setting }),
+        ...(imageUrl !== undefined && { imageUrl }),
+      },
+    });
+
+    res.json({ status: 'ok', message: 'Campaign updated successfully', campaign: updatedCampaign });
+  }
+  catch (error: any) {
+    res.status(500).json({ status: 'error', message: 'Campaign update failed', error: error.message });
   }
 });
 

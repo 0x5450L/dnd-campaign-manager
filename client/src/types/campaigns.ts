@@ -19,6 +19,15 @@ export type GetCampaignsResponse = {
 
 export type GetCampaignResponse = CreateCampaignResponse;
 
+export type UpdateCampaignResponse = CreateCampaignResponse;
+
+export type UpdateCampaignPayload = {
+  name?: string;
+  description?: string;
+  setting?: string;
+  imageUrl?: string;
+}
+
 export type Campaign = {
   id: string;
   dm: User;
