@@ -3,21 +3,50 @@ import { useCampaigns } from "../../hooks/useCampaigns";
 import { useAuth } from "../../hooks/useAuth";
 import { useEffect, useState } from "react";
 import type { Campaign } from "../../types/campaigns";
+import CommonInput from "../../components/ui/inputs/CommonInput";
 
 function CampaignPage() {
   const { id } = useParams();
-  const { deleteCampaign, fetchCampaign, message } = useCampaigns();
+  const { deleteCampaign, fetchCampaign, updateCampaign, message, fetchCampaigns } = useCampaigns();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [campaign, setCampaign] = useState<Campaign | null>(null);
+  const [originalCampaign, setOriginalCampaign] = useState<Campaign | null>(null);
+
+  const isDM = user?.id === campaign?.dmId;
+
+  const hasChanges =
+    campaign &&
+    originalCampaign &&
+    (campaign.name !== originalCampaign.name ||
+      campaign.description !== originalCampaign.description ||
+      campaign.setting !== originalCampaign.setting ||
+      campaign.imageUrl !== originalCampaign.imageUrl);
 
   useEffect(() => {
     if (id) {
       fetchCampaign(id)
-        .then((campaign) => setCampaign(campaign))
+        .then((data) => {
+          setCampaign(data);
+          setOriginalCampaign(data);
+        })
         .catch((error) => console.error("Error fetching campaign:", error));
     }
   }, [id, fetchCampaign]);
+
+  const handleSave = async () => {
+    if (!campaign || !hasChanges) return;
+    const updated = await updateCampaign(campaign.id, {
+      name: campaign.name,
+      description: campaign.description,
+      setting: campaign.setting,
+      imageUrl: campaign.imageUrl,
+    });
+    if (updated) {
+      setOriginalCampaign({ ...campaign, ...updated });
+    }
+    fetchCampaigns();
+  };
 
   const handleDeleteCampaign = () => {
     if (!id) return;
@@ -38,8 +67,6 @@ function CampaignPage() {
     );
   }
 
-  const isDM = user?.id === campaign?.dmId;
-
   return (
     <div className="max-w-3xl mx-auto p-6 flex flex-col gap-6">
       {/* Header */}
@@ -51,37 +78,77 @@ function CampaignPage() {
           &larr; Back
         </button>
         {isDM && (
-          <button
-            onClick={handleDeleteCampaign}
-            className="bg-red-900/50 hover:bg-red-800 text-red-300 text-sm px-4 py-2 rounded-lg border border-red-800 cursor-pointer transition-colors duration-200"
-          >
-            Delete Campaign
-          </button>
+          <div className="flex gap-2">
+            {hasChanges && (
+              <button
+                onClick={handleSave}
+                className="bg-amber-600 hover:bg-amber-500 text-white text-sm font-semibold px-4 py-2 rounded-lg cursor-pointer transition-colors duration-200"
+              >
+                Save
+              </button>
+            )}
+            <button
+              onClick={handleDeleteCampaign}
+              className="bg-red-900/50 hover:bg-red-800 text-red-300 text-sm px-4 py-2 rounded-lg border border-red-800 cursor-pointer transition-colors duration-200"
+            >
+              Delete Campaign
+            </button>
+          </div>
         )}
       </div>
 
       {/* Campaign Info */}
-      <div className="bg-gray-800/50 p-6 rounded-xl border border-gray-700">
-        <h1 className="text-2xl font-bold text-amber-400">{campaign.name}</h1>
+      <div className="flex flex-col gap-4 bg-gray-800/50 p-6 rounded-xl border border-gray-700">
+        <CommonInput
+          type="text"
+          name="name"
+          value={campaign.name}
+          disabled={!isDM}
+          onChange={(value) => setCampaign({ ...campaign, name: value })}
+          validator={(value) => {
+            if (!value?.trim()) {
+              return { errorMessage: "name is required", validatedValue: value };
+            }
+            return { errorMessage: null, validatedValue: value };
+          }}
+        />
+
         <p className="text-sm text-gray-400 mt-1">DM: {campaign.dm.displayName}</p>
 
-        {campaign.description && <p className="text-gray-300 mt-4">{campaign.description}</p>}
-
-        {campaign.setting && (
-          <div className="mt-4">
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Setting</span>
-            <p className="text-gray-300 mt-1">{campaign.setting}</p>
-          </div>
+        {(campaign.description || isDM) && (
+          <CommonInput
+            type="text"
+            name="description"
+            value={campaign.description}
+            disabled={!isDM}
+            onChange={(value) => setCampaign({ ...campaign, description: value })}
+          >
+            Description
+          </CommonInput>
         )}
 
-        {campaign.imageUrl && (
-          <div className="mt-4">
-            <img
-              src={campaign.imageUrl}
-              alt={campaign.name}
-              className="rounded-lg max-h-48 object-cover border border-gray-700"
-            />
-          </div>
+        {(campaign.setting || isDM) && (
+          <CommonInput
+            type="text"
+            name="setting"
+            value={campaign.setting}
+            disabled={!isDM}
+            onChange={(value) => setCampaign({ ...campaign, setting: value })}
+          >
+            Setting
+          </CommonInput>
+        )}
+
+        {(campaign.imageUrl || isDM) && (
+          <CommonInput
+            type="text"
+            name="imageUrl"
+            value={campaign.imageUrl}
+            disabled={!isDM}
+            onChange={(value) => setCampaign({ ...campaign, imageUrl: value })}
+          >
+            Image URL
+          </CommonInput>
         )}
       </div>
 
