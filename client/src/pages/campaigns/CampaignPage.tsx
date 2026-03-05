@@ -105,6 +105,7 @@ function CampaignPage() {
           value={campaign.name}
           disabled={!isDM}
           onChange={(value) => setCampaign({ ...campaign, name: value })}
+          inputClassName="text-2xl font-bold text-amber-400"
           validator={(value) => {
             if (!value?.trim()) {
               return { errorMessage: "name is required", validatedValue: value };

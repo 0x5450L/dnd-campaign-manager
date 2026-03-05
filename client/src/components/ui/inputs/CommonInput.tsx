@@ -9,9 +9,10 @@ type CommonInputProps = {
   disabled?: boolean;
   validator?: (value: string | undefined) => { errorMessage: string | null; validatedValue: string | undefined };
   children?: React.ReactNode;
+  inputClassName?: string;
 };
 
-function CommonInput({ type, name, placeholder, validator, onChange, children, value, disabled }: CommonInputProps) {
+function CommonInput({ type, name, placeholder, validator, onChange, children, value, disabled, inputClassName }: CommonInputProps) {
   const [error, setError] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -26,26 +27,31 @@ function CommonInput({ type, name, placeholder, validator, onChange, children, v
     onChange(e.target.value);
   };
 
-  const labelTextColor = error ? `text-red-400` : `text-gray-400`;
-  const inputBorderColor = error ? `border-red-400` : `border-gray-700`;
+  const labelTextColor = error ? "text-red-400" : "text-gray-400";
+  const inputBorderColor = error ? "border-red-400" : disabled ? "border-transparent" : "border-gray-700";
+  const baseInputStyles = disabled
+    ? "bg-transparent cursor-default"
+    : "bg-gray-700/30 focus:outline-none focus:border-amber-500";
+
+  const defaultTextColor = inputClassName ? "" : "text-gray-200";
 
   return (
-    <div className="common-input-wrapper">
+    <div>
       <label
         htmlFor={name}
-        className={`flex flex-col gap-2 w-full align-left pd-2 pd-b-4 border-b ${inputBorderColor}`}
+        className={`flex flex-col gap-1 w-full pb-1 border-b ${inputBorderColor} transition-colors duration-200`}
       >
-        <div className={`label-error-wrapper flex gap-1 items-center align-baseline text-sm ${labelTextColor}`}>
-          {children} {error ? `: ${error}` : '\u00A0'}
+        <div className={`flex gap-1 items-center text-sm min-h-5 ${labelTextColor}`}>
+          {children}{error ? `: ${error}` : '\u00A0'}
         </div>
         <input
           type={type}
           name={name}
-          placeholder={placeholder}
+          placeholder={disabled ? "" : placeholder}
           disabled={disabled}
           value={value}
           onChange={handleChange}
-          className=""
+          className={`w-full bg-transparent border-0 p-0 outline-none ${baseInputStyles} ${defaultTextColor} ${inputClassName ?? ""}`}
         />
       </label>
     </div>
