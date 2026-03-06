@@ -9,6 +9,7 @@ function CreateNewCampaign() {
   const { user } = useAuth();
   const [nameError, setNameError] = useState<string | null>(null);
   const [createCampaignError, setCreateCampaignError] = useState<string | null>(null);
+
   const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
     if (!user) {
       //TODO: In future, make a unutorized campaign
@@ -29,11 +30,15 @@ function CreateNewCampaign() {
     createCampaign(name, description, setting, imageUrl)
       .then(async () => {
         await fetchCampaigns();
+        e.target.reset();
+        setNameError(null);
+        setCreateCampaignError(null);
       })
       .catch((error: ApiError) => {
         setCreateCampaignError(error.data.message);
       });
   };
+
   return (
     <div className="bg-gray-800/50 p-6 rounded-xl border border-gray-700">
       <h2 className="text-lg font-semibold text-gray-200 mb-4">Create New Campaign</h2>
