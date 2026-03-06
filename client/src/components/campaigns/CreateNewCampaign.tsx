@@ -11,12 +11,12 @@ function CreateNewCampaign() {
   const [createCampaignError, setCreateCampaignError] = useState<string | null>(null);
 
   const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault();
     if (!user) {
       //TODO: In future, make a unutorized campaign
       setCreateCampaignError("You must be logged in to create a campaign");
       return;
     }
-    e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
     const name = formData.get("name") as string;
     const description = formData.get("description") as string;
