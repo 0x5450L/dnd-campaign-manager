@@ -23,7 +23,7 @@ function Register() {
     register(email, password, name)
       .then((data) => {
         setAuth(data.user, data.token);
-        navigate("/");
+        navigate("/campaigns");
       })
       .catch((error: ApiError) => {
         setRegisterError(error.data.message);

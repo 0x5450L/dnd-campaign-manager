@@ -14,16 +14,14 @@ function Login() {
     const formData = new FormData(e.target as HTMLFormElement);
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
-    console.log(email, password);
     if (!email || !password) {
       setLoginError("Email and password are required");
       return;
     }
     login(email, password)
       .then((data) => {
-        console.log(data);
         setAuth(data.user, data.token);
-        navigate("/");
+        navigate("/campaigns");
       })
       .catch((error: ApiError) => {
         setLoginError(error.data.message);
