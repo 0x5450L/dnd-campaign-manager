@@ -4,6 +4,7 @@ import { useAuth } from "../../hooks/useAuth";
 import { useEffect, useState } from "react";
 import type { Campaign } from "../../types/campaigns";
 import CommonInput from "../../components/ui/inputs/CommonInput";
+import ConfirmDialog from "../../components/ui/ConfirmDialog";
 
 function CampaignPage() {
   const { id } = useParams();
@@ -12,6 +13,7 @@ function CampaignPage() {
   const navigate = useNavigate();
   const [campaign, setCampaign] = useState<Campaign | null>(null);
   const [originalCampaign, setOriginalCampaign] = useState<Campaign | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const isDM = user?.id === campaign?.dmId;
 
@@ -68,7 +70,7 @@ function CampaignPage() {
   }
 
   return (
-    <div className="h-screen max-w-3xl mx-auto p-6 flex flex-col gap-6">
+    <div className="min-h-[calc(100vh-53px)] h-100% max-w-3xl mx-auto p-6 flex flex-col gap-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <button
@@ -88,7 +90,7 @@ function CampaignPage() {
               </button>
             )}
             <button
-              onClick={handleDeleteCampaign}
+              onClick={() => setShowDeleteConfirm(true)}
               className="bg-red-900/50 hover:bg-red-800 text-red-300 text-sm px-4 py-2 rounded-lg border border-red-800 cursor-pointer transition-colors duration-200"
             >
               Delete Campaign
@@ -96,6 +98,7 @@ function CampaignPage() {
           </div>
         )}
       </div>
+
       {isLoading ? (
         <p className="text-amber-400 m-auto">Loading campaign...</p>
       ) : (
@@ -175,6 +178,17 @@ function CampaignPage() {
             </ul>
           </div>
         </>
+      )}
+
+      {showDeleteConfirm && (
+        <ConfirmDialog
+          title="Delete Campaign"
+          message="Are you sure you want to delete this campaign? This action cannot be undone."
+          confirmLabel="Delete"
+          cancelLabel="Cancel"
+          onConfirm={handleDeleteCampaign}
+          onCancel={() => setShowDeleteConfirm(false)}
+        />
       )}
     </div>
   );
