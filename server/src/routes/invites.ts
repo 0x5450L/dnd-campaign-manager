@@ -48,4 +48,130 @@ router.post('/create', authMiddleware, async (req, res) => {
   }
 });
 
+
+router.get('/my', authMiddleware, async (req, res) => {
+  try {
+    const userId = req.userId;
+    if (!userId) {
+      res.status(401).json({ status: 'error', message: 'Unauthorized', error: 'Unauthorized' });
+      return;
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      res.status(404).json({ status: 'error', message: 'User not found', error: 'User not found' });
+      return;
+    }
+
+    const invites = await prisma.campaignInvite.findMany({
+      where: {
+        email: user.email,
+        status: 'pending',
+        expiresAt: { gt: new Date() },
+      },
+    });
+
+    res.json({ status: 'ok', message: `You have ${invites.length || 'no'} invites`, invites });
+  } catch (error: any) {
+    res.status(500).json({ status: 'error', message: 'Invites retrieval failed', error: error.message });
+  }
+});
+
+router.get('/:token', async (req, res) => {
+  try {
+    const { token } = req.params;
+    const invite = await prisma.campaignInvite.findUnique({
+      where: { token },
+      include: { campaign: { include: { dm: { select: { displayName: true } } } } }
+    });
+
+    if (!invite) {
+      res.status(404).json({ status: 'error', message: 'Invite not found', error: 'Invite not found' });
+      return;
+    }
+
+    res.json({ status: 'ok', message: 'Invite retrieved successfully', invite });
+  } catch (error: any) {
+    res.status(500).json({ status: 'error', message: 'Invite retrieval failed', error: error.message });
+  }
+});
+
+router.post('/:token/respond', authMiddleware, async (req, res) => {
+  try {
+
+    const userId = req.userId;
+    if (!userId) {
+      res.status(401).json({ status: 'error', message: 'Unauthorized', error: 'Unauthorized' });
+      return;
+    }
+
+    const { token } = req.params as { token: string };
+    const { action } = req.body as { action: 'accept' | 'reject' };
+    const invite = await prisma.campaignInvite.findUnique({
+      where: { token },
+    });
+
+    if (!invite) {
+      res.status(404).json({ status: 'error', message: 'Invite not found', error: 'Invite not found' });
+      return;
+    }
+
+    if (invite.expiresAt < new Date()) {
+      res.status(400).json({ status: 'error', message: 'Invite expired', error: 'Invite expired' });
+      return;
+    }
+
+    if (invite.status !== 'pending') {
+      res.status(400).json({ status: 'error', message: 'Invite already responded', error: 'Invite already responded' });
+      return;
+    }
+
+    const existingMember = await prisma.campaignMember.findUnique({
+      where: { userId_campaignId: { userId, campaignId: invite.campaignId } },
+    });
+
+    if (existingMember) {
+      res.status(400).json({ status: 'error', message: 'You are already a member of this campaign', error: 'You are already a member of this campaign' });
+      return;
+    }
+
+    switch (action) {
+      case 'accept':
+        await prisma.campaignMember.create({
+          data: {
+            userId,
+            campaignId: invite.campaignId,
+            role: 'PLAYER',
+          },
+        });
+
+        if (invite.email) {
+          await prisma.campaignInvite.delete({
+            where: { token },
+          });
+        }
+
+        break;
+
+      case 'reject':
+        await prisma.campaignInvite.delete({
+          where: { token },
+        });
+        break;
+
+      default:
+        res.status(400).json({ status: 'error', message: 'Invalid action', error: 'Invalid action' });
+        return;
+    }
+
+    res.json({ status: 'ok', message: `Invite ${action}ed successfully` });
+
+  } catch (error: any) {
+    res.status(500).json({ status: 'error', message: 'Invite response failed', error: error.message });
+  }
+});
+
 export default router;
