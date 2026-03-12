@@ -1,12 +1,10 @@
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { login } from "../../services/api/auth";
 import { useState } from "react";
 import type { ApiError } from "../../services/api/errors";
 
-function Login() {
+function Login({ handleRedirect }: { handleRedirect: () => void }) {
   const { setAuth } = useAuth();
-  const navigate = useNavigate();
   const [loginError, setLoginError] = useState<string | null>(null);
 
   const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
@@ -21,7 +19,7 @@ function Login() {
     login(email, password)
       .then((data) => {
         setAuth(data.user, data.token);
-        navigate("/campaigns");
+        handleRedirect();
       })
       .catch((error: ApiError) => {
         setLoginError(error.data.message);

@@ -1,12 +1,10 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { register } from "../../services/api/auth";
 import type { ApiError } from "../../services/api/errors";
 
-function Register() {
+function Register({ handleRedirect }: { handleRedirect: () => void }) {
   const { setAuth } = useAuth();
-  const navigate = useNavigate();
   const [registerError, setRegisterError] = useState<string | null>(null);
 
   const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
@@ -23,7 +21,7 @@ function Register() {
     register(email, password, name)
       .then((data) => {
         setAuth(data.user, data.token);
-        navigate("/campaigns");
+        handleRedirect();
       })
       .catch((error: ApiError) => {
         setRegisterError(error.data.message);
