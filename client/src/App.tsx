@@ -5,6 +5,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import CampaignsPage from "./pages/campaigns/CampaignsPage";
 import CampaignPage from "./pages/campaigns/CampaignPage";
 import { CampaignsProvider } from "./context/campaignsContext/CampaignsProvider";
+import InvitePage from "./pages/InvitePage";
 
 function App() {
   return (
@@ -18,9 +19,7 @@ function App() {
       </Route>
 
       <Route path="/auth" element={<AuthPage />} />
-      {/* TODO: Phase 1 routes */}
-      {/* <Route path="/campaigns" element={<CampaignsPage />} /> */}
-      {/* <Route path="/campaigns/:id" element={<CampaignDetailPage />} /> */}
+      <Route path="/invite/:token" element={<InvitePage />} />
     </Routes>
   );
 }
