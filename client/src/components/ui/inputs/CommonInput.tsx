@@ -3,13 +3,14 @@ import { useState } from "react";
 type CommonInputProps = {
   type: string;
   name: string;
-  onChange: (value: string) => void;
+  onChange?: (value: string) => void;
   value?: string | number;
   placeholder?: string;
   disabled?: boolean;
   validator?: (value: string | undefined) => { errorMessage: string | null; validatedValue: string | undefined };
   children?: React.ReactNode;
   inputClassName?: string;
+  variant?: "underline" | "boxed";
 };
 
 function CommonInput({
@@ -22,6 +23,7 @@ function CommonInput({
   value,
   disabled,
   inputClassName,
+  variant = "underline",
 }: CommonInputProps) {
   const [error, setError] = useState<string | null>(null);
 
@@ -34,9 +36,36 @@ function CommonInput({
       e.target.value = validatedValue || "";
     }
 
-    onChange(e.target.value);
+    onChange?.(e.target.value);
   };
 
+  const defaultTextColor = inputClassName ? "" : "text-gray-200";
+
+  if (variant === "boxed") {
+    return (
+      <div className="flex flex-col gap-1">
+        {children && (
+          <label htmlFor={name} className={`text-sm ${error ? "text-red-400" : "text-gray-400"}`}>
+            {children}
+          </label>
+        )}
+        <input
+          type={type}
+          name={name}
+          placeholder={placeholder}
+          disabled={disabled}
+          value={value}
+          onChange={handleChange}
+          className={`bg-gray-700 border rounded-lg p-2.5 placeholder-gray-400 focus:outline-none transition-colors duration-200 ${
+            error ? "border-red-400" : "border-gray-600 focus:border-amber-500 hover:border-amber-500/50"
+          } ${defaultTextColor} ${disabled ? "opacity-50 cursor-not-allowed" : ""} ${inputClassName ?? ""}`}
+        />
+        {error && <p className="text-red-400 text-sm">{error}</p>}
+      </div>
+    );
+  }
+
+  // underline variant (default)
   const labelTextColor = error ? "text-red-400" : "text-gray-400";
   const inputBorderColor = error
     ? "border-red-400"
@@ -46,8 +75,6 @@ function CommonInput({
   const baseInputStyles = disabled
     ? "bg-transparent cursor-default"
     : "bg-gray-700/30 focus:outline-none focus:border-amber-500";
-
-  const defaultTextColor = inputClassName ? "" : "text-gray-200";
 
   return (
     <div>

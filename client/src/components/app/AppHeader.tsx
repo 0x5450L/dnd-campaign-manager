@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
+import CommonButton from "../ui/buttons/CommonButton";
 
 function Header() {
   const { user, logout } = useAuth();
@@ -22,12 +23,9 @@ function Header() {
       {user && (
         <div className="flex items-center gap-4">
           <span className="text-sm text-gray-400">{user.displayName}</span>
-          <button
-            onClick={handleLogout}
-            className="text-sm text-gray-400 hover:text-red-400 transition-colors duration-200 cursor-pointer"
-          >
+          <CommonButton onClick={handleLogout} variant="secondary" size="sm" className="hover:!text-red-400">
             Logout
-          </button>
+          </CommonButton>
         </div>
       )}
     </header>

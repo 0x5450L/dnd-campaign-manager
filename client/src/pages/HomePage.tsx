@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import CommonButton from "../components/ui/buttons/CommonButton";
 
 function HomePage() {
   const { user } = useAuth();
@@ -14,12 +15,7 @@ function HomePage() {
             <p className="text-sm text-gray-400">Name: <span className="text-gray-200">{user.displayName}</span></p>
           </div>
 
-          <button
-            onClick={() => navigate("/campaigns")}
-            className="bg-amber-600 hover:bg-amber-500 text-white font-semibold p-2.5 rounded-lg cursor-pointer transition-colors duration-200"
-          >
-            Campaigns
-          </button>
+          <CommonButton onClick={() => navigate("/campaigns")}>Campaigns</CommonButton>
         </div>
       )}
     </div>

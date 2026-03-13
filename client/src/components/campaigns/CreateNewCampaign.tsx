@@ -3,6 +3,8 @@ import { createCampaign } from "../../services/api/campaigns";
 import type { ApiError } from "../../services/api/errors";
 import { useCampaigns } from "../../hooks/useCampaigns";
 import { useAuth } from "../../hooks/useAuth";
+import CommonButton from "../ui/buttons/CommonButton";
+import CommonInput from "../ui/inputs/CommonInput";
 
 function CreateNewCampaign() {
   const { fetchCampaigns } = useCampaigns();
@@ -43,37 +45,12 @@ function CreateNewCampaign() {
     <div className="bg-gray-800/50 p-6 rounded-xl border border-gray-700">
       <h2 className="text-lg font-semibold text-gray-200 mb-4">Create New Campaign</h2>
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-        <input
-          type="text"
-          name="name"
-          placeholder="Campaign Name *"
-          className="bg-gray-700 border border-gray-600 rounded-lg p-2.5 text-gray-200 placeholder-gray-400 focus:outline-none focus:border-amber-500"
-        />
+        <CommonInput type="text" name="name" placeholder="Campaign Name *" variant="boxed" />
         {nameError && <p className="text-red-400 text-sm">{nameError}</p>}
-        <input
-          type="text"
-          name="description"
-          placeholder="Description (optional)"
-          className="bg-gray-700 border border-gray-600 rounded-lg p-2.5 text-gray-200 placeholder-gray-400 focus:outline-none focus:border-amber-500"
-        />
-        <input
-          type="text"
-          name="setting"
-          placeholder="Setting (optional)"
-          className="bg-gray-700 border border-gray-600 rounded-lg p-2.5 text-gray-200 placeholder-gray-400 focus:outline-none focus:border-amber-500"
-        />
-        <input
-          type="text"
-          name="imageUrl"
-          placeholder="Image URL (optional)"
-          className="bg-gray-700 border border-gray-600 rounded-lg p-2.5 text-gray-200 placeholder-gray-400 focus:outline-none focus:border-amber-500"
-        />
-        <button
-          type="submit"
-          className="bg-amber-600 hover:bg-amber-500 text-white font-semibold p-2.5 rounded-lg cursor-pointer transition-colors duration-200"
-        >
-          Create Campaign
-        </button>
+        <CommonInput type="text" name="description" placeholder="Description (optional)" variant="boxed" />
+        <CommonInput type="text" name="setting" placeholder="Setting (optional)" variant="boxed" />
+        <CommonInput type="text" name="imageUrl" placeholder="Image URL (optional)" variant="boxed" />
+        <CommonButton type="submit">Create Campaign</CommonButton>
         {createCampaignError && <p className="text-red-400 text-sm">{createCampaignError}</p>}
       </form>
     </div>

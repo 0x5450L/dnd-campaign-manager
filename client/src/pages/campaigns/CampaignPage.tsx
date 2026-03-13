@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import type { Campaign } from "../../types/campaigns";
 import CommonInput from "../../components/ui/inputs/CommonInput";
 import ConfirmDialog from "../../components/ui/ConfirmDialog";
+import CreateInvite from "../../components/campaigns/campaign/CreateInvite";
+import CommonButton from "../../components/ui/buttons/CommonButton";
 
 function CampaignPage() {
   const { id } = useParams();
@@ -59,12 +61,9 @@ function CampaignPage() {
     return (
       <div className="max-w-3xl mx-auto p-6">
         (message? <p className="text-red-400">{message}</p> : <p className="text-gray-400">Campaign not found.</p>)
-        <button
-          onClick={() => navigate("/campaigns")}
-          className="text-amber-300 hover:text-amber-100 underline mt-2 cursor-pointer"
-        >
+        <CommonButton onClick={() => navigate("/campaigns")} variant="secondary" size="sm">
           Back to campaigns
-        </button>
+        </CommonButton>
       </div>
     );
   }
@@ -73,28 +72,19 @@ function CampaignPage() {
     <div className="min-h-[calc(100vh-53px)] h-100% max-w-3xl mx-auto p-6 flex flex-col gap-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <button
-          onClick={() => navigate("/campaigns")}
-          className="text-gray-400 hover:text-amber-300 transition-colors duration-200 cursor-pointer"
-        >
+        <CommonButton onClick={() => navigate("/campaigns")} variant="secondary" size="sm">
           &larr; To Campaigns
-        </button>
+        </CommonButton>
         {isDM && (
           <div className="flex gap-2">
             {hasChanges && (
-              <button
-                onClick={handleSave}
-                className="bg-amber-600 hover:bg-amber-500 text-white text-sm font-semibold px-4 py-2 rounded-lg cursor-pointer transition-colors duration-200"
-              >
+              <CommonButton onClick={handleSave} size="sm">
                 Save
-              </button>
+              </CommonButton>
             )}
-            <button
-              onClick={() => setShowDeleteConfirm(true)}
-              className="bg-red-900/50 hover:bg-red-800 text-red-300 text-sm px-4 py-2 rounded-lg border border-red-800 cursor-pointer transition-colors duration-200"
-            >
+            <CommonButton onClick={() => setShowDeleteConfirm(true)} variant="decline" size="sm">
               Delete Campaign
-            </button>
+            </CommonButton>
           </div>
         )}
       </div>
@@ -177,6 +167,9 @@ function CampaignPage() {
               ))}
             </ul>
           </div>
+
+          {/* Invites */}
+          <CreateInvite />
         </>
       )}
 

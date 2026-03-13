@@ -1,3 +1,5 @@
+import CommonButton from "./buttons/CommonButton";
+
 type ConfirmDialogProps = {
   title: string;
   message: string;
@@ -27,18 +29,12 @@ function ConfirmDialog({
         <h3 className="text-lg font-semibold text-gray-200">{title}</h3>
         <p className="text-sm text-gray-400">{message}</p>
         <div className="flex gap-3 justify-end">
-          <button
-            onClick={onCancel}
-            className="text-sm text-gray-400 hover:text-gray-200 px-4 py-2 rounded-lg cursor-pointer transition-colors duration-200"
-          >
+          <CommonButton onClick={onCancel} variant="secondary" size="sm">
             {cancelLabel}
-          </button>
-          <button
-            onClick={onConfirm}
-            className="bg-red-900/50 hover:bg-red-800 text-red-300 text-sm font-semibold px-4 py-2 rounded-lg border border-red-800 cursor-pointer transition-colors duration-200"
-          >
+          </CommonButton>
+          <CommonButton onClick={onConfirm} variant="decline" size="sm">
             {confirmLabel}
-          </button>
+          </CommonButton>
         </div>
       </div>
     </div>
