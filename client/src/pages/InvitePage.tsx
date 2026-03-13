@@ -33,7 +33,7 @@ function InvitePage() {
       .finally(async () => {
         setIsLoading(false);
         setTimeout(() => {
-          navigate("/campaigns");
+          navigate("/campaigns", { replace: true });
         }, 1000);
       });
   }, [token]);
@@ -45,7 +45,7 @@ function InvitePage() {
 
         {isLoading && <p className="text-sm text-gray-400">Loading...</p>}
         {success && <p className="text-sm text-green-400">{success}</p>}
-        {error && <p className="text-sm text-red-400">{error}</p>}
+        {!success && error && <p className="text-sm text-red-400">{error}</p>}
       </div>
     </div>
   );

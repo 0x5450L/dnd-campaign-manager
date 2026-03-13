@@ -30,6 +30,20 @@ router.post('/create', authMiddleware, async (req, res) => {
       return;
     }
 
+    const existingInvite = await prisma.campaignInvite.findFirst({
+      where: {
+        email,
+        campaignId,
+        status: 'pending',
+        expiresAt: { gt: new Date() },
+      },
+    });
+
+    if (existingInvite) {
+      res.json({ status: 'ok', message: 'Invite already exists', response: { token: existingInvite.token, expiresAt: existingInvite.expiresAt } });
+      return;
+    }
+
     const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24 * 7);//1week
     const token = crypto.randomUUID();
     await prisma.campaignInvite.create({

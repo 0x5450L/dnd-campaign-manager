@@ -23,7 +23,7 @@ function Header() {
       {user && (
         <div className="flex items-center gap-4">
           <span className="text-sm text-gray-400">{user.displayName}</span>
-          <CommonButton onClick={handleLogout} variant="secondary" size="sm" className="hover:!text-red-400">
+          <CommonButton onClick={handleLogout} variant="secondary" size="sm" className="hover:text-red-400">
             Logout
           </CommonButton>
         </div>

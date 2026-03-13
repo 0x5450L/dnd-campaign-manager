@@ -169,7 +169,7 @@ function CampaignPage() {
           </div>
 
           {/* Invites */}
-          <CreateInvite />
+          <CreateInvite campaignId={campaign.id} />
         </>
       )}
 
