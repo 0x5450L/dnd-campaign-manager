@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import type { MeResponse, User } from "../../types/auth";
-import { me } from "../../services/api/auth";
+import type { LogoutResponse, MeResponse, User } from "../../types/auth";
+import { me, logout as logoutApi } from "../../services/api/auth";
 import { AuthContext } from "./AuthContext";
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -32,9 +32,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem("dndCampaignManagerJWT");
-    setUser(null);
-    setToken(null);
+    logoutApi()
+      .catch((error: Error) => {
+        console.error("Error logging out:", error);
+      })
+      .finally(() => {
+        localStorage.removeItem("dndCampaignManagerJWT");
+        setUser(null);
+        setToken(null);
+      });
   };
 
   return <AuthContext.Provider value={{ user, token, setAuth, logout, isLoading }}>{children}</AuthContext.Provider>;

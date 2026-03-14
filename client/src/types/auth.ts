@@ -13,6 +13,11 @@ export type LoginResponse = {
 
 export type RegisterResponse = LoginResponse;
 
+export type LogoutResponse = {
+  status: 'ok' | 'error';
+  message: string;
+}
+
 export type MeResponse = {
   status: 'ok' | 'error';
   message: string;

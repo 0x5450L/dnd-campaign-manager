@@ -12,7 +12,7 @@ router.post('/register', async (req, res) => {
       res.status(400).json({ status: 'error', message: 'Email, password and name are required' });
       return;
     }
-    
+
     const hashedPassword = await bcrypt.hash(password, 10);
     const createdUser = await prisma.user.create({
       data: {
@@ -22,6 +22,14 @@ router.post('/register', async (req, res) => {
       },
     });
     const token = generateToken(createdUser.id);
+
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: false, // TODO: change to true in production
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
     res.json({ status: 'ok', message: 'User created successfully', user: { email, displayName, id: createdUser.id }, token });
   } catch (error: any) {
     switch (error.code) {
@@ -55,11 +63,24 @@ router.post('/login', async (req, res) => {
 
     const token = generateToken(user.id);
 
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: false, // TODO: change to true in production
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
     res.json({ status: 'ok', message: 'Login successful', user: { email, displayName: user.displayName, id: user.id }, token });
 
   } catch (error: any) {
     res.status(500).json({ status: 'error', message: 'Login failed', error: error.message });
   }
+});
+
+
+router.post('/logout', async (req, res) => {
+  res.clearCookie('token');
+  res.json({ status: 'ok', message: 'Logout successful' });
 });
 
 export default router;

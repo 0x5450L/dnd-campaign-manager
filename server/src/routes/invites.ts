@@ -1,3 +1,4 @@
+import { addClient, notifyClient, removeClient } from "../services/sseClients";
 import { authMiddleware } from "../middleware/auth";
 import prisma from "../services/prisma";
 import { Router } from "express";
@@ -57,11 +58,14 @@ router.post('/create', authMiddleware, async (req, res) => {
 
     res.json({ status: 'ok', message: `Invite created successfully. Valid for 1 week.`, response: { token, expiresAt } });
 
+    if (email) {
+      notifyClient(email, { type: 'invite_created', invite: { token, expiresAt } });
+    }
+
   } catch (error: any) {
     res.status(500).json({ status: 'error', message: 'Invite creation failed', error: error.message });
   }
 });
-
 
 router.get('/my', authMiddleware, async (req, res) => {
   try {
@@ -86,6 +90,13 @@ router.get('/my', authMiddleware, async (req, res) => {
         status: 'pending',
         expiresAt: { gt: new Date() },
       },
+      include: {
+        campaign: {
+          include: {
+            dm: { select: { displayName: true } },
+          },
+        },
+      },
     });
 
     res.json({ status: 'ok', message: `You have ${invites.length || 'no'} invites`, invites });
@@ -93,6 +104,34 @@ router.get('/my', authMiddleware, async (req, res) => {
     res.status(500).json({ status: 'error', message: 'Invites retrieval failed', error: error.message });
   }
 });
+
+router.get('/stream', authMiddleware, async (req, res) => {
+  const userId = req.userId;
+  if (!userId) {
+    res.status(401).json({ status: 'error', message: 'Unauthorized', error: 'Unauthorized' });
+    return;
+  }
+
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user || !user.email) {
+    res.status(404).json({ status: 'error', message: 'User not found', error: 'User not found' });
+    return;
+  }
+
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+
+  res.write(`\n`)
+
+  addClient(user.email, res);
+
+  req.on('close', () => {
+    removeClient(user.email, res);
+  });
+
+});
+
 
 router.get('/:token', async (req, res) => {
   try {

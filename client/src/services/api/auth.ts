@@ -1,5 +1,5 @@
 import { apiClient } from ".";
-import type { LoginResponse, MeResponse, RegisterResponse } from "../../types/auth";
+import type { LoginResponse, MeResponse, RegisterResponse, LogoutResponse } from "../../types/auth";
 
 export const register = async (email: string, password: string, name: string) => {
   return apiClient<RegisterResponse>('/api/auth/register', {
@@ -18,5 +18,11 @@ export const login = async (email: string, password: string) => {
 export const me = async () => {
   return apiClient<MeResponse>('/api/me', {
     method: 'GET',
+  })
+};
+
+export const logout = async () => {
+  return apiClient<LogoutResponse>('/api/auth/logout', {
+    method: 'POST',
   })
 };

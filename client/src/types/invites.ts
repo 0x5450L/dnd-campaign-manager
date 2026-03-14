@@ -6,6 +6,10 @@ export type Invite = {
   campaignId: string;
   status: string;
   expiresAt: Date;
+  campaign?: {
+    name: string;
+    dm: { displayName: string };
+  };
 }
 
 export type GetInvitesResponse = {

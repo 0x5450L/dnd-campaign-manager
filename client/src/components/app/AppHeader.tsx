@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import CommonButton from "../ui/buttons/CommonButton";
+import InvitesDropdown from "./InvitesDropdown";
 
 function Header() {
   const { user, logout } = useAuth();
@@ -21,7 +22,8 @@ function Header() {
       </button>
 
       {user && (
-        <div className="flex items-center gap-4">
+        <div className="flex  items-center gap-4">
+          <InvitesDropdown />
           <span className="text-sm text-gray-400">{user.displayName}</span>
           <CommonButton onClick={handleLogout} variant="secondary" size="sm" className="hover:text-red-400">
             Logout
