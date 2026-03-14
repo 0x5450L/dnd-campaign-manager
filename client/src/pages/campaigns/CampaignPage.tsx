@@ -7,10 +7,13 @@ import CommonInput from "../../components/ui/inputs/CommonInput";
 import ConfirmDialog from "../../components/ui/ConfirmDialog";
 import CreateInvite from "../../components/campaigns/campaign/CreateInvite";
 import CommonButton from "../../components/ui/buttons/CommonButton";
+import { useSSE } from "../../hooks/useSSE";
 
 function CampaignPage() {
   const { id } = useParams();
   const { deleteCampaign, fetchCampaign, updateCampaign, message, fetchCampaigns, isLoading } = useCampaigns();
+  const { subscribe } = useSSE();
+
   const { user } = useAuth();
   const navigate = useNavigate();
   const [campaign, setCampaign] = useState<Campaign | null>(null);
@@ -37,6 +40,20 @@ function CampaignPage() {
         .catch((error) => console.error("Error fetching campaign:", error));
     }
   }, [id, fetchCampaign]);
+
+  useEffect(() => {
+    const unsubscribe = subscribe("member_joined", (data: unknown) => {
+      if ((data as { campaignId: string }).campaignId === id) {
+        fetchCampaign(id as string).then((data) => {
+          if (data) {
+            setCampaign(data);
+            setOriginalCampaign(data);
+          }
+        });
+      }
+    });
+    return unsubscribe;
+  }, [id]);
 
   const handleSave = async () => {
     if (!campaign || !hasChanges) return;

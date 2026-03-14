@@ -207,6 +207,15 @@ router.post('/:token/respond', authMiddleware, async (req, res) => {
           });
         }
 
+        const members = await prisma.campaignMember.findMany({
+          where: { campaignId: invite.campaignId },
+          include: { user: { select: { email: true } } },
+        });
+
+        members.forEach(member => {
+          notifyClient(member.user.email, { type: 'member_joined', campaignId: invite.campaignId });
+        });
+
         break;
 
       case 'reject':

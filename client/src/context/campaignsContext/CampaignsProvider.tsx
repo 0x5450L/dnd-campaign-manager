@@ -1,11 +1,18 @@
 import { useCallback, useEffect, useState } from "react";
-import { deleteCampaign as deleteCampaignApi, getCampaign, getCampaigns, updateCampaign as updateCampaignApi } from "../../services/api/campaigns";
+import {
+  deleteCampaign as deleteCampaignApi,
+  getCampaign,
+  getCampaigns,
+  updateCampaign as updateCampaignApi,
+} from "../../services/api/campaigns";
 import type { Campaign, GetCampaignsResponse, UpdateCampaignPayload } from "../../types/campaigns";
 import { CampaignsContext } from "./CampaignsContext";
 import { Outlet, useNavigate } from "react-router-dom";
+import { useSSE } from "../../hooks/useSSE";
 
 export const CampaignsProvider = () => {
   const token = localStorage.getItem("dndCampaignManagerJWT");
+  const { subscribe } = useSSE();
   const [campaigns, setCampaigns] = useState<Campaign[] | null>(null);
   const [isLoading, setIsLoading] = useState(!!campaigns);
   const [message, setMessage] = useState<string | null>(null);
@@ -13,6 +20,11 @@ export const CampaignsProvider = () => {
   const clearMessage = () => {
     setMessage(null);
   };
+
+  useEffect(() => {
+    const unsubscribe = subscribe("member_joined", () => fetchCampaigns());
+    return unsubscribe;
+  }, []);
 
   const fetchCampaigns = useCallback(async () => {
     if (!token) return;
@@ -71,7 +83,7 @@ export const CampaignsProvider = () => {
       const campaignToUpdate = campaigns?.find((campaign) => campaign.id === id);
       if (campaignToUpdate) {
         const updatedCampaign = { ...campaignToUpdate, ...data.campaign };
-        setCampaigns(campaigns!.map((campaign) => campaign.id === id ? updatedCampaign : campaign));
+        setCampaigns(campaigns!.map((campaign) => (campaign.id === id ? updatedCampaign : campaign)));
       }
       return data.campaign;
     } catch (error: unknown) {

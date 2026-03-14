@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { LogoutResponse, MeResponse, User } from "../../types/auth";
+import type { MeResponse, User } from "../../types/auth";
 import { me, logout as logoutApi } from "../../services/api/auth";
 import { AuthContext } from "./AuthContext";
 

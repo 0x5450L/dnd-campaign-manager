@@ -4,8 +4,10 @@ import type { Invite } from "../../types/invites";
 import type { ApiError } from "../../services/api/errors";
 import CommonButton from "../ui/buttons/CommonButton";
 import { useAuth } from "../../hooks/useAuth";
+import { useSSE } from "../../hooks/useSSE";
 
 function InvitesDropdown() {
+  const { subscribe } = useSSE();
   const { user } = useAuth();
   const [invites, setInvites] = useState<Invite[]>([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -21,21 +23,8 @@ function InvitesDropdown() {
   useEffect(() => {
     if (!user) return;
     fetchInvites();
-
-    const eventSource = new EventSource("/api/invites/stream");
-
-    eventSource.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      if (data.type === "invite_created") {
-        fetchInvites();
-      }
-    };
-
-    eventSource.onerror = (event: Event) => {
-      console.error("Error fetching invites:", event);
-    };
-
-    return () => eventSource.close();
+    const unsubscribe = subscribe("invite_created", () => fetchInvites());
+    return unsubscribe;
   }, [user]);
 
   useEffect(() => {
