@@ -15,6 +15,7 @@ model User {
   updatedAt    DateTime         @updatedAt @map("updated_at")
   memberships  CampaignMember[] @relation("UsersCampaigns")
   dmCampaigns  Campaign[]       @relation("CampaignDM")
+  characters   Character[]      @relation("UserCharacters")
 
   @@map("users")
 }
@@ -29,9 +30,10 @@ model Campaign {
   updatedAt   DateTime @updatedAt @map("updated_at")
   dmId        String
 
-  dm      User             @relation("CampaignDM", fields: [dmId], references: [id])
-  members CampaignMember[] @relation("CampaignMembership")
-  invites CampaignInvite[] @relation("CampaignInvites")
+  dm         User             @relation("CampaignDM", fields: [dmId], references: [id])
+  members    CampaignMember[] @relation("CampaignMembership")
+  invites    CampaignInvite[] @relation("CampaignInvites")
+  characters Character[]      @relation("CampaignCharacters")
 
   @@unique([dmId, name])
   @@map("campaigns")
@@ -62,4 +64,21 @@ model CampaignInvite {
   campaign   Campaign @relation("CampaignInvites", fields: [campaignId], references: [id])
 
   @@map("campaign_invites")
+}
+
+model Character {
+  id         String   @id @default(uuid())
+  name       String
+  type       String // player, npc,monster
+  level      Int      @default(1)
+  race       String
+  class      String
+  campaignId String
+  userId     String
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+  user       User     @relation("UserCharacters", fields: [userId], references: [id])
+  campaign   Campaign @relation("CampaignCharacters", fields: [campaignId], references: [id])
+
+  @@map("characters")
 }
