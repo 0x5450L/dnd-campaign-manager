@@ -67,18 +67,18 @@ model CampaignInvite {
 }
 
 model Character {
-  id         String   @id @default(uuid())
-  name       String
-  type       String // player, npc,monster
-  level      Int      @default(1)
-  race       String
-  class      String
-  campaignId String
-  userId     String
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
-  user       User     @relation("UserCharacters", fields: [userId], references: [id])
-  campaign   Campaign @relation("CampaignCharacters", fields: [campaignId], references: [id])
+  id             String   @id @default(uuid())
+  name           String
+  type           String // player, npc,monster
+  level          Int      @default(1)
+  race           String
+  characterClass String   @map("character_class")
+  campaignId     String
+  userId         String
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  user           User     @relation("UserCharacters", fields: [userId], references: [id])
+  campaign       Campaign @relation("CampaignCharacters", fields: [campaignId], references: [id])
 
   @@map("characters")
 }
