@@ -9,6 +9,7 @@ import authRoutes from './routes/auth';
 import meRoutes from './routes/me';
 import campaignsRoutes from './routes/campaigns';
 import invitesRoutes from './routes/invites';
+import charactersRoutes from './routes/characters';
 
 const app = express();
 app.use(cookieParser());
@@ -17,6 +18,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/me', meRoutes);
 app.use('/api/campaigns', campaignsRoutes);
 app.use('/api/invites', invitesRoutes);
+app.use('/api/characters', charactersRoutes);
 
 app.get('/api/health', async (req, res) => {
   const userCount = await prisma.user.count();
