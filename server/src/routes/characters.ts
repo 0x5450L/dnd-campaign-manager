@@ -13,6 +13,23 @@ router.post('/create', authMiddleware, async (req, res) => {
       return;
     }
 
+    const campaign = await prisma.campaign.findUnique({
+      where: {
+        id: req.body.campaignId,
+        members: {
+          some: {
+            userId,
+          },
+        },
+      },
+      include: { members: { include: { user: { select: { email: true } } } } },
+    });
+
+    if (!campaign) {
+      res.status(404).json({ status: 'error', message: 'Campaign not found or you are not a member of it', error: 'Campaign not found or you are not a member of it' });
+      return;
+    }
+
     const { name, type, level, race, characterClass, campaignId } = req.body;
     if (!name || !type || !race || !characterClass || !campaignId) {
       res.status(400).json({ status: 'error', message: 'Provide all necessary character details', error: 'Provide all necessary character details' });
@@ -33,12 +50,7 @@ router.post('/create', authMiddleware, async (req, res) => {
 
     res.json({ status: 'ok', message: 'Character created successfully', character });
 
-    const campaign = await prisma.campaign.findUnique({
-      where: { id: campaignId },
-      include: { members: { include: { user: { select: { email: true } } } } },
-    });
-
-    campaign?.members.forEach(member => {
+    campaign.members.forEach(member => {
       notifyClient(member.user.email, { type: 'character_created', characterId: character.id });
     });
 
@@ -119,9 +131,18 @@ router.patch('/:id', authMiddleware, async (req, res) => {
 
     const currentCharacter = await prisma.character.findUnique({
       where: { id },
+      include: {
+        campaign: {
+          select: {
+            dmId: true
+          },
+          include: { members: { include: { user: { select: { email: true } } } } }
+        }
+      }
     });
-    if (!currentCharacter) {
-      res.status(404).json({ status: 'error', message: 'Character not found', error: 'Character not found' });
+
+    if (!currentCharacter || (currentCharacter.userId !== userId && currentCharacter.campaign.dmId !== userId)) {
+      res.status(404).json({ status: 'error', message: 'Character not found or you are not the owner of it', error: 'Character not found or you are not the owner of it' });
       return;
     }
 
@@ -138,11 +159,7 @@ router.patch('/:id', authMiddleware, async (req, res) => {
 
     res.json({ status: 'ok', message: 'Character updated successfully', character });
 
-    const campaign = await prisma.campaign.findUnique({
-      where: { id: character.campaignId },
-      include: { members: { include: { user: { select: { email: true } } } } },
-    });
-    campaign?.members.forEach(member => {
+    currentCharacter.campaign.members.forEach(member => {
       notifyClient(member.user.email, { type: 'character_updated', characterId: character.id });
     });
   } catch (error: any) {
@@ -164,18 +181,30 @@ router.delete('/:id', authMiddleware, async (req, res) => {
       return;
     };
 
-    const character = await prisma.character.delete({
+    const character = await prisma.character.findUnique({
+      where: { id },
+      include: {
+        campaign: {
+          select: {
+            dmId: true
+          },
+          include: { members: { include: { user: { select: { email: true } } } } }
+        }
+      }
+    });
+
+    if (!character || (character.userId !== userId && character.campaign.dmId !== userId)) {
+      res.status(404).json({ status: 'error', message: 'Character not found or you are not the owner of it', error: 'Character not found or you are not the owner of it' });
+      return;
+    }
+
+    await prisma.character.delete({
       where: { id },
     });
 
     res.json({ status: 'ok', message: 'You have lost your friend...', character });
 
-    const campaign = await prisma.campaign.findUnique({
-      where: { id: character.campaignId },
-      include: { members: { include: { user: { select: { email: true } } } } },
-    });
-
-    campaign?.members.forEach(member => {
+    character.campaign.members.forEach(member => {
       notifyClient(member.user.email, { type: 'character_deleted', characterId: id });
     });
 
@@ -202,11 +231,11 @@ router.get('/:id', authMiddleware, async (req, res) => {
     const id = req.params.id as string;
 
     const character = await prisma.character.findUnique({
-      where: { id },
+      where: { id, campaign: { members: { some: { userId } } } },
     });
 
     if (!character) {
-      res.status(404).json({ status: 'error', message: 'Character not found', error: 'Character not found' });
+      res.status(404).json({ status: 'error', message: 'Character not found or you are not a member of the campaign', error: 'Character not found or you are not a member of the campaign' });
       return;
     }
     res.json({ status: 'ok', message: 'Character retrieved successfully', character });
