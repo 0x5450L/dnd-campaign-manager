@@ -6,11 +6,7 @@ const router = Router();
 
 router.post('/create', authMiddleware, async (req, res) => {
   try {
-    const userId = req.userId;
-    if (!userId) {
-      res.status(401).json({ status: 'error', message: 'Unauthorized', error: 'Unauthorized' });
-      return;
-    }
+    const userId = req.userId!;
     const { name, description, setting, imageUrl } = req.body;
 
     if (!name) {
@@ -56,11 +52,7 @@ router.post('/create', authMiddleware, async (req, res) => {
 
 router.get('/', authMiddleware, async (req, res) => {
   try {
-    const userId = req.userId;
-    if (!userId) {
-      res.status(401).json({ status: 'error', message: 'Unauthorized', error: 'Unauthorized' });
-      return;
-    }
+    const userId = req.userId!;
 
     const campaigns = await prisma.campaign.findMany({
       where: {
@@ -100,11 +92,7 @@ router.get('/', authMiddleware, async (req, res) => {
 
 router.get('/:id', authMiddleware, async (req, res) => {
   try {
-    const userId = req.userId;
-    if (!userId) {
-      res.status(401).json({ status: 'error', message: 'Unauthorized', error: 'Unauthorized' });
-      return;
-    }
+    const userId = req.userId!;
 
     const campaignId = req.params.id as string;
     if (!campaignId) {
@@ -164,11 +152,7 @@ router.delete('/delete/:id', authMiddleware, async (req, res) => {
       return;
     }
 
-    const userId = req.userId;
-    if (!userId) {
-      res.status(401).json({ status: 'error', message: 'Unauthorized', error: 'Unauthorized' });
-      return;
-    }
+    const userId = req.userId!;
 
     await prisma.$transaction(async (tx) => {
       await tx.campaignMember.deleteMany({ where: { campaignId } });
@@ -191,11 +175,7 @@ router.delete('/delete/:id', authMiddleware, async (req, res) => {
 
 router.patch('/:id', authMiddleware, async (req, res) => {
   try {
-    const userId = req.userId;
-    if (!userId) {
-      res.status(401).json({ status: 'error', message: 'Unauthorized', error: 'Unauthorized' });
-      return;
-    }
+    const userId = req.userId!;
 
     const campaignId = req.params.id as string;
     if (!campaignId) {

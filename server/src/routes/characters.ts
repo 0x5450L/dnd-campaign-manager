@@ -7,11 +7,7 @@ const router = Router();
 
 router.post('/create', authMiddleware, async (req, res) => {
   try {
-    const userId = req.userId;
-    if (!userId) {
-      res.status(401).json({ status: 'error', message: 'Unauthorized', error: 'Unauthorized' });
-      return;
-    }
+    const userId = req.userId!;
 
     const campaign = await prisma.campaign.findUnique({
       where: {
@@ -61,11 +57,7 @@ router.post('/create', authMiddleware, async (req, res) => {
 
 router.get('/campaign-characters/:campaignId', authMiddleware, async (req, res) => {
   try {
-    const userId = req.userId;
-    if (!userId) {
-      res.status(401).json({ status: 'error', message: 'Unauthorized', error: 'Unauthorized' });
-      return;
-    }
+    const userId = req.userId!;
 
     const campaignId = req.params.campaignId as string;
     if (!campaignId) {
@@ -115,11 +107,7 @@ router.get('/campaign-characters/:campaignId', authMiddleware, async (req, res) 
 
 router.patch('/:id', authMiddleware, async (req, res) => {
   try {
-    const userId = req.userId;
-    if (!userId) {
-      res.status(401).json({ status: 'error', message: 'Unauthorized', error: 'Unauthorized' });
-      return;
-    }
+    const userId = req.userId!;
 
     const { name, type, level, race, characterClass } = req.body;
 
@@ -169,11 +157,7 @@ router.patch('/:id', authMiddleware, async (req, res) => {
 
 router.delete('/:id', authMiddleware, async (req, res) => {
   try {
-    const userId = req.userId;
-    if (!userId) {
-      res.status(401).json({ status: 'error', message: 'Unauthorized', error: 'Unauthorized' });
-      return;
-    };
+    const userId = req.userId!;
 
     const id = req.params.id as string;
     if (!id) {
@@ -222,11 +206,7 @@ router.delete('/:id', authMiddleware, async (req, res) => {
 
 router.get('/:id', authMiddleware, async (req, res) => {
   try {
-    const userId = req.userId;
-    if (!userId) {
-      res.status(401).json({ status: 'error', message: 'Unauthorized', error: 'Unauthorized' });
-      return;
-    }
+    const userId = req.userId!;
 
     const id = req.params.id as string;
 

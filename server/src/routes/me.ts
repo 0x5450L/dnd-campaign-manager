@@ -6,12 +6,7 @@ const router = Router();
 
 router.get('', authMiddleware, async (req, res) => {
   try {
-    const userId = req.userId;
-
-    if (!userId) {
-      res.status(401).json({ status: 'error', message: 'Unauthorized' });
-      return;
-    }
+    const userId = req.userId!;
 
     const user = await prisma.user.findUnique({ where: { id: userId } });
 

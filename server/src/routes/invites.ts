@@ -7,11 +7,7 @@ const router = Router();
 
 router.post('/create', authMiddleware, async (req, res) => {
   try {
-    const userId = req.userId;
-    if (!userId) {
-      res.status(401).json({ status: 'error', message: 'Unauthorized', error: 'Unauthorized' });
-      return;
-    }
+    const userId = req.userId!;
 
     const { email, campaignId } = req.body;
 
@@ -69,11 +65,7 @@ router.post('/create', authMiddleware, async (req, res) => {
 
 router.get('/my', authMiddleware, async (req, res) => {
   try {
-    const userId = req.userId;
-    if (!userId) {
-      res.status(401).json({ status: 'error', message: 'Unauthorized', error: 'Unauthorized' });
-      return;
-    }
+    const userId = req.userId!;
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -106,11 +98,7 @@ router.get('/my', authMiddleware, async (req, res) => {
 });
 
 router.get('/stream', authMiddleware, async (req, res) => {
-  const userId = req.userId;
-  if (!userId) {
-    res.status(401).json({ status: 'error', message: 'Unauthorized', error: 'Unauthorized' });
-    return;
-  }
+  const userId = req.userId!;
 
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user || !user.email) {
@@ -154,12 +142,7 @@ router.get('/:token', async (req, res) => {
 
 router.post('/:token/respond', authMiddleware, async (req, res) => {
   try {
-
-    const userId = req.userId;
-    if (!userId) {
-      res.status(401).json({ status: 'error', message: 'Unauthorized', error: 'Unauthorized' });
-      return;
-    }
+    const userId = req.userId!;
 
     const { token } = req.params as { token: string };
     const { action } = req.body as { action: 'accept' | 'reject' };
