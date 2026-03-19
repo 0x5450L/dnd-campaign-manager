@@ -28,7 +28,8 @@ function InvitePage() {
         setSuccess("Invite accepted successfully");
       })
       .catch((error: ApiError) => {
-        setError(error.data.message);
+        setError(error.data.error.message);
+        console.error(error.data.error.message);
       })
       .finally(async () => {
         setIsLoading(false);

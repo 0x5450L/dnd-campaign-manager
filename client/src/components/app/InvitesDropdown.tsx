@@ -44,7 +44,7 @@ function InvitesDropdown() {
         setInvites((prev) => prev.filter((inv) => inv.token !== token));
       })
       .catch((error: ApiError) => {
-        console.error(error.data.message);
+        console.error(error.data.error.message);
       })
       .finally(() => {
         setLoadingTokens((prev) => {

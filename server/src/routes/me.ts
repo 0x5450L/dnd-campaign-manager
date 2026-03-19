@@ -1,24 +1,21 @@
 import { authMiddleware } from "../middleware/auth";
 import prisma from "../services/prisma";
 import { Router } from "express";
+import { asyncHandler } from "../utils/asyncHandler";
+import { AppError } from "../utils/errors";
 
 const router = Router();
 
-router.get('', authMiddleware, async (req, res) => {
-  try {
-    const userId = req.userId!;
+router.get('', authMiddleware, asyncHandler(async (req, res) => {
+  const userId = req.userId!;
 
-    const user = await prisma.user.findUnique({ where: { id: userId } });
+  const user = await prisma.user.findUnique({ where: { id: userId } });
 
-    if (!user) {
-      res.status(404).json({ status: 'error', message: 'User not found' });
-      return;
-    }
-
-    res.json({ status: 'ok', message: 'User information', user: { email: user.email, displayName: user.displayName, id: user.id } });
-  } catch (error: any) {
-    res.status(500).json({ status: 'error', message: 'User information failed', error: error.message });
+  if (!user) {
+    throw new AppError(404, 'User not found');
   }
-});
+
+  res.json({ status: 'ok', message: 'User information', user: { email: user.email, displayName: user.displayName, id: user.id } });
+}));
 
 export default router;

@@ -1,7 +1,9 @@
 type ApiErrorData = {
   status: string;
-  message: string;
-  error?: string;
+  error: {
+    message: string;
+    statusCode: number;
+  };
 };
 
 export class ApiError extends Error {
@@ -9,7 +11,7 @@ export class ApiError extends Error {
   data: ApiErrorData;
 
   constructor(status: number, data: ApiErrorData) {
-    super(data.message || 'API Error');
+    super(data.error.message || 'API Error');
     this.status = status;
     this.data = data;
   };

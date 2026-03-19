@@ -24,7 +24,7 @@ export default function CreateInvite({ campaignId }: { campaignId: string }) {
         setTimeout(() => setLinkButtonText("Get invite link"), 2000);
       })
       .catch((error: ApiError) => {
-        console.error(error);
+        console.error(error.data.error.message);
         setLinkButtonText("Error!");
         setTimeout(() => setLinkButtonText("Get invite link"), 2000);
       })
@@ -51,7 +51,8 @@ export default function CreateInvite({ campaignId }: { campaignId: string }) {
         setTimeout(() => setEmailSuccess(null), 3000);
       })
       .catch((error: ApiError) => {
-        setEmailError(error.data.message);
+        setEmailError(error.data.error.message);
+        console.error(error.data.error.message);
       })
       .finally(() => setEmailLoading(false));
   };

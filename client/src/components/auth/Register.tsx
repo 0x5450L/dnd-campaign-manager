@@ -26,7 +26,8 @@ function Register({ handleRedirect }: { handleRedirect: () => void }) {
         handleRedirect();
       })
       .catch((error: ApiError) => {
-        setRegisterError(error.data.message);
+        setRegisterError(error.data.error.message);
+        console.error(error.data.error.message);
       });
   };
   return (
