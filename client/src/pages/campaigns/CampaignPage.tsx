@@ -88,10 +88,15 @@ function CampaignPage() {
   return (
     <div className="min-h-[calc(100vh-53px)] h-100% max-w-3xl mx-auto p-6 flex flex-col gap-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2">
         <CommonButton onClick={() => navigate("/campaigns")} variant="secondary" size="sm">
           &larr; To Campaigns
         </CommonButton>
+
+        <CommonButton className="ml-auto" onClick={() => navigate("/character")} size="sm">
+          Create Character
+        </CommonButton>
+
         {isDM && (
           <div className="flex gap-2">
             {hasChanges && (

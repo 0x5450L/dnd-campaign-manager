@@ -6,12 +6,14 @@ import CampaignsPage from "./pages/campaigns/CampaignsPage";
 import CampaignPage from "./pages/campaigns/CampaignPage";
 import { CampaignsProvider } from "./context/campaignsContext/CampaignsProvider";
 import InvitePage from "./pages/InvitePage";
+import CharacterPage from "./pages/characters/CharacterPage";
 
 function App() {
   return (
     <Routes>
       <Route element={<ProtectedRoute />}>
         <Route path="/" element={<HomePage />} />
+        <Route path="/character" element={<CharacterPage />} />
         <Route element={<CampaignsProvider />}>
           <Route path="/campaigns" element={<CampaignsPage />} />
           <Route path="/campaigns/:id" element={<CampaignPage />} />
