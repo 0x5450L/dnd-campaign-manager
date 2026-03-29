@@ -86,11 +86,11 @@ export const CharacterSheet = () => {
   // Combat
   const [ac, setAc] = useState(10);
   const [speed, setSpeed] = useState(30);
+  const [size, setSize] = useState("Medium");
   const [currentHp, setCurrentHp] = useState(10);
   const [maxHp, setMaxHp] = useState(10);
   const [tempHp, setTempHp] = useState(0);
   const [hitDiceType, setHitDiceType] = useState("d8");
-  const [hitDiceUsed, setHitDiceUsed] = useState(0);
   const [hpSpent, setHpSpent] = useState(0);
   const [deathSaveSuccesses, setDeathSaveSuccesses] = useState(0);
   const [deathSaveFailures, setDeathSaveFailures] = useState(0);
@@ -154,9 +154,10 @@ export const CharacterSheet = () => {
   };
 
   // Combat update handler
-  const handleCombatUpdate = (field: string, value: number) => {
+  const handleCombatUpdate = (field: string, value: number | string) => {
     switch (field) {
-      case "speed": setSpeed(value); break;
+      case "speed": setSpeed(value as number); break;
+      case "size": setSize(value as string); break;
     }
   };
 
@@ -193,12 +194,13 @@ export const CharacterSheet = () => {
     setSkills((prev) => prev.map((s) => (s.name === skillName ? { ...s, proficient } : s)));
   };
 
-  // Layout order for abilities: left column
-  const abilityOrder: AbilityName[] = ["str", "dex", "con", "int", "wis", "cha"];
+  // PDF layout: left column = STR, DEX, CON; center column = INT, WIS, CHA
+  const leftAbilities: AbilityName[] = ["str", "dex", "con"];
+  const centerAbilities: AbilityName[] = ["int", "wis", "cha"];
 
   return (
-    <div className="max-w-4xl mx-auto p-4 flex flex-col gap-4">
-      {/* Header — top bar matching PDF layout */}
+    <div className="max-w-6xl mx-auto p-4 flex flex-col gap-4">
+      {/* ── Header — top bar ── */}
       <CharacterHeader
         name={name}
         race={race}
@@ -218,21 +220,23 @@ export const CharacterSheet = () => {
         onUpdate={handleHeaderUpdate}
       />
 
-      {/* Combat stats row */}
+      {/* ── Combat stats row ── */}
       <CombatStats
         ac={ac}
         initiative={initiative}
         speed={speed}
+        size={size}
         proficiencyBonus={proficiencyBonus}
         passivePerception={passivePerception}
         onUpdate={handleCombatUpdate}
       />
 
-      {/* Main content: abilities left, combat/attacks right */}
-      <div className="grid grid-cols-[220px_1fr] gap-4">
-        {/* Left column — Abilities */}
+      {/* ── Main 3-column layout (matching PDF) ── */}
+      <div className="grid grid-cols-[200px_200px_1fr] gap-4">
+
+        {/* LEFT COLUMN — Physical abilities: STR, DEX, CON + Inspiration */}
         <div className="flex flex-col gap-3">
-          {abilityOrder.map((ability) => (
+          {leftAbilities.map((ability) => (
             <AbilityScoreBlock
               key={ability}
               name={ABILITY_NAMES[ability]}
@@ -253,9 +257,26 @@ export const CharacterSheet = () => {
           />
         </div>
 
-        {/* Right column */}
+        {/* CENTER COLUMN — Mental abilities: INT, WIS, CHA */}
         <div className="flex flex-col gap-3">
-          {/* Attacks */}
+          {centerAbilities.map((ability) => (
+            <AbilityScoreBlock
+              key={ability}
+              name={ABILITY_NAMES[ability]}
+              score={abilities[ability].score}
+              modifier={getModifier(ability)}
+              saveProficient={abilities[ability].saveProficient}
+              saveValue={getSaveValue(ability)}
+              skills={getSkillsForAbility(ability)}
+              onScoreChange={(v) => handleAbilityScoreChange(ability, v)}
+              onSaveProfChange={(v) => handleSaveProfChange(ability, v)}
+              onSkillProfChange={handleSkillProfChange}
+            />
+          ))}
+        </div>
+
+        {/* RIGHT COLUMN — Attacks, Class Features, Traits, Feats */}
+        <div className="flex flex-col gap-3">
           <AttacksTable
             attacks={attacks}
             onUpdate={handleAttackUpdate}
@@ -263,14 +284,13 @@ export const CharacterSheet = () => {
             onRemove={handleRemoveAttack}
           />
 
-          {/* Class features */}
           <TextBlock
             title="Class Features"
             value={classFeatures}
             onChange={setClassFeatures}
           />
 
-          {/* Bottom row */}
+          {/* Bottom row: Racial Traits + Feats side by side */}
           <div className="grid grid-cols-2 gap-3">
             <TextBlock
               title="Racial Traits"
@@ -285,15 +305,17 @@ export const CharacterSheet = () => {
               minHeight="80px"
             />
           </div>
-
-          {/* Proficiencies */}
-          <ProficienciesBlock
-            armorProficiencies={armorProficiencies}
-            weaponProficiencies={weaponProficiencies}
-            toolProficiencies={toolProficiencies}
-            onUpdate={handleProficienciesUpdate}
-          />
         </div>
+      </div>
+
+      {/* ── Bottom section — Proficiencies ── */}
+      <div className="grid grid-cols-[400px_1fr] gap-4">
+        <ProficienciesBlock
+          armorProficiencies={armorProficiencies}
+          weaponProficiencies={weaponProficiencies}
+          toolProficiencies={toolProficiencies}
+          onUpdate={handleProficienciesUpdate}
+        />
       </div>
     </div>
   );

@@ -2,8 +2,12 @@ import { CharacterSheet } from "../../components/characters/CharacterSheet";
 
 export const CharacterPage = () => {
   return (
-    <div>
-      <h1>Character Page</h1>
+    <div className="min-h-screen py-4">
+      {/* Site header / logo */}
+      <div className="cs-site-header">
+        <span className="cs-site-logo">Dungeons & Dragons</span>
+      </div>
+
       <CharacterSheet />
     </div>
   );

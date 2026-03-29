@@ -15,63 +15,61 @@ type AttacksTableProps = {
 
 export const AttacksTable = ({ attacks, onUpdate, onAdd, onRemove }: AttacksTableProps) => {
   return (
-    <div className="border border-gray-700 rounded-lg bg-gray-800/30 p-3">
-      <div className="text-center text-[10px] uppercase tracking-wider text-gray-500 mb-2">
-        Attacks & Spellcasting
-      </div>
-      <table className="w-full text-xs">
+    <div className="cs-section-card p-3">
+      <div className="cs-section-title">Attacks & Spellcasting</div>
+
+      <table className="cs-table">
         <thead>
-          <tr className="border-b border-gray-700">
-            <th className="text-left text-gray-500 font-normal p-1 text-[10px] uppercase">Name</th>
-            <th className="text-center text-gray-500 font-normal p-1 text-[10px] uppercase">Atk Bonus</th>
-            <th className="text-center text-gray-500 font-normal p-1 text-[10px] uppercase">Damage/Type</th>
-            <th className="text-left text-gray-500 font-normal p-1 text-[10px] uppercase">Notes</th>
+          <tr>
+            <th className="text-left">Name</th>
+            <th className="text-center">Atk Bonus</th>
+            <th className="text-center">Damage/Type</th>
+            <th className="text-left">Notes</th>
             <th className="w-6"></th>
           </tr>
         </thead>
         <tbody>
           {attacks.map((attack) => (
-            <tr key={attack.id} className="border-b border-gray-700/50 group">
-              <td className="p-0.5">
+            <tr key={attack.id} className="group">
+              <td>
                 <input
                   type="text"
                   value={attack.name}
                   onChange={(e) => onUpdate(attack.id, "name", e.target.value)}
-                  className="w-full bg-transparent text-gray-200 outline-none p-1 text-xs"
                   placeholder="Weapon..."
                 />
               </td>
-              <td className="p-0.5">
+              <td>
                 <input
                   type="text"
                   value={attack.attackBonus}
                   onChange={(e) => onUpdate(attack.id, "attackBonus", e.target.value)}
-                  className="w-full bg-transparent text-gray-200 text-center outline-none p-1 text-xs"
+                  className="text-center"
                   placeholder="+5"
                 />
               </td>
-              <td className="p-0.5">
+              <td>
                 <input
                   type="text"
                   value={attack.damage}
                   onChange={(e) => onUpdate(attack.id, "damage", e.target.value)}
-                  className="w-full bg-transparent text-gray-200 text-center outline-none p-1 text-xs"
-                  placeholder="1d8+3"
+                  className="text-center"
+                  placeholder="1d8+3 slashing"
                 />
               </td>
-              <td className="p-0.5">
+              <td>
                 <input
                   type="text"
                   value={attack.notes}
                   onChange={(e) => onUpdate(attack.id, "notes", e.target.value)}
-                  className="w-full bg-transparent text-gray-200 outline-none p-1 text-xs"
                   placeholder="..."
                 />
               </td>
-              <td className="p-0.5">
+              <td>
                 <button
                   onClick={() => onRemove(attack.id)}
-                  className="text-gray-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity text-xs"
+                  className="opacity-0 group-hover:opacity-100 transition-opacity text-xs cursor-pointer"
+                  style={{ color: "var(--color-accent-red)" }}
                 >
                   ✕
                 </button>
@@ -80,9 +78,13 @@ export const AttacksTable = ({ attacks, onUpdate, onAdd, onRemove }: AttacksTabl
           ))}
         </tbody>
       </table>
+
       <button
         onClick={onAdd}
-        className="mt-2 text-gray-500 hover:text-amber-400 text-xs transition-colors"
+        className="mt-2 text-xs transition-colors cursor-pointer"
+        style={{ color: "var(--color-text-dim)" }}
+        onMouseEnter={(e) => (e.currentTarget.style.color = "var(--color-gold)")}
+        onMouseLeave={(e) => (e.currentTarget.style.color = "var(--color-text-dim)")}
       >
         + Add attack
       </button>

@@ -7,12 +7,12 @@ type TextBlockProps = {
 
 export const TextBlock = ({ title, value, onChange, minHeight = "120px" }: TextBlockProps) => {
   return (
-    <div className="border border-gray-700 rounded-lg bg-gray-800/30 p-3 flex flex-col">
-      <div className="text-[10px] uppercase tracking-wider text-gray-500 mb-2">{title}</div>
+    <div className="cs-section-card p-3 flex flex-col">
+      <div className="cs-section-title">{title}</div>
       <textarea
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full bg-transparent text-gray-200 text-xs outline-none resize-none flex-1"
+        className="cs-textarea"
         style={{ minHeight }}
         placeholder={`${title}...`}
       />

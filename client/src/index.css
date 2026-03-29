@@ -1,8 +1,453 @@
 @import "tailwindcss";
 
+/* ── Fonts ── */
+:root {
+  --font-fantasy: "Cinzel", "Palatino Linotype", Georgia, serif;
+  --font-fantasy-decorative: "Cinzel Decorative", "Cinzel", serif;
+  --font-body: "Segoe UI", system-ui, sans-serif;
+
+  /* Color tokens */
+  --color-bg: #0f0f1a;
+  --color-surface: #1a1a2e;
+  --color-surface-light: #252540;
+  --color-border: #3d3d5c;
+  --color-gold: #d4a574;
+  --color-gold-dim: #a07d55;
+  --color-gold-bright: #e8c48a;
+  --color-text: #e0ddd5;
+  --color-text-dim: #9a9a9a;
+  --color-text-label: #7a7a8a;
+  --color-accent-green: #5da55d;
+  --color-accent-red: #c95555;
+
+  /* Single hover color for everything */
+  --color-hover: #a07d55;
+}
+
 body {
-  background-color: #1a1a2e;
-  color: #e0e0e0;
-  font-family: "Segoe UI", system-ui, sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
   min-height: 100vh;
+}
+
+/* ══════════════════════════════════════════
+   Character Sheet Styles
+   All hover states use ONE color: --color-hover
+   ══════════════════════════════════════════ */
+
+/* ── Ornate frame (ability blocks, lore block) ── */
+.cs-ornate-frame {
+  position: relative;
+  border: 2px solid var(--color-border);
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(26,26,46,0.9), rgba(20,20,35,0.95));
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  transition: border-color 0.25s;
+}
+
+.cs-ornate-frame::before {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border: 1px solid rgba(61,61,92,0.2);
+  border-radius: 5px;
+  pointer-events: none;
+  transition: border-color 0.25s;
+}
+
+.cs-ornate-frame:hover {
+  border-color: var(--color-hover);
+}
+
+.cs-ornate-frame:hover::before {
+  border-color: rgba(90,84,120,0.2);
+}
+
+/* ── Section card (attacks, features, proficiencies) ── */
+.cs-section-card {
+  border: 1.5px solid var(--color-border);
+  border-radius: 6px;
+  background: linear-gradient(180deg, rgba(26,26,46,0.7), rgba(15,15,26,0.8));
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  transition: border-color 0.25s;
+}
+
+.cs-section-card:hover {
+  border-color: var(--color-hover);
+}
+
+/* ── Section title ── */
+.cs-section-title {
+  font-family: var(--font-fantasy);
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-gold);
+  text-align: center;
+  padding: 4px 12px;
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: 8px;
+}
+
+/* ── Shield (AC) ── */
+.cs-shield {
+  position: relative;
+  width: 52px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.cs-shield::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(0% 0%, 100% 0%, 100% 65%, 50% 100%, 0% 65%);
+  border-radius: 6px 6px 0 0;
+  background: rgba(61,61,92,0.15);
+  border: 2px solid var(--color-border);
+  transition: border-color 0.25s;
+}
+
+.cs-shield:hover::before {
+  border-color: var(--color-hover);
+}
+
+/* ── Level circle ── */
+.cs-level-circle {
+  width: 56px;
+  height: 56px;
+  border: 2px solid var(--color-border);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(26,26,46,0.9);
+  box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+  transition: border-color 0.25s;
+}
+
+.cs-level-circle:hover {
+  border-color: var(--color-hover);
+}
+
+/* ── Stat box (initiative, speed, etc.) ── */
+.cs-stat-box {
+  border: 1.5px solid var(--color-border);
+  border-radius: 6px;
+  background: rgba(26,26,46,0.6);
+  padding: 6px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 64px;
+  transition: border-color 0.25s;
+}
+
+.cs-stat-box:hover {
+  border-color: var(--color-hover);
+}
+
+/* ── Proficiency dot ── */
+.cs-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1.5px solid var(--color-text-dim);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.cs-dot:hover {
+  border-color: var(--color-hover);
+}
+
+.cs-dot.active {
+  background-color: var(--color-gold);
+  border-color: var(--color-gold);
+}
+
+/* ── Death save dots ── */
+.cs-death-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1.5px solid var(--color-text-dim);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.cs-death-dot:hover {
+  border-color: var(--color-hover);
+}
+
+.cs-death-dot.success {
+  background-color: var(--color-accent-green);
+  border-color: var(--color-accent-green);
+}
+
+.cs-death-dot.fail {
+  background-color: var(--color-accent-red);
+  border-color: var(--color-accent-red);
+}
+
+/* ── Fantasy text ── */
+.cs-fantasy-header {
+  font-family: var(--font-fantasy);
+  font-weight: 700;
+  color: var(--color-gold);
+  letter-spacing: 0.08em;
+}
+
+.cs-fantasy-decorative {
+  font-family: var(--font-fantasy-decorative);
+  font-weight: 700;
+  color: var(--color-gold);
+}
+
+/* ── Skill row ── */
+.cs-skill-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 1px 4px;
+  border-radius: 3px;
+  transition: background-color 0.15s;
+}
+
+.cs-skill-row:hover {
+  background-color: rgba(90,84,120,0.12);
+}
+
+/* ── Label ── */
+.cs-label {
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-text-label);
+}
+
+/* ── Modifier display ── */
+.cs-modifier {
+  font-family: var(--font-fantasy);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* ── Text input (underlined) ── */
+.cs-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--color-text);
+  font-size: 13px;
+  padding: 2px 4px;
+  width: 100%;
+}
+
+.cs-input::placeholder {
+  color: rgba(122,122,138,0.4);
+}
+
+.cs-input-wrap {
+  position: relative;
+}
+
+.cs-input-wrap::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--color-border);
+  transition: background 0.25s;
+}
+
+.cs-input-wrap:hover::after,
+.cs-input-wrap:focus-within::after {
+  background: linear-gradient(90deg, transparent, var(--color-hover) 30%, var(--color-hover) 70%, transparent);
+}
+
+/* ── Score input (boxed numeric) ── */
+.cs-score-input {
+  background: transparent;
+  border: 1.5px solid var(--color-border);
+  border-radius: 4px;
+  outline: none;
+  color: var(--color-text);
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+  width: 40px;
+  height: 32px;
+  transition: border-color 0.25s;
+}
+
+.cs-score-input:hover,
+.cs-score-input:focus {
+  border-color: var(--color-hover);
+}
+
+/* ── Textarea ── */
+.cs-textarea {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--color-text);
+  font-size: 12px;
+  line-height: 1.5;
+  resize: none;
+  width: 100%;
+  flex: 1;
+}
+
+.cs-textarea::placeholder {
+  color: rgba(122,122,138,0.4);
+}
+
+/* ── Divider line ── */
+.cs-divider {
+  height: 1px;
+  background: var(--color-border);
+  margin: 4px 0;
+}
+
+/* ── Site header / logo ── */
+.cs-site-header {
+  text-align: center;
+  padding: 12px 0 8px;
+}
+
+.cs-site-logo {
+  font-family: var(--font-fantasy-decorative);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-gold);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  position: relative;
+  display: inline-block;
+}
+
+.cs-site-logo::before,
+.cs-site-logo::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 60px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-border), transparent);
+}
+
+.cs-site-logo::before {
+  right: calc(100% + 16px);
+}
+
+.cs-site-logo::after {
+  left: calc(100% + 16px);
+}
+
+/* ── Inspiration ── */
+.cs-inspiration {
+  border: 2px solid var(--color-border);
+  border-radius: 6px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+
+.cs-inspiration:hover {
+  border-color: var(--color-hover);
+}
+
+.cs-inspiration.active {
+  border-color: var(--color-gold-dim);
+  background: rgba(212,165,116,0.05);
+}
+
+/* ── Table (attacks) ── */
+.cs-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.cs-table th {
+  font-family: var(--font-fantasy);
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-label);
+  padding: 4px 6px;
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+}
+
+.cs-table td {
+  padding: 2px 4px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.cs-table input {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  outline: none;
+  color: var(--color-text);
+  font-size: 12px;
+  padding: 3px 4px;
+  width: 100%;
+  transition: border-color 0.25s;
+}
+
+.cs-table input:hover,
+.cs-table input:focus {
+  border-bottom-color: var(--color-hover);
+}
+
+/* ── Select inputs ── */
+.cs-select {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  outline: none;
+  color: var(--color-text);
+  font-size: 13px;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+
+.cs-select:hover,
+.cs-select:focus {
+  border-color: var(--color-hover);
+}
+
+/* ── Diamond checkbox ── */
+.cs-diamond {
+  width: 10px;
+  height: 10px;
+  transform: rotate(45deg);
+  border: 1.5px solid var(--color-text-dim);
+  cursor: pointer;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.cs-diamond:hover {
+  border-color: var(--color-hover);
+}
+
+.cs-diamond.active {
+  background-color: var(--color-gold);
+  border-color: var(--color-gold);
 }

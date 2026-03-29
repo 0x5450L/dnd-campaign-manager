@@ -1,4 +1,3 @@
-import { SimpleInfoInput } from "../inputs/SimpleInfoInput";
 import { NumericInput } from "../inputs/NumericInput";
 
 type CharacterHeaderProps = {
@@ -27,146 +26,185 @@ export const CharacterHeader = ({
   onUpdate,
 }: CharacterHeaderProps) => {
 
-  const renderDots = (count: number, max: number, activeColor: string, field: string) => (
-    <div className="flex gap-0.5">
+  const DeathDots = ({ count, max, type, field }: {
+    count: number; max: number; type: "success" | "fail"; field: string;
+  }) => (
+    <div className="flex gap-1">
       {Array.from({ length: max }, (_, i) => (
         <div
           key={i}
           onClick={() => onUpdate(field, i < count ? i : i + 1)}
-          className={`w-2.5 h-2.5 rounded-full border cursor-pointer transition-colors
-            ${i < count ? `${activeColor} border-transparent` : "border-gray-500 hover:border-gray-300"}`}
+          className={`cs-death-dot ${i < count ? type : ""}`}
         />
       ))}
     </div>
   );
 
+  const GradientInput = ({ value, onChange, placeholder, large }: {
+    value: string; onChange: (v: string) => void; placeholder?: string; large?: boolean;
+  }) => (
+    <div className="cs-input-wrap">
+      <input
+        type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="cs-input"
+        style={large ? { fontFamily: "var(--font-fantasy)", fontSize: "18px", fontWeight: 500 } : { fontSize: "13px" }}
+        placeholder={placeholder}
+      />
+    </div>
+  );
+
   return (
-    <div className="flex items-stretch gap-0 border border-gray-600 rounded-lg overflow-hidden bg-gray-800/50">
+    <div className="flex gap-3">
 
-      {/* Left — Character Info */}
-      <div className="flex flex-col justify-center gap-0 p-2 min-w-[240px] border-r border-gray-700">
-        <div className="border-b border-gray-600 pb-1 mb-1">
-          <SimpleInfoInput label="Character Name" value={name} onChange={(v) => onUpdate("name", v)} labelAlign="left" />
-        </div>
-        <div className="grid grid-cols-2 gap-x-3 gap-y-0">
-          <SimpleInfoInput label="Background" value={background} onChange={(v) => onUpdate("background", v)} labelAlign="left" />
-          <SimpleInfoInput label="Class" value={characterClass} onChange={(v) => onUpdate("characterClass", v)} labelAlign="left" />
-          <SimpleInfoInput label="Race" value={race} onChange={(v) => onUpdate("race", v)} labelAlign="left" />
-          <SimpleInfoInput label="Subclass" value={subclass} onChange={(v) => onUpdate("subclass", v)} labelAlign="left" />
-        </div>
-      </div>
-
-      {/* Center — Level & XP */}
-      <div className="flex flex-col items-center justify-center px-4 border-r border-gray-700 min-w-[90px]">
-        <span className="text-gray-500 text-[9px] uppercase tracking-wider">Level</span>
-        <NumericInput
-          value={level}
-          onChange={(v) => onUpdate("level", v)}
-          min={1}
-          max={20}
-          defaultValue={1}
-          className="border-2 border-gray-500 rounded-full w-12 h-12 text-amber-400 text-xl font-bold focus:border-amber-400"
-        />
-        <NumericInput
-          value={xp}
-          onChange={(v) => onUpdate("xp", v)}
-          min={0}
-          defaultValue={0}
-          className="text-gray-400 text-[11px] w-14 mt-0.5"
-        />
-        <span className="text-gray-600 text-[8px] uppercase tracking-wider">XP</span>
-      </div>
-
-      {/* AC Shield */}
-      <div className="flex flex-col items-center justify-center px-3 border-r border-gray-700 min-w-[70px]">
-        <span className="text-gray-500 text-[9px] uppercase tracking-wider mb-1">AC</span>
-        <div className="w-11 h-13 border-2 border-gray-500 rounded-t-lg rounded-b-[50%] flex items-center justify-center">
-          <NumericInput
-            value={ac}
-            onChange={(v) => onUpdate("ac", v)}
-            min={0}
-            max={30}
-            defaultValue={10}
-            className="text-gray-200 text-lg font-bold w-8"
-          />
-        </div>
-        <span className="text-gray-600 text-[8px] uppercase tracking-wider mt-0.5">Shield</span>
-      </div>
-
-      {/* Hit Points */}
-      <div className="flex flex-col items-center justify-center px-3 border-r border-gray-700 min-w-[160px]">
-        <span className="text-gray-500 text-[9px] uppercase tracking-wider mb-1">Hit Points</span>
-        <div className="flex items-end gap-1.5">
-          <div className="flex flex-col items-center">
-            <NumericInput
-              value={currentHp}
-              onChange={(v) => onUpdate("currentHp", v)}
-              defaultValue={0}
-              className="border border-gray-600 rounded text-gray-200 text-sm w-10 h-7 focus:border-amber-500"
-            />
-            <span className="text-gray-600 text-[7px] uppercase">Current</span>
+      {/* ── LEFT BOX: Lore (ornate frame) ── */}
+      <div className="cs-ornate-frame p-3 flex-1 flex items-stretch gap-4">
+        {/* Character info fields */}
+        <div className="flex-1 flex flex-col justify-center">
+          {/* Name */}
+          <div className="mb-2">
+            <GradientInput value={name} onChange={(v) => onUpdate("name", v)} placeholder="Character Name" large />
+            <div className="cs-label mt-1">Character Name</div>
           </div>
-          <div className="flex flex-col items-center">
-            <NumericInput
-              value={tempHp}
-              onChange={(v) => onUpdate("tempHp", v)}
-              min={0}
-              defaultValue={0}
-              className="border border-gray-600 rounded text-gray-200 text-sm w-10 h-7 focus:border-amber-500"
-            />
-            <span className="text-gray-600 text-[7px] uppercase">Temp</span>
+
+          {/* Info grid: 2x2 */}
+          <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+            <div>
+              <GradientInput value={background} onChange={(v) => onUpdate("background", v)} placeholder="—" />
+              <div className="cs-label">Background</div>
+            </div>
+            <div>
+              <GradientInput value={characterClass} onChange={(v) => onUpdate("characterClass", v)} placeholder="—" />
+              <div className="cs-label">Class</div>
+            </div>
+            <div>
+              <GradientInput value={race} onChange={(v) => onUpdate("race", v)} placeholder="—" />
+              <div className="cs-label">Species</div>
+            </div>
+            <div>
+              <GradientInput value={subclass} onChange={(v) => onUpdate("subclass", v)} placeholder="—" />
+              <div className="cs-label">Subclass</div>
+            </div>
           </div>
-          <div className="flex flex-col items-center">
+        </div>
+
+        {/* Level circle + XP (right side of lore box) */}
+        <div className="flex flex-col items-center justify-center pl-4" style={{ borderLeft: "1px solid var(--color-border)" }}>
+          <span className="cs-label mb-1">Level</span>
+          <div className="cs-level-circle">
             <NumericInput
-              value={maxHp}
-              onChange={(v) => onUpdate("maxHp", v)}
-              min={0}
-              defaultValue={0}
-              className="border border-gray-600 rounded text-gray-200 text-sm w-10 h-7 focus:border-amber-500"
+              value={level}
+              onChange={(v) => onUpdate("level", v)}
+              min={1} max={20} defaultValue={1}
+              className="bg-transparent text-center outline-none w-8 text-xl font-bold"
+              style={{ fontFamily: "var(--font-fantasy)", color: "var(--color-gold)" }}
             />
-            <span className="text-gray-600 text-[7px] uppercase">Maximum</span>
+          </div>
+          <div className="flex flex-col items-center mt-1">
+            <NumericInput
+              value={xp}
+              onChange={(v) => onUpdate("xp", v)}
+              min={0} defaultValue={0}
+              className="bg-transparent text-center outline-none w-16 text-xs"
+              style={{ color: "var(--color-text-dim)" }}
+            />
+            <span className="cs-label">XP</span>
           </div>
         </div>
       </div>
 
-      {/* Hit Dice */}
-      <div className="flex flex-col items-center justify-center px-3 border-r border-gray-700 min-w-[80px]">
-        <span className="text-gray-500 text-[9px] uppercase tracking-wider mb-1">Hit Dice</span>
-        <div className="flex items-center gap-1">
-          <span className="text-gray-200 text-sm font-medium">{level}</span>
-          <select
-            value={hitDiceType}
-            onChange={(e) => onUpdate("hitDiceType", e.target.value)}
-            className="bg-gray-700 border border-gray-600 rounded text-gray-200 text-xs p-0.5 outline-none focus:border-amber-500 cursor-pointer"
-          >
-            <option value="d6">d6</option>
-            <option value="d8">d8</option>
-            <option value="d10">d10</option>
-            <option value="d12">d12</option>
-          </select>
-        </div>
-        <NumericInput
-          value={hpSpent}
-          onChange={(v) => onUpdate("hpSpent", v)}
-          min={0}
-          max={level}
-          defaultValue={0}
-          className="border border-gray-600 rounded text-gray-400 text-xs w-8 h-5 focus:border-amber-500 mt-0.5"
-        />
-        <span className="text-gray-600 text-[7px] uppercase">Spent</span>
-      </div>
+      {/* ── RIGHT BOX: Combat (section card) ── */}
+      <div className="cs-section-card flex items-stretch">
 
-      {/* Death Saves */}
-      <div className="flex flex-col items-center justify-center px-3 min-w-[85px]">
-        <span className="text-gray-500 text-[9px] uppercase tracking-wider mb-1.5">Death Saves</span>
-        <div className="flex flex-col gap-1.5">
+        {/* AC Shield */}
+        <div className="flex flex-col items-center justify-center px-4 border-r border-[var(--color-border)]">
+          <span className="cs-label mb-1">Armor Class</span>
+          <div className="cs-shield">
+            <NumericInput
+              value={ac}
+              onChange={(v) => onUpdate("ac", v)}
+              min={0} max={30} defaultValue={10}
+              className="bg-transparent text-center outline-none w-8 text-lg font-bold relative z-10"
+              style={{ color: "var(--color-text)" }}
+            />
+          </div>
+        </div>
+
+        {/* Hit Points */}
+        <div className="flex flex-col items-center justify-center px-4 py-3 border-r border-[var(--color-border)]">
+          <span className="cs-label mb-2">Hit Points</span>
+          <div className="flex items-end gap-2">
+            <div className="flex flex-col items-center">
+              <NumericInput
+                value={currentHp}
+                onChange={(v) => onUpdate("currentHp", v)}
+                defaultValue={0}
+                className="cs-score-input w-11 h-8 text-sm"
+              />
+              <span className="cs-label mt-0.5">Current</span>
+            </div>
+            <div className="flex flex-col items-center">
+              <NumericInput
+                value={tempHp}
+                onChange={(v) => onUpdate("tempHp", v)}
+                min={0} defaultValue={0}
+                className="cs-score-input w-11 h-8 text-sm"
+              />
+              <span className="cs-label mt-0.5">Temp</span>
+            </div>
+            <div className="flex flex-col items-center">
+              <NumericInput
+                value={maxHp}
+                onChange={(v) => onUpdate("maxHp", v)}
+                min={0} defaultValue={0}
+                className="cs-score-input w-11 h-8 text-sm"
+              />
+              <span className="cs-label mt-0.5">Maximum</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Hit Dice */}
+        <div className="flex flex-col items-center justify-center px-3 border-r border-[var(--color-border)]">
+          <span className="cs-label mb-1">Hit Dice</span>
           <div className="flex items-center gap-1">
-            <span className="text-[8px] text-green-400 w-8">Pass</span>
-            {renderDots(deathSaveSuccesses, 3, "bg-green-500", "deathSaveSuccesses")}
+            <span className="text-sm font-medium" style={{ color: "var(--color-text)" }}>{level}</span>
+            <select
+              value={hitDiceType}
+              onChange={(e) => onUpdate("hitDiceType", e.target.value)}
+              className="cs-select text-xs rounded px-1 py-0.5"
+              style={{ backgroundColor: "var(--color-surface)" }}
+            >
+              <option value="d6">d6</option>
+              <option value="d8">d8</option>
+              <option value="d10">d10</option>
+              <option value="d12">d12</option>
+            </select>
           </div>
-          <div className="flex items-center gap-1">
-            <span className="text-[8px] text-red-400 w-8">Fail</span>
-            {renderDots(deathSaveFailures, 3, "bg-red-500", "deathSaveFailures")}
+          <div className="flex flex-col items-center mt-1">
+            <NumericInput
+              value={hpSpent}
+              onChange={(v) => onUpdate("hpSpent", v)}
+              min={0} max={level} defaultValue={0}
+              className="cs-score-input w-8 h-6 text-xs"
+            />
+            <span className="cs-label mt-0.5">Spent</span>
+          </div>
+        </div>
+
+        {/* Death Saves */}
+        <div className="flex flex-col items-center justify-center px-4">
+          <span className="cs-label" style={{ marginBottom: "8px" }}>Death Saves</span>
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <span className="text-[9px] uppercase tracking-wider w-7" style={{ color: "var(--color-accent-green)" }}>Pass</span>
+              <DeathDots count={deathSaveSuccesses} max={3} type="success" field="deathSaveSuccesses" />
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-[9px] uppercase tracking-wider w-7" style={{ color: "var(--color-accent-red)" }}>Fail</span>
+              <DeathDots count={deathSaveFailures} max={3} type="fail" field="deathSaveFailures" />
+            </div>
           </div>
         </div>
       </div>
