@@ -1,4 +1,5 @@
 import { NumericInput } from "../inputs/NumericInput";
+import { ArmorClass } from "./ArmorClass";
 
 type CharacterHeaderProps = {
   name: string;
@@ -9,6 +10,8 @@ type CharacterHeaderProps = {
   subclass: string;
   xp: number;
   ac: number;
+  usesShield: boolean;
+  onToggleShield: () => void;
   currentHp: number;
   maxHp: number;
   tempHp: number;
@@ -21,7 +24,7 @@ type CharacterHeaderProps = {
 
 export const CharacterHeader = ({
   name, race, characterClass, level, background, subclass, xp,
-  ac, currentHp, maxHp, tempHp, hpSpent,
+  ac, usesShield, onToggleShield, currentHp, maxHp, tempHp, hpSpent,
   hitDiceType, deathSaveSuccesses, deathSaveFailures,
   onUpdate,
 }: CharacterHeaderProps) => {
@@ -114,22 +117,16 @@ export const CharacterHeader = ({
         </div>
       </div>
 
-      {/* ── RIGHT BOX: Combat (section card) ── */}
-      <div className="cs-section-card flex items-stretch">
+      {/* ── MIDDLE: AC Shield ── */}
+      <ArmorClass
+        ac={ac}
+        usesShield={usesShield}
+        onToggleShield={onToggleShield}
+        onUpdate={onUpdate}
+      />
 
-        {/* AC Shield */}
-        <div className="flex flex-col items-center justify-center px-4 border-r border-[var(--color-border)]">
-          <span className="cs-label mb-1">Armor Class</span>
-          <div className="cs-shield">
-            <NumericInput
-              value={ac}
-              onChange={(v) => onUpdate("ac", v)}
-              min={0} max={30} defaultValue={10}
-              className="bg-transparent text-center outline-none w-8 text-lg font-bold relative z-10"
-              style={{ color: "var(--color-text)" }}
-            />
-          </div>
-        </div>
+      {/* ── RIGHT BOX: Combat (section card) ── */}
+      <div className="cs-section-card flex-1 flex items-stretch">
 
         {/* Hit Points */}
         <div className="flex flex-col items-center justify-center px-4 py-3 border-r border-[var(--color-border)]">

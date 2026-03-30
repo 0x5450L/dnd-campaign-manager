@@ -95,6 +95,7 @@ export const CharacterSheet = () => {
   const [deathSaveSuccesses, setDeathSaveSuccesses] = useState(0);
   const [deathSaveFailures, setDeathSaveFailures] = useState(0);
   const [inspiration, setInspiration] = useState(false);
+  const [usesShield, setUsesShield] = useState(false);
 
   // Attacks
   const [attacks, setAttacks] = useState<Attack[]>([]);
@@ -210,6 +211,8 @@ export const CharacterSheet = () => {
         subclass={subclass}
         xp={xp}
         ac={ac}
+        usesShield={usesShield}
+        onToggleShield={() => setUsesShield((v) => !v)}
         currentHp={currentHp}
         maxHp={maxHp}
         tempHp={tempHp}
