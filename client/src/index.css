@@ -94,7 +94,7 @@ body {
 /* ── AC Shield Block ── */
 .cs-ac-shield {
   position: relative;
-  width: 100px;
+  width: 120px;
   align-self: stretch;
   flex-shrink: 0;
   cursor: default;
