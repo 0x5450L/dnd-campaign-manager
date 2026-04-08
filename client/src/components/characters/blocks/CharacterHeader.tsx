@@ -84,7 +84,7 @@ export const CharacterHeader = ({
           className="flex flex-col items-center justify-center pl-4"
           style={{ borderLeft: "1px solid var(--color-border)" }}
         >
-          <span className="cs-label mb-1">Level</span>
+          <span className="cs-section-title mb-1">Level</span>
           <div className="cs-level-circle">
             <NumericInput
               value={level}

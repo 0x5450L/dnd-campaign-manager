@@ -10,7 +10,7 @@ type HitDiceProps = {
 export const HitDice = ({ hitDiceType, hitDiceTotal, hitDiceUsed, onUpdate }: HitDiceProps) => {
   return (
     <div className="border border-gray-700 rounded-lg bg-gray-800/30 p-3">
-      <div className="text-center text-[10px] uppercase tracking-wider text-gray-500 mb-2">Hit Dice</div>
+      <div className="cs-section-title">Hit Dice</div>
       <div className="flex items-center justify-center gap-3">
         <div className="flex flex-col items-center gap-0.5">
           <span className="text-gray-500 text-[10px]">Type</span>

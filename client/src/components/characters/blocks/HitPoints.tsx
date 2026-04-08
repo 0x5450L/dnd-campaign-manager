@@ -9,11 +9,10 @@ type HitPointsProps = {
 
 export const HitPoints = ({ currentHp, maxHp, tempHp, onUpdate }: HitPointsProps) => {
   return (
-    <div className="cs-section-card flex flex-col p-2" style={{ width: 150 }}>
+    <div className="cs-section-card flex flex-col p-3 justify-between" style={{ width: 150 }}>
       {/* Title */}
       <div
         className="cs-section-title"
-        style={{ borderBottom: "none", marginBottom: 4 }}
       >
         Hit Points
       </div>
