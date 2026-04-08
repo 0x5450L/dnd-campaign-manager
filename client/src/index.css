@@ -506,3 +506,67 @@ body {
   background-color: var(--color-gold);
   border-color: var(--color-gold);
 }
+
+/* ── Themed select (fantasy-styled native <select>) ── */
+.cs-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: transparent;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' fill='none' stroke='%237a7a8a' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 6px center;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  color: var(--color-text);
+  font-family: var(--font-fantasy);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 3px 18px 3px 8px;
+  text-align: center;
+  text-align-last: center;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.cs-select:hover,
+.cs-select:focus {
+  border-color: var(--color-hover);
+  background-color: rgba(90, 84, 120, 0.1);
+}
+
+.cs-select option {
+  background: #1a1a2e;
+  color: var(--color-text);
+}
+
+/* ── Ghost button (fantasy secondary action) ── */
+.cs-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: var(--font-fantasy);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text);
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  padding: 4px 6px;
+  cursor: pointer;
+  transition: border-color 0.2s, background-color 0.2s, color 0.2s;
+}
+
+.cs-btn-ghost:hover:not(:disabled) {
+  border-color: var(--color-hover);
+  background-color: rgba(90, 84, 120, 0.12);
+  color: var(--color-gold-bright);
+}
+
+.cs-btn-ghost:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

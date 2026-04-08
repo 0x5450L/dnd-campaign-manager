@@ -1,28 +1,23 @@
 import { NumericInput } from "../inputs/NumericInput";
+import { useCharacterSheet } from "../../../context/characterSheetContext/useCharacterSheet";
 
-type HitPointsProps = {
-  currentHp: number;
-  maxHp: number;
-  tempHp: number;
-  onUpdate: (field: string, value: number) => void;
-};
+export const HitPoints = () => {
+  const { state, setField } = useCharacterSheet();
 
-export const HitPoints = ({ currentHp, maxHp, tempHp, onUpdate }: HitPointsProps) => {
   return (
-    <div className="cs-section-card flex flex-col p-3 justify-between" style={{ width: 150 }}>
+    <div
+      className="cs-section-card flex flex-col p-3 justify-between"
+      style={{ width: 150 }}
+    >
       {/* Title */}
-      <div
-        className="cs-section-title"
-      >
-        Hit Points
-      </div>
+      <div className="cs-section-title">Hit Points</div>
 
       {/* Row 1: Current HP */}
       <div className="flex flex-col items-center px-2 py-1">
         <div className="cs-input-wrap w-full">
           <NumericInput
-            value={currentHp}
-            onChange={(v) => onUpdate("currentHp", v)}
+            value={state.currentHp}
+            onChange={(v) => setField("currentHp", v)}
             min={0}
             max={9999}
             className="cs-input"
@@ -42,8 +37,8 @@ export const HitPoints = ({ currentHp, maxHp, tempHp, onUpdate }: HitPointsProps
         <div className="flex-1 flex flex-col items-center px-2 py-1">
           <div className="cs-input-wrap w-full">
             <NumericInput
-              value={tempHp}
-              onChange={(v) => onUpdate("tempHp", v)}
+              value={state.tempHp}
+              onChange={(v) => setField("tempHp", v)}
               min={0}
               max={9999}
               className="cs-input"
@@ -56,8 +51,8 @@ export const HitPoints = ({ currentHp, maxHp, tempHp, onUpdate }: HitPointsProps
         <div className="flex-1 flex flex-col items-center px-2 py-1">
           <div className="cs-input-wrap w-full">
             <NumericInput
-              value={maxHp}
-              onChange={(v) => onUpdate("maxHp", v)}
+              value={state.maxHp}
+              onChange={(v) => setField("maxHp", v)}
               min={0}
               max={9999}
               className="cs-input"

@@ -1,13 +1,9 @@
 import { NumericInput } from "../inputs/NumericInput";
+import { useCharacterSheet } from "../../../context/characterSheetContext/useCharacterSheet";
 
-type ArmorClassProps = {
-  ac: number;
-  usesShield: boolean;
-  onToggleShield: () => void;
-  onUpdate: (field: string, value: number) => void;
-};
-
-export const ArmorClass = ({ ac, usesShield, onToggleShield, onUpdate }: ArmorClassProps) => {
+export const ArmorClass = () => {
+  const { state, setField, toggleShield } = useCharacterSheet();
+  const { ac, usesShield } = state;
   const displayAc = usesShield ? ac + 2 : ac;
 
   return (
@@ -34,7 +30,7 @@ export const ArmorClass = ({ ac, usesShield, onToggleShield, onUpdate }: ArmorCl
         <span className="cs-ac-shield-label">Armor Class</span>
         <NumericInput
           value={displayAc}
-          onChange={(v) => onUpdate("ac", usesShield ? v - 2 : v)}
+          onChange={(v) => setField("ac", usesShield ? v - 2 : v)}
           min={0}
           max={30}
           defaultValue={10}
@@ -42,7 +38,13 @@ export const ArmorClass = ({ ac, usesShield, onToggleShield, onUpdate }: ArmorCl
         />
 
         {/* Shield toggle checkbox */}
-        <div className="cs-ac-toggle" onClick={(e) => { e.stopPropagation(); onToggleShield(); }}>
+        <div
+          className="cs-ac-toggle"
+          onClick={(e) => {
+            e.stopPropagation();
+            toggleShield();
+          }}
+        >
           <div
             className="cs-ac-toggle-box"
             style={{

@@ -1,46 +1,84 @@
-import { NumericInput } from "../inputs/NumericInput";
+import { useCharacterSheet } from "../../../context/characterSheetContext/useCharacterSheet";
+import type { HitDiceType } from "../../../context/characterSheetContext/CharacterSheetContext";
 
-type HitDiceProps = {
-  hitDiceType: string;
-  hitDiceTotal: number;
-  hitDiceUsed: number;
-  onUpdate: (field: string, value: number | string) => void;
-};
+const DICE_OPTIONS: HitDiceType[] = ["d6", "d8", "d10", "d12"];
 
-export const HitDice = ({ hitDiceType, hitDiceTotal, hitDiceUsed, onUpdate }: HitDiceProps) => {
+export const HitDice = () => {
+  const {
+    state,
+    setField,
+    hitDiceRemaining,
+    hitDiceMax,
+    spendHitDie,
+    longRest,
+  } = useCharacterSheet();
+
+  const canSpend =
+    hitDiceRemaining > 0 && state.currentHp < state.maxHp && state.currentHp > 0;
+
+  const spendTitle = !canSpend
+    ? hitDiceRemaining <= 0
+      ? "No hit dice remaining"
+      : state.currentHp >= state.maxHp
+        ? "Already at full HP"
+        : "Unconscious — cannot spend hit dice"
+    : `Roll ${state.hitDiceType} + CON mod and heal`;
+
   return (
-    <div className="border border-gray-700 rounded-lg bg-gray-800/30 p-3">
+    <div
+      className="cs-section-card flex flex-col p-3 gap-2"
+      style={{ width: 150 }}
+    >
       <div className="cs-section-title">Hit Dice</div>
-      <div className="flex items-center justify-center gap-3">
-        <div className="flex flex-col items-center gap-0.5">
-          <span className="text-gray-500 text-[10px]">Type</span>
+
+      {/* Remaining / Max  |  Dice type select */}
+      <div className="flex items-center justify-evenly gap-2 px-1">
+        <div className="flex flex-col items-center leading-none">
+          <span className="cs-modifier text-lg">
+            {hitDiceRemaining}
+            <span className="text-xs font-normal opacity-60">
+              {" "}
+              / {hitDiceMax}
+            </span>
+          </span>
+        </div>
+
+        <div className="flex flex-col items-center leading-none">
           <select
-            value={hitDiceType}
-            onChange={(e) => onUpdate("hitDiceType", e.target.value)}
-            className="bg-gray-700 border border-gray-600 rounded text-gray-200 text-sm p-1 outline-none focus:border-amber-500 cursor-pointer"
+            value={state.hitDiceType}
+            onChange={(e) =>
+              setField("hitDiceType", e.target.value as HitDiceType)
+            }
+            className="cs-select"
           >
-            <option value="d6">d6</option>
-            <option value="d8">d8</option>
-            <option value="d10">d10</option>
-            <option value="d12">d12</option>
+            {DICE_OPTIONS.map((d) => (
+              <option key={d} value={d}>
+                {d}
+              </option>
+            ))}
           </select>
         </div>
-        <div className="flex flex-col items-center gap-0.5">
-          <span className="text-gray-500 text-[10px]">Total</span>
-          <span className="text-gray-200 text-sm font-medium">{hitDiceTotal}</span>
-        </div>
-        <div className="flex flex-col items-center gap-0.5">
-          <span className="text-gray-500 text-[10px]">Used</span>
-          <NumericInput
-            value={hitDiceUsed}
-            onChange={(v) => onUpdate("hitDiceUsed", v)}
-            min={0}
-            max={hitDiceTotal}
-            defaultValue={0}
-            className="border border-gray-600 rounded text-gray-200 text-sm p-1 w-10 focus:border-amber-500"
-          />
-        </div>
       </div>
+
+      {/* Actions */}
+      <button
+        type="button"
+        onClick={() => canSpend && spendHitDie()}
+        disabled={!canSpend}
+        title={spendTitle}
+        className="cs-btn-ghost w-full"
+      >
+        Use Hit Die
+      </button>
+
+      <button
+        type="button"
+        onClick={longRest}
+        title="Long Rest — restore HP, hit dice and death saves"
+        className="cs-btn-ghost w-full"
+      >
+        Long Rest
+      </button>
     </div>
   );
 };

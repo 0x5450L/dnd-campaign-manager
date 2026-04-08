@@ -1,51 +1,14 @@
 import { NumericInput } from "../inputs/NumericInput";
 import { GradientInput } from "../inputs/GradientInput";
+import { useCharacterSheet } from "../../../context/characterSheetContext/useCharacterSheet";
 import { ArmorClass } from "./ArmorClass";
 import { DeathSaves } from "./DeathSaves";
 import { HitDice } from "./HitDice";
 import { HitPoints } from "./HitPoints";
 
-type CharacterHeaderProps = {
-  name: string;
-  race: string;
-  characterClass: string;
-  level: number;
-  background: string;
-  subclass: string;
-  xp: number;
-  ac: number;
-  usesShield: boolean;
-  onToggleShield: () => void;
-  currentHp: number;
-  maxHp: number;
-  tempHp: number;
-  hpSpent: number;
-  hitDiceType: string;
-  deathSaveSuccesses: number;
-  deathSaveFailures: number;
-  onUpdate: (field: string, value: string | number) => void;
-};
+export const CharacterHeader = () => {
+  const { state, setField } = useCharacterSheet();
 
-export const CharacterHeader = ({
-  name,
-  race,
-  characterClass,
-  level,
-  background,
-  subclass,
-  xp,
-  ac,
-  usesShield,
-  onToggleShield,
-  currentHp,
-  maxHp,
-  tempHp,
-  hpSpent,
-  hitDiceType,
-  deathSaveSuccesses,
-  deathSaveFailures,
-  onUpdate,
-}: CharacterHeaderProps) => {
   return (
     <div className="flex gap-3">
       {/* ── LEFT BOX: Lore (ornate frame) ── */}
@@ -54,26 +17,47 @@ export const CharacterHeader = ({
         <div className="flex-1 flex flex-col justify-center">
           {/* Name */}
           <div className="mb-2">
-            <GradientInput value={name} onChange={(v) => onUpdate("name", v)} placeholder="Character Name" large />
+            <GradientInput
+              value={state.name}
+              onChange={(v) => setField("name", v)}
+              placeholder="Character Name"
+              large
+            />
             <div className="cs-label mt-1">Character Name</div>
           </div>
 
           {/* Info grid: 2x2 */}
           <div className="grid grid-cols-2 gap-x-4 gap-y-1">
             <div>
-              <GradientInput value={background} onChange={(v) => onUpdate("background", v)} placeholder="—" />
+              <GradientInput
+                value={state.background}
+                onChange={(v) => setField("background", v)}
+                placeholder="—"
+              />
               <div className="cs-label">Background</div>
             </div>
             <div>
-              <GradientInput value={characterClass} onChange={(v) => onUpdate("characterClass", v)} placeholder="—" />
+              <GradientInput
+                value={state.characterClass}
+                onChange={(v) => setField("characterClass", v)}
+                placeholder="—"
+              />
               <div className="cs-label">Class</div>
             </div>
             <div>
-              <GradientInput value={race} onChange={(v) => onUpdate("race", v)} placeholder="—" />
+              <GradientInput
+                value={state.race}
+                onChange={(v) => setField("race", v)}
+                placeholder="—"
+              />
               <div className="cs-label">Species</div>
             </div>
             <div>
-              <GradientInput value={subclass} onChange={(v) => onUpdate("subclass", v)} placeholder="—" />
+              <GradientInput
+                value={state.subclass}
+                onChange={(v) => setField("subclass", v)}
+                placeholder="—"
+              />
               <div className="cs-label">Subclass</div>
             </div>
           </div>
@@ -87,19 +71,22 @@ export const CharacterHeader = ({
           <span className="cs-section-title mb-1">Level</span>
           <div className="cs-level-circle">
             <NumericInput
-              value={level}
-              onChange={(v) => onUpdate("level", v)}
+              value={state.level}
+              onChange={(v) => setField("level", v)}
               min={1}
               max={20}
               defaultValue={1}
               className="bg-transparent text-center outline-none w-8 text-xl font-bold"
-              style={{ fontFamily: "var(--font-fantasy)", color: "var(--color-gold)" }}
+              style={{
+                fontFamily: "var(--font-fantasy)",
+                color: "var(--color-gold)",
+              }}
             />
           </div>
           <div className="flex flex-col items-center mt-1">
             <NumericInput
-              value={xp}
-              onChange={(v) => onUpdate("xp", v)}
+              value={state.xp}
+              onChange={(v) => setField("xp", v)}
               min={0}
               defaultValue={0}
               className="bg-transparent text-center outline-none w-16 text-xs"
@@ -110,13 +97,13 @@ export const CharacterHeader = ({
         </div>
       </div>
 
-      <ArmorClass ac={ac} usesShield={usesShield} onToggleShield={onToggleShield} onUpdate={onUpdate} />
+      <ArmorClass />
 
-      <HitPoints currentHp={currentHp} maxHp={maxHp} tempHp={tempHp} onUpdate={onUpdate} />
+      <HitPoints />
 
-      <HitDice hitDiceType={hitDiceType} hitDiceTotal={level} hitDiceUsed={hpSpent} onUpdate={onUpdate} />
+      <HitDice />
 
-      <DeathSaves successes={deathSaveSuccesses} failures={deathSaveFailures} onUpdate={onUpdate} />
+      <DeathSaves />
     </div>
   );
 };
