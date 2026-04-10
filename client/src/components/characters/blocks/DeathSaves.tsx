@@ -1,5 +1,19 @@
 import { useCharacterSheet } from "../../../context/characterSheetContext/useCharacterSheet";
 
+const PLATINUM = {
+  border: "#b0c4d8",
+  bg: "rgba(176, 196, 216, 0.2)",
+  icon: "#c8dcea",
+  label: "#b0c4d8",
+};
+
+const GRIM = {
+  border: "#3a1518",
+  bg: "#1a0a0c",
+  icon: "#6b2a2a",
+  label: "#b0c4d8",
+};
+
 export const DeathSaves = () => {
   const { state, setField } = useCharacterSheet();
   const { deathSaveSuccesses: successes, deathSaveFailures: failures } = state;
@@ -12,43 +26,51 @@ export const DeathSaves = () => {
     setField(field, i < count ? i : i + 1);
   };
 
-  const renderDots = (
+  const renderChecks = (
     count: number,
     max: number,
-    activeColor: string,
+    palette: typeof PLATINUM,
     field: "deathSaveSuccesses" | "deathSaveFailures",
+    label: string,
   ) => (
-    <div className="flex gap-1">
-      {Array.from({ length: max }, (_, i) => (
-        <div
-          key={i}
-          onClick={() => handleClick(field, count, i)}
-          className={`w-3.5 h-3.5 rounded-full border cursor-pointer transition-colors
-            ${
-              i < count
-                ? `${activeColor} border-transparent`
-                : "border-gray-600 hover:border-gray-400"
-            }`}
-        />
-      ))}
+    <div className="flex flex-col items-center gap-1">
+      <span
+        className="text-[11px] uppercase tracking-[0.1em] font-semibold"
+        style={{ fontFamily: "var(--font-fantasy)", color: "var(--color-text-label)" }}
+      >
+        {label}
+      </span>
+      <div className="flex gap-2">
+        {Array.from({ length: max }, (_, i) => {
+          const active = i < count;
+          return (
+            <div
+              key={i}
+              onClick={() => handleClick(field, count, i)}
+              className="w-6 h-6 rounded border-2 flex items-center justify-center transition-all cursor-pointer"
+              style={{
+                borderColor: active ? palette.border : "var(--color-border)",
+                background: active ? palette.bg : "transparent",
+              }}
+            >
+              {active && (
+                <span style={{ color: palette.icon, fontSize: "14px" }}>
+                  &#10022;
+                </span>
+              )}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 
   return (
-    <div className="border border-gray-700 rounded-lg bg-gray-800/30 p-3">
-      <div className="text-center text-[10px] uppercase tracking-wider text-gray-500 mb-2">
-        Death Saves
-      </div>
-      <div className="flex flex-col gap-2">
-        <div className="flex items-center justify-between">
-          <span className="text-green-400 text-xs">Successes</span>
-          {renderDots(successes, 3, "bg-green-500", "deathSaveSuccesses")}
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="text-red-400 text-xs">Failures</span>
-          {renderDots(failures, 3, "bg-red-500", "deathSaveFailures")}
-        </div>
-      </div>
+    <div className="cs-section-card flex flex-col p-3 justify-between" style={{ width: 150 }}>
+      <div className="cs-section-title">Death Saves</div>
+
+      {renderChecks(successes, 3, PLATINUM, "deathSaveSuccesses", "Successes")}
+      {renderChecks(failures, 3, GRIM, "deathSaveFailures", "Failures")}
     </div>
   );
 };
