@@ -31,39 +31,6 @@ body {
   min-height: 100vh;
 }
 
-/* ══════════════════════════════════════════
-   Character Sheet Styles
-   All hover states use ONE color: --color-hover
-   ══════════════════════════════════════════ */
-
-/* ── Ornate frame (ability blocks, lore block) ── */
-.cs-ornate-frame {
-  position: relative;
-  border: 2px solid var(--color-border);
-  border-radius: 8px;
-  background: linear-gradient(180deg, rgba(26,26,46,0.9), rgba(20,20,35,0.95));
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  transition: border-color 0.25s;
-}
-
-.cs-ornate-frame::before {
-  content: "";
-  position: absolute;
-  inset: 3px;
-  border: 1px solid rgba(61,61,92,0.2);
-  border-radius: 5px;
-  pointer-events: none;
-  transition: border-color 0.25s;
-}
-
-.cs-ornate-frame:hover {
-  border-color: var(--color-hover);
-}
-
-.cs-ornate-frame:hover::before {
-  border-color: rgba(90,84,120,0.2);
-}
-
 /* ── Section card (attacks, features, proficiencies) ── */
 .cs-section-card {
   border: 1.5px solid var(--color-border);

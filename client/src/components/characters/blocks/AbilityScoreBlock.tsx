@@ -25,7 +25,7 @@ export const AbilityScoreBlock = ({
   const modStr = modifier >= 0 ? `+${modifier}` : `${modifier}`;
 
   return (
-    <div className="cs-ornate-frame p-2">
+    <div className="cs-section-card p-2">
       {/* Ability name — fantasy header */}
       <div
         className="text-center text-[10px] uppercase tracking-[0.15em] mb-1 font-semibold"

@@ -6,7 +6,7 @@ export const CharacterHeader = () => {
   const { state, setField } = useCharacterSheet();
 
   return (
-    <div className="cs-ornate-frame p-3 flex items-stretch gap-4">
+    <div className="cs-section-card p-3 flex items-stretch gap-4">
       {/* Character info fields */}
       <div className="flex-1 flex flex-col justify-center">
         {/* Name */}
