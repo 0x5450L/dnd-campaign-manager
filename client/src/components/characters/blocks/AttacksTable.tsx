@@ -1,10 +1,4 @@
-type Attack = {
-  id: string;
-  name: string;
-  attackBonus: string;
-  damage: string;
-  notes: string;
-};
+import { MIN_ATTACKS, type Attack } from "../../../context/characterSheetContext/CharacterSheetContext";
 
 type AttacksTableProps = {
   attacks: Attack[];
@@ -14,32 +8,35 @@ type AttacksTableProps = {
 };
 
 export const AttacksTable = ({ attacks, onUpdate, onAdd, onRemove }: AttacksTableProps) => {
+  const canRemove = attacks.length > MIN_ATTACKS;
+
   return (
     <div className="cs-section-card p-3">
       <div className="cs-section-title">Attacks & Spellcasting</div>
 
-      <table className="cs-table">
-        <thead>
-          <tr>
-            <th className="text-left">Name</th>
-            <th className="text-center">Atk Bonus</th>
-            <th className="text-center">Damage/Type</th>
-            <th className="text-left">Notes</th>
-            <th className="w-6"></th>
-          </tr>
-        </thead>
-        <tbody>
+      <div className="cs-table">
+        {/* Header */}
+        <div className="cs-table-header-row">
+          <span className="cs-table-header cs-table-col-3 text-left">Name</span>
+          <span className="cs-table-header cs-table-col-2 text-center">Atk Bonus</span>
+          <span className="cs-table-header cs-table-col-3 text-center">Damage/Type</span>
+          <span className="cs-table-header cs-table-col-2 text-left">Notes</span>
+          <span className="cs-table-col-action"></span>
+        </div>
+
+        {/* Scrollable rows */}
+        <div className="cs-table-scroll custom-scrollbar">
           {attacks.map((attack) => (
-            <tr key={attack.id} className="group">
-              <td>
+            <div key={attack.id} className="cs-table-row group">
+              <div className="cs-table-col-3">
                 <input
                   type="text"
                   value={attack.name}
                   onChange={(e) => onUpdate(attack.id, "name", e.target.value)}
                   placeholder="Weapon..."
                 />
-              </td>
-              <td>
+              </div>
+              <div className="cs-table-col-2">
                 <input
                   type="text"
                   value={attack.attackBonus}
@@ -47,8 +44,8 @@ export const AttacksTable = ({ attacks, onUpdate, onAdd, onRemove }: AttacksTabl
                   className="text-center"
                   placeholder="+5"
                 />
-              </td>
-              <td>
+              </div>
+              <div className="cs-table-col-3">
                 <input
                   type="text"
                   value={attack.damage}
@@ -56,36 +53,31 @@ export const AttacksTable = ({ attacks, onUpdate, onAdd, onRemove }: AttacksTabl
                   className="text-center"
                   placeholder="1d8+3 slashing"
                 />
-              </td>
-              <td>
+              </div>
+              <div className="cs-table-col-2">
                 <input
                   type="text"
                   value={attack.notes}
                   onChange={(e) => onUpdate(attack.id, "notes", e.target.value)}
                   placeholder="..."
                 />
-              </td>
-              <td>
-                <button
-                  onClick={() => onRemove(attack.id)}
-                  className="opacity-0 group-hover:opacity-100 transition-opacity text-xs cursor-pointer"
-                  style={{ color: "var(--color-accent-red)" }}
-                >
-                  ✕
-                </button>
-              </td>
-            </tr>
+              </div>
+              <div className="cs-table-col-action">
+                {canRemove && (
+                  <button
+                    onClick={() => onRemove(attack.id)}
+                    className="cs-table-remove-btn"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+            </div>
           ))}
-        </tbody>
-      </table>
+        </div>
+      </div>
 
-      <button
-        onClick={onAdd}
-        className="mt-2 text-xs transition-colors cursor-pointer"
-        style={{ color: "var(--color-text-dim)" }}
-        onMouseEnter={(e) => (e.currentTarget.style.color = "var(--color-gold)")}
-        onMouseLeave={(e) => (e.currentTarget.style.color = "var(--color-text-dim)")}
-      >
+      <button onClick={onAdd} className="cs-table-add-btn">
         + Add attack
       </button>
     </div>

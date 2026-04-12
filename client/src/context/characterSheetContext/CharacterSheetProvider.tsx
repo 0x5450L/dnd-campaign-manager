@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState, type ReactNode } from "react";
 import {
   CharacterSheetContext,
+  MIN_ATTACKS,
   type AbilityName,
   type AbilityState,
   type Attack,
@@ -65,7 +66,13 @@ const INITIAL_STATE: CharacterSheetState = {
   deathSaveFailures: 0,
   inspiration: false,
 
-  attacks: [],
+  attacks: Array.from({ length: MIN_ATTACKS }, () => ({
+    id: crypto.randomUUID(),
+    name: "",
+    attackBonus: "",
+    damage: "",
+    notes: "",
+  })),
 
   classFeatures: "",
   racialTraits: "",

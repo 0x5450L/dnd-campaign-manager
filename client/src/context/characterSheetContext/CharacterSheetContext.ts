@@ -1,5 +1,7 @@
 import { createContext } from "react";
 
+export const MIN_ATTACKS = 3;
+
 export type AbilityName = "str" | "dex" | "con" | "int" | "wis" | "cha";
 
 export type AbilityState = {

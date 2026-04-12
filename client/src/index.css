@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./styles/scrollbar.css";
 
 /* ── Fonts ── */
 :root {
@@ -395,10 +396,16 @@ body {
 /* ── Table (attacks) ── */
 .cs-table {
   width: 100%;
-  border-collapse: collapse;
 }
 
-.cs-table th {
+.cs-table-header-row,
+.cs-table-row {
+  display: flex;
+  gap: 4px;
+}
+
+.cs-table th,
+.cs-table-header {
   font-family: var(--font-fantasy);
   font-size: 9px;
   font-weight: 600;
@@ -407,12 +414,24 @@ body {
   color: var(--color-text-label);
   padding: 4px 6px;
   border-bottom: 1px solid var(--color-border);
-  text-align: left;
+}
+
+.cs-table-row {
+  align-items: center;
+  height: 28px;
+}
+
+.cs-table-col-3 { flex: 3; }
+.cs-table-col-2 { flex: 2; }
+.cs-table-col-action { width: 20px; text-align: center; }
+
+.cs-table-scroll {
+  min-height: calc(28px * 3);
+  max-height: calc(28px * 3);
 }
 
 .cs-table td {
   padding: 2px 4px;
-  border-bottom: 1px solid var(--color-border);
 }
 
 .cs-table input {
@@ -430,6 +449,30 @@ body {
 .cs-table input:hover,
 .cs-table input:focus {
   border-bottom-color: var(--color-hover);
+}
+
+.cs-table-add-btn {
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--color-text-dim);
+  transition: color 0.2s;
+  cursor: pointer;
+}
+
+.cs-table-add-btn:hover {
+  color: var(--color-gold);
+}
+
+.cs-table-remove-btn {
+  color: var(--color-accent-red);
+  font-size: 12px;
+  opacity: 0;
+  transition: opacity 0.15s;
+  cursor: pointer;
+}
+
+.group:hover .cs-table-remove-btn {
+  opacity: 1;
 }
 
 /* ── Select inputs ── */
@@ -531,4 +574,4 @@ body {
 .cs-btn-ghost:disabled {
   opacity: 0.4;
   cursor: not-allowed;
-}
+}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
