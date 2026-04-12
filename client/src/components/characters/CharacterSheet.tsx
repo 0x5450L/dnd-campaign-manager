@@ -50,8 +50,7 @@ const CharacterSheetInner = () => {
 
   const handleProficienciesUpdate = (field: string, value: string) => {
     if (field === "armorProficiencies") setField("armorProficiencies", value);
-    else if (field === "weaponProficiencies")
-      setField("weaponProficiencies", value);
+    else if (field === "weaponProficiencies") setField("weaponProficiencies", value);
     else if (field === "toolProficiencies") setField("toolProficiencies", value);
   };
 
@@ -117,30 +116,29 @@ const CharacterSheetInner = () => {
 
         {/* ═══ BOTTOM-RIGHT: Combat stats, attacks, features ═══ */}
         <div className="flex flex-col gap-3">
-          <CombatStats
-            ac={state.ac}
-            initiative={initiative}
-            speed={state.speed}
-            size={state.size}
-            proficiencyBonus={proficiencyBonus}
-            passivePerception={passivePerception}
-            hasInspiration={state.inspiration}
-            onUpdate={handleCombatUpdate}
-            onToggleInspiration={toggleInspiration}
-          />
+          <div className="flex gap-3" style={{ alignItems: "stretch" }}>
+            <CombatStats
+              ac={state.ac}
+              initiative={initiative}
+              speed={state.speed}
+              size={state.size}
+              proficiencyBonus={proficiencyBonus}
+              passivePerception={passivePerception}
+              hasInspiration={state.inspiration}
+              onUpdate={handleCombatUpdate}
+              onToggleInspiration={toggleInspiration}
+            />
 
-          <AttacksTable
-            attacks={state.attacks}
-            onUpdate={updateAttack}
-            onAdd={addAttack}
-            onRemove={removeAttack}
-          />
-
-          <TextBlock
-            title="Class Features"
-            value={state.classFeatures}
-            onChange={(v) => setField("classFeatures", v)}
-          />
+            <div className="cs-section-card p-3 flex flex-col flex-1">
+              <div className="cs-section-title">Class Features</div>
+              <textarea
+                value={state.classFeatures}
+                onChange={(e) => setField("classFeatures", e.target.value)}
+                className="cs-textarea flex-1"
+                placeholder="Class Features..."
+              />
+            </div>
+          </div>
 
           <div className="grid grid-cols-2 gap-3">
             <TextBlock
@@ -149,13 +147,10 @@ const CharacterSheetInner = () => {
               onChange={(v) => setField("racialTraits", v)}
               minHeight="80px"
             />
-            <TextBlock
-              title="Feats"
-              value={state.feats}
-              onChange={(v) => setField("feats", v)}
-              minHeight="80px"
-            />
+            <TextBlock title="Feats" value={state.feats} onChange={(v) => setField("feats", v)} minHeight="80px" />
           </div>
+
+          <AttacksTable attacks={state.attacks} onUpdate={updateAttack} onAdd={addAttack} onRemove={removeAttack} />
 
           <ProficienciesBlock
             armorProficiencies={state.armorProficiencies}
