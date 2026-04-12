@@ -7,61 +7,96 @@ type CombatStatsProps = {
   size: string;
   proficiencyBonus: number;
   passivePerception: number;
+  hasInspiration: boolean;
   onUpdate: (field: string, value: number | string) => void;
+  onToggleInspiration: () => void;
 };
 
 export const CombatStats = ({
-  initiative, speed, size, proficiencyBonus, passivePerception, onUpdate,
+  initiative,
+  speed,
+  size,
+  proficiencyBonus,
+  passivePerception,
+  hasInspiration,
+  onUpdate,
+  onToggleInspiration,
 }: CombatStatsProps) => {
   const initStr = initiative >= 0 ? `+${initiative}` : `${initiative}`;
   const profStr = proficiencyBonus >= 0 ? `+${proficiencyBonus}` : `${proficiencyBonus}`;
 
   return (
-    <div className="flex items-center gap-2 flex-wrap">
-      {/* Proficiency Bonus */}
-      <div className="cs-ornate-frame p-2 flex flex-col items-center min-w-[72px]">
-        <span className="cs-label">Prof. Bonus</span>
-        <span className="cs-fantasy-header text-xl mt-1">{profStr}</span>
+    <div className="cs-section-card p-3 flex flex-col gap-3" style={{ width: "fit-content" }}>
+      {/* 2x2 grid of combat numbers */}
+      <div className="grid grid-cols-2 gap-x-4 gap-y-2.5">
+        <div className="flex flex-col items-center">
+          <div className="cs-score-input w-10 h-6 text-xs flex items-center justify-center">{profStr}</div>
+          <span className="cs-label mt-1">Proficiency</span>
+        </div>
+        <div className="flex flex-col items-center">
+          <div className="cs-score-input w-10 h-6 text-xs flex items-center justify-center">{initStr}</div>
+          <span className="cs-label mt-1">Initiative</span>
+        </div>
+        <div className="flex flex-col items-center">
+          <NumericInput
+            value={speed}
+            onChange={(v) => onUpdate("speed", v)}
+            min={0}
+            defaultValue={30}
+            className="cs-score-input w-10 h-6 text-xs"
+          />
+          <span className="cs-label mt-1">Speed</span>
+        </div>
+        <div className="flex flex-col items-center">
+          <div className="cs-score-input w-10 h-6 text-xs flex items-center justify-center">{passivePerception}</div>
+          <span className="cs-label mt-1">Passive Perc.</span>
+        </div>
       </div>
 
-      {/* Initiative */}
-      <div className="cs-stat-box">
-        <span className="cs-label">Initiative</span>
-        <span className="text-sm font-medium" style={{ color: "var(--color-text)" }}>{initStr}</span>
-      </div>
+      {/* Divider */}
+      <div style={{ height: 1, background: "var(--color-border)", opacity: 0.3 }} />
 
-      {/* Speed */}
-      <div className="cs-stat-box">
-        <span className="cs-label">Speed</span>
-        <NumericInput
-          value={speed}
-          onChange={(v) => onUpdate("speed", v)}
-          min={0} defaultValue={30}
-          className="cs-score-input w-12 h-7 text-sm"
-        />
-      </div>
+      {/* Size — full width, no label */}
+      <select
+        value={size}
+        onChange={(e) => onUpdate("size", e.target.value)}
+        className="cs-select text-sm w-full text-center"
+        style={{ padding: "6px 8px" }}
+      >
+        <option value="Tiny">Tiny</option>
+        <option value="Small">Small</option>
+        <option value="Medium">Medium</option>
+        <option value="Large">Large</option>
+        <option value="Huge">Huge</option>
+        <option value="Gargantuan">Gargantuan</option>
+      </select>
 
-      {/* Size */}
-      <div className="cs-stat-box">
-        <span className="cs-label">Size</span>
-        <select
-          value={size}
-          onChange={(e) => onUpdate("size", e.target.value)}
-          className="cs-select text-sm"
+      {/* Inspiration — full width with border, compact */}
+      <div
+        onClick={onToggleInspiration}
+        className={`cs-inspiration w-full ${hasInspiration ? "active" : ""}`}
+        style={{ padding: "5px 10px" }}
+      >
+        <div
+          className="w-5 h-5 rounded border-2 flex items-center justify-center transition-all"
+          style={{
+            borderColor: hasInspiration ? "var(--color-gold)" : "var(--color-border)",
+            background: hasInspiration ? "rgba(212, 165, 116, 0.2)" : "transparent",
+          }}
         >
-          <option value="Tiny">Tiny</option>
-          <option value="Small">Small</option>
-          <option value="Medium">Medium</option>
-          <option value="Large">Large</option>
-          <option value="Huge">Huge</option>
-          <option value="Gargantuan">Gargantuan</option>
-        </select>
-      </div>
-
-      {/* Passive Perception */}
-      <div className="cs-stat-box">
-        <span className="cs-label">Passive Perc.</span>
-        <span className="text-sm font-medium" style={{ color: "var(--color-text)" }}>{passivePerception}</span>
+          {hasInspiration && (
+            <span style={{ color: "var(--color-gold)", fontSize: "12px" }}>&#10022;</span>
+          )}
+        </div>
+        <span
+          className="text-[10px] uppercase tracking-[0.12em]"
+          style={{
+            fontFamily: "var(--font-fantasy)",
+            color: hasInspiration ? "var(--color-gold)" : "var(--color-text-label)",
+          }}
+        >
+          Heroic Inspiration
+        </span>
       </div>
     </div>
   );
