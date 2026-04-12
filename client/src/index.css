@@ -81,7 +81,7 @@ body {
 .cs-section-title {
   font-family: var(--font-fantasy);
   font-weight: 600;
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--color-gold);
@@ -129,7 +129,7 @@ body {
 
 .cs-ac-shield-label {
   margin-top: -12px;
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.12em;
   color: var(--color-gold);
   font-family: var(--font-fantasy);
@@ -282,7 +282,7 @@ body {
 
 /* ── Label ── */
 .cs-label {
-  font-size: 8px;
+  font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--color-text-label);
@@ -375,11 +375,6 @@ body {
 }
 
 /* ── Site header / logo ── */
-.cs-site-header {
-  text-align: center;
-  padding: 12px 0 8px;
-}
-
 .cs-site-logo {
   font-family: var(--font-fantasy-decorative);
   font-size: 18px;

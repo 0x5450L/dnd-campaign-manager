@@ -26,8 +26,7 @@ export const HitDice = () => {
 
   return (
     <div
-      className="cs-section-card flex flex-col p-3 gap-2"
-      style={{ width: 150 }}
+      className="cs-section-card flex flex-col justify-between p-3 gap-2 flex-1"
     >
       <div className="cs-section-title">Hit Dice</div>
 

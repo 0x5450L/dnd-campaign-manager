@@ -6,8 +6,7 @@ export const HitPoints = () => {
 
   return (
     <div
-      className="cs-section-card flex flex-col p-3 justify-between"
-      style={{ width: 150 }}
+      className="cs-section-card flex flex-col p-3 justify-between flex-1"
     >
       {/* Title */}
       <div className="cs-section-title">Hit Points</div>

@@ -66,7 +66,7 @@ export const DeathSaves = () => {
   );
 
   return (
-    <div className="cs-section-card flex flex-col p-3 justify-between" style={{ width: 150 }}>
+    <div className="cs-section-card flex flex-col p-3 justify-between flex-1">
       <div className="cs-section-title">Death Saves</div>
 
       {renderChecks(successes, 3, PLATINUM, "deathSaveSuccesses", "Successes")}
