@@ -60,6 +60,7 @@ export type CharacterSheetState = {
   classFeatures: string;
   racialTraits: string;
   feats: string;
+  notes: string;
 
   // Proficiencies
   armorProficiencies: string;

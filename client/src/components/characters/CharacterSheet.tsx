@@ -21,8 +21,8 @@ const ABILITY_NAMES: Record<AbilityName, string> = {
   cha: "Charisma",
 };
 
-const leftAbilities: AbilityName[] = ["str", "dex", "con"];
-const centerAbilities: AbilityName[] = ["int", "wis", "cha"];
+const leftAbilities: AbilityName[] = ["str", "dex", "wis"];
+const rightAbilities: AbilityName[] = ["con", "int", "cha"];
 
 const CharacterSheetInner = () => {
   const {
@@ -77,41 +77,50 @@ const CharacterSheetInner = () => {
           <DeathSaves />
         </div>
 
-        {/* ═══ BOTTOM-LEFT: All ability scores ═══ */}
-        <div className="flex gap-3">
-          <div className="flex flex-col gap-3 flex-1">
-            {leftAbilities.map((ability) => (
-              <AbilityScoreBlock
-                key={ability}
-                name={ABILITY_NAMES[ability]}
-                score={state.abilities[ability].score}
-                modifier={getModifier(ability)}
-                saveProficient={state.abilities[ability].saveProficient}
-                saveValue={getSaveValue(ability)}
-                skills={getSkillsForAbility(ability)}
-                onScoreChange={(v) => setAbilityScore(ability, v)}
-                onSaveProfChange={(v) => setSaveProficient(ability, v)}
-                onSkillProfChange={setSkillProficient}
-              />
-            ))}
+        {/* ═══ BOTTOM-LEFT: Ability scores + Notes ═══ */}
+        <div className="flex flex-col gap-3">
+          <div className="flex gap-3">
+            <div className="flex flex-col gap-3 flex-1">
+              {leftAbilities.map((ability) => (
+                <AbilityScoreBlock
+                  key={ability}
+                  name={ABILITY_NAMES[ability]}
+                  score={state.abilities[ability].score}
+                  modifier={getModifier(ability)}
+                  saveProficient={state.abilities[ability].saveProficient}
+                  saveValue={getSaveValue(ability)}
+                  skills={getSkillsForAbility(ability)}
+                  onScoreChange={(v) => setAbilityScore(ability, v)}
+                  onSaveProfChange={(v) => setSaveProficient(ability, v)}
+                  onSkillProfChange={setSkillProficient}
+                />
+              ))}
+            </div>
+
+            <div className="flex flex-col gap-3 flex-1">
+              {rightAbilities.map((ability) => (
+                <AbilityScoreBlock
+                  key={ability}
+                  name={ABILITY_NAMES[ability]}
+                  score={state.abilities[ability].score}
+                  modifier={getModifier(ability)}
+                  saveProficient={state.abilities[ability].saveProficient}
+                  saveValue={getSaveValue(ability)}
+                  skills={getSkillsForAbility(ability)}
+                  onScoreChange={(v) => setAbilityScore(ability, v)}
+                  onSaveProfChange={(v) => setSaveProficient(ability, v)}
+                  onSkillProfChange={setSkillProficient}
+                />
+              ))}
+            </div>
           </div>
 
-          <div className="flex flex-col gap-3 flex-1">
-            {centerAbilities.map((ability) => (
-              <AbilityScoreBlock
-                key={ability}
-                name={ABILITY_NAMES[ability]}
-                score={state.abilities[ability].score}
-                modifier={getModifier(ability)}
-                saveProficient={state.abilities[ability].saveProficient}
-                saveValue={getSaveValue(ability)}
-                skills={getSkillsForAbility(ability)}
-                onScoreChange={(v) => setAbilityScore(ability, v)}
-                onSaveProfChange={(v) => setSaveProficient(ability, v)}
-                onSkillProfChange={setSkillProficient}
-              />
-            ))}
-          </div>
+          <TextBlock
+            title="Notes"
+            value={state.notes}
+            onChange={(v) => setField("notes", v)}
+            minHeight="80px"
+          />
         </div>
 
         {/* ═══ BOTTOM-RIGHT: Combat stats, attacks, features ═══ */}

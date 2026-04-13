@@ -77,6 +77,7 @@ const INITIAL_STATE: CharacterSheetState = {
   classFeatures: "",
   racialTraits: "",
   feats: "",
+  notes: "",
 
   armorProficiencies: "",
   weaponProficiencies: "",
