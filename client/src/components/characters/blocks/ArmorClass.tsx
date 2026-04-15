@@ -19,7 +19,7 @@ export const ArmorClass = () => {
         <path
           d="M50 2 L96 16 L96 60 Q96 100 50 126 Q4 100 4 60 L4 16 Z"
           fill="url(#shieldGrad)"
-          stroke="var(--color-border)"
+          stroke="var(--color-rule)"
           strokeWidth="2.5"
           className="cs-ac-shield-path"
         />
@@ -45,13 +45,7 @@ export const ArmorClass = () => {
             toggleShield();
           }}
         >
-          <div
-            className="cs-ac-toggle-box"
-            style={{
-              borderColor: usesShield ? "var(--color-gold)" : "var(--color-border)",
-              background: usesShield ? "rgba(212, 165, 116, 0.2)" : "transparent",
-            }}
-          >
+          <div className={`cs-ac-toggle-box ${usesShield ? "active" : ""}`}>
             {usesShield && <span>&#10022;</span>}
           </div>
         </div>

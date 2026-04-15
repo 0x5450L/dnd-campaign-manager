@@ -26,11 +26,7 @@ export const AbilityScoreBlock = ({
 
   return (
     <div className="cs-section-card p-2">
-      {/* Ability name — fantasy header */}
-      <div
-        className="text-center text-[10px] uppercase tracking-[0.15em] mb-1 font-semibold"
-        style={{ fontFamily: "var(--font-fantasy)", color: "var(--color-gold)" }}
-      >
+      <div className="mb-1 text-center text-[10px] font-semibold uppercase tracking-[0.15em] text-gold font-fantasy">
         {name}
       </div>
 
@@ -45,7 +41,7 @@ export const AbilityScoreBlock = ({
       </div>
 
       {/* Modifier */}
-      <div className="text-center text-xs mb-2" style={{ color: "var(--color-text-dim)" }}>
+      <div className="text-center text-xs mb-2 text-dim">
         Mod:{" "}
         <span className="cs-modifier text-sm">{modStr}</span>
       </div>
@@ -56,8 +52,8 @@ export const AbilityScoreBlock = ({
           className={`cs-dot ${saveProficient ? "active" : ""}`}
           onClick={() => onSaveProfChange(!saveProficient)}
         />
-        <span className="text-xs" style={{ color: "var(--color-text-dim)" }}>
-          <span className="font-medium" style={{ color: saveProficient ? "var(--color-gold-bright)" : "var(--color-text)" }}>
+        <span className="text-xs text-dim">
+          <span className={`font-medium ${saveProficient ? "text-gold-bright" : "text-ink"}`}>
             {saveValue >= 0 ? `+${saveValue}` : saveValue}
           </span>{" "}
           Save
@@ -66,15 +62,15 @@ export const AbilityScoreBlock = ({
 
       {/* Skills */}
       {skills.length > 0 && (
-        <div className="flex flex-col gap-0.5 pt-1" style={{ borderTop: "1px solid var(--color-border)" }}>
+        <div className="flex flex-col gap-0.5 pt-1 border-t border-rule">
           {skills.map((skill) => (
             <div key={skill.name} className="cs-skill-row">
               <div
                 className={`cs-dot ${skill.proficient ? "active" : ""}`}
                 onClick={() => onSkillProfChange(skill.name, !skill.proficient)}
               />
-              <span className="text-xs" style={{ color: "var(--color-text-dim)" }}>
-                <span className="font-medium" style={{ color: skill.proficient ? "var(--color-gold-bright)" : "var(--color-text)" }}>
+              <span className="text-xs text-dim">
+                <span className={`font-medium ${skill.proficient ? "text-gold-bright" : "text-ink"}`}>
                   {skill.value >= 0 ? `+${skill.value}` : skill.value}
                 </span>{" "}
                 {skill.name}

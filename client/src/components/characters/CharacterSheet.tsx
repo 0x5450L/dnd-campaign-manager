@@ -21,8 +21,7 @@ const ABILITY_NAMES: Record<AbilityName, string> = {
   cha: "Charisma",
 };
 
-const leftAbilities: AbilityName[] = ["str", "dex", "wis"];
-const rightAbilities: AbilityName[] = ["con", "int", "cha"];
+const ALL_ABILITIES: AbilityName[] = ["str", "con", "dex", "int", "wis", "cha"];
 
 const CharacterSheetInner = () => {
   const {
@@ -49,83 +48,61 @@ const CharacterSheetInner = () => {
   };
 
   const handleProficienciesUpdate = (field: string, value: string) => {
-    if (field === "armorProficiencies") setField("armorProficiencies", value);
-    else if (field === "weaponProficiencies") setField("weaponProficiencies", value);
-    else if (field === "toolProficiencies") setField("toolProficiencies", value);
+    switch (field) {
+      case "armorProficiencies":
+        setField("armorProficiencies", value);
+        break;
+      case "weaponProficiencies":
+        setField("weaponProficiencies", value);
+        break;
+      case "toolProficiencies":
+        setField("toolProficiencies", value);
+        break;
+    }
   };
 
   return (
     <div className="min-h-screen py-4">
-      {/* 2×2 grid layout */}
-      <div
-        className="max-w-6xl mx-auto p-4"
-        style={{
-          display: "grid",
-          gridTemplateColumns: "420px 1fr",
-          gridTemplateRows: "auto 1fr",
-          gap: "12px",
-        }}
-      >
-        {/* ═══ TOP-LEFT: Character header (name, class, level) ═══ */}
+      <div className="flex flex-col gap-3 max-w-6xl mx-auto p-4 lg:grid lg:grid-cols-[420px_1fr] lg:grid-rows-[auto_1fr]">
         <CharacterHeader />
 
-        {/* ═══ TOP-RIGHT: AC, HP, Hit Dice, Death Saves ═══ */}
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3">
           <ArmorClass />
           <HitPoints />
           <HitDice />
           <DeathSaves />
         </div>
 
-        {/* ═══ BOTTOM-LEFT: Ability scores + Notes ═══ */}
-        <div className="flex flex-col gap-3">
-          <div className="flex gap-3">
-            <div className="flex flex-col gap-3 flex-1">
-              {leftAbilities.map((ability) => (
-                <AbilityScoreBlock
-                  key={ability}
-                  name={ABILITY_NAMES[ability]}
-                  score={state.abilities[ability].score}
-                  modifier={getModifier(ability)}
-                  saveProficient={state.abilities[ability].saveProficient}
-                  saveValue={getSaveValue(ability)}
-                  skills={getSkillsForAbility(ability)}
-                  onScoreChange={(v) => setAbilityScore(ability, v)}
-                  onSaveProfChange={(v) => setSaveProficient(ability, v)}
-                  onSkillProfChange={setSkillProficient}
-                />
-              ))}
-            </div>
 
-            <div className="flex flex-col gap-3 flex-1">
-              {rightAbilities.map((ability) => (
-                <AbilityScoreBlock
-                  key={ability}
-                  name={ABILITY_NAMES[ability]}
-                  score={state.abilities[ability].score}
-                  modifier={getModifier(ability)}
-                  saveProficient={state.abilities[ability].saveProficient}
-                  saveValue={getSaveValue(ability)}
-                  skills={getSkillsForAbility(ability)}
-                  onScoreChange={(v) => setAbilityScore(ability, v)}
-                  onSaveProfChange={(v) => setSaveProficient(ability, v)}
-                  onSkillProfChange={setSkillProficient}
-                />
-              ))}
-            </div>
+        <div className="contents lg:flex lg:flex-col lg:gap-3">
+          <div className="grid grid-cols-3 gap-3 order-5 sm:gap-3 lg:grid-cols-2 lg:order-none">
+            {ALL_ABILITIES.map((ability) => (
+              <AbilityScoreBlock
+                key={ability}
+                name={ABILITY_NAMES[ability]}
+                score={state.abilities[ability].score}
+                modifier={getModifier(ability)}
+                saveProficient={state.abilities[ability].saveProficient}
+                saveValue={getSaveValue(ability)}
+                skills={getSkillsForAbility(ability)}
+                onScoreChange={(v) => setAbilityScore(ability, v)}
+                onSaveProfChange={(v) => setSaveProficient(ability, v)}
+                onSkillProfChange={setSkillProficient}
+              />
+            ))}
           </div>
 
-          <TextBlock
-            title="Notes"
-            value={state.notes}
-            onChange={(v) => setField("notes", v)}
-            minHeight="80px"
-          />
+          <div className="order-6 lg:order-none">
+            <TextBlock
+              title="Notes"
+              value={state.notes}
+              onChange={(v) => setField("notes", v)}
+            />
+          </div>
         </div>
 
-        {/* ═══ BOTTOM-RIGHT: Combat stats, attacks, features ═══ */}
-        <div className="flex flex-col gap-3">
-          <div className="flex gap-3" style={{ alignItems: "stretch" }}>
+        <div className="contents lg:flex lg:flex-col lg:gap-3">
+          <div className="flex flex-col gap-3 order-3 sm:flex-row sm:items-stretch lg:order-none">
             <CombatStats
               ac={state.ac}
               initiative={initiative}
@@ -143,30 +120,42 @@ const CharacterSheetInner = () => {
               <textarea
                 value={state.classFeatures}
                 onChange={(e) => setField("classFeatures", e.target.value)}
-                className="cs-textarea flex-1"
+                className="cs-textarea flex-1 min-h-20"
                 placeholder="Class Features..."
               />
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="order-4 lg:order-none">
+            <AttacksTable
+              attacks={state.attacks}
+              onUpdate={updateAttack}
+              onAdd={addAttack}
+              onRemove={removeAttack}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 gap-3 order-7 sm:grid-cols-2 lg:order-none">
             <TextBlock
               title="Racial Traits"
               value={state.racialTraits}
               onChange={(v) => setField("racialTraits", v)}
-              minHeight="80px"
             />
-            <TextBlock title="Feats" value={state.feats} onChange={(v) => setField("feats", v)} minHeight="80px" />
+            <TextBlock
+              title="Feats"
+              value={state.feats}
+              onChange={(v) => setField("feats", v)}
+            />
           </div>
 
-          <AttacksTable attacks={state.attacks} onUpdate={updateAttack} onAdd={addAttack} onRemove={removeAttack} />
-
-          <ProficienciesBlock
-            armorProficiencies={state.armorProficiencies}
-            weaponProficiencies={state.weaponProficiencies}
-            toolProficiencies={state.toolProficiencies}
-            onUpdate={handleProficienciesUpdate}
-          />
+          <div className="order-8 lg:order-none">
+            <ProficienciesBlock
+              armorProficiencies={state.armorProficiencies}
+              weaponProficiencies={state.weaponProficiencies}
+              toolProficiencies={state.toolProficiencies}
+              onUpdate={handleProficienciesUpdate}
+            />
+          </div>
         </div>
       </div>
     </div>

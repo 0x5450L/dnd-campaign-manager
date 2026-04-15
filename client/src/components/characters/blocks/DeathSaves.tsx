@@ -1,18 +1,6 @@
 import { useCharacterSheet } from "../../../context/characterSheetContext/useCharacterSheet";
 
-const PLATINUM = {
-  border: "#b0c4d8",
-  bg: "rgba(176, 196, 216, 0.2)",
-  icon: "#c8dcea",
-  label: "#b0c4d8",
-};
-
-const GRIM = {
-  border: "#3a1518",
-  bg: "#1a0a0c",
-  icon: "#6b2a2a",
-  label: "#b0c4d8",
-};
+type CheckVariant = "success" | "fail";
 
 export const DeathSaves = () => {
   const { state, setField } = useCharacterSheet();
@@ -29,15 +17,12 @@ export const DeathSaves = () => {
   const renderChecks = (
     count: number,
     max: number,
-    palette: typeof PLATINUM,
+    variant: CheckVariant,
     field: "deathSaveSuccesses" | "deathSaveFailures",
     label: string,
   ) => (
     <div className="flex flex-col items-center gap-1">
-      <span
-        className="text-[11px] uppercase tracking-[0.1em] font-semibold"
-        style={{ fontFamily: "var(--font-fantasy)", color: "var(--color-text-label)" }}
-      >
+      <span className="text-[11px] font-semibold uppercase tracking-[0.1em] font-fantasy text-faint">
         {label}
       </span>
       <div className="flex gap-2">
@@ -47,17 +32,9 @@ export const DeathSaves = () => {
             <div
               key={i}
               onClick={() => handleClick(field, count, i)}
-              className="w-6 h-6 rounded border-2 flex items-center justify-center transition-all cursor-pointer"
-              style={{
-                borderColor: active ? palette.border : "var(--color-border)",
-                background: active ? palette.bg : "transparent",
-              }}
+              className={`cs-death-check ${active ? variant : ""}`}
             >
-              {active && (
-                <span style={{ color: palette.icon, fontSize: "14px" }}>
-                  &#10022;
-                </span>
-              )}
+              {active && <span className="text-sm">&#10022;</span>}
             </div>
           );
         })}
@@ -69,8 +46,8 @@ export const DeathSaves = () => {
     <div className="cs-section-card flex flex-col p-3 justify-between flex-1">
       <div className="cs-section-title">Death Saves</div>
 
-      {renderChecks(successes, 3, PLATINUM, "deathSaveSuccesses", "Successes")}
-      {renderChecks(failures, 3, GRIM, "deathSaveFailures", "Failures")}
+      {renderChecks(successes, 3, "success", "deathSaveSuccesses", "Successes")}
+      {renderChecks(failures, 3, "fail", "deathSaveFailures", "Failures")}
     </div>
   );
 };

@@ -26,7 +26,7 @@ export const CombatStats = ({
   const profStr = proficiencyBonus >= 0 ? `+${proficiencyBonus}` : `${proficiencyBonus}`;
 
   return (
-    <div className="cs-section-card p-3 flex flex-col gap-3" style={{ width: "fit-content" }}>
+    <div className="cs-section-card p-3 flex flex-col gap-3 w-full sm:w-fit">
       {/* 2x2 grid of combat numbers */}
       <div className="grid grid-cols-2 gap-x-4 gap-y-2.5">
         <div className="flex flex-col items-center">
@@ -54,14 +54,13 @@ export const CombatStats = ({
       </div>
 
       {/* Divider */}
-      <div style={{ height: 1, background: "var(--color-border)", opacity: 0.3 }} />
+      <div className="h-px bg-rule opacity-30" />
 
       {/* Size — full width, no label */}
       <select
         value={size}
         onChange={(e) => onUpdate("size", e.target.value)}
-        className="cs-select text-sm w-full text-center"
-        style={{ padding: "6px 8px" }}
+        className="cs-select cs-select-lg text-sm w-full text-center"
       >
         <option value="Tiny">Tiny</option>
         <option value="Small">Small</option>
@@ -71,29 +70,24 @@ export const CombatStats = ({
         <option value="Gargantuan">Gargantuan</option>
       </select>
 
-      {/* Inspiration — full width with border, compact */}
+      {/* Inspiration — full width, compact */}
       <div
         onClick={onToggleInspiration}
         className={`cs-inspiration w-full ${hasInspiration ? "active" : ""}`}
-        style={{ padding: "5px 10px" }}
       >
         <div
-          className="w-5 h-5 rounded border-2 flex items-center justify-center transition-all"
-          style={{
-            borderColor: hasInspiration ? "var(--color-gold)" : "var(--color-border)",
-            background: hasInspiration ? "rgba(212, 165, 116, 0.2)" : "transparent",
-          }}
+          className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
+            hasInspiration
+              ? "border-gold bg-gold/20"
+              : "border-rule bg-transparent"
+          }`}
         >
-          {hasInspiration && (
-            <span style={{ color: "var(--color-gold)", fontSize: "12px" }}>&#10022;</span>
-          )}
+          {hasInspiration && <span className="text-xs text-gold">&#10022;</span>}
         </div>
         <span
-          className="text-[10px] uppercase tracking-[0.12em]"
-          style={{
-            fontFamily: "var(--font-fantasy)",
-            color: hasInspiration ? "var(--color-gold)" : "var(--color-text-label)",
-          }}
+          className={`text-[10px] uppercase tracking-[0.12em] font-fantasy ${
+            hasInspiration ? "text-gold" : "text-faint"
+          }`}
         >
           Heroic Inspiration
         </span>

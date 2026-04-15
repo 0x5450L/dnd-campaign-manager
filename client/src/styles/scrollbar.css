@@ -6,7 +6,7 @@
 .custom-scrollbar {
   --_sb-size: 4px;
   --_sb-track: transparent;
-  --_sb-thumb: var(--color-border);
+  --_sb-thumb: var(--color-rule);
   --_sb-thumb-hover: var(--color-gold-dim);
 
   /* fallback for Firefox */

@@ -58,10 +58,7 @@ export const CharacterHeader = () => {
       </div>
 
       {/* Level circle + XP (right side of lore box) */}
-      <div
-        className="flex flex-col items-center justify-center pl-4"
-        style={{ borderLeft: "1px solid var(--color-border)" }}
-      >
+      <div className="flex flex-col items-center justify-center pl-4 border-l border-rule">
         <span className="cs-section-title mb-1">Level</span>
         <div className="cs-level-circle">
           <NumericInput
@@ -70,11 +67,7 @@ export const CharacterHeader = () => {
             min={1}
             max={20}
             defaultValue={1}
-            className="bg-transparent text-center outline-none w-8 text-xl font-bold"
-            style={{
-              fontFamily: "var(--font-fantasy)",
-              color: "var(--color-gold)",
-            }}
+            className="bg-transparent text-center outline-none w-8 text-xl font-bold font-fantasy text-gold"
           />
         </div>
         <div className="flex flex-col items-center mt-1">
@@ -83,8 +76,7 @@ export const CharacterHeader = () => {
             onChange={(v) => setField("xp", v)}
             min={0}
             defaultValue={0}
-            className="bg-transparent text-center outline-none w-16 text-xs"
-            style={{ color: "var(--color-text-dim)" }}
+            className="bg-transparent text-center outline-none w-16 text-xs text-dim"
           />
           <span className="cs-label">XP</span>
         </div>

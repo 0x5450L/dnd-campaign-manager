@@ -5,9 +5,7 @@ export const HitPoints = () => {
   const { state, setField } = useCharacterSheet();
 
   return (
-    <div
-      className="cs-section-card flex flex-col p-3 justify-between flex-1"
-    >
+    <div className="cs-section-card flex flex-col p-3 justify-between flex-1">
       {/* Title */}
       <div className="cs-section-title">Hit Points</div>
 
@@ -19,13 +17,7 @@ export const HitPoints = () => {
             onChange={(v) => setField("currentHp", v)}
             min={0}
             max={9999}
-            className="cs-input"
-            style={{
-              textAlign: "center",
-              fontSize: "18px",
-              fontFamily: "var(--font-fantasy)",
-              fontWeight: 600,
-            }}
+            className="cs-input text-center text-lg font-semibold font-fantasy"
           />
         </div>
         <span className="cs-label mt-1">Current</span>
@@ -40,8 +32,7 @@ export const HitPoints = () => {
               onChange={(v) => setField("tempHp", v)}
               min={0}
               max={9999}
-              className="cs-input"
-              style={{ textAlign: "center", fontSize: "12px" }}
+              className="cs-input text-center text-xs"
             />
           </div>
           <span className="cs-label mt-1">Temp</span>
@@ -54,8 +45,7 @@ export const HitPoints = () => {
               onChange={(v) => setField("maxHp", v)}
               min={0}
               max={9999}
-              className="cs-input"
-              style={{ textAlign: "center", fontSize: "12px" }}
+              className="cs-input text-center text-xs"
             />
           </div>
           <span className="cs-label mt-1">Max</span>
