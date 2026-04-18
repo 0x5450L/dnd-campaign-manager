@@ -51,7 +51,7 @@ export const MobileCharacterSheet = () => {
     <div className="flex flex-col min-h-screen bg-bg">
       <MobileHeader />
 
-      <div className="flex-1 overflow-y-auto p-3 pb-20 flex flex-col gap-3">
+      <div className="flex-1 overflow-y-auto p-3 pb-3 flex flex-col gap-3">
         {activeTab === "combat" && (
           <>
             <div className="grid grid-cols-2 gap-3">

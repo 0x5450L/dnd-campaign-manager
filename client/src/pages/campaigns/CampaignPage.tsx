@@ -8,6 +8,7 @@ import ConfirmDialog from "../../components/ui/ConfirmDialog";
 import CreateInvite from "../../components/campaigns/campaign/CreateInvite";
 import CommonButton from "../../components/ui/buttons/CommonButton";
 import { useSSE } from "../../hooks/useSSE";
+import { CharacterSheet } from "../../components/characters/CharacterSheet";
 
 function CampaignPage() {
   const { id } = useParams();
@@ -19,6 +20,7 @@ function CampaignPage() {
   const [campaign, setCampaign] = useState<Campaign | null>(null);
   const [originalCampaign, setOriginalCampaign] = useState<Campaign | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isCharacterSheetOpen, setIsCharacterSheetOpen] = useState(false);
 
   const isDM = user?.id === campaign?.dmId;
 
@@ -93,7 +95,7 @@ function CampaignPage() {
           &larr; To Campaigns
         </CommonButton>
 
-        <CommonButton className="ml-auto" onClick={() => navigate("/character")} size="sm">
+        <CommonButton className="ml-auto" onClick={() => setIsCharacterSheetOpen(true)} size="sm">
           Create Character
         </CommonButton>
 
@@ -205,6 +207,11 @@ function CampaignPage() {
           onCancel={() => setShowDeleteConfirm(false)}
         />
       )}
+
+      <CharacterSheet
+        isOpen={isCharacterSheetOpen}
+        onClose={() => setIsCharacterSheetOpen(false)}
+      />
     </div>
   );
 }

@@ -12,7 +12,7 @@ type Props = {
 };
 
 export const MobileTabBar = ({ activeTab, onTabChange }: Props) => (
-  <div className="fixed bottom-0 inset-x-0 z-20 flex border-t border-rule bg-surface">
+  <div className="sticky bottom-0 inset-x-0 z-20 flex border-t border-rule bg-surface">
     {TAB_META.map((tab) => (
       <button
         key={tab.id}
