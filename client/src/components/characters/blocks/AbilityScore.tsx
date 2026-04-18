@@ -6,7 +6,7 @@ type Skill = {
   value: number;
 };
 
-type AbilityScoreBlockProps = {
+type AbilityScoreProps = {
   name: string;
   score: number;
   modifier: number;
@@ -18,10 +18,10 @@ type AbilityScoreBlockProps = {
   onSkillProfChange: (skillName: string, value: boolean) => void;
 };
 
-export const AbilityScoreBlock = ({
+export const AbilityScore = ({
   name, score, modifier, saveProficient, saveValue, skills,
   onScoreChange, onSaveProfChange, onSkillProfChange,
-}: AbilityScoreBlockProps) => {
+}: AbilityScoreProps) => {
   const modStr = modifier >= 0 ? `+${modifier}` : `${modifier}`;
 
   return (

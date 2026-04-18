@@ -1,13 +1,13 @@
-type ProficienciesBlockProps = {
+type ProficienciesProps = {
   armorProficiencies: string;
   weaponProficiencies: string;
   toolProficiencies: string;
   onUpdate: (field: string, value: string) => void;
 };
 
-export const ProficienciesBlock = ({
+export const Proficiencies = ({
   armorProficiencies, weaponProficiencies, toolProficiencies, onUpdate,
-}: ProficienciesBlockProps) => {
+}: ProficienciesProps) => {
   return (
     <div className="cs-section-card p-3">
       <div className="cs-section-title">Proficiencies & Equipment</div>

@@ -2,7 +2,7 @@ import { NumericInput } from "../inputs/NumericInput";
 import { GradientInput } from "../inputs/GradientInput";
 import { useCharacterSheet } from "../../../context/characterSheetContext/useCharacterSheet";
 
-export const CharacterHeader = () => {
+export const CharacterLore = () => {
   const { state, setField } = useCharacterSheet();
 
   return (

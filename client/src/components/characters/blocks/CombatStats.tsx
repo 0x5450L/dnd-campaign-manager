@@ -25,72 +25,76 @@ export const CombatStats = ({
   const initStr = initiative >= 0 ? `+${initiative}` : `${initiative}`;
   const profStr = proficiencyBonus >= 0 ? `+${proficiencyBonus}` : `${proficiencyBonus}`;
 
-  return (
-    <div className="cs-section-card p-3 flex flex-col gap-3 w-full sm:w-fit">
-      {/* 2x2 grid of combat numbers */}
-      <div className="grid grid-cols-2 gap-x-4 gap-y-2.5">
-        <div className="flex flex-col items-center">
-          <div className="cs-score-input w-10 h-6 text-xs flex items-center justify-center">{profStr}</div>
-          <span className="cs-label mt-1">Proficiency</span>
-        </div>
-        <div className="flex flex-col items-center">
-          <div className="cs-score-input w-10 h-6 text-xs flex items-center justify-center">{initStr}</div>
-          <span className="cs-label mt-1">Initiative</span>
-        </div>
-        <div className="flex flex-col items-center">
-          <NumericInput
-            value={speed}
-            onChange={(v) => onUpdate("speed", v)}
-            min={0}
-            defaultValue={30}
-            className="cs-score-input w-10 h-6 text-xs"
-          />
-          <span className="cs-label mt-1">Speed</span>
-        </div>
-        <div className="flex flex-col items-center">
-          <div className="cs-score-input w-10 h-6 text-xs flex items-center justify-center">{passivePerception}</div>
-          <span className="cs-label mt-1">Passive Perc.</span>
-        </div>
+  const statsGrid = (
+    <div className="grid grid-cols-2 gap-x-3 gap-y-2.5 shrink-0 sm:gap-x-4">
+      <div className="flex flex-col items-center">
+        <div className="cs-score-input w-10 h-6 text-xs flex items-center justify-center">{profStr}</div>
+        <span className="cs-label mt-1">Proficiency</span>
       </div>
+      <div className="flex flex-col items-center">
+        <div className="cs-score-input w-10 h-6 text-xs flex items-center justify-center">{initStr}</div>
+        <span className="cs-label mt-1">Initiative</span>
+      </div>
+      <div className="flex flex-col items-center">
+        <NumericInput
+          value={speed}
+          onChange={(v) => onUpdate("speed", v)}
+          min={0}
+          defaultValue={30}
+          className="cs-score-input w-10 h-6 text-xs"
+        />
+        <span className="cs-label mt-1">Speed</span>
+      </div>
+      <div className="flex flex-col items-center">
+        <div className="cs-score-input w-10 h-6 text-xs flex items-center justify-center">{passivePerception}</div>
+        <span className="cs-label mt-1">Passive Perc.</span>
+      </div>
+    </div>
+  );
 
-      {/* Divider */}
-      <div className="h-px bg-rule opacity-30" />
+  const sizeSelect = (
+    <select
+      value={size}
+      onChange={(e) => onUpdate("size", e.target.value)}
+      className="cs-select cs-select-lg text-sm max-w-45 w-full text-center"
+    >
+      <option value="Tiny">Tiny</option>
+      <option value="Small">Small</option>
+      <option value="Medium">Medium</option>
+      <option value="Large">Large</option>  
+      <option value="Huge">Huge</option>
+      <option value="Gargantuan">Gargantuan</option>
+    </select>
+  );
 
-      {/* Size — full width, no label */}
-      <select
-        value={size}
-        onChange={(e) => onUpdate("size", e.target.value)}
-        className="cs-select cs-select-lg text-sm w-full text-center"
-      >
-        <option value="Tiny">Tiny</option>
-        <option value="Small">Small</option>
-        <option value="Medium">Medium</option>
-        <option value="Large">Large</option>
-        <option value="Huge">Huge</option>
-        <option value="Gargantuan">Gargantuan</option>
-      </select>
-
-      {/* Inspiration — full width, compact */}
+  const inspirationToggle = (
+    <div onClick={onToggleInspiration} className={`flex items-center gap-2 cs-inspiration max-w-45 w-full ${hasInspiration ? "active" : ""}`}>
       <div
-        onClick={onToggleInspiration}
-        className={`cs-inspiration w-full ${hasInspiration ? "active" : ""}`}
+        className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all shrink-0 ${
+          hasInspiration ? "border-gold bg-gold/20" : "border-rule bg-transparent"
+        }`}
       >
-        <div
-          className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
-            hasInspiration
-              ? "border-gold bg-gold/20"
-              : "border-rule bg-transparent"
-          }`}
-        >
-          {hasInspiration && <span className="text-xs text-gold">&#10022;</span>}
-        </div>
-        <span
-          className={`text-[10px] uppercase tracking-[0.12em] font-fantasy ${
-            hasInspiration ? "text-gold" : "text-faint"
-          }`}
-        >
-          Heroic Inspiration
-        </span>
+        {hasInspiration && <span className="text-xs text-gold">&#10022;</span>}
+      </div>
+      <span
+        className={`text-[10px] uppercase tracking-[0.12em] font-fantasy truncate ${
+          hasInspiration ? "text-gold" : "text-faint"
+        }`}
+      >
+        Heroic Inspiration
+      </span>
+    </div>
+  );
+
+  return (
+    <div className="cs-section-card p-3 flex gap-3 sm:flex-col overflow-hidden">
+      {statsGrid}
+
+      <div className="w-px bg-rule opacity-30 self-stretch sm:w-auto sm:h-px sm:self-auto" />
+
+      <div className="flex flex-col justify-evenly items-center flex-1 min-w-0 gap-2 sm:gap-3">
+        {sizeSelect}
+        {inspirationToggle}
       </div>
     </div>
   );
