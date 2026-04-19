@@ -42,6 +42,20 @@ export const DesktopCharacterSheet = () => {
     removeAttack,
   } = useCharacterSheet();
 
+  const onProficienciesUpdate = (field: string, value: string) => {
+    switch (field) {
+      case "armorProficiencies":
+        setField("armorProficiencies", value);
+        break;
+      case "weaponProficiencies":
+        setField("weaponProficiencies", value);
+        break;
+      case "toolProficiencies":
+        setField("toolProficiencies", value);
+        break;
+    }
+  };
+
   return (
     <div className="min-h-screen py-4">
       <div className="flex flex-col gap-3 max-w-6xl mx-auto p-4 lg:grid lg:grid-cols-[420px_1fr] lg:grid-rows-[auto_1fr]">
@@ -66,8 +80,8 @@ export const DesktopCharacterSheet = () => {
                   saveProficient={state.abilities[ability].saveProficient}
                   saveValue={getSaveValue(ability)}
                   skills={getSkillsForAbility(ability)}
-                  onScoreChange={(v) => setAbilityScore(ability, v)}
-                  onSaveProfChange={(v) => setSaveProficient(ability, v)}
+                  onScoreChange={(updatedAbilityScore) => setAbilityScore(ability, updatedAbilityScore)}
+                  onSaveProfChange={(updatedAbilityProficient) => setSaveProficient(ability, updatedAbilityProficient)}
                   onSkillProfChange={setSkillProficient}
                 />
               ))}
@@ -75,11 +89,7 @@ export const DesktopCharacterSheet = () => {
           </div>
 
           <div className="order-6 lg:order-0">
-            <TextBlock
-              title="Notes"
-              value={state.notes}
-              onChange={(v) => setField("notes", v)}
-            />
+            <TextBlock title="Notes" value={state.notes} onChange={(updatedNotes) => setField("notes", updatedNotes)} />
           </div>
         </div>
 
@@ -103,24 +113,19 @@ export const DesktopCharacterSheet = () => {
           </div>
 
           <div className="order-4 lg:order-0">
-            <AttacksTable
-              attacks={state.attacks}
-              onUpdate={updateAttack}
-              onAdd={addAttack}
-              onRemove={removeAttack}
-            />
+            <AttacksTable attacks={state.attacks} onUpdate={updateAttack} onAdd={addAttack} onRemove={removeAttack} />
           </div>
 
           <div className="grid grid-cols-1 gap-3 order-7 sm:grid-cols-2 lg:order-0">
             <TextBlock
               title="Racial Traits"
               value={state.racialTraits}
-              onChange={(v) => setField("racialTraits", v)}
+              onChange={(updatedRacialTraisValue) => setField("racialTraits", updatedRacialTraisValue)}
             />
             <TextBlock
               title="Feats"
               value={state.feats}
-              onChange={(v) => setField("feats", v)}
+              onChange={(updatedFeatsValue) => setField("feats", updatedFeatsValue)}
             />
           </div>
 
@@ -129,19 +134,7 @@ export const DesktopCharacterSheet = () => {
               armorProficiencies={state.armorProficiencies}
               weaponProficiencies={state.weaponProficiencies}
               toolProficiencies={state.toolProficiencies}
-              onUpdate={(field, value) => {
-                switch (field) {
-                  case "armorProficiencies":
-                    setField("armorProficiencies", value);
-                    break;
-                  case "weaponProficiencies":
-                    setField("weaponProficiencies", value);
-                    break;
-                  case "toolProficiencies":
-                    setField("toolProficiencies", value);
-                    break;
-                }
-              }}
+              onUpdate={onProficienciesUpdate}
             />
           </div>
         </div>

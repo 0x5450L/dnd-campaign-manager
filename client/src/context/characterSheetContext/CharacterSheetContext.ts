@@ -26,7 +26,7 @@ export type Attack = {
 export type HitDiceType = "d6" | "d8" | "d10" | "d12";
 
 export type CharacterSheetState = {
-  // Header
+  // Lore
   name: string;
   race: string;
   characterClass: string;
