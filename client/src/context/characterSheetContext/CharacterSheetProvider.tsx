@@ -1,8 +1,14 @@
-import { useCallback, useMemo, useState, type ReactNode } from "react";
+import {
+  useCallback,
+  useMemo,
+  useReducer,
+  type ReactNode,
+} from "react";
 import {
   CharacterSheetContext,
   type CharacterSheetContextType,
 } from "./CharacterSheetContext";
+import { characterSheetReducer } from "./characterSheetReducer";
 import type {
   AbilityName,
   Attack,
@@ -10,167 +16,128 @@ import type {
   SkillDef,
   UseHitDieResult,
 } from "../../types/characters/characterSheet";
-import { calcModifier, clamp, parseDiceToSidesNumber } from "../../utils/dndMath";
-import { INITIAL_CHARACTER_SHEET } from "../../constants/characterSheet";
+import {
+  calcModifier,
+  clamp,
+  parseDiceToSidesNumber,
+} from "../../utils/dndMath";
+import { createInitialCharacterSheet } from "../../constants/characterSheet";
 
-type Props = { children: ReactNode; initialState?: Partial<CharacterSheetState> };
+type Props = {
+  children: ReactNode;
+  initialState?: Partial<CharacterSheetState>;
+};
+
+const buildInitialState = (
+  overrides?: Partial<CharacterSheetState>,
+): CharacterSheetState => ({
+  ...createInitialCharacterSheet(),
+  ...overrides,
+});
 
 export const CharacterSheetProvider = ({ children, initialState }: Props) => {
-  const [state, setState] = useState<CharacterSheetState>({
-    ...INITIAL_CHARACTER_SHEET,
-    ...initialState,
-  });
+  const [state, dispatch] = useReducer(
+    characterSheetReducer,
+    initialState,
+    buildInitialState,
+  );
 
   const setField = useCallback(
     <K extends keyof CharacterSheetState>(
       field: K,
       value: CharacterSheetState[K],
     ) => {
-      setState((prev) => ({ ...prev, [field]: value }));
+      dispatch({
+        type: "SET_FIELD",
+        payload: { [field]: value } as Partial<CharacterSheetState>,
+      });
     },
     [],
   );
 
-  const setAbilityScore = useCallback((ability: AbilityName, score: number) => {
-    setState((prev) => ({
-      ...prev,
-      abilities: {
-        ...prev.abilities,
-        [ability]: { ...prev.abilities[ability], score },
-      },
-    }));
-  }, []);
+  const setAbilityScore = useCallback(
+    (ability: AbilityName, score: number) =>
+      dispatch({ type: "SET_ABILITY_SCORE", ability, score }),
+    [],
+  );
 
   const setSaveProficient = useCallback(
-    (ability: AbilityName, proficient: boolean) => {
-      setState((prev) => ({
-        ...prev,
-        abilities: {
-          ...prev.abilities,
-          [ability]: { ...prev.abilities[ability], saveProficient: proficient },
-        },
-      }));
-    },
+    (ability: AbilityName, proficient: boolean) =>
+      dispatch({ type: "SET_SAVE_PROFICIENT", ability, proficient }),
     [],
   );
 
   const setSkillProficient = useCallback(
-    (skillName: string, proficient: boolean) => {
-      setState((prev) => ({
-        ...prev,
-        skills: prev.skills.map((s) =>
-          s.name === skillName ? { ...s, proficient } : s,
-        ),
-      }));
-    },
+    (skillName: string, proficient: boolean) =>
+      dispatch({ type: "SET_SKILL_PROFICIENT", skillName, proficient }),
     [],
   );
 
   const toggleShield = useCallback(
-    () => setState((prev) => ({ ...prev, usesShield: !prev.usesShield })),
+    () => dispatch({ type: "TOGGLE_SHIELD" }),
     [],
   );
+
   const toggleInspiration = useCallback(
-    () => setState((prev) => ({ ...prev, inspiration: !prev.inspiration })),
+    () => dispatch({ type: "TOGGLE_INSPIRATION" }),
     [],
   );
 
   const addAttack = useCallback(() => {
-    setState((prev) => ({
-      ...prev,
-      attacks: [
-        ...prev.attacks,
-        {
-          id: crypto.randomUUID(),
-          name: "",
-          attackBonus: "",
-          damage: "",
-          notes: "",
-        },
-      ],
-    }));
+    dispatch({
+      type: "ADD_ATTACK",
+      attack: {
+        id: crypto.randomUUID(),
+        name: "",
+        attackBonus: "",
+        damage: "",
+        notes: "",
+      },
+    });
   }, []);
 
   const updateAttack = useCallback(
-    (id: string, field: keyof Attack, value: string) => {
-      setState((prev) => ({
-        ...prev,
-        attacks: prev.attacks.map((a) =>
-          a.id === id ? { ...a, [field]: value } : a,
-        ),
-      }));
-    },
+    (id: string, field: keyof Attack, value: string) =>
+      dispatch({ type: "UPDATE_ATTACK", id, field, value }),
     [],
   );
 
-  const removeAttack = useCallback((id: string) => {
-    setState((prev) => ({
-      ...prev,
-      attacks: prev.attacks.filter((a) => a.id !== id),
-    }));
-  }, []);
+  const removeAttack = useCallback(
+    (id: string) => dispatch({ type: "REMOVE_ATTACK", id }),
+    [],
+  );
 
-  const heal = useCallback((amount: number) => {
-    if (amount <= 0) return;
-    setState((prev) => ({
-      ...prev,
-      currentHp: clamp(prev.currentHp + amount, 0, prev.maxHp),
-    }));
-  }, []);
+  const heal = useCallback(
+    (amount: number) => dispatch({ type: "HEAL", amount }),
+    [],
+  );
 
-  const damage = useCallback((amount: number) => {
-    if (amount <= 0) return;
-    setState((prev) => {
-      let remaining = amount;
-      let temp = prev.tempHp;
-      if (temp > 0) {
-        const used = Math.min(temp, remaining);
-        temp -= used;
-        remaining -= used;
-      }
-      const current = Math.max(0, prev.currentHp - remaining);
-      return { ...prev, currentHp: current, tempHp: temp };
-    });
-  }, []);
+  const damage = useCallback(
+    (amount: number) => dispatch({ type: "DAMAGE", amount }),
+    [],
+  );
 
   const spendHitDie = useCallback((): UseHitDieResult => {
-    let result: UseHitDieResult = null;
-    setState((prev) => {
-      const max = prev.level;
-      const remaining = max - prev.hitDiceUsed;
-      if (remaining <= 0) return prev;
-      if (prev.currentHp >= prev.maxHp) return prev;
+    const remaining = state.level - state.hitDiceUsed;
+    if (remaining <= 0) return null;
+    if (state.currentHp >= state.maxHp) return null;
 
-      const sides = parseDiceToSidesNumber(prev.hitDiceType);
-      const rolled = Math.floor(Math.random() * sides) + 1;
-      const conMod = calcModifier(prev.abilities.con.score);
-      const healed = Math.max(1, rolled + conMod);
-      const newCurrentHp = clamp(prev.currentHp + healed, 0, prev.maxHp);
+    const sides = parseDiceToSidesNumber(state.hitDiceType);
+    const rolled = Math.floor(Math.random() * sides) + 1;
+    const conMod = calcModifier(state.abilities.con.score);
+    const healed = Math.max(1, rolled + conMod);
+    const newCurrentHp = clamp(state.currentHp + healed, 0, state.maxHp);
 
-      result = { rolled, conMod, healed, newCurrentHp };
+    dispatch({ type: "APPLY_HIT_DIE", newCurrentHp });
+    return { rolled, conMod, healed, newCurrentHp };
+  }, [state]);
 
-      return {
-        ...prev,
-        currentHp: newCurrentHp,
-        hitDiceUsed: prev.hitDiceUsed + 1,
-      };
-    });
-    return result;
-  }, []);
+  const resetHitDice = useCallback(
+    () => dispatch({ type: "RESET_HIT_DICE" }),
+    [],
+  );
 
-  const resetHitDice = useCallback(() => {
-    setState((prev) => ({ ...prev, hitDiceUsed: 0 }));
-  }, []);
-
-  const longRest = useCallback(() => {
-    setState((prev) => ({
-      ...prev,
-      currentHp: prev.maxHp,
-      hitDiceUsed: 0,
-      deathSaveSuccesses: 0,
-      deathSaveFailures: 0,
-    }));
-  }, []);
+  const longRest = useCallback(() => dispatch({ type: "LONG_REST" }), []);
 
   const value = useMemo<CharacterSheetContextType>(() => {
     const proficiencyBonus = Math.ceil(state.level / 4) + 1;
@@ -200,7 +167,8 @@ export const CharacterSheetProvider = ({ children, initialState }: Props) => {
         }));
 
     const perception = state.skills.find((s) => s.name === "Perception");
-    const passivePerception = 10 + (perception ? getSkillValue(perception) : 0);
+    const passivePerception =
+      10 + (perception ? getSkillValue(perception) : 0);
 
     return {
       state,

@@ -37,7 +37,7 @@ export const DEFAULT_ABILITIES: Record<AbilityName, AbilityState> = {
   cha: { score: 10, saveProficient: false },
 };
 
-export const INITIAL_CHARACTER_SHEET: CharacterSheetState = {
+export const createInitialCharacterSheet = (): CharacterSheetState => ({
   name: "New Character",
   race: "",
   characterClass: "",
@@ -78,4 +78,4 @@ export const INITIAL_CHARACTER_SHEET: CharacterSheetState = {
   armorProficiencies: "",
   weaponProficiencies: "",
   toolProficiencies: "",
-};
+});
