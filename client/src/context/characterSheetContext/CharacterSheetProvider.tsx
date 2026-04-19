@@ -12,6 +12,7 @@ import type {
   SkillDef,
   UseHitDieResult,
 } from "../../types/characters/characterSheet";
+import { calcModifier, clamp, parseDiceToSidesNumber } from "../../utils/dndMath";
 
 const DEFAULT_SKILLS: SkillDef[] = [
   { name: "Athletics", ability: "str", proficient: false },
@@ -85,11 +86,6 @@ const INITIAL_STATE: CharacterSheetState = {
   weaponProficiencies: "",
   toolProficiencies: "",
 };
-
-const calcModifier = (score: number) => Math.floor((score - 10) / 2);
-const diceSides = (type: string): number => Number(type.replace("d", "")) || 8;
-const clamp = (v: number, min: number, max: number) =>
-  Math.max(min, Math.min(max, v));
 
 type Props = { children: ReactNode; initialState?: Partial<CharacterSheetState> };
 
@@ -219,7 +215,7 @@ export const CharacterSheetProvider = ({ children, initialState }: Props) => {
       if (remaining <= 0) return prev;
       if (prev.currentHp >= prev.maxHp) return prev;
 
-      const sides = diceSides(prev.hitDiceType);
+      const sides = parseDiceToSidesNumber(prev.hitDiceType);
       const rolled = Math.floor(Math.random() * sides) + 1;
       const conMod = calcModifier(prev.abilities.con.score);
       const healed = Math.max(1, rolled + conMod);
@@ -331,4 +327,4 @@ export const CharacterSheetProvider = ({ children, initialState }: Props) => {
       {children}
     </CharacterSheetContext.Provider>
   );
-}
+};
