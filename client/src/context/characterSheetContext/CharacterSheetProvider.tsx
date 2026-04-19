@@ -2,14 +2,16 @@ import { useCallback, useMemo, useState, type ReactNode } from "react";
 import {
   CharacterSheetContext,
   MIN_ATTACKS,
-  type AbilityName,
-  type AbilityState,
-  type Attack,
   type CharacterSheetContextType,
-  type CharacterSheetState,
-  type SkillDef,
-  type UseHitDieResult,
 } from "./CharacterSheetContext";
+import type {
+  AbilityName,
+  AbilityState,
+  Attack,
+  CharacterSheetState,
+  SkillDef,
+  UseHitDieResult,
+} from "../../types/characters/characterSheet";
 
 const DEFAULT_SKILLS: SkillDef[] = [
   { name: "Athletics", ability: "str", proficient: false },

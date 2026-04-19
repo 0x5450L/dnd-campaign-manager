@@ -1,5 +1,5 @@
 import { useCharacterSheet } from "../../../context/characterSheetContext/useCharacterSheet";
-import type { HitDiceType } from "../../../context/characterSheetContext/CharacterSheetContext";
+import type { HitDiceType } from "../../../types/characters/characterSheet";
 
 const DICE_OPTIONS: HitDiceType[] = ["d6", "d8", "d10", "d12"];
 

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useCharacterSheet } from "../../../context/characterSheetContext/useCharacterSheet";
-import type { AbilityName } from "../../../context/characterSheetContext/CharacterSheetContext";
+import type { AbilityName } from "../../../types/characters/characterSheet";
 import { MobileHeader } from "./MobileHeader";
 import { MobileTabBar, type MobileTab } from "./MobileTabBar";
 import { ArmorClass } from "../blocks/ArmorClass";

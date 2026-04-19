@@ -7,7 +7,7 @@ import type {
   GetCharacterResponse,
   UpdateCharacterPayload,
   UpdateCharacterResponse,
-} from "../../types/characters";
+} from "../../types/characters/characters";
 
 export const createCharacter = async (payload: CreateCharacterPayload) => {
   return apiClient<CreateCharacterResponse>('/api/characters/create', {

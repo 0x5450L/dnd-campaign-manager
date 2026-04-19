@@ -1,5 +1,5 @@
 import { useCharacterSheet } from "../../../context/characterSheetContext/useCharacterSheet";
-import type { AbilityName } from "../../../context/characterSheetContext/CharacterSheetContext";
+import type { AbilityName } from "../../../types/characters/characterSheet";
 import { CharacterLore } from "../blocks/CharacterLore";
 import { ArmorClass } from "../blocks/ArmorClass";
 import { HitPoints } from "../blocks/HitPoints";
