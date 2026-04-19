@@ -55,7 +55,7 @@ export const DesktopCharacterSheet = () => {
         </div>
 
         <div className="contents lg:flex lg:flex-col lg:gap-3">
-          <div className="order-5 lg:order-none">
+          <div className="order-5 lg:order-0">
             <div className="grid grid-cols-3 lg:grid-cols-2 gap-3">
               {ALL_ABILITIES.map((ability) => (
                 <AbilityScore
@@ -74,7 +74,7 @@ export const DesktopCharacterSheet = () => {
             </div>
           </div>
 
-          <div className="order-6 lg:order-none">
+          <div className="order-6 lg:order-0">
             <TextBlock
               title="Notes"
               value={state.notes}
@@ -84,7 +84,7 @@ export const DesktopCharacterSheet = () => {
         </div>
 
         <div className="contents lg:flex lg:flex-col lg:gap-3">
-          <div className="flex flex-col gap-3 order-3 sm:flex-row sm:items-stretch lg:order-none">
+          <div className="flex flex-col gap-3 order-3 sm:flex-row sm:items-stretch lg:order-0">
             <CombatStats
               ac={state.ac}
               initiative={initiative}
@@ -102,7 +102,7 @@ export const DesktopCharacterSheet = () => {
             <ClassFeatures />
           </div>
 
-          <div className="order-4 lg:order-none">
+          <div className="order-4 lg:order-0">
             <AttacksTable
               attacks={state.attacks}
               onUpdate={updateAttack}
@@ -111,7 +111,7 @@ export const DesktopCharacterSheet = () => {
             />
           </div>
 
-          <div className="grid grid-cols-1 gap-3 order-7 sm:grid-cols-2 lg:order-none">
+          <div className="grid grid-cols-1 gap-3 order-7 sm:grid-cols-2 lg:order-0">
             <TextBlock
               title="Racial Traits"
               value={state.racialTraits}
@@ -124,7 +124,7 @@ export const DesktopCharacterSheet = () => {
             />
           </div>
 
-          <div className="order-8 lg:order-none">
+          <div className="order-8 lg:order-0">
             <Proficiencies
               armorProficiencies={state.armorProficiencies}
               weaponProficiencies={state.weaponProficiencies}

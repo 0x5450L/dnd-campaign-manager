@@ -26,7 +26,7 @@ const ABILITY_NAMES: Record<AbilityName, string> = {
 
 const ALL_ABILITIES: AbilityName[] = ["str", "con", "dex", "int", "wis", "cha"];
 
-export const MobileCharacterSheet = () => {
+export const MobileCharacterSheet = ({ onClose }: { onClose: () => void }) => {
   const {
     state,
     proficiencyBonus,
@@ -49,7 +49,7 @@ export const MobileCharacterSheet = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-bg">
-      <MobileHeader />
+      <MobileHeader onClose={onClose} />
 
       <div className="flex-1 overflow-y-auto p-3 pb-3 flex flex-col gap-3">
         {activeTab === "combat" && (

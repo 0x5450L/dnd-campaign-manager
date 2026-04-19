@@ -11,9 +11,9 @@ type CharacterSheetProps = {
   onClose: () => void;
 };
 
-const CharacterSheetInner = () => {
+const CharacterSheetInner = ({ onClose }: { onClose: () => void }) => {
   const isMobile = useIsMobile();
-  return isMobile ? <MobileCharacterSheet /> : <DesktopCharacterSheet />;
+  return isMobile ? <MobileCharacterSheet onClose={onClose} /> : <DesktopCharacterSheet />;
 };
 
 export const CharacterSheet = ({ isOpen, onClose }: CharacterSheetProps) => {
@@ -80,14 +80,9 @@ export const CharacterSheet = ({ isOpen, onClose }: CharacterSheetProps) => {
           type="button"
           onClick={onClose}
           aria-label="Close character sheet"
-          className="fixed top-3 right-3 z-21  w-10 h-10 rounded-full bg-gray-800/90 hover:bg-gray-700 text-gray-200 border border-gray-600 cursor-pointer transition-colors duration-200 flex items-center justify-center shadow-lg backdrop-blur-sm"
+          className="fixed top-3 right-3 z-21 w-10 h-10 rounded-full bg-gray-800/90 hover:bg-gray-700 text-gray-200 border border-gray-600 cursor-pointer transition-colors duration-200 hidden items-center justify-center shadow-lg backdrop-blur-sm sm:flex"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="w-5 h-5"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
             <path
               fillRule="evenodd"
               d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
@@ -97,7 +92,7 @@ export const CharacterSheet = ({ isOpen, onClose }: CharacterSheetProps) => {
         </button>
 
         <CharacterSheetProvider>
-          <CharacterSheetInner />
+          <CharacterSheetInner onClose={onClose} />
         </CharacterSheetProvider>
       </div>
     </div>
