@@ -7,8 +7,6 @@ import type {
   UseHitDieResult,
 } from "../../types/characters/characterSheet";
 
-export const MIN_ATTACKS = 3;
-
 export type CharacterSheetContextType = {
   state: CharacterSheetState;
 

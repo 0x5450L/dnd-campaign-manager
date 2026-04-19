@@ -1,4 +1,4 @@
-import { MIN_ATTACKS } from "../../../context/characterSheetContext/CharacterSheetContext";
+import { MIN_ATTACKS } from "../../../constants/characterSheet";
 import type { Attack } from "../../../types/characters/characterSheet";
 
 type AttacksTableProps = {
