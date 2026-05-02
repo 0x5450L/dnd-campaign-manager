@@ -19,6 +19,7 @@ import type {
 import {
   calcModifier,
   clamp,
+  getProficiencyBonus,
   parseDiceToSidesNumber,
 } from "../../utils/dndMath";
 import { createInitialCharacterSheet } from "../../constants/characterSheet";
@@ -140,7 +141,7 @@ export const CharacterSheetProvider = ({ children, initialState }: Props) => {
   const longRest = useCallback(() => dispatch({ type: "LONG_REST" }), []);
 
   const value = useMemo<CharacterSheetContextType>(() => {
-    const proficiencyBonus = Math.ceil(state.level / 4) + 1;
+    const proficiencyBonus = getProficiencyBonus(state.level);
 
     const getModifier = (ability: AbilityName) =>
       calcModifier(state.abilities[ability].score);
