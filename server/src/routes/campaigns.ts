@@ -29,7 +29,7 @@ router.post('/create', authMiddleware, asyncHandler(async (req, res) => {
       data: {
         userId,
         campaignId: id,
-        role: 'DM',
+        role: 'dm',
       },
     });
 

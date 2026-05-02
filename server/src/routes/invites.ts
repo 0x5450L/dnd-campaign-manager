@@ -160,7 +160,7 @@ router.post('/:token/respond', authMiddleware, asyncHandler(async (req, res) => 
         data: {
           userId,
           campaignId: invite.campaignId,
-          role: 'PLAYER',
+          role: 'player',
         },
       });
 

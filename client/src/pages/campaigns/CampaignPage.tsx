@@ -182,7 +182,7 @@ function CampaignPage() {
                   <span className="text-gray-300">{member.user.displayName}</span>
                   <span
                     className={`text-xs font-semibold px-2 py-0.5 rounded ${
-                      member.role === "DM" ? "bg-amber-600/20 text-amber-300" : "bg-blue-600/20 text-blue-300"
+                      member.role === "dm" ? "bg-amber-600/20 text-amber-300" : "bg-blue-600/20 text-blue-300"
                     }`}
                   >
                     {member.role}

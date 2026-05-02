@@ -8,7 +8,7 @@ function CampaignsListItem({ campaign }: { campaign: Campaign }) {
 
   const myMembership = campaign.members.find((m) => m.userId === user?.id);
   const myRole = myMembership?.role;
-  const isDM = myRole === "DM";
+  const isDM = myRole === "dm";
 
   return (
     <li

@@ -46,14 +46,14 @@ type CampaignMember = {
   user: User;
   userId: string;
   campaignId: string;
-  role: 'DM' | 'PLAYER';
+  role: 'dm' | 'player';
   joinedAt: Date;
 }
 
 export type DM = CampaignMember & {
-  role: 'DM';
+  role: 'dm';
 }
 
 export type Player = CampaignMember & {
-  role: 'PLAYER';
+  role: 'player';
 }
