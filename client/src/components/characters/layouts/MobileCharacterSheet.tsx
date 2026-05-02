@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { useCharacterSheet } from "../../../context/characterSheetContext/useCharacterSheet";
-import type { AbilityName } from "../../../types/characters/characterSheet";
+import type {
+  AbilityName,
+  CharacterSheetState,
+} from "../../../types/characters/characterSheet";
 import { MobileHeader } from "./MobileHeader";
 import { MobileTabBar, type MobileTab } from "./MobileTabBar";
 import { ArmorClass } from "../blocks/ArmorClass";
@@ -26,7 +29,12 @@ const ABILITY_NAMES: Record<AbilityName, string> = {
 
 const ALL_ABILITIES: AbilityName[] = ["str", "con", "dex", "int", "wis", "cha"];
 
-export const MobileCharacterSheet = ({ onClose }: { onClose: () => void }) => {
+type MobileCharacterSheetProps = {
+  onClose: () => void;
+  onForceSave?: (state: CharacterSheetState) => void;
+};
+
+export const MobileCharacterSheet = ({ onClose, onForceSave }: MobileCharacterSheetProps) => {
   const {
     state,
     proficiencyBonus,
@@ -49,7 +57,7 @@ export const MobileCharacterSheet = ({ onClose }: { onClose: () => void }) => {
 
   return (
     <div className="flex flex-col min-h-screen bg-bg">
-      <MobileHeader onClose={onClose} />
+      <MobileHeader onClose={onClose} onForceSave={onForceSave} />
 
       <div className="flex-1 overflow-y-auto p-3 pb-3 flex flex-col gap-3">
         {activeTab === "combat" && (

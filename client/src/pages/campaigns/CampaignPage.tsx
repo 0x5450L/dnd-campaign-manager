@@ -208,7 +208,7 @@ function CampaignPage() {
         />
       )}
 
-      <CharacterSheet isOpen={isCharacterSheetOpen} onClose={() => setIsCharacterSheetOpen(false)} />
+      <CharacterSheet isOpen={isCharacterSheetOpen} onForceSave={(state) => console.log(state)} onClose={() => setIsCharacterSheetOpen(false)} />
     </div>
   );
 }
