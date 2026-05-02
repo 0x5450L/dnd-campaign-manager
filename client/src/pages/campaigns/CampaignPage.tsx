@@ -55,7 +55,7 @@ function CampaignPage() {
       }
     });
     return unsubscribe;
-  }, [id]);
+  }, [id, subscribe, fetchCampaign]);
 
   const handleSave = async () => {
     if (!campaign || !hasChanges) return;
@@ -208,10 +208,7 @@ function CampaignPage() {
         />
       )}
 
-      <CharacterSheet
-        isOpen={isCharacterSheetOpen}
-        onClose={() => setIsCharacterSheetOpen(false)}
-      />
+      <CharacterSheet isOpen={isCharacterSheetOpen} onClose={() => setIsCharacterSheetOpen(false)} />
     </div>
   );
 }

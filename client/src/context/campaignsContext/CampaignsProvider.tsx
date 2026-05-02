@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   deleteCampaign as deleteCampaignApi,
   getCampaign,
@@ -11,22 +11,17 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { useSSE } from "../../hooks/useSSE";
 
 export const CampaignsProvider = () => {
-  const token = localStorage.getItem("dndCampaignManagerJWT");
   const { subscribe } = useSSE();
   const [campaigns, setCampaigns] = useState<Campaign[] | null>(null);
   const [isLoading, setIsLoading] = useState(!!campaigns);
   const [message, setMessage] = useState<string | null>(null);
   const navigate = useNavigate();
-  const clearMessage = () => {
+  const clearMessage = useCallback(() => {
     setMessage(null);
-  };
-
-  useEffect(() => {
-    const unsubscribe = subscribe("member_joined", () => fetchCampaigns());
-    return unsubscribe;
   }, []);
 
   const fetchCampaigns = useCallback(async () => {
+    const token = localStorage.getItem("dndCampaignManagerJWT");
     if (!token) return;
     setIsLoading(true);
     getCampaigns()
@@ -41,10 +36,15 @@ export const CampaignsProvider = () => {
       .finally(() => {
         setIsLoading(false);
       });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    const unsubscribe = subscribe("member_joined", () => fetchCampaigns());
+    return unsubscribe;
+  }, [subscribe, fetchCampaigns]);
+
   const fetchCampaign = useCallback(async (id: string): Promise<Campaign | null> => {
+    const token = localStorage.getItem("dndCampaignManagerJWT");
     if (!token) return null;
     setIsLoading(true);
     try {
@@ -58,63 +58,79 @@ export const CampaignsProvider = () => {
     } finally {
       setIsLoading(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const deleteCampaign = async (id: string) => {
-    if (!token) return;
-    deleteCampaignApi(id)
-      .then(async () => {
-        await fetchCampaigns();
-        navigate(`/campaigns`);
-      })
-      .catch((error: Error) => {
-        console.error("Error deleting campaign:", error);
-        setMessage(error.message);
-      });
-  };
+  const deleteCampaign = useCallback(
+    async (id: string) => {
+      const token = localStorage.getItem("dndCampaignManagerJWT");
+      if (!token) return;
+      deleteCampaignApi(id)
+        .then(async () => {
+          await fetchCampaigns();
+          navigate(`/campaigns`);
+        })
+        .catch((error: Error) => {
+          console.error("Error deleting campaign:", error);
+          setMessage(error.message);
+        });
+    },
+    [fetchCampaigns, navigate]
+  );
 
-  const updateCampaign = useCallback(async (id: string, payload: UpdateCampaignPayload) => {
-    if (!token) return null;
-    setIsLoading(true);
-    try {
-      const data = await updateCampaignApi(id, payload);
-      setMessage(data.message);
-      const campaignToUpdate = campaigns?.find((campaign) => campaign.id === id);
-      if (campaignToUpdate) {
-        const updatedCampaign = { ...campaignToUpdate, ...data.campaign };
-        setCampaigns(campaigns!.map((campaign) => (campaign.id === id ? updatedCampaign : campaign)));
+  const updateCampaign = useCallback(
+    async (id: string, payload: UpdateCampaignPayload) => {
+      const token = localStorage.getItem("dndCampaignManagerJWT");
+      if (!token) return null;
+      setIsLoading(true);
+      try {
+        const data = await updateCampaignApi(id, payload);
+        setMessage(data.message);
+        setCampaigns((prev) => prev?.map((c) => (c.id === id ? { ...c, ...data.campaign } : c)) ?? null);
+        return data.campaign;
+      } catch (error: unknown) {
+        console.error("Error updating campaign:", error);
+        setMessage((error as Error).message);
+        return null;
+      } finally {
+        setIsLoading(false);
       }
-      return data.campaign;
-    } catch (error: unknown) {
-      console.error("Error updating campaign:", error);
-      setMessage((error as Error).message);
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    },
+    []
+  );
 
   useEffect(() => {
     fetchCampaigns();
   }, [fetchCampaigns]);
 
+  const value = useMemo(
+    () => ({
+      campaigns,
+      setCampaigns,
+      fetchCampaigns,
+      fetchCampaign,
+      updateCampaign,
+      isLoading,
+      message,
+      setMessage,
+      clearMessage,
+      deleteCampaign,
+    }),
+    [
+      campaigns,
+      setCampaigns,
+      fetchCampaigns,
+      fetchCampaign,
+      updateCampaign,
+      isLoading,
+      message,
+      setMessage,
+      clearMessage,
+      deleteCampaign,
+    ]
+  );
+
   return (
-    <CampaignsContext.Provider
-      value={{
-        campaigns,
-        setCampaigns,
-        fetchCampaigns,
-        fetchCampaign,
-        updateCampaign,
-        isLoading,
-        message,
-        setMessage,
-        clearMessage,
-        deleteCampaign,
-      }}
-    >
+    <CampaignsContext.Provider value={value}>
       <Outlet />
     </CampaignsContext.Provider>
   );

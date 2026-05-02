@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { SSEContext } from "./SSEContext";
 
 export const SSEProvider = ({ children }: { children: React.ReactNode }) => {
@@ -20,7 +20,7 @@ export const SSEProvider = ({ children }: { children: React.ReactNode }) => {
     return () => eventSource.close();
   }, []);
 
-  const subscribe = (eventType: string, callback: (data: unknown) => void) => {
+  const subscribe = useCallback((eventType: string, callback: (data: unknown) => void) => {
     if (!listenersRef.current.has(eventType)) {
       listenersRef.current.set(eventType, new Set());
     }
@@ -29,7 +29,9 @@ export const SSEProvider = ({ children }: { children: React.ReactNode }) => {
     return () => {
       listenersRef.current.get(eventType)?.delete(callback);
     };
-  };
+  }, []);
 
-  return <SSEContext.Provider value={{ subscribe }}>{children}</SSEContext.Provider>;
+  const value = useMemo(() => ({ subscribe }), [subscribe]);
+
+  return <SSEContext.Provider value={value}>{children}</SSEContext.Provider>;
 };
