@@ -6,6 +6,51 @@ datasource db {
   provider = "postgresql"
 }
 
+enum CharacterType {
+  player
+  npc
+  monster
+}
+
+enum CampaignMemberRole {
+  dm
+  player
+}
+
+enum InviteStatus {
+  pending
+  accepted
+  rejected
+}
+
+enum AbilityName {
+  str
+  dex
+  con
+  int
+  wis
+  cha
+}
+
+enum Alignment {
+  lawful_good
+  neutral_good
+  chaotic_good
+  lawful_neutral
+  true_neutral
+  chaotic_neutral
+  lawful_evil
+  neutral_evil
+  chaotic_evil
+}
+
+enum HitDiceType {
+  d6
+  d8
+  d10
+  d12
+}
+
 model User {
   id           String           @id @default(uuid())
   email        String           @unique
@@ -40,9 +85,9 @@ model Campaign {
 }
 
 model CampaignMember {
-  id         String   @id @default(uuid())
-  role       String   @default("player") @map("role")
-  joinedAt   DateTime @default(now()) @map("joined_at")
+  id         String             @id @default(uuid())
+  role       CampaignMemberRole @default(player) @map("role")
+  joinedAt   DateTime           @default(now()) @map("joined_at")
   userId     String
   campaignId String
 
@@ -54,31 +99,83 @@ model CampaignMember {
 }
 
 model CampaignInvite {
-  id         String   @id @default(uuid())
-  token      String   @unique
+  id         String       @id @default(uuid())
+  token      String       @unique
   email      String?
   campaignId String
-  status     String   @default("pending") // pending, accepted, rejected
-  createdAt  DateTime @default(now()) @map("created_at")
-  expiresAt  DateTime @map("expires_at")
-  campaign   Campaign @relation("CampaignInvites", fields: [campaignId], references: [id])
+  status     InviteStatus @default(pending)
+  createdAt  DateTime     @default(now()) @map("created_at")
+  expiresAt  DateTime     @map("expires_at")
+  campaign   Campaign     @relation("CampaignInvites", fields: [campaignId], references: [id])
 
   @@map("campaign_invites")
 }
 
 model Character {
-  id             String   @id @default(uuid())
-  name           String
-  type           String // player, npc,monster
-  level          Int      @default(1)
-  race           String
-  characterClass String   @map("character_class")
-  campaignId     String
-  userId         String
-  createdAt      DateTime @default(now()) @map("created_at")
-  updatedAt      DateTime @updatedAt @map("updated_at")
-  user           User     @relation("UserCharacters", fields: [userId], references: [id])
-  campaign       Campaign @relation("CampaignCharacters", fields: [campaignId], references: [id])
+  id                 String         @id @default(uuid())
+  name               String
+  type               CharacterType  @default(player)
+  race               String
+  experience         Int            @default(0)
+  characterClass     String         @map("character_class")
+  background         String?
+  alignment          Alignment?
+  notes              String?
+  speed              Int            @default(30)
+  hitDiceType        HitDiceType    @default(d8)
+  hitDiceUsed        Int            @default(0)
+  maxHp              Int            @default(1)
+  currentHp          Int            @default(1)
+  tempHp             Int            @default(0)
+  deathSaveSuccesses Int            @default(0)
+  deathSaveFailures  Int            @default(0)
+  armorClass         Int            @default(10)
+  usesShield         Boolean        @default(false)
+  inspiration        Boolean        @default(false)
+  campaignId         String
+  userId             String
+  createdAt          DateTime       @default(now()) @map("created_at")
+  updatedAt          DateTime       @updatedAt @map("updated_at")
+  user               User           @relation("UserCharacters", fields: [userId], references: [id])
+  campaign           Campaign       @relation("CampaignCharacters", fields: [campaignId], references: [id])
+  abilityScores      AbilityScore[]
+  skills             Skill[]
+  attacks            Attack[]
 
   @@map("characters")
+}
+
+model AbilityScore {
+  id                  String      @id @default(uuid())
+  name                AbilityName
+  score               Int
+  saveThrowProficient Boolean     @default(false)
+  characterId         String      @map("character_id")
+  character           Character   @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@unique([characterId, name])
+  @@map("ability_scores")
+}
+
+model Skill {
+  id          String    @id @default(uuid())
+  name        String
+  proficient  Boolean   @default(false)
+  characterId String    @map("character_id")
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@unique([characterId, name])
+  @@map("skills")
+}
+
+model Attack {
+  id          String    @id @default(uuid())
+  name        String
+  damage      String
+  attackBonus Int
+  notes       String?
+  characterId String    @map("character_id")
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@map("attacks")
 }
