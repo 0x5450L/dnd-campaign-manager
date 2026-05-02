@@ -4,29 +4,15 @@ import type {
   CharacterSheetState,
   SkillDef,
 } from "../types/characters/characterSheet";
+import { SKILL_DEFINITIONS } from "../../../shared/dnd";
 
 export const MIN_ATTACKS = 3;
 
-export const DEFAULT_SKILLS: SkillDef[] = [
-  { name: "Athletics", ability: "str", proficient: false },
-  { name: "Acrobatics", ability: "dex", proficient: false },
-  { name: "Sleight of Hand", ability: "dex", proficient: false },
-  { name: "Stealth", ability: "dex", proficient: false },
-  { name: "Arcana", ability: "int", proficient: false },
-  { name: "History", ability: "int", proficient: false },
-  { name: "Investigation", ability: "int", proficient: false },
-  { name: "Nature", ability: "int", proficient: false },
-  { name: "Religion", ability: "int", proficient: false },
-  { name: "Animal Handling", ability: "wis", proficient: false },
-  { name: "Insight", ability: "wis", proficient: false },
-  { name: "Medicine", ability: "wis", proficient: false },
-  { name: "Perception", ability: "wis", proficient: false },
-  { name: "Survival", ability: "wis", proficient: false },
-  { name: "Deception", ability: "cha", proficient: false },
-  { name: "Intimidation", ability: "cha", proficient: false },
-  { name: "Performance", ability: "cha", proficient: false },
-  { name: "Persuasion", ability: "cha", proficient: false },
-];
+export const DEFAULT_SKILLS: SkillDef[] = SKILL_DEFINITIONS.map((s) => ({
+  name: s.name,
+  ability: s.ability,
+  proficient: false,
+}));
 
 export const DEFAULT_ABILITIES: Record<AbilityName, AbilityState> = {
   str: { score: 10, saveProficient: false },

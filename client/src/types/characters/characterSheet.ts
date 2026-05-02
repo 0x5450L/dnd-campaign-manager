@@ -1,4 +1,5 @@
-export type AbilityName = "str" | "dex" | "con" | "int" | "wis" | "cha";
+import type { AbilityName } from "../../../../shared/dnd";
+export type { AbilityName };
 
 export type AbilityState = {
   score: number;
