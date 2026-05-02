@@ -111,7 +111,7 @@ router.get('/stream', authMiddleware, async (req, res) => {
   });
 });
 
-router.get('/:token', asyncHandler(async (req, res) => {
+router.get<{token: string}>('/:token', asyncHandler(async (req, res) => {
   const { token } = req.params;
   const invite = await prisma.campaignInvite.findUnique({
     where: { token },
