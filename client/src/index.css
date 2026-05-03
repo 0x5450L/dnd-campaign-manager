@@ -277,6 +277,29 @@ body {
   background: linear-gradient(90deg, transparent, var(--color-hover) 30%, var(--color-hover) 70%, transparent);
 }
 
+.cs-input-wrap.required-empty::after {
+  background: #3a1518;
+  height: 2px;
+}
+
+.cs-input-wrap.required-empty:focus-within::after {
+  background: linear-gradient(90deg, transparent, #6b2a2a 30%, #6b2a2a 70%, transparent);
+}
+
+.cs-input-wrap.required-empty + .cs-label {
+  color: #6b2a2a;
+}
+
+.cs-input-wrap.required-empty .cs-input::placeholder {
+  color: rgba(107, 42, 42, 0.55);
+}
+
+.cs-input-wrap[data-required] + .cs-label::after {
+  content: " *";
+  color: var(--color-gold);
+  font-weight: 600;
+}
+
 /* ── Score input (boxed numeric) ── */
 .cs-score-input {
   background: transparent;

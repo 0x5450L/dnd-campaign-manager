@@ -16,6 +16,7 @@ export const CharacterLore = () => {
             onChange={(v) => setField("name", v)}
             placeholder="Character Name"
             large
+            required
           />
           <div className="cs-label mt-1">Character Name</div>
         </div>
@@ -35,6 +36,7 @@ export const CharacterLore = () => {
               value={state.characterClass}
               onChange={(v) => setField("characterClass", v)}
               placeholder="—"
+              required
             />
             <div className="cs-label">Class</div>
           </div>
@@ -43,6 +45,7 @@ export const CharacterLore = () => {
               value={state.race}
               onChange={(v) => setField("race", v)}
               placeholder="—"
+              required
             />
             <div className="cs-label">Species</div>
           </div>

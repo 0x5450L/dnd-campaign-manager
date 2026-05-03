@@ -1,16 +1,19 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CharacterSheetProvider } from "../../context/characterSheetContext/CharacterSheetProvider";
 import { useCharacterSheet } from "../../context/characterSheetContext/useCharacterSheet";
 import { useIsMobile } from "../../hooks/useMediaQuery";
 import { MobileCharacterSheet } from "./layouts/MobileCharacterSheet";
 import { DesktopCharacterSheet } from "./layouts/DesktopCharacterSheet";
 import type { CharacterSheetState } from "../../types/characters/characterSheet";
+import type { CharacterDTO } from "../../types/characters/characters";
+import { dtoToSheetState } from "../../utils/characterSheetMapping";
 
 const ANIMATION_MS = 200;
 
 type CharacterSheetProps = {
   isOpen: boolean;
   onClose: () => void;
+  character?: CharacterDTO;
   onForceSave?: (state: CharacterSheetState) => void;
 };
 
@@ -79,9 +82,14 @@ const SheetTopActions = ({
   );
 };
 
-export const CharacterSheet = ({ isOpen, onClose, onForceSave }: CharacterSheetProps) => {
+export const CharacterSheet = ({ isOpen, onClose, character, onForceSave }: CharacterSheetProps) => {
   const [mounted, setMounted] = useState(isOpen);
   const [visible, setVisible] = useState(false);
+
+  const initialState = useMemo(
+    () => (character ? dtoToSheetState(character) : undefined),
+    [character],
+  );
 
   useEffect(() => {
     if (isOpen) {
@@ -139,7 +147,7 @@ export const CharacterSheet = ({ isOpen, onClose, onForceSave }: CharacterSheetP
         }`}
         onClick={(e) => e.stopPropagation()}
       >
-        <CharacterSheetProvider>
+        <CharacterSheetProvider key={character?.id ?? "new"} initialState={initialState}>
           <SheetTopActions onClose={onClose} onForceSave={onForceSave} />
           <CharacterSheetInner onClose={onClose} onForceSave={onForceSave} />
         </CharacterSheetProvider>
