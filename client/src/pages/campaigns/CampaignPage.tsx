@@ -1,25 +1,16 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useCampaigns } from "../../hooks/useCampaigns";
 import { useAuth } from "../../hooks/useAuth";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import type { Campaign } from "../../types/campaigns";
 import type { Character } from "../../types/characters/characters";
-import type { CharacterSheetState } from "../../types/characters/characterSheet";
 import CommonInput from "../../components/ui/inputs/CommonInput";
 import ConfirmDialog from "../../components/ui/ConfirmDialog";
 import CreateInvite from "../../components/campaigns/campaign/CreateInvite";
 import CommonButton from "../../components/ui/buttons/CommonButton";
 import { useSSE } from "../../hooks/useSSE";
 import { CharacterSheet } from "../../components/characters/CharacterSheet";
-import {
-  createCharacter,
-  getCampaignCharacters,
-  updateCharacter,
-} from "../../services/api/characters";
-import {
-  sheetStateToCreatePayload,
-  sheetStateToUpdatePayload,
-} from "../../utils/characterSheetMapping";
+import { getCampaignCharacters } from "../../services/api/characters";
 
 function CampaignPage() {
   const { id } = useParams();
@@ -33,7 +24,6 @@ function CampaignPage() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isCharacterSheetOpen, setIsCharacterSheetOpen] = useState(false);
   const [myCharacter, setMyCharacter] = useState<Character | null>(null);
-  const [sheetCharacter, setSheetCharacter] = useState<Character | null>(null);
 
   const isDM = user?.id === campaign?.dmId;
 
@@ -80,29 +70,6 @@ function CampaignPage() {
       .catch((error) => console.error("Error fetching characters:", error));
   }, [id, user]);
 
-  const openCharacterSheet = () => {
-    setSheetCharacter(myCharacter);
-    setIsCharacterSheetOpen(true);
-  };
-
-  const handleCharacterSave = useCallback(
-    async (state: CharacterSheetState) => {
-      if (!id) return;
-      try {
-        if (myCharacter) {
-          const res = await updateCharacter(myCharacter.id, sheetStateToUpdatePayload(state));
-          setMyCharacter(res.character);
-        } else {
-          const res = await createCharacter(sheetStateToCreatePayload(state, id));
-          setMyCharacter(res.character);
-        }
-      } catch (error) {
-        console.error("Error saving character:", error);
-      }
-    },
-    [id, myCharacter],
-  );
-
   const handleSave = async () => {
     if (!campaign || !hasChanges) return;
     const updated = await updateCampaign(campaign.id, {
@@ -124,8 +91,12 @@ function CampaignPage() {
 
   if (!campaign) {
     return (
-      <div className="max-w-3xl mx-auto p-6">
-        (message? <p className="text-red-400">{message}</p> : <p className="text-gray-400">Campaign not found.</p>)
+      <div className="max-w-3xl mx-auto p-6 flex flex-col gap-4">
+        {message ? (
+          <p className="text-red-400">{message}</p>
+        ) : (
+          <p className="text-gray-400">Campaign not found.</p>
+        )}
         <CommonButton onClick={() => navigate("/campaigns")} variant="secondary" size="sm">
           Back to campaigns
         </CommonButton>
@@ -141,7 +112,7 @@ function CampaignPage() {
           &larr; To Campaigns
         </CommonButton>
 
-        <CommonButton className="ml-auto" onClick={openCharacterSheet} size="sm">
+        <CommonButton className="ml-auto" onClick={() => setIsCharacterSheetOpen(true)} size="sm">
           {myCharacter ? "My Character" : "Create Character"}
         </CommonButton>
 
@@ -256,8 +227,9 @@ function CampaignPage() {
 
       <CharacterSheet
         isOpen={isCharacterSheetOpen}
-        character={sheetCharacter ?? undefined}
-        onForceSave={handleCharacterSave}
+        characterId={myCharacter?.id}
+        campaignId={campaign.id}
+        onSaved={(c) => setMyCharacter(c)}
         onClose={() => setIsCharacterSheetOpen(false)}
       />
     </div>
