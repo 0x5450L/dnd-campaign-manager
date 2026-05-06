@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useCampaigns } from "../../hooks/useCampaigns";
 import { useAuth } from "../../hooks/useAuth";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { Campaign } from "../../types/campaigns";
 import type { Character } from "../../types/characters/characters";
 import CommonInput from "../../components/ui/inputs/CommonInput";
@@ -60,7 +60,7 @@ function CampaignPage() {
     return unsubscribe;
   }, [id, subscribe, fetchCampaign]);
 
-  useEffect(() => {
+  const refetchMyCharacter = useCallback(() => {
     if (!id || !user) return;
     getCampaignCharacters(id)
       .then((res) => {
@@ -69,6 +69,37 @@ function CampaignPage() {
       })
       .catch((error) => console.error("Error fetching characters:", error));
   }, [id, user]);
+
+  useEffect(() => {
+    refetchMyCharacter();
+  }, [refetchMyCharacter]);
+
+  useEffect(() => {
+    if (!id) return;
+
+    const matchesCampaign = (data: unknown) =>
+      (data as { campaignId?: string }).campaignId === id;
+
+    const unsubCreated = subscribe("character_created", (data) => {
+      if (matchesCampaign(data)) refetchMyCharacter();
+    });
+
+    const unsubUpdated = subscribe("character_updated", (data) => {
+      if (matchesCampaign(data)) refetchMyCharacter();
+    });
+
+    const unsubDeleted = subscribe("character_deleted", (data) => {
+      if (!matchesCampaign(data)) return;
+      const { characterId } = data as { characterId: string };
+      setMyCharacter((prev) => (prev && prev.id === characterId ? null : prev));
+    });
+
+    return () => {
+      unsubCreated();
+      unsubUpdated();
+      unsubDeleted();
+    };
+  }, [id, subscribe, refetchMyCharacter]);
 
   const handleSave = async () => {
     if (!campaign || !hasChanges) return;
@@ -106,7 +137,6 @@ function CampaignPage() {
 
   return (
     <div className="min-h-[calc(100vh-53px)] h-100% max-w-3xl mx-auto p-6 flex flex-col gap-6">
-      {/* Header */}
       <div className="flex items-center justify-between gap-2">
         <CommonButton onClick={() => navigate("/campaigns")} variant="secondary" size="sm">
           &larr; To Campaigns
@@ -134,7 +164,6 @@ function CampaignPage() {
         <p className="text-amber-400 m-auto">Loading campaign...</p>
       ) : (
         <>
-          {/* Campaign Info */}
           <div className="flex flex-col gap-4 bg-gray-800/50 p-6 rounded-xl border border-gray-700">
             <CommonInput
               type="text"
@@ -190,7 +219,6 @@ function CampaignPage() {
             )}
           </div>
 
-          {/* Members */}
           <div className="bg-gray-800/50 p-6 rounded-xl border border-gray-700">
             <h2 className="text-lg font-semibold text-gray-200 mb-3">Members ({campaign.members.length})</h2>
             <ul className="flex flex-col gap-2">
@@ -209,7 +237,6 @@ function CampaignPage() {
             </ul>
           </div>
 
-          {/* Invites */}
           <CreateInvite campaignId={campaign.id} />
         </>
       )}

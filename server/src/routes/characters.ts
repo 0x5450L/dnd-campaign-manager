@@ -66,7 +66,11 @@ router.post('/create', authMiddleware, asyncHandler(async (req, res) => {
   res.json({ status: 'ok', message: 'Character created successfully', character });
 
   campaign.members.forEach(member => {
-    notifyClient(member.user.email, { type: 'character_created', characterId: character.id });
+    notifyClient(member.user.email, {
+      type: 'character_created',
+      characterId: character.id,
+      campaignId,
+    });
   });
 
 }));
@@ -114,8 +118,10 @@ router.patch<{ id: string }>('/:id', authMiddleware, asyncHandler(async (req, re
     where: { id },
     include: {
       campaign: {
-        select: { dmId: true },
-        include: { members: { include: { user: { select: { email: true } } } } },
+        select: {
+          dmId: true,
+          members: { include: { user: { select: { email: true } } } },
+        },
       },
     },
   });
@@ -154,7 +160,7 @@ router.patch<{ id: string }>('/:id', authMiddleware, asyncHandler(async (req, re
       ...(usesShield !== undefined && { usesShield }),
       ...(inspiration !== undefined && { inspiration }),
 
-      ...(abilityScores !== undefined && {
+      ...(abilityScores !== undefined && abilityScores.length > 0 && {
         abilityScores: {
           updateMany: abilityScores.map((a) => ({
             where: { name: a.name },
@@ -163,7 +169,7 @@ router.patch<{ id: string }>('/:id', authMiddleware, asyncHandler(async (req, re
         },
       }),
 
-      ...(skills !== undefined && {
+      ...(skills !== undefined && skills.length > 0 && {
         skills: {
           updateMany: skills.map((s) => ({
             where: { name: s.name },
@@ -173,15 +179,18 @@ router.patch<{ id: string }>('/:id', authMiddleware, asyncHandler(async (req, re
       }),
 
       ...(attacks !== undefined && {
-        attacks: {
-          deleteMany: {},
-          create: attacks.map((a) => ({
-            name: a.name,
-            damage: a.damage,
-            attackBonus: a.attackBonus,
-            notes: a.notes ?? null,
-          })),
-        },
+        attacks:
+          attacks.length === 0
+            ? { deleteMany: {} }
+            : {
+                deleteMany: {},
+                create: attacks.map((a) => ({
+                  name: a.name,
+                  damage: a.damage,
+                  attackBonus: a.attackBonus,
+                  notes: a.notes ?? null,
+                })),
+              },
       }),
     },
     include: {
@@ -194,7 +203,11 @@ router.patch<{ id: string }>('/:id', authMiddleware, asyncHandler(async (req, re
   res.json({ status: 'ok', message: 'Character updated successfully', character });
 
   currentCharacter.campaign.members.forEach(member => {
-    notifyClient(member.user.email, { type: 'character_updated', characterId: character.id });
+    notifyClient(member.user.email, {
+      type: 'character_updated',
+      characterId: character.id,
+      campaignId: character.campaignId,
+    });
   });
 }));
 
@@ -210,11 +223,11 @@ router.delete<{ id: string }>('/:id', authMiddleware, asyncHandler(async (req, r
     include: {
       campaign: {
         select: {
-          dmId: true
+          dmId: true,
+          members: { include: { user: { select: { email: true } } } },
         },
-        include: { members: { include: { user: { select: { email: true } } } } }
-      }
-    }
+      },
+    },
   });
 
   if (!character || (character.userId !== userId && character.campaign.dmId !== userId)) {
@@ -228,7 +241,11 @@ router.delete<{ id: string }>('/:id', authMiddleware, asyncHandler(async (req, r
   res.json({ status: 'ok', message: 'You have lost your friend...', character });
 
   character.campaign.members.forEach(member => {
-    notifyClient(member.user.email, { type: 'character_deleted', characterId: id });
+    notifyClient(member.user.email, {
+      type: 'character_deleted',
+      characterId: id,
+      campaignId: character.campaignId,
+    });
   });
 
 }));
