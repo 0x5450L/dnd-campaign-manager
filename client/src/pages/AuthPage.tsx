@@ -1,20 +1,27 @@
 import { useState } from "react";
 import Login from "../components/auth/Login";
 import Register from "../components/auth/Register";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
 
 function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [searchParams] = useSearchParams();
   const redirect = searchParams.get("redirect");
   const navigate = useNavigate();
+  const { user, isLoading } = useAuth();
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (user) {
+    return <Navigate to={redirect ?? "/campaigns"} replace />;
+  }
 
   const handleRedirect = () => {
-    if (redirect) {
-      navigate(redirect);
-    } else {
-      navigate("/campaigns");
-    }
+    const target = redirect ?? "/campaigns";
+    navigate(target, { replace: true });
   };
 
   return (

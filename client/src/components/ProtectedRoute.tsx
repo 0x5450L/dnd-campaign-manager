@@ -7,7 +7,7 @@ function ProtectedRoute() {
   if (isLoading) {
     return <div>Loading...</div>;
   }
-  if (!user) return <Navigate to="/auth" />;
+  if (!user) return <Navigate to="/auth" replace />;
 
   return (
     <div className="min-h-screen flex flex-col">
