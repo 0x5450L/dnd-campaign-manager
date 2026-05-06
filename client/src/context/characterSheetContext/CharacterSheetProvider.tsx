@@ -19,7 +19,11 @@ import type {
 import {
   calcModifier,
   clamp,
+  getLevelFromXp,
   getProficiencyBonus,
+  getXpFromLevel,
+  MAX_LEVEL,
+  MIN_LEVEL,
   parseDiceToSidesNumber,
 } from "../../utils/dndMath";
 import { createInitialCharacterSheet } from "../../constants/characterSheet";
@@ -55,6 +59,22 @@ export const CharacterSheetProvider = ({ children, initialState }: Props) => {
     },
     [],
   );
+
+  const setLevelFromXp = useCallback((xp: number) => {
+    const safeXp = Math.max(0, xp);
+    dispatch({
+      type: "SET_FIELD",
+      payload: { xp: safeXp, level: getLevelFromXp(safeXp) },
+    });
+  }, []);
+
+  const setXpFromLevel = useCallback((level: number) => {
+    const safeLevel = clamp(level, MIN_LEVEL, MAX_LEVEL);
+    dispatch({
+      type: "SET_FIELD",
+      payload: { level: safeLevel, xp: getXpFromLevel(safeLevel) },
+    });
+  }, []);
 
   const setAbilityScore = useCallback(
     (ability: AbilityName, score: number) =>
@@ -185,6 +205,8 @@ export const CharacterSheetProvider = ({ children, initialState }: Props) => {
       hitDiceRemaining: Math.max(0, state.level - state.hitDiceUsed),
 
       setField,
+      setLevelFromXp,
+      setXpFromLevel,
       setAbilityScore,
       setSaveProficient,
       setSkillProficient,
@@ -202,6 +224,8 @@ export const CharacterSheetProvider = ({ children, initialState }: Props) => {
   }, [
     state,
     setField,
+    setLevelFromXp,
+    setXpFromLevel,
     setAbilityScore,
     setSaveProficient,
     setSkillProficient,

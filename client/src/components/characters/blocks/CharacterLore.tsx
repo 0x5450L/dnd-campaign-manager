@@ -3,7 +3,7 @@ import { GradientInput } from "../inputs/GradientInput";
 import { useCharacterSheet } from "../../../context/characterSheetContext/useCharacterSheet";
 
 export const CharacterLore = () => {
-  const { state, setField } = useCharacterSheet();
+  const { state, setField, setLevelFromXp, setXpFromLevel } = useCharacterSheet();
 
   return (
     <div className="cs-section-card p-3 flex items-stretch gap-4">
@@ -66,7 +66,7 @@ export const CharacterLore = () => {
         <div className="cs-level-circle">
           <NumericInput
             value={state.level}
-            onChange={(v) => setField("level", v)}
+            onChange={setXpFromLevel}
             min={1}
             max={20}
             defaultValue={1}
@@ -76,7 +76,7 @@ export const CharacterLore = () => {
         <div className="flex flex-col items-center mt-1">
           <NumericInput
             value={state.xp}
-            onChange={(v) => setField("xp", v)}
+            onChange={setLevelFromXp}
             min={0}
             defaultValue={0}
             className="bg-transparent text-center outline-none w-16 text-xs text-dim"

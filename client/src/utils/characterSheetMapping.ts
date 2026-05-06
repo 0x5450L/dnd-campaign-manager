@@ -1,4 +1,5 @@
 import { ABILITY_NAMES, SKILL_DEFINITIONS } from "../../../shared/dnd";
+import { MIN_ATTACKS } from "../constants/characterSheet";
 import { getLevelFromXp } from "./dndMath";
 import type {
   CharacterAbilityDTO,
@@ -15,6 +16,14 @@ import type {
   CharacterSheetState,
   SkillDef,
 } from "../types/characters/characterSheet";
+
+const makeEmptyAttack = (): Attack => ({
+  id: crypto.randomUUID(),
+  name: "",
+  attackBonus: "",
+  damage: "",
+  notes: "",
+});
 
 const buildAbilitiesFromDto = (
   abilityScores: CharacterAbilityDTO[],
@@ -40,14 +49,19 @@ const buildSkillsFromDto = (skills: CharacterSkillDTO[]): SkillDef[] =>
     };
   });
 
-const buildAttacksFromDto = (attacks: CharacterDTO["attacks"]): Attack[] =>
-  attacks.map((a) => ({
+const buildAttacksFromDto = (attacks: CharacterDTO["attacks"]): Attack[] => {
+  const mapped: Attack[] = attacks.map((a) => ({
     id: a.id,
     name: a.name,
     attackBonus: String(a.attackBonus),
     damage: a.damage,
     notes: a.notes ?? "",
   }));
+  while (mapped.length < MIN_ATTACKS) {
+    mapped.push(makeEmptyAttack());
+  }
+  return mapped;
+};
 
 export const dtoToSheetState = (
   dto: CharacterDTO,

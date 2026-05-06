@@ -30,6 +30,10 @@ export type CharacterSheetContextType = {
     value: CharacterSheetState[K],
   ) => void;
 
+  // Level <-> XP synced setters
+  setLevelFromXp: (xp: number) => void;
+  setXpFromLevel: (level: number) => void;
+
   // Ability / skills
   setAbilityScore: (ability: AbilityName, score: number) => void;
   setSaveProficient: (ability: AbilityName, proficient: boolean) => void;
