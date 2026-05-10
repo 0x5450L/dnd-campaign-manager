@@ -47,12 +47,12 @@ function CharacterCard({ character, isOwnedByDm, onOpen, onDelete }: CharacterCa
           handleOpen();
         }
       }}
-      className="group w-full text-left bg-gray-800/60 hover:bg-gray-700/60 border border-gray-700 hover:border-amber-700/50 rounded-xl p-4 transition-colors duration-200 cursor-pointer flex flex-col gap-3 focus:outline-none focus:ring-2 focus:ring-amber-600/50"
+      className="group w-full text-left bg-gray-800/50 hover:bg-gray-700/50 border border-gray-700 hover:border-amber-700/50 rounded-xl p-4 transition-colors duration-200 cursor-pointer flex flex-col gap-3 focus:outline-none focus:ring-2 focus:ring-amber-600/50"
     >
       <div className="flex items-start justify-between gap-2">
         <div className="flex flex-col min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <h3 className="text-base font-semibold text-amber-200 truncate">
+            <h3 className="text-base font-semibold text-amber-300 truncate">
               {character.name || "Unnamed"}
             </h3>
             <span
@@ -97,7 +97,7 @@ function CharacterCard({ character, isOwnedByDm, onOpen, onDelete }: CharacterCa
             {character.currentHp}
             <span className="text-gray-500"> / {character.maxHp || "—"}</span>
             {character.tempHp > 0 && (
-              <span className="text-cyan-300"> +{character.tempHp}</span>
+              <span className="text-blue-300"> +{character.tempHp}</span>
             )}
           </span>
         </div>

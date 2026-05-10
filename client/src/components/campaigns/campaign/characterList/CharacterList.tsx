@@ -1,6 +1,7 @@
+import React from "react";
 import type { Character } from "../../../../types/characters/characters";
 
-function CharacterList({ characters }: { characters: Character[] }) {
+function CharacterList({ characters }: { characters: Character[] }): React.ReactElement {
   return (
     <div>
       <h1>Character List</h1>
