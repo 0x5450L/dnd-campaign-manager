@@ -1,16 +1,22 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useCampaigns } from "../../hooks/useCampaigns";
 import { useAuth } from "../../hooks/useAuth";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Campaign } from "../../types/campaigns";
-import type { Character } from "../../types/characters/characters";
+import type { Character, CharacterType } from "../../types/characters/characters";
 import CommonInput from "../../components/ui/inputs/CommonInput";
 import ConfirmDialog from "../../components/ui/ConfirmDialog";
 import CreateInvite from "../../components/campaigns/campaign/CreateInvite";
 import CommonButton from "../../components/ui/buttons/CommonButton";
 import { useSSE } from "../../hooks/useSSE";
 import { CharacterSheet } from "../../components/characters/CharacterSheet";
-import { getCampaignCharacters } from "../../services/api/characters";
+import CharactersSidebar from "../../components/campaigns/campaign/characterList/CharactersSidebar";
+import { deleteCharacter, getCampaignCharacters } from "../../services/api/characters";
+
+type SheetMode =
+  | { kind: "closed" }
+  | { kind: "edit"; characterId: string }
+  | { kind: "create"; type: CharacterType };
 
 function CampaignPage() {
   const { id } = useParams();
@@ -22,10 +28,17 @@ function CampaignPage() {
   const [campaign, setCampaign] = useState<Campaign | null>(null);
   const [originalCampaign, setOriginalCampaign] = useState<Campaign | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [isCharacterSheetOpen, setIsCharacterSheetOpen] = useState(false);
-  const [myCharacter, setMyCharacter] = useState<Character | null>(null);
+  const [characters, setCharacters] = useState<Character[]>([]);
+  const [sheetMode, setSheetMode] = useState<SheetMode>({ kind: "closed" });
+  const [isCharactersSidebarOpen, setIsCharactersSidebarOpen] = useState(false);
+  const [characterToDelete, setCharacterToDelete] = useState<Character | null>(null);
 
   const isDM = user?.id === campaign?.dmId;
+
+  const myCharacter = useMemo(
+    () => characters.find((c) => c.userId === user?.id && c.type === "player") ?? null,
+    [characters, user?.id],
+  );
 
   const hasChanges =
     campaign &&
@@ -60,19 +73,16 @@ function CampaignPage() {
     return unsubscribe;
   }, [id, subscribe, fetchCampaign]);
 
-  const refetchMyCharacter = useCallback(() => {
-    if (!id || !user) return;
+  const refetchCharacters = useCallback(() => {
+    if (!id) return;
     getCampaignCharacters(id)
-      .then((res) => {
-        const mine = res.characters.find((c) => c.userId === user.id) ?? null;
-        setMyCharacter(mine);
-      })
+      .then((res) => setCharacters(res.characters))
       .catch((error) => console.error("Error fetching characters:", error));
-  }, [id, user]);
+  }, [id]);
 
   useEffect(() => {
-    refetchMyCharacter();
-  }, [refetchMyCharacter]);
+    refetchCharacters();
+  }, [refetchCharacters]);
 
   useEffect(() => {
     if (!id) return;
@@ -81,17 +91,17 @@ function CampaignPage() {
       (data as { campaignId?: string }).campaignId === id;
 
     const unsubCreated = subscribe("character_created", (data) => {
-      if (matchesCampaign(data)) refetchMyCharacter();
+      if (matchesCampaign(data)) refetchCharacters();
     });
 
     const unsubUpdated = subscribe("character_updated", (data) => {
-      if (matchesCampaign(data)) refetchMyCharacter();
+      if (matchesCampaign(data)) refetchCharacters();
     });
 
     const unsubDeleted = subscribe("character_deleted", (data) => {
       if (!matchesCampaign(data)) return;
       const { characterId } = data as { characterId: string };
-      setMyCharacter((prev) => (prev && prev.id === characterId ? null : prev));
+      setCharacters((prev) => prev.filter((c) => c.id !== characterId));
     });
 
     return () => {
@@ -99,7 +109,7 @@ function CampaignPage() {
       unsubUpdated();
       unsubDeleted();
     };
-  }, [id, subscribe, refetchMyCharacter]);
+  }, [id, subscribe, refetchCharacters]);
 
   const handleSave = async () => {
     if (!campaign || !hasChanges) return;
@@ -120,6 +130,41 @@ function CampaignPage() {
     deleteCampaign(id);
   };
 
+  const handleOpenMyCharacter = () => {
+    if (myCharacter) {
+      setSheetMode({ kind: "edit", characterId: myCharacter.id });
+    } else {
+      setSheetMode({ kind: "create", type: "player" });
+    }
+  };
+
+  const handleOpenCharacterFromSidebar = (character: Character) => {
+    setSheetMode({ kind: "edit", characterId: character.id });
+  };
+
+  const handleCreateNpc = () => {
+    setSheetMode({ kind: "create", type: "npc" });
+  };
+
+  const handleCharacterSaved = (saved: Character) => {
+    setCharacters((prev) => {
+      const exists = prev.some((c) => c.id === saved.id);
+      return exists ? prev.map((c) => (c.id === saved.id ? saved : c)) : [...prev, saved];
+    });
+  };
+
+  const handleConfirmDeleteCharacter = async () => {
+    if (!characterToDelete) return;
+    const target = characterToDelete;
+    setCharacterToDelete(null);
+    try {
+      await deleteCharacter(target.id);
+      setCharacters((prev) => prev.filter((c) => c.id !== target.id));
+    } catch (error) {
+      console.error("Error deleting character:", error);
+    }
+  };
+
   if (!campaign) {
     return (
       <div className="max-w-3xl mx-auto p-6 flex flex-col gap-4">
@@ -137,27 +182,35 @@ function CampaignPage() {
 
   return (
     <div className="min-h-[calc(100vh-53px)] h-100% max-w-3xl mx-auto p-6 flex flex-col gap-6">
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <CommonButton onClick={() => navigate("/campaigns")} variant="secondary" size="sm">
           &larr; To Campaigns
         </CommonButton>
 
-        <CommonButton className="ml-auto" onClick={() => setIsCharacterSheetOpen(true)} size="sm">
-          {myCharacter ? "My Character" : "Create Character"}
-        </CommonButton>
-
-        {isDM && (
-          <div className="flex gap-2">
-            {hasChanges && (
-              <CommonButton onClick={handleSave} size="sm">
-                Save
-              </CommonButton>
-            )}
-            <CommonButton onClick={() => setShowDeleteConfirm(true)} variant="decline" size="sm">
-              Delete Campaign
+        <div className="flex flex-wrap items-center gap-2 ml-auto">
+          {isDM ? (
+            <CommonButton onClick={() => setIsCharactersSidebarOpen(true)} size="sm">
+              Characters ({characters.length})
             </CommonButton>
-          </div>
-        )}
+          ) : (
+            <CommonButton onClick={handleOpenMyCharacter} size="sm">
+              {myCharacter ? "My Character" : "Create Character"}
+            </CommonButton>
+          )}
+
+          {isDM && (
+            <>
+              {hasChanges && (
+                <CommonButton onClick={handleSave} size="sm">
+                  Save
+                </CommonButton>
+              )}
+              <CommonButton onClick={() => setShowDeleteConfirm(true)} variant="decline" size="sm">
+                Delete Campaign
+              </CommonButton>
+            </>
+          )}
+        </div>
       </div>
 
       {isLoading ? (
@@ -252,12 +305,36 @@ function CampaignPage() {
         />
       )}
 
+      {characterToDelete && (
+        <ConfirmDialog
+          title="Delete character"
+          message={`Are you sure you want to delete "${characterToDelete.name || "this character"}"? This action cannot be undone.`}
+          confirmLabel="Delete"
+          cancelLabel="Cancel"
+          onConfirm={handleConfirmDeleteCharacter}
+          onCancel={() => setCharacterToDelete(null)}
+        />
+      )}
+
+      {isDM && (
+        <CharactersSidebar
+          isOpen={isCharactersSidebarOpen}
+          onClose={() => setIsCharactersSidebarOpen(false)}
+          characters={characters}
+          dmId={campaign.dmId}
+          onOpenCharacter={handleOpenCharacterFromSidebar}
+          onCreateNpc={handleCreateNpc}
+          onDeleteCharacter={(c) => setCharacterToDelete(c)}
+        />
+      )}
+
       <CharacterSheet
-        isOpen={isCharacterSheetOpen}
-        characterId={myCharacter?.id}
+        isOpen={sheetMode.kind !== "closed"}
+        characterId={sheetMode.kind === "edit" ? sheetMode.characterId : undefined}
+        defaultType={sheetMode.kind === "create" ? sheetMode.type : "player"}
         campaignId={campaign.id}
-        onSaved={(c) => setMyCharacter(c)}
-        onClose={() => setIsCharacterSheetOpen(false)}
+        onSaved={handleCharacterSaved}
+        onClose={() => setSheetMode({ kind: "closed" })}
       />
     </div>
   );

@@ -6,6 +6,7 @@ import type {
   CharacterAttackInput,
   CharacterDTO,
   CharacterSkillDTO,
+  CharacterType,
   CreateCharacterPayload,
   UpdateCharacterPayload,
 } from "../types/characters/characters";
@@ -118,9 +119,10 @@ const sheetSkillsToDtos = (skills: SkillDef[]): CharacterSkillDTO[] =>
 export const sheetStateToCreatePayload = (
   state: CharacterSheetState,
   campaignId: string,
+  type: CharacterType = "player",
 ): CreateCharacterPayload => ({
   name: state.name,
-  type: "player",
+  type,
   race: state.race,
   characterClass: state.characterClass,
   campaignId,

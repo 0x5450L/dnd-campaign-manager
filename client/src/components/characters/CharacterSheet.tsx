@@ -5,7 +5,7 @@ import { useIsMobile } from "../../hooks/useMediaQuery";
 import { MobileCharacterSheet } from "./layouts/MobileCharacterSheet";
 import { DesktopCharacterSheet } from "./layouts/DesktopCharacterSheet";
 import type { CharacterSheetState } from "../../types/characters/characterSheet";
-import type { Character } from "../../types/characters/characters";
+import type { Character, CharacterType } from "../../types/characters/characters";
 import {
   createCharacter,
   getCharacter,
@@ -23,6 +23,7 @@ type CharacterSheetProps = {
   onClose: () => void;
   characterId?: string;
   campaignId: string;
+  defaultType?: CharacterType;
   onSaved?: (character: Character) => void;
 };
 
@@ -101,6 +102,7 @@ export const CharacterSheet = ({
   onClose,
   characterId,
   campaignId,
+  defaultType = "player",
   onSaved,
 }: CharacterSheetProps) => {
   const [loadedCharacter, setLoadedCharacter] = useState<Character | null>(null);
@@ -181,7 +183,7 @@ export const CharacterSheet = ({
     try {
       const res = loadedCharacter
         ? await updateCharacter(loadedCharacter.id, sheetStateToUpdatePayload(state))
-        : await createCharacter(sheetStateToCreatePayload(state, campaignId));
+        : await createCharacter(sheetStateToCreatePayload(state, campaignId, defaultType));
 
       setLoadedCharacter(res.character);
       onSaved?.(res.character);
