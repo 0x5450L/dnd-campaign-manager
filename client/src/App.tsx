@@ -6,7 +6,7 @@ import CampaignsPage from "./pages/campaigns/CampaignsPage";
 import CampaignPage from "./pages/campaigns/CampaignPage";
 import { CampaignsProvider } from "./context/campaignsContext/CampaignsProvider";
 import InvitePage from "./pages/InvitePage";
-import NotFoundRedirect from "./components/NotFoundRedirect";
+import NotFound from "./pages/NotFound";
 
 function App() {
   return (
@@ -22,8 +22,7 @@ function App() {
       <Route path="/auth" element={<AuthPage />} />
       <Route path="/invite/:token" element={<InvitePage />} />
 
-      {/* Catch-all guard for unknown routes */}
-      <Route path="*" element={<NotFoundRedirect />} />
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }
