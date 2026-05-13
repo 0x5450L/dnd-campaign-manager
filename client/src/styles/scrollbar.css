@@ -1,32 +1,30 @@
-/* ── Custom scrollbar ──
-   Add .custom-scrollbar to any scrollable container.
-   Scrollbar overlays content — zero layout shift.
-   Uses overflow:overlay (Chromium) with auto fallback. */
-
-.custom-scrollbar {
+.custom-scrollbar,
+.custom-scrollbar-x {
   --_sb-size: 4px;
   --_sb-track: transparent;
   --_sb-thumb: var(--color-rule);
   --_sb-thumb-hover: var(--color-gold-dim);
 
-  /* fallback for Firefox */
-  overflow-y: auto;
-  /* Chromium: true overlay, no space reserved */
-  overflow-y: overlay;
-
-  /* Firefox */
   scrollbar-width: thin;
   scrollbar-color: var(--_sb-thumb) var(--_sb-track);
 }
 
-/* ── Webkit (Chrome, Edge, Safari) ── */
+.custom-scrollbar {
+  overflow-y: auto;
+  overflow-y: overlay;
+}
 
-/* Remove arrow buttons */
+.custom-scrollbar-x {
+  overflow-x: auto;
+  overflow-x: overlay;
+}
+
 .custom-scrollbar::-webkit-scrollbar-button:start:decrement,
 .custom-scrollbar::-webkit-scrollbar-button:start:increment,
 .custom-scrollbar::-webkit-scrollbar-button:end:decrement,
 .custom-scrollbar::-webkit-scrollbar-button:end:increment,
-.custom-scrollbar::-webkit-scrollbar-button {
+.custom-scrollbar::-webkit-scrollbar-button,
+.custom-scrollbar-x::-webkit-scrollbar-button {
   display: none !important;
   width: 0 !important;
   height: 0 !important;
@@ -36,15 +34,22 @@
   width: var(--_sb-size);
 }
 
-.custom-scrollbar::-webkit-scrollbar-track {
+.custom-scrollbar-x::-webkit-scrollbar {
+  height: var(--_sb-size);
+}
+
+.custom-scrollbar::-webkit-scrollbar-track,
+.custom-scrollbar-x::-webkit-scrollbar-track {
   background: var(--_sb-track);
 }
 
-.custom-scrollbar::-webkit-scrollbar-thumb {
+.custom-scrollbar::-webkit-scrollbar-thumb,
+.custom-scrollbar-x::-webkit-scrollbar-thumb {
   background: var(--_sb-thumb);
   border-radius: 999px;
 }
 
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+.custom-scrollbar::-webkit-scrollbar-thumb:hover,
+.custom-scrollbar-x::-webkit-scrollbar-thumb:hover {
   background: var(--_sb-thumb-hover);
 }
