@@ -88,7 +88,6 @@ router.get('/my', authMiddleware, asyncHandler(async (req, res) => {
   res.json({ status: 'ok', message: `You have ${invites.length || 'no'} invites`, invites });
 }));
 
-// SSE stream — не оборачиваем в asyncHandler
 router.get('/stream', authMiddleware, async (req, res) => {
   const userId = req.userId!;
 

@@ -51,6 +51,29 @@ enum HitDiceType {
   d12
 }
 
+enum SessionStatus {
+  active
+  paused
+  ended
+}
+
+enum EncounterStatus {
+  active
+  ended
+}
+
+enum ParticipantType {
+  pc
+  npc
+  monster
+}
+
+enum DiceRollMode {
+  normal
+  advantage
+  disadvantage
+}
+
 model User {
   id           String           @id @default(uuid())
   email        String           @unique
@@ -61,6 +84,7 @@ model User {
   memberships  CampaignMember[] @relation("UsersCampaigns")
   dmCampaigns  Campaign[]       @relation("CampaignDM")
   characters   Character[]      @relation("UserCharacters")
+  diceRolls    DiceRoll[]       @relation("UserDiceRolls")
 
   @@map("users")
 }
@@ -75,10 +99,11 @@ model Campaign {
   updatedAt   DateTime @updatedAt @map("updated_at")
   dmId        String
 
-  dm         User             @relation("CampaignDM", fields: [dmId], references: [id])
-  members    CampaignMember[] @relation("CampaignMembership")
-  invites    CampaignInvite[] @relation("CampaignInvites")
-  characters Character[]      @relation("CampaignCharacters")
+  dm         User              @relation("CampaignDM", fields: [dmId], references: [id])
+  members    CampaignMember[]  @relation("CampaignMembership")
+  invites    CampaignInvite[]  @relation("CampaignInvites")
+  characters Character[]       @relation("CampaignCharacters")
+  sessions   CampaignSession[] @relation("CampaignSessions")
 
   @@unique([dmId, name])
   @@map("campaigns")
@@ -112,35 +137,37 @@ model CampaignInvite {
 }
 
 model Character {
-  id                 String         @id @default(uuid())
-  name               String
-  type               CharacterType  @default(player)
-  race               String
-  experience         Int            @default(0)
-  characterClass     String         @map("character_class")
-  background         String?
-  alignment          Alignment?
-  notes              String?
-  speed              Int            @default(30)
-  hitDiceType        HitDiceType    @default(d8)
-  hitDiceUsed        Int            @default(0)
-  maxHp              Int            @default(1)
-  currentHp          Int            @default(1)
-  tempHp             Int            @default(0)
-  deathSaveSuccesses Int            @default(0)
-  deathSaveFailures  Int            @default(0)
-  armorClass         Int            @default(10)
-  usesShield         Boolean        @default(false)
-  inspiration        Boolean        @default(false)
-  campaignId         String
-  userId             String
-  createdAt          DateTime       @default(now()) @map("created_at")
-  updatedAt          DateTime       @updatedAt @map("updated_at")
-  user               User           @relation("UserCharacters", fields: [userId], references: [id])
-  campaign           Campaign       @relation("CampaignCharacters", fields: [campaignId], references: [id])
-  abilityScores      AbilityScore[]
-  skills             Skill[]
-  attacks            Attack[]
+  id                      String                 @id @default(uuid())
+  name                    String
+  type                    CharacterType          @default(player)
+  race                    String
+  experience              Int                    @default(0)
+  characterClass          String                 @map("character_class")
+  background              String?
+  alignment               Alignment?
+  notes                   String?
+  speed                   Int                    @default(30)
+  hitDiceType             HitDiceType            @default(d8)
+  hitDiceUsed             Int                    @default(0)
+  maxHp                   Int                    @default(1)
+  currentHp               Int                    @default(1)
+  tempHp                  Int                    @default(0)
+  deathSaveSuccesses      Int                    @default(0)
+  deathSaveFailures       Int                    @default(0)
+  armorClass              Int                    @default(10)
+  usesShield              Boolean                @default(false)
+  inspiration             Boolean                @default(false)
+  campaignId              String
+  userId                  String
+  createdAt               DateTime               @default(now()) @map("created_at")
+  updatedAt               DateTime               @updatedAt @map("updated_at")
+  user                    User                   @relation("UserCharacters", fields: [userId], references: [id])
+  campaign                Campaign               @relation("CampaignCharacters", fields: [campaignId], references: [id])
+  characterParticipations EncounterParticipant[] @relation("CharacterParticipations")
+  diceRolls               DiceRoll[]             @relation("CharacterDiceRolls")
+  abilityScores           AbilityScore[]
+  skills                  Skill[]
+  attacks                 Attack[]
 
   @@map("characters")
 }
@@ -169,13 +196,94 @@ model Skill {
 }
 
 model Attack {
-  id          String    @id @default(uuid())
-  name        String
-  damage      String
-  attackBonus Int
-  notes       String?
-  characterId String    @map("character_id")
-  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  id                     String                @id @default(uuid())
+  name                   String
+  damage                 String
+  attackBonus            Int
+  notes                  String?
+  characterId            String                @map("character_id")
+  character              Character             @relation(fields: [characterId], references: [id], onDelete: Cascade)
 
   @@map("attacks")
+}
+
+model CampaignSession {
+  id         String        @id @default(uuid())
+  number     Int           @default(1)
+  status     SessionStatus @default(active)
+  startedAt  DateTime      @default(now()) @map("started_at")
+  updatedAt  DateTime      @updatedAt @map("updated_at")
+  endedAt    DateTime?     @map("ended_at")
+  title      String?
+  summary    String?
+  notes      String?
+  campaignId String        @map("campaign_id")
+  campaign   Campaign      @relation("CampaignSessions", fields: [campaignId], references: [id], onDelete: Cascade)
+  encounters Encounter[]   @relation("SessionEncounters")
+  diceRolls  DiceRoll[]    @relation("CampaignSessionDiceRolls")
+
+  @@map("campaign_sessions")
+}
+
+model Encounter {
+  id                String                 @id @default(uuid())
+  name              String?
+  status            EncounterStatus        @default(active)
+  startedAt         DateTime               @default(now()) @map("started_at")
+  updatedAt         DateTime               @updatedAt @map("updated_at")
+  endedAt           DateTime?              @map("ended_at")
+  round             Int                    @default(1)
+  currentTurnIndex  Int                    @default(0)
+  campaignSessionId String                 @map("campaign_session_id")
+  campaignSession   CampaignSession        @relation("SessionEncounters", fields: [campaignSessionId], references: [id], onDelete: Cascade)
+  participants      EncounterParticipant[] @relation("EncounterParticipants")
+
+  @@map("encounters")
+}
+
+model EncounterParticipant {
+  id                 String          @id @default(uuid())
+  encounterId        String          @map("encounter_id")
+  encounter          Encounter       @relation("EncounterParticipants", fields: [encounterId], references: [id], onDelete: Cascade)
+  characterId        String?         @map("character_id")
+  character          Character?      @relation("CharacterParticipations", fields: [characterId], references: [id], onDelete: SetNull)
+  type               ParticipantType
+  name               String
+  sortOrder          Int             @map("sort_order")
+  maxHp              Int             @map("max_hp")
+  armorClass         Int             @map("armor_class")
+  attacks            Json            @default("[]")
+  currentHp          Int             @map("current_hp")
+  tempHp             Int             @default(0) @map("temp_hp")
+  conditions         String[]        @default([])
+  isVisible          Boolean         @default(true) @map("is_visible")
+  deathSaveSuccesses Int             @default(0) @map("death_save_successes")
+  deathSaveFailures  Int             @default(0) @map("death_save_failures")
+  createdAt          DateTime        @default(now()) @map("created_at")
+  updatedAt          DateTime        @updatedAt @map("updated_at")
+
+  @@index([encounterId, sortOrder])
+  @@map("encounter_participants")
+}
+
+model DiceRoll {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now()) @map("created_at")
+
+  campaignSessionId String          @map("campaign_session_id")
+  campaignSession   CampaignSession @relation("CampaignSessionDiceRolls", fields: [campaignSessionId], references: [id], onDelete: Cascade)
+
+  userId String @map("user_id")
+  user   User   @relation("UserDiceRolls", fields: [userId], references: [id], onDelete: Cascade)
+
+  characterId String?    @map("character_id")
+  character   Character? @relation("CharacterDiceRolls", fields: [characterId], references: [id], onDelete: SetNull)
+
+  formula     String
+  mode        DiceRollMode @default(normal)
+  resultByDie Json
+  total       Int
+
+  @@index([campaignSessionId, createdAt])
+  @@map("dice_rolls")
 }
