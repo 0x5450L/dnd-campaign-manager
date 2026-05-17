@@ -1,0 +1,21 @@
+model DiceRoll {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now()) @map("created_at")
+
+  campaignSessionId String          @map("campaign_session_id")
+  campaignSession   CampaignSession @relation("CampaignSessionDiceRolls", fields: [campaignSessionId], references: [id], onDelete: Cascade)
+
+  userId String @map("user_id")
+  user   User   @relation("UserDiceRolls", fields: [userId], references: [id], onDelete: Cascade)
+
+  characterId String?    @map("character_id")
+  character   Character? @relation("CharacterDiceRolls", fields: [characterId], references: [id], onDelete: Cascade)
+
+  formula     String
+  mode        DiceRollMode @default(normal)
+  resultByDie Json
+  total       Int
+
+  @@index([campaignSessionId, createdAt])
+  @@map("dice_rolls")
+}

@@ -1,0 +1,70 @@
+model Character {
+  id                      String                 @id @default(uuid())
+  name                    String
+  type                    CharacterType          @default(player)
+  race                    String
+  experience              Int                    @default(0)
+  characterClass          String                 @map("character_class")
+  background              String?
+  alignment               Alignment?
+  notes                   String?
+  speed                   Int                    @default(30)
+  hitDiceType             HitDiceType            @default(d8)
+  hitDiceUsed             Int                    @default(0)
+  maxHp                   Int                    @default(1)
+  currentHp               Int                    @default(1)
+  tempHp                  Int                    @default(0)
+  deathSaveSuccesses      Int                    @default(0)
+  deathSaveFailures       Int                    @default(0)
+  armorClass              Int                    @default(10)
+  usesShield              Boolean                @default(false)
+  inspiration             Boolean                @default(false)
+  campaignId              String
+  userId                  String
+  createdAt               DateTime               @default(now()) @map("created_at")
+  updatedAt               DateTime               @updatedAt @map("updated_at")
+  user                    User                   @relation("UserCharacters", fields: [userId], references: [id])
+  campaign                Campaign               @relation("CampaignCharacters", fields: [campaignId], references: [id])
+  characterParticipations EncounterParticipant[] @relation("CharacterParticipations")
+  diceRolls               DiceRoll[]             @relation("CharacterDiceRolls")
+  abilityScores           AbilityScore[]
+  skills                  Skill[]
+  attacks                 Attack[]
+
+  @@map("characters")
+}
+
+model AbilityScore {
+  id                  String      @id @default(uuid())
+  name                AbilityName
+  score               Int
+  saveThrowProficient Boolean     @default(false)
+  characterId         String      @map("character_id")
+  character           Character   @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@unique([characterId, name])
+  @@map("ability_scores")
+}
+
+model Skill {
+  id          String    @id @default(uuid())
+  name        String
+  proficient  Boolean   @default(false)
+  characterId String    @map("character_id")
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@unique([characterId, name])
+  @@map("skills")
+}
+
+model Attack {
+  id          String    @id @default(uuid())
+  name        String
+  damage      String
+  attackBonus Int
+  notes       String?
+  characterId String    @map("character_id")
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@map("attacks")
+}

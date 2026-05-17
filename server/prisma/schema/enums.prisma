@@ -1,0 +1,67 @@
+enum CharacterType {
+  player
+  npc
+  monster
+}
+
+enum CampaignMemberRole {
+  dm
+  player
+}
+
+enum InviteStatus {
+  pending
+  accepted
+  rejected
+}
+
+enum AbilityName {
+  str
+  dex
+  con
+  int
+  wis
+  cha
+}
+
+enum Alignment {
+  lawful_good
+  neutral_good
+  chaotic_good
+  lawful_neutral
+  true_neutral
+  chaotic_neutral
+  lawful_evil
+  neutral_evil
+  chaotic_evil
+}
+
+enum HitDiceType {
+  d6
+  d8
+  d10
+  d12
+}
+
+enum SessionStatus {
+  active
+  paused
+  ended
+}
+
+enum EncounterStatus {
+  active
+  ended
+}
+
+enum ParticipantType {
+  pc
+  npc
+  monster
+}
+
+enum DiceRollMode {
+  normal
+  advantage
+  disadvantage
+}

@@ -1,0 +1,46 @@
+model Campaign {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  setting     String?
+  imageUrl    String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  dmId        String
+
+  dm         User              @relation("CampaignDM", fields: [dmId], references: [id])
+  members    CampaignMember[]  @relation("CampaignMembership")
+  invites    CampaignInvite[]  @relation("CampaignInvites")
+  characters Character[]       @relation("CampaignCharacters")
+  sessions   CampaignSession[] @relation("CampaignSessions")
+
+  @@unique([dmId, name])
+  @@map("campaigns")
+}
+
+model CampaignMember {
+  id         String             @id @default(uuid())
+  role       CampaignMemberRole @default(player) @map("role")
+  joinedAt   DateTime           @default(now()) @map("joined_at")
+  userId     String
+  campaignId String
+
+  user     User     @relation("UsersCampaigns", fields: [userId], references: [id])
+  campaign Campaign @relation("CampaignMembership", fields: [campaignId], references: [id])
+
+  @@unique([userId, campaignId])
+  @@map("campaign_members")
+}
+
+model CampaignInvite {
+  id         String       @id @default(uuid())
+  token      String       @unique
+  email      String?
+  campaignId String
+  status     InviteStatus @default(pending)
+  createdAt  DateTime     @default(now()) @map("created_at")
+  expiresAt  DateTime     @map("expires_at")
+  campaign   Campaign     @relation("CampaignInvites", fields: [campaignId], references: [id])
+
+  @@map("campaign_invites")
+}

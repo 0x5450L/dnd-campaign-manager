@@ -1,0 +1,14 @@
+model User {
+  id           String           @id @default(uuid())
+  email        String           @unique
+  passwordHash String           @map("password_hash")
+  displayName  String           @map("display_name")
+  createdAt    DateTime         @default(now()) @map("created_at")
+  updatedAt    DateTime         @updatedAt @map("updated_at")
+  memberships  CampaignMember[] @relation("UsersCampaigns")
+  dmCampaigns  Campaign[]       @relation("CampaignDM")
+  characters   Character[]      @relation("UserCharacters")
+  diceRolls    DiceRoll[]       @relation("UserDiceRolls")
+
+  @@map("users")
+}
