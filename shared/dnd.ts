@@ -1,10 +1,3 @@
-/**
- * Shared D&D 5e domain constants — single source of truth for both client and server.
- *
- * IMPORTANT: this file must remain free of any client-only (React/DOM) or
- * server-only (@prisma/client, Express) dependencies. Only plain TypeScript values.
- */
-
 export const ABILITY_NAMES = ["str", "dex", "con", "int", "wis", "cha"] as const;
 
 export type AbilityName = (typeof ABILITY_NAMES)[number];
@@ -38,3 +31,17 @@ export const SKILL_DEFINITIONS = [
 ] as const satisfies readonly SkillDefinition[];
 
 export const SKILL_NAMES: readonly string[] = SKILL_DEFINITIONS.map((s) => s.name);
+
+export type DiceRollDTO = {
+  id:string;
+  createdAt: string;
+  campaignSessionId: string;
+  userId: string;
+  characterId: string | null;
+  formula: string;
+  mode: DiceRollMode;
+  resultByDie: any;
+  total:number;
+}
+
+export type DiceRollMode = "normal" | "advantage" | "disadvantage";
