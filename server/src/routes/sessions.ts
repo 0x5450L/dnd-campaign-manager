@@ -4,6 +4,7 @@ import prisma from "../services/prisma";
 import { asyncHandler } from "../utils/asyncHandler";
 import { AppError } from "../utils/errors";
 import { requireCampaignAccess, requireCampaignDM } from "../utils/accessControl";
+import { pickDefined, trimOrNull } from "../utils/payload";
 import type { UpdateSessionPayload } from "../../../shared/session";
 
 const router = Router();
@@ -87,10 +88,12 @@ router.patch<{ id: string }>('/:id', authMiddleware, asyncHandler(async (req, re
   const session = await prisma.campaignSession.update({
     where: { id },
     data: {
-      ...(status !== undefined && { status }),
-      ...(title !== undefined && { title: title.trim() }),
-      ...(summary !== undefined && { summary: summary.trim() }),
-      ...(notes !== undefined && { notes: notes.trim() }),
+      ...pickDefined({
+        status,
+        title: trimOrNull(title),
+        summary: trimOrNull(summary),
+        notes: trimOrNull(notes),
+      }),
       ...(status === 'ended' && { endedAt: new Date() }),
     },
   });
