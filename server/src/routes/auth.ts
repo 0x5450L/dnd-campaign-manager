@@ -8,7 +8,7 @@ import { AppError } from '../utils/errors';
 const router = Router();
 
 router.post('/register', asyncHandler(async (req, res) => {
-  const { email, password, displayName } = req.body;
+  const { email, password, displayName } = req.body as { email: string; password: string; displayName: string };
   if (!email || !password || !displayName) {
     throw new AppError(400, 'Email, password and name are required');
   }
@@ -25,7 +25,7 @@ router.post('/register', asyncHandler(async (req, res) => {
 
   res.cookie('token', token, {
     httpOnly: true,
-    secure: false, // TODO: change to true in production
+    secure: false,// TODO: change to true in production
     sameSite: 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
@@ -34,7 +34,7 @@ router.post('/register', asyncHandler(async (req, res) => {
 }));
 
 router.post('/login', asyncHandler(async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password } = req.body as { email: string; password: string };
   const user = await prisma.user.findUnique({
     where: { email },
   });
@@ -51,7 +51,7 @@ router.post('/login', asyncHandler(async (req, res) => {
 
   res.cookie('token', token, {
     httpOnly: true,
-    secure: false, // TODO: change to true in production
+    secure: false,// TODO: change to true in production
     sameSite: 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
