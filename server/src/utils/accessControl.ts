@@ -1,6 +1,7 @@
 import type { Campaign } from "@prisma/client";
 import prisma from "../services/prisma";
 import { AppError } from "./errors";
+import type { EncounterWithCampaignDM } from "../types/access";
 
 export const requireCampaignDM = async (
   userId: string,
@@ -33,4 +34,46 @@ export const requireCampaignAccess = async (
   }
 
   return campaign;
+};
+
+export const requireEncounterDM = async (
+  userId: string,
+  encounterId: string,
+): Promise<EncounterWithCampaignDM> => {
+  const encounter = await prisma.encounter.findUnique({
+    where: {
+      id: encounterId,
+      campaignSession: { campaign: { dmId: userId } },
+    },
+    include: {
+      campaignSession: { select: { campaign: { select: { dmId: true } } } },
+    },
+  });
+
+  if (!encounter) {
+    throw new AppError(404, "Encounter not found");
+  }
+
+  return encounter;
+};
+
+export const requireEncounterAccess = async (
+  userId: string,
+  encounterId: string,
+): Promise<EncounterWithCampaignDM> => {
+  const encounter = await prisma.encounter.findUnique({
+    where: {
+      id: encounterId,
+      campaignSession: { campaign: { members: { some: { userId } } } },
+    },
+    include: {
+      campaignSession: { select: { campaign: { select: { dmId: true } } } },
+    },
+  });
+
+  if (!encounter) {
+    throw new AppError(404, "Encounter not found");
+  }
+
+  return encounter;
 };
