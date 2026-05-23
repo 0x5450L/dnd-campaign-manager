@@ -118,3 +118,7 @@ export type BulkInitiativeEntry = {
 export type BulkInitiativePayload = {
   entries: BulkInitiativeEntry[];
 };
+
+export type BulkCreateParticipantsPayload = {
+  participants: CreateParticipantPayload[];
+};
