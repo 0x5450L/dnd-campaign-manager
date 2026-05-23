@@ -9,6 +9,7 @@ import meRoutes from './routes/me';
 import campaignsRoutes from './routes/campaigns';
 import invitesRoutes from './routes/invites';
 import charactersRoutes from './routes/characters';
+import sessionsRoutes from './routes/sessions';
 import { errorMiddleware } from './middleware/errors';
 
 const app = express();
@@ -21,6 +22,7 @@ app.use('/api/me', meRoutes);
 app.use('/api/campaigns', campaignsRoutes);
 app.use('/api/invites', invitesRoutes);
 app.use('/api/characters', charactersRoutes);
+app.use('/api/sessions', sessionsRoutes);
 
 app.use(errorMiddleware);
 
