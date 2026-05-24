@@ -28,7 +28,7 @@ router.post('/', authMiddleware, asyncHandler(async (req, res) => {
     data: {
       campaignId,
       number: (_max.number ?? 0) + 1,
-      ...(title !== undefined && { title: title.trim() }),
+      ...pickDefined({ title: trimOrNull(title) }),
     },
   });
 

@@ -4,6 +4,8 @@ import prisma from "../services/prisma";
 import { notifyClient } from "../services/sseClients";
 import { asyncHandler } from "../utils/asyncHandler";
 import { AppError } from "../utils/errors";
+import { requireCampaignAccess } from "../utils/accessControl";
+import { pickDefined } from "../utils/payload";
 import {
   ABILITY_NAMES,
   DEFAULT_ABILITY_SCORE,
@@ -40,10 +42,9 @@ router.post('/create', authMiddleware, asyncHandler(async (req, res) => {
       race,
       characterClass,
       background: background ?? '',
-      ...(alignment !== undefined && { alignment }),
-      ...(notes !== undefined && { notes }),
       campaignId,
       userId,
+      ...pickDefined({ alignment, notes }),
       abilityScores: {
         create: ABILITY_NAMES.map((ability) => ({
           name: ability,
@@ -82,14 +83,7 @@ router.get<{ campaignId: string }>('/campaign-characters/:campaignId', authMiddl
     throw new AppError(400, 'Campaign ID is required');
   }
 
-  const campaign = await prisma.campaign.findUnique({
-    where: { id: campaignId },
-    include: { members: { include: { user: { select: { email: true } } } } },
-  });
-
-  if (!campaign || !campaign.members.some(member => member.userId === userId)) {
-    throw new AppError(404, 'Campaign not found');
-  }
+  await requireCampaignAccess(userId, campaignId);
 
   const characters = await prisma.character.findMany({
     where: { campaignId },
@@ -140,25 +134,11 @@ router.patch<{ id: string }>('/:id', authMiddleware, asyncHandler(async (req, re
   const character = await prisma.character.update({
     where: { id },
     data: {
-      ...(name !== undefined && { name }),
-      ...(type !== undefined && { type }),
-      ...(race !== undefined && { race }),
-      ...(characterClass !== undefined && { characterClass }),
-      ...(background !== undefined && { background }),
-      ...(alignment !== undefined && { alignment }),
-      ...(notes !== undefined && { notes }),
-      ...(experience !== undefined && { experience }),
-      ...(speed !== undefined && { speed }),
-      ...(hitDiceType !== undefined && { hitDiceType }),
-      ...(hitDiceUsed !== undefined && { hitDiceUsed }),
-      ...(maxHp !== undefined && { maxHp }),
-      ...(currentHp !== undefined && { currentHp }),
-      ...(tempHp !== undefined && { tempHp }),
-      ...(deathSaveSuccesses !== undefined && { deathSaveSuccesses }),
-      ...(deathSaveFailures !== undefined && { deathSaveFailures }),
-      ...(armorClass !== undefined && { armorClass }),
-      ...(usesShield !== undefined && { usesShield }),
-      ...(inspiration !== undefined && { inspiration }),
+      ...pickDefined({
+        name, type, race, characterClass, background, alignment, notes, experience,
+        speed, hitDiceType, hitDiceUsed, maxHp, currentHp, tempHp,
+        deathSaveSuccesses, deathSaveFailures, armorClass, usesShield, inspiration,
+      }),
 
       ...(abilityScores !== undefined && abilityScores.length > 0 && {
         abilityScores: {

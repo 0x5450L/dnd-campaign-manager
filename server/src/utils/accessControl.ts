@@ -1,7 +1,7 @@
 import type { Campaign } from "@prisma/client";
 import prisma from "../services/prisma";
 import { AppError } from "./errors";
-import type { EncounterWithCampaignDM } from "../types/access";
+import type { EncounterWithCampaignDM } from "../types/accessControl";
 
 export const requireCampaignDM = async (
   userId: string,

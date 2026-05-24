@@ -3,6 +3,8 @@ import prisma from "../services/prisma";
 import { Router } from "express";
 import { asyncHandler } from "../utils/asyncHandler";
 import { AppError } from "../utils/errors";
+import { requireCampaignDM } from "../utils/accessControl";
+import { pickDefined } from "../utils/payload";
 
 const router = Router();
 
@@ -121,9 +123,11 @@ router.delete('/delete/:id', authMiddleware, asyncHandler(async (req, res) => {
   const campaignId = req.params.id as string;
   const userId = req.userId!;
 
+  await requireCampaignDM(userId, campaignId);
+
   await prisma.$transaction(async (tx) => {
     await tx.campaignMember.deleteMany({ where: { campaignId } });
-    await tx.campaign.delete({ where: { dmId: userId, id: campaignId } });
+    await tx.campaign.delete({ where: { id: campaignId } });
   });
 
   res.json({ status: 'ok', message: 'Campaign deleted successfully' });
@@ -132,15 +136,20 @@ router.delete('/delete/:id', authMiddleware, asyncHandler(async (req, res) => {
 router.patch('/:id', authMiddleware, asyncHandler(async (req, res) => {
   const userId = req.userId!;
   const campaignId = req.params.id as string;
-  const { name, description, setting, imageUrl } = req.body;
+  const { name, description, setting, imageUrl } = req.body as {
+    name?: string;
+    description?: string | null;
+    setting?: string | null;
+    imageUrl?: string | null;
+  };
+
+  await requireCampaignDM(userId, campaignId);
 
   const updatedCampaign = await prisma.campaign.update({
-    where: { id: campaignId, dmId: userId },
+    where: { id: campaignId },
     data: {
       ...(name?.trim() && { name: name.trim() }),
-      ...(description !== undefined && { description }),
-      ...(setting !== undefined && { setting }),
-      ...(imageUrl !== undefined && { imageUrl }),
+      ...pickDefined({ description, setting, imageUrl }),
     },
   });
 

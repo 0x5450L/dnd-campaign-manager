@@ -35,7 +35,7 @@ router.post('/', authMiddleware, asyncHandler(async (req, res) => {
   const encounter = await prisma.encounter.create({
     data: {
       campaignSessionId,
-      ...(name !== undefined && { name: name.trim() }),
+      ...pickDefined({ name: trimOrNull(name) }),
     },
     include: { participants: true },
   });
