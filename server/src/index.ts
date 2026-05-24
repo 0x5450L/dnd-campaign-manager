@@ -12,6 +12,8 @@ import charactersRoutes from './routes/characters';
 import sessionsRoutes from './routes/sessions';
 import encountersRoutes from './routes/encounters';
 import { errorMiddleware } from './middleware/errors';
+import { createServer } from 'node:http';
+import { Server } from 'socket.io';
 
 const app = express();
 
@@ -28,6 +30,22 @@ app.use('/api/encounters', encountersRoutes);
 
 app.use(errorMiddleware);
 
-app.listen(3001, () => {
+const httpServer = createServer(app);
+
+const io = new Server(httpServer, {
+  cors: {
+    origin: 'http://localhost:5173',
+    credentials: true,
+  },
+});
+
+io.on('connection', (socket) => {
+  console.log(`${socket.id} connected`);
+  socket.on('disconnect', () => {
+    console.log(`${socket.id} disconnected`);
+  });
+});
+
+httpServer.listen(3001, () => {
   console.log('Server running on http://localhost:3001');
 });
