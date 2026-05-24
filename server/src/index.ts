@@ -32,9 +32,14 @@ app.use('/api/encounters', encountersRoutes);
 
 app.use(errorMiddleware);
 
+type ClientToServerEvents = {
+  ping: (ack: (response: { at: number, userId: string }) => void) => void
+}
+type ServerToClientEvents = {}
+
 const httpServer = createServer(app);
 
-const io = new Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, { userId: string }>(httpServer, {
+const io = new Server<ClientToServerEvents, ServerToClientEvents, DefaultEventsMap, { userId: string }>(httpServer, {
   cors: {
     origin: 'http://localhost:5173',
     credentials: true,
@@ -58,6 +63,10 @@ io.use((socket, next) => {
 
 io.on('connection', (socket) => {
   console.log(`${socket.id} connected`);
+  socket.on('ping', (ack) => {
+    ack({ at: Date.now(), userId: socket.data.userId });
+  });
+  
   socket.on('disconnect', () => {
     console.log(`${socket.id} disconnected`);
   });
