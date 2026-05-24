@@ -13,7 +13,9 @@ import sessionsRoutes from './routes/sessions';
 import encountersRoutes from './routes/encounters';
 import { errorMiddleware } from './middleware/errors';
 import { createServer } from 'node:http';
-import { Server } from 'socket.io';
+import { DefaultEventsMap, Server } from 'socket.io';
+import { getTokenFromCookie } from './utils/cookies';
+import { verifyToken } from './utils/jwt';
 
 const app = express();
 
@@ -32,11 +34,26 @@ app.use(errorMiddleware);
 
 const httpServer = createServer(app);
 
-const io = new Server(httpServer, {
+const io = new Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, { userId: string }>(httpServer, {
   cors: {
     origin: 'http://localhost:5173',
     credentials: true,
   },
+});
+
+io.use((socket, next) => {
+  const token = getTokenFromCookie(socket.handshake.headers.cookie);
+  if (!token) {
+    return next(new Error('Unauthorized'));
+  }
+
+  try {
+    const userId = verifyToken(token);
+    socket.data.userId = userId;
+  } catch (error) {
+    return next(new Error('Unauthorized'));
+  }
+  return next();
 });
 
 io.on('connection', (socket) => {
