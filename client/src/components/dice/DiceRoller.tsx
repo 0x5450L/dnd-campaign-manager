@@ -4,6 +4,7 @@ import { DICE_TYPES, type AdvDis, type DiceType } from "../../types/dice";
 import DiceShape from "./DiceShape";
 import DiceResult from "./DiceResult";
 import DiceHistory from "./DiceHistory";
+import CommonButton from "../ui/buttons/CommonButton";
 
 export const DiceRoller = () => {
   const {
@@ -102,14 +103,13 @@ export const DiceRoller = () => {
                 </button>
               )}
             </div>
-            <button
-              type="button"
+            <CommonButton
               onClick={() => roll()}
               disabled={isRolling || !formula.trim()}
-              className="cursor-pointer rounded-md border border-gold-dim bg-gradient-to-b from-gold-bright to-gold-dim px-5 py-3 font-fantasy text-sm font-bold uppercase tracking-widest text-bg transition-[filter,transform] hover:brightness-110 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50"
+              size="lg"
             >
               Roll
-            </button>
+            </CommonButton>
           </div>
 
           <div className="flex shrink-0 gap-1.5">

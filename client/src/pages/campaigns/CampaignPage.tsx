@@ -5,11 +5,13 @@ import { useAuth } from "../../hooks/useAuth";
 import { useSSE } from "../../hooks/useSSE";
 import type { Campaign } from "../../types/campaigns";
 import CommonButton from "../../components/ui/buttons/CommonButton";
-import CreateInvite from "../../components/campaigns/campaign/CreateInvite";
-import CampaignHeaderActions from "../../components/campaigns/campaign/CampaignHeaderActions";
 import CampaignDetails from "../../components/campaigns/campaign/CampaignDetails";
-import CampaignMembersList from "../../components/campaigns/campaign/CampaignMembersList";
+import CampaignActionsPanel from "../../components/campaigns/campaign/CampaignActionsPanel";
+import CampaignHeaderBar from "../../components/campaigns/campaign/CampaignHeaderBar";
+import PartyRow from "../../components/campaigns/campaign/PartyRow";
 import CampaignCharactersController from "../../components/campaigns/campaign/characters/controller/CampaignCharactersController";
+import { LiveSessionProvider } from "../../context/liveSessionContext/LiveSessionProvider";
+import SessionPanel from "../../components/campaigns/campaign/session/SessionPanel";
 
 function CampaignPage() {
   const { id } = useParams();
@@ -74,14 +76,14 @@ function CampaignPage() {
 
   if (!campaign) {
     return (
-      <div className="max-w-3xl mx-auto p-6 flex flex-col gap-4">
+      <div className="mx-auto flex max-w-3xl flex-col gap-4 p-4">
         {message ? (
-          <p className="text-red-400">{message}</p>
+          <p className="text-rust">{message}</p>
         ) : (
-          <p className="text-gray-400">Campaign not found.</p>
+          <p className="text-dim">Campaign not found.</p>
         )}
         <CommonButton onClick={() => navigate("/campaigns")} variant="secondary" size="sm">
-          Back to campaigns
+          &larr; Campaigns
         </CommonButton>
       </div>
     );
@@ -93,24 +95,40 @@ function CampaignPage() {
       dmId={campaign.dmId}
       currentUserId={user?.id ?? null}
     >
-      <div className="min-h-[calc(100vh-53px)] h-100% max-w-3xl mx-auto p-6 flex flex-col gap-6">
-        <CampaignHeaderActions
-          isDM={isDM}
-          hasChanges={hasChanges}
-          onSave={handleSave}
-          onDeleteCampaign={handleDeleteCampaign}
-        />
+      <LiveSessionProvider campaign={campaign}>
+        <div className="mx-auto flex min-h-[calc(100vh-53px)] w-full max-w-7xl flex-col gap-3 p-3 sm:p-4">
+          <CampaignHeaderBar
+            campaign={campaign}
+            isDM={isDM}
+            onChange={setCampaign}
+          />
 
-        {isLoading ? (
-          <p className="text-amber-400 m-auto">Loading campaign...</p>
-        ) : (
-          <>
-            <CampaignDetails campaign={campaign} isDM={isDM} onChange={setCampaign} />
-            <CampaignMembersList members={campaign.members} />
-            <CreateInvite campaignId={campaign.id} />
-          </>
-        )}
-      </div>
+          {isLoading ? (
+            <p className="m-auto text-gold-bright">Loading campaign...</p>
+          ) : (
+            <>
+              <div className="grid items-stretch gap-3 md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+                <CampaignDetails campaign={campaign} isDM={isDM} onChange={setCampaign} />
+                <CampaignActionsPanel
+                  campaignId={campaign.id}
+                  isDM={isDM}
+                  hasChanges={hasChanges}
+                  onSave={handleSave}
+                  onDeleteCampaign={handleDeleteCampaign}
+                />
+              </div>
+
+              <PartyRow
+                members={campaign.members}
+                dmId={campaign.dmId}
+                isDM={isDM}
+              />
+
+              <SessionPanel isDM={isDM} />
+            </>
+          )}
+        </div>
+      </LiveSessionProvider>
     </CampaignCharactersController>
   );
 }

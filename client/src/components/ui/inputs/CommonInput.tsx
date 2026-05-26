@@ -45,7 +45,10 @@ function CommonInput({
     return (
       <div className="flex flex-col gap-1">
         {children && (
-          <label htmlFor={name} className={`text-sm ${error ? "text-red-400" : "text-gray-400"}`}>
+          <label
+            htmlFor={name}
+            className={`font-fantasy text-[10px] uppercase tracking-[0.15em] ${error ? "text-rust" : "text-faint"}`}
+          >
             {children}
           </label>
         )}
@@ -56,16 +59,17 @@ function CommonInput({
           disabled={disabled}
           value={value}
           onChange={handleChange}
-          className={`bg-gray-700 border rounded-lg p-2.5 placeholder-gray-400 focus:outline-none transition-colors duration-200 ${
-            error ? "border-red-400" : "border-gray-600 focus:border-amber-500 hover:border-amber-500/50"
+          className={`rounded-md border bg-bg/60 px-3 py-2 text-sm text-ink placeholder:text-faint/60 outline-none transition-colors duration-150 ${
+            error
+              ? "border-rust focus:border-rust"
+              : "border-rule hover:border-hover focus:border-hover"
           } ${defaultTextColor} ${disabled ? "opacity-50 cursor-not-allowed" : ""} ${inputClassName ?? ""}`}
         />
-        {error && <p className="text-red-400 text-sm">{error}</p>}
+        {error && <p className="text-rust text-xs">{error}</p>}
       </div>
     );
   }
 
-  // underline variant (default)
   const labelTextColor = error ? "text-red-400" : "text-gray-400";
   const inputBorderColor = error
     ? "border-red-400"
@@ -84,7 +88,7 @@ function CommonInput({
       >
         <div className={`flex gap-1 items-center text-sm min-h-5 ${labelTextColor}`}>
           {children}
-          {error ? `: ${error}` : "\u00A0"}
+          {error ? `: ${error}` : " "}
         </div>
         <input
           type={type}

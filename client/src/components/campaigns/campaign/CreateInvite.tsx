@@ -4,6 +4,9 @@ import CommonInput from "../../ui/inputs/CommonInput";
 import { createInvite } from "../../../services/api/invites";
 import type { ApiError } from "../../../services/api/errors";
 
+const PANEL_LABEL =
+  "font-fantasy text-xs font-bold uppercase tracking-[0.16em] text-gold-bright";
+
 export default function CreateInvite({ campaignId }: { campaignId: string }) {
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState<string | null>(null);
@@ -58,35 +61,43 @@ export default function CreateInvite({ campaignId }: { campaignId: string }) {
   };
 
   return (
-    <div className="flex flex-col gap-4 bg-gray-800/50 p-6 rounded-xl border border-gray-700">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-gray-200">Invite to campaign</h2>
-        <CommonButton onClick={handleGetLink} size="sm" disabled={linkLoading}>
-          {linkButtonText}
-        </CommonButton>
-      </div>
-
-      <div className="flex flex-col gap-2">
-        <CommonInput
-          type="email"
-          name="email"
-          placeholder="Player's email"
-          variant="boxed"
-          value={email}
-          onChange={(value) => {
-            setEmail(value);
-            setEmailError(null);
-            setEmailSuccess(null);
-          }}
-        />
-        <div className="flex items-center gap-2 justify-end">
-          {emailSuccess && <p className="text-green-400 text-sm">{emailSuccess}</p>}
-          {emailError && <p className="text-red-400 text-sm">{emailError}</p>}
-          <CommonButton onClick={handleSendInvite} variant="accept" size="sm" disabled={emailLoading}>
+    <div className="flex flex-col gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <span className={PANEL_LABEL}>Invite players</span>
+        <div className="flex flex-wrap items-center gap-2">
+          <CommonButton onClick={handleGetLink} size="sm" disabled={linkLoading}>
+            {linkButtonText}
+          </CommonButton>
+          <CommonButton
+            onClick={handleSendInvite}
+            variant="accept"
+            size="sm"
+            disabled={emailLoading}
+          >
             {emailLoading ? "Sending..." : "Send invite"}
           </CommonButton>
         </div>
       </div>
+
+      <CommonInput
+        type="email"
+        name="email"
+        placeholder="Player's email"
+        variant="boxed"
+        value={email}
+        onChange={(value) => {
+          setEmail(value);
+          setEmailError(null);
+          setEmailSuccess(null);
+        }}
+      />
+
+      {(emailSuccess || emailError) && (
+        <div className="flex justify-end">
+          {emailSuccess && <p className="text-leaf text-xs">{emailSuccess}</p>}
+          {emailError && <p className="text-rust text-xs">{emailError}</p>}
+        </div>
+      )}
     </div>
   );
 }

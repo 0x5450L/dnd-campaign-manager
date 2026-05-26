@@ -4,24 +4,25 @@ type CommonButtonProps = {
   type?: "button" | "submit" | "reset";
   variant?: "primary" | "secondary" | "accept" | "decline";
   disabled?: boolean;
-  size?: "sm" | "md";
+  size?: "sm" | "md" | "lg";
   className?: string;
 };
 
-const variantStyles: Record<string, string> = {
+const variantStyles: Record<NonNullable<CommonButtonProps["variant"]>, string> = {
   primary:
-    "bg-amber-600 hover:bg-amber-500 text-white font-semibold border border-transparent",
+    "border border-gold-dim bg-gradient-to-b from-gold-bright to-gold-dim text-bg font-fantasy font-bold uppercase tracking-widest hover:brightness-110 active:scale-[0.97]",
   secondary:
-    "bg-transparent hover:bg-gray-700/50 text-gray-400 hover:text-gray-200 border border-transparent",
+    "border border-rule bg-transparent text-dim font-fantasy uppercase tracking-widest hover:text-ink hover:border-hover hover:bg-surface-light/30 active:scale-[0.97]",
   accept:
-    "bg-green-900/50 hover:bg-green-800 text-green-300 font-semibold border border-green-800",
+    "border border-leaf/70 bg-leaf/15 text-[#c2e8c2] font-fantasy font-bold uppercase tracking-widest hover:bg-leaf/25 hover:brightness-110 active:scale-[0.97]",
   decline:
-    "bg-red-900/50 hover:bg-red-800 text-red-300 font-semibold border border-red-800",
+    "border border-rust/70 bg-rust/15 text-[#f1c2c2] font-fantasy font-bold uppercase tracking-widest hover:bg-rust/25 hover:brightness-110 active:scale-[0.97]",
 };
 
-const sizeStyles: Record<string, string> = {
-  sm: "text-sm px-4 py-2",
-  md: "px-4 py-2.5",
+const sizeStyles: Record<NonNullable<CommonButtonProps["size"]>, string> = {
+  sm: "text-xs px-3 py-1.5",
+  md: "text-sm px-5 py-2.5",
+  lg: "text-sm px-6 py-3",
 };
 
 function CommonButton({
@@ -38,7 +39,7 @@ function CommonButton({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`rounded-lg cursor-pointer transition-colors duration-200 ${variantStyles[variant]} ${sizeStyles[size]} ${
+      className={`inline-flex cursor-pointer items-center justify-center rounded-md transition-[filter,transform,background-color,color,border-color] duration-150 ${variantStyles[variant]} ${sizeStyles[size]} ${
         disabled ? "opacity-50 cursor-not-allowed pointer-events-none" : ""
       } ${className}`}
     >
