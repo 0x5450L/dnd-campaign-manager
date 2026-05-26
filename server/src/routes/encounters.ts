@@ -11,7 +11,33 @@ import type {
   UpdateParticipantPayload,
   BulkInitiativePayload,
   BulkCreateParticipantsPayload,
+  EncounterParticipantDTO,
 } from "../../../shared/session";
+import { EncounterParticipant } from "@prisma/client";
+import { CharacterAttackDTO } from "../../../shared/character";
+import { getIo } from "../services/socket";
+
+const mapParticipantToDTO = (participant: EncounterParticipant): EncounterParticipantDTO => {
+  return {
+    id: participant.id,
+    encounterId: participant.encounterId,
+    characterId: participant.characterId,
+    name: participant.name,
+    type: participant.type,
+    sortOrder: participant.sortOrder,
+    maxHp: participant.maxHp,
+    currentHp: participant.currentHp,
+    tempHp: participant.tempHp,
+    armorClass: participant.armorClass,
+    attacks: participant.attacks as unknown as CharacterAttackDTO[] | [],
+    conditions: participant.conditions,
+    isVisible: participant.isVisible,
+    deathSaveSuccesses: participant.deathSaveSuccesses,
+    deathSaveFailures: participant.deathSaveFailures,
+    createdAt: participant.createdAt.toISOString(),
+    updatedAt: participant.updatedAt.toISOString(),
+  };
+};
 
 const router = Router();
 
@@ -74,9 +100,9 @@ router.get('/', authMiddleware, asyncHandler(async (req, res) => {
   const encountersForUser = isDM
     ? encounters
     : encounters.map((encounter) => ({
-        ...encounter,
-        participants: encounter.participants.filter((p) => p.isVisible),
-      }));
+      ...encounter,
+      participants: encounter.participants.filter((p) => p.isVisible),
+    }));
 
   res.json({ status: 'ok', encounters: encountersForUser });
 }));
@@ -126,6 +152,7 @@ router.patch<{ id: string }>('/:id', authMiddleware, asyncHandler(async (req, re
   });
 
   res.json({ status: 'ok', encounter });
+
 }));
 
 router.delete<{ id: string }>('/:id', authMiddleware, asyncHandler(async (req, res) => {
@@ -317,12 +344,12 @@ router.patch<{ id: string; pid: string }>('/:id/participants/:pid', authMiddlewa
 
   const dmOnlyFields = isDM
     ? {
-        name: body.name,
-        maxHp: body.maxHp,
-        armorClass: body.armorClass,
-        attacks: body.attacks,
-        isVisible: body.isVisible,
-      }
+      name: body.name,
+      maxHp: body.maxHp,
+      armorClass: body.armorClass,
+      attacks: body.attacks,
+      isVisible: body.isVisible,
+    }
     : {};
 
   const data = pickDefined({
@@ -341,6 +368,12 @@ router.patch<{ id: string; pid: string }>('/:id/participants/:pid', authMiddlewa
   });
 
   res.json({ status: 'ok', participant: updated });
+
+  try {
+    getIo().to(`encounter:${id}`).emit('participant_updated', { encounterId: id, participant: mapParticipantToDTO(updated) });
+  } catch (error) {
+    console.error('participant_updated broadcast failed', error);
+  }
 }));
 
 router.delete<{ id: string }>('/:id/participants', authMiddleware, asyncHandler(async (req, res) => {
