@@ -1,5 +1,5 @@
 import type { CharacterAttackDTO, CharacterAttackInput } from "./character";
-import type { DiceRollDTO } from "./dnd";
+import type { AbilityName, DiceRollDTO } from "./dnd";
 
 export type SessionStatus = "active" | "paused" | "ended";
 
@@ -32,6 +32,11 @@ export type EncounterDTO = {
   endedAt: string | null;
 };
 
+export type ParticipantAbilityScore = {
+  name: AbilityName;
+  score: number;
+};
+
 export type EncounterParticipantDTO = {
   id: string;
   encounterId: string;
@@ -46,6 +51,9 @@ export type EncounterParticipantDTO = {
   attacks: CharacterAttackDTO[];
   conditions: string[];
   isVisible: boolean;
+  acHidden: boolean;
+  typeHidden: boolean;
+  abilityScores: ParticipantAbilityScore[] | null;
   deathSaveSuccesses: number;
   deathSaveFailures: number;
   createdAt: string;
@@ -93,6 +101,9 @@ export type CreateParticipantPayload = {
   tempHp?: number;
   conditions?: string[];
   isVisible?: boolean;
+  acHidden?: boolean;
+  typeHidden?: boolean;
+  abilityScores?: ParticipantAbilityScore[] | null;
   attacks?: CharacterAttackInput[];
 };
 
@@ -106,6 +117,9 @@ export type UpdateParticipantPayload = Partial<{
   attacks: CharacterAttackInput[];
   conditions: string[];
   isVisible: boolean;
+  acHidden: boolean;
+  typeHidden: boolean;
+  abilityScores: ParticipantAbilityScore[] | null;
   deathSaveSuccesses: number;
   deathSaveFailures: number;
 }>;

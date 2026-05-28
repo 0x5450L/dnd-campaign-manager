@@ -1,6 +1,6 @@
 import { useLiveSession } from "../../../../context/liveSessionContext/useLiveSession";
 import CommonButton from "../../../ui/buttons/CommonButton";
-import EncounterParticipantRow from "./EncounterParticipantRow";
+import EncounterParticipantCard from "./participantCard/EncounterParticipantCard";
 
 type EncounterTrackerProps = {
   isDM: boolean;
@@ -58,9 +58,9 @@ export const EncounterTracker = ({ isDM }: EncounterTrackerProps) => {
         )}
       </div>
 
-      <ul className="flex flex-col gap-1.5">
+      <ul className="flex flex-col gap-2">
         {participants.map((p, idx) => (
-          <EncounterParticipantRow
+          <EncounterParticipantCard
             key={p.id}
             participant={p}
             isActive={idx === encounter.currentTurnIndex}

@@ -25,7 +25,17 @@ export type LiveSessionAction =
   | { type: "END_ENCOUNTER" }
   | { type: "ADVANCE_TURN" }
   | { type: "ADJUST_HP"; participantId: string; delta: number }
+  | { type: "GRANT_TEMP_HP"; participantId: string; amount: number }
   | { type: "TOGGLE_CONDITION"; participantId: string; condition: string }
+  | { type: "SET_VISIBILITY"; participantId: string; isVisible: boolean }
+  | { type: "SET_AC_HIDDEN"; participantId: string; acHidden: boolean }
+  | { type: "SET_TYPE_HIDDEN"; participantId: string; typeHidden: boolean }
+  | {
+      type: "RECORD_DEATH_SAVE";
+      participantId: string;
+      outcome: "success" | "failure";
+    }
+  | { type: "RESET_DEATH_SAVES"; participantId: string }
   | { type: "ADD_PARTICIPANT"; participant: EncounterParticipantDTO }
   | { type: "REMOVE_PARTICIPANT"; participantId: string }
   | {
@@ -138,9 +148,33 @@ export const liveSessionReducer = (
     case "ADJUST_HP": {
       const target = state.participants.find((p) => p.id === action.participantId);
       if (!target) return state;
-      const next = clampHp(target.currentHp + action.delta, target.maxHp);
+
+      let nextTempHp = target.tempHp;
+      let nextCurrentHp = target.currentHp;
+
+      if (action.delta < 0) {
+        const damage = Math.abs(action.delta);
+        const absorbed = Math.min(damage, target.tempHp);
+        nextTempHp = target.tempHp - absorbed;
+        nextCurrentHp = clampHp(target.currentHp - (damage - absorbed), target.maxHp);
+      } else {
+        nextCurrentHp = clampHp(target.currentHp + action.delta, target.maxHp);
+      }
+
+      const wasDown = target.currentHp === 0;
+      const isUp = nextCurrentHp > 0;
+      const clearedDeathSaves = wasDown && isUp;
+
       const participants = state.participants.map((p) =>
-        p.id === action.participantId ? { ...p, currentHp: next } : p,
+        p.id === action.participantId
+          ? {
+              ...p,
+              tempHp: nextTempHp,
+              currentHp: nextCurrentHp,
+              deathSaveSuccesses: clearedDeathSaves ? 0 : p.deathSaveSuccesses,
+              deathSaveFailures: clearedDeathSaves ? 0 : p.deathSaveFailures,
+            }
+          : p,
       );
       const verb = action.delta < 0 ? "took" : "healed";
       const amount = Math.abs(action.delta);
@@ -151,10 +185,98 @@ export const liveSessionReducer = (
           state.events,
           makeEvent(
             "hp_changed",
-            `${target.name} ${verb} ${amount} (${next}/${target.maxHp})`,
+            `${target.name} ${verb} ${amount} (${nextCurrentHp}/${target.maxHp})`,
           ),
         ),
       };
+    }
+
+    case "GRANT_TEMP_HP": {
+      const target = state.participants.find((p) => p.id === action.participantId);
+      if (!target) return state;
+      const next = Math.max(target.tempHp, Math.max(0, action.amount));
+      const participants = state.participants.map((p) =>
+        p.id === action.participantId ? { ...p, tempHp: next } : p,
+      );
+      return {
+        ...state,
+        participants,
+        events: pushEvent(
+          state.events,
+          makeEvent("hp_changed", `${target.name} gained ${next} temp HP`),
+        ),
+      };
+    }
+
+    case "SET_VISIBILITY": {
+      const target = state.participants.find((p) => p.id === action.participantId);
+      if (!target) return state;
+      const participants = state.participants.map((p) =>
+        p.id === action.participantId ? { ...p, isVisible: action.isVisible } : p,
+      );
+      return {
+        ...state,
+        participants,
+        events: pushEvent(
+          state.events,
+          makeEvent(
+            "note",
+            `${target.name} is now ${action.isVisible ? "visible" : "hidden"} to players`,
+          ),
+        ),
+      };
+    }
+
+    case "SET_AC_HIDDEN": {
+      const participants = state.participants.map((p) =>
+        p.id === action.participantId ? { ...p, acHidden: action.acHidden } : p,
+      );
+      return { ...state, participants };
+    }
+
+    case "SET_TYPE_HIDDEN": {
+      const participants = state.participants.map((p) =>
+        p.id === action.participantId ? { ...p, typeHidden: action.typeHidden } : p,
+      );
+      return { ...state, participants };
+    }
+
+    case "RECORD_DEATH_SAVE": {
+      const target = state.participants.find((p) => p.id === action.participantId);
+      if (!target) return state;
+      const successes =
+        action.outcome === "success"
+          ? Math.min(3, target.deathSaveSuccesses + 1)
+          : target.deathSaveSuccesses;
+      const failures =
+        action.outcome === "failure"
+          ? Math.min(3, target.deathSaveFailures + 1)
+          : target.deathSaveFailures;
+      const participants = state.participants.map((p) =>
+        p.id === action.participantId
+          ? { ...p, deathSaveSuccesses: successes, deathSaveFailures: failures }
+          : p,
+      );
+      return {
+        ...state,
+        participants,
+        events: pushEvent(
+          state.events,
+          makeEvent(
+            "note",
+            `${target.name} death save ${action.outcome} (${successes}✓ / ${failures}✗)`,
+          ),
+        ),
+      };
+    }
+
+    case "RESET_DEATH_SAVES": {
+      const participants = state.participants.map((p) =>
+        p.id === action.participantId
+          ? { ...p, deathSaveSuccesses: 0, deathSaveFailures: 0 }
+          : p,
+      );
+      return { ...state, participants };
     }
 
     case "TOGGLE_CONDITION": {

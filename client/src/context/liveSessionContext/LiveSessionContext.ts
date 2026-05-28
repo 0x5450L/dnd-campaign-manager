@@ -28,7 +28,16 @@ export type LiveSessionContextType = {
   advanceTurn: () => void;
 
   adjustHp: (participantId: string, delta: number) => void;
+  grantTempHp: (participantId: string, amount: number) => void;
   toggleCondition: (participantId: string, condition: string) => void;
+  setVisibility: (participantId: string, isVisible: boolean) => void;
+  setAcHidden: (participantId: string, acHidden: boolean) => void;
+  setTypeHidden: (participantId: string, typeHidden: boolean) => void;
+  recordDeathSave: (
+    participantId: string,
+    outcome: "success" | "failure",
+  ) => void;
+  resetDeathSaves: (participantId: string) => void;
 };
 
 export const LiveSessionContext = createContext<LiveSessionContextType | null>(null);

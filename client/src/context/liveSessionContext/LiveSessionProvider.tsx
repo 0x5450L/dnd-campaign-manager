@@ -14,6 +14,7 @@ import type {
   EncounterDTO,
   EncounterParticipantDTO,
   MemberPresence,
+  ParticipantAbilityScore,
   PresenceStatus,
 } from "../../types/session";
 import type { Campaign } from "../../types/campaigns";
@@ -63,6 +64,24 @@ const seedEncounter = (campaignSessionId: string): EncounterDTO => {
   };
 };
 
+const goblinBossAbilities: ParticipantAbilityScore[] = [
+  { name: "str", score: 15 },
+  { name: "dex", score: 14 },
+  { name: "con", score: 12 },
+  { name: "int", score: 10 },
+  { name: "wis", score: 8 },
+  { name: "cha", score: 10 },
+];
+
+const goblinScoutAbilities: ParticipantAbilityScore[] = [
+  { name: "str", score: 8 },
+  { name: "dex", score: 14 },
+  { name: "con", score: 10 },
+  { name: "int", score: 10 },
+  { name: "wis", score: 8 },
+  { name: "cha", score: 8 },
+];
+
 const seedParticipants = (
   encounterId: string,
   campaign: Campaign,
@@ -85,6 +104,9 @@ const seedParticipants = (
       attacks: [],
       conditions: [],
       isVisible: true,
+      acHidden: false,
+      typeHidden: false,
+      abilityScores: null,
       deathSaveSuccesses: 0,
       deathSaveFailures: 0,
       createdAt: now,
@@ -106,6 +128,9 @@ const seedParticipants = (
       attacks: [],
       conditions: [],
       isVisible: true,
+      acHidden: true,
+      typeHidden: false,
+      abilityScores: goblinBossAbilities,
       deathSaveSuccesses: 0,
       deathSaveFailures: 0,
       createdAt: now,
@@ -125,6 +150,9 @@ const seedParticipants = (
       attacks: [],
       conditions: [],
       isVisible: true,
+      acHidden: true,
+      typeHidden: false,
+      abilityScores: goblinScoutAbilities,
       deathSaveSuccesses: 0,
       deathSaveFailures: 0,
       createdAt: now,
@@ -143,7 +171,10 @@ const seedParticipants = (
       armorClass: 13,
       attacks: [],
       conditions: [],
-      isVisible: true,
+      isVisible: false,
+      acHidden: true,
+      typeHidden: true,
+      abilityScores: goblinScoutAbilities,
       deathSaveSuccesses: 0,
       deathSaveFailures: 0,
       createdAt: now,
@@ -209,12 +240,48 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
     dispatch({ type: "ADJUST_HP", participantId, delta });
   }, []);
 
+  const grantTempHp = useCallback((participantId: string, amount: number) => {
+    dispatch({ type: "GRANT_TEMP_HP", participantId, amount });
+  }, []);
+
   const toggleCondition = useCallback(
     (participantId: string, condition: string) => {
       dispatch({ type: "TOGGLE_CONDITION", participantId, condition });
     },
     [],
   );
+
+  const setVisibility = useCallback(
+    (participantId: string, isVisible: boolean) => {
+      dispatch({ type: "SET_VISIBILITY", participantId, isVisible });
+    },
+    [],
+  );
+
+  const setAcHidden = useCallback(
+    (participantId: string, acHidden: boolean) => {
+      dispatch({ type: "SET_AC_HIDDEN", participantId, acHidden });
+    },
+    [],
+  );
+
+  const setTypeHidden = useCallback(
+    (participantId: string, typeHidden: boolean) => {
+      dispatch({ type: "SET_TYPE_HIDDEN", participantId, typeHidden });
+    },
+    [],
+  );
+
+  const recordDeathSave = useCallback(
+    (participantId: string, outcome: "success" | "failure") => {
+      dispatch({ type: "RECORD_DEATH_SAVE", participantId, outcome });
+    },
+    [],
+  );
+
+  const resetDeathSaves = useCallback((participantId: string) => {
+    dispatch({ type: "RESET_DEATH_SAVES", participantId });
+  }, []);
 
   const presenceFor = useCallback(
     (userId: string): PresenceStatus =>
@@ -251,7 +318,13 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
       endEncounter,
       advanceTurn,
       adjustHp,
+      grantTempHp,
       toggleCondition,
+      setVisibility,
+      setAcHidden,
+      setTypeHidden,
+      recordDeathSave,
+      resetDeathSaves,
     }),
     [
       state,
@@ -265,7 +338,13 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
       endEncounter,
       advanceTurn,
       adjustHp,
+      grantTempHp,
       toggleCondition,
+      setVisibility,
+      setAcHidden,
+      setTypeHidden,
+      recordDeathSave,
+      resetDeathSaves,
     ],
   );
 
