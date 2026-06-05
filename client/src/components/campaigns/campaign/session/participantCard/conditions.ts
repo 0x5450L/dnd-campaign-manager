@@ -23,6 +23,7 @@ export type ConditionTheme = {
   chipBg: string;
   chipText: string;
   fillRgba: string;
+  dotRgba: string;
 };
 
 export const CONDITION_THEME: Record<ConditionName, ConditionTheme> = {
@@ -31,90 +32,105 @@ export const CONDITION_THEME: Record<ConditionName, ConditionTheme> = {
     chipBg: "bg-[#6b7280]/15",
     chipText: "text-[#cbd5e1]",
     fillRgba: "rgba(107, 114, 128, 0.28)",
+    dotRgba: "rgba(107, 114, 128, 0.9)",
   },
   Charmed: {
     chipBorder: "border-[#d48aa7]/60",
     chipBg: "bg-[#d48aa7]/15",
     chipText: "text-[#f1c6da]",
     fillRgba: "rgba(212, 138, 167, 0.28)",
+    dotRgba: "rgba(212, 138, 167, 0.9)",
   },
   Deafened: {
     chipBorder: "border-[#7a8aa5]/60",
     chipBg: "bg-[#7a8aa5]/15",
     chipText: "text-[#c5d0e0]",
     fillRgba: "rgba(122, 138, 165, 0.28)",
+    dotRgba: "rgba(122, 138, 165, 0.9)",
   },
   Exhaustion: {
     chipBorder: "border-[#8a6b5a]/60",
     chipBg: "bg-[#8a6b5a]/15",
     chipText: "text-[#d6bba6]",
     fillRgba: "rgba(138, 107, 90, 0.32)",
+    dotRgba: "rgba(138, 107, 90, 0.9)",
   },
   Frightened: {
     chipBorder: "border-[#9b7bc4]/60",
     chipBg: "bg-[#9b7bc4]/15",
     chipText: "text-[#d4c0ec]",
     fillRgba: "rgba(155, 123, 196, 0.28)",
+    dotRgba: "rgba(155, 123, 196, 0.9)",
   },
   Grappled: {
     chipBorder: "border-[#b58a5a]/60",
     chipBg: "bg-[#b58a5a]/15",
     chipText: "text-[#e6cba3]",
     fillRgba: "rgba(181, 138, 90, 0.28)",
+    dotRgba: "rgba(181, 138, 90, 0.9)",
   },
   Incapacitated: {
     chipBorder: "border-[#6a8a8a]/60",
     chipBg: "bg-[#6a8a8a]/15",
     chipText: "text-[#bdd6d6]",
     fillRgba: "rgba(106, 138, 138, 0.28)",
+    dotRgba: "rgba(106, 138, 138, 0.9)",
   },
   Invisible: {
     chipBorder: "border-[#9ab5c9]/60",
     chipBg: "bg-[#9ab5c9]/10",
     chipText: "text-[#dceaf3]",
     fillRgba: "rgba(154, 181, 201, 0.22)",
+    dotRgba: "rgba(154, 181, 201, 0.85)",
   },
   Paralyzed: {
     chipBorder: "border-[#c9b86a]/60",
     chipBg: "bg-[#c9b86a]/15",
     chipText: "text-[#ecdf9e]",
     fillRgba: "rgba(201, 184, 106, 0.30)",
+    dotRgba: "rgba(201, 184, 106, 0.9)",
   },
   Petrified: {
     chipBorder: "border-[#7a7a7a]/60",
     chipBg: "bg-[#7a7a7a]/15",
     chipText: "text-[#c4c4c4]",
     fillRgba: "rgba(122, 122, 122, 0.32)",
+    dotRgba: "rgba(122, 122, 122, 0.9)",
   },
   Poisoned: {
     chipBorder: "border-[#7aa55a]/60",
     chipBg: "bg-[#7aa55a]/15",
     chipText: "text-[#c4e0a8]",
     fillRgba: "rgba(122, 165, 90, 0.28)",
+    dotRgba: "rgba(122, 165, 90, 0.9)",
   },
   Prone: {
     chipBorder: "border-[#c08a5a]/60",
     chipBg: "bg-[#c08a5a]/15",
     chipText: "text-[#ecc7a3]",
     fillRgba: "rgba(192, 138, 90, 0.26)",
+    dotRgba: "rgba(192, 138, 90, 0.9)",
   },
   Restrained: {
     chipBorder: "border-[#a07d55]/60",
     chipBg: "bg-[#a07d55]/15",
     chipText: "text-[#d4b58a]",
     fillRgba: "rgba(160, 125, 85, 0.28)",
+    dotRgba: "rgba(160, 125, 85, 0.9)",
   },
   Stunned: {
     chipBorder: "border-[#e8c46a]/60",
     chipBg: "bg-[#e8c46a]/15",
     chipText: "text-[#f5e0a8]",
     fillRgba: "rgba(232, 196, 106, 0.30)",
+    dotRgba: "rgba(232, 196, 106, 0.9)",
   },
   Unconscious: {
     chipBorder: "border-[#7a5aa5]/60",
     chipBg: "bg-[#7a5aa5]/15",
     chipText: "text-[#c8b0e0]",
     fillRgba: "rgba(122, 90, 165, 0.32)",
+    dotRgba: "rgba(122, 90, 165, 0.9)",
   },
 };
 
