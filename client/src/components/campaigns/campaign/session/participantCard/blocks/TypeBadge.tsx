@@ -41,7 +41,7 @@ export const TypeBadge = ({
             : "Visible to players — click to hide"
           : undefined
       }
-      className={`rounded border px-1.5 py-0.5 font-fantasy text-[9px] uppercase tracking-widest transition-opacity ${typeStyle[type]} ${
+      className={`rounded border px-2 py-0.5 font-fantasy text-[11px] uppercase tracking-widest transition-opacity ${typeStyle[type]} ${
         hidden ? "opacity-50" : ""
       } ${canToggle ? "cursor-pointer hover:opacity-80" : "cursor-default"}`}
     >
