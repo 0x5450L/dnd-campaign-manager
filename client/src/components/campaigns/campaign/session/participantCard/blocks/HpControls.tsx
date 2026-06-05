@@ -17,7 +17,7 @@ export const HpControls = ({ onDamage, onHeal, onTemp }: HpControlsProps) => {
   };
 
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex items-center gap-1.5">
       <input
         type="number"
         min={0}
@@ -27,26 +27,26 @@ export const HpControls = ({ onDamage, onHeal, onTemp }: HpControlsProps) => {
           if (e.key === "Enter") apply(onDamage);
         }}
         placeholder="0"
-        className="h-7 w-12 rounded border border-rule bg-bg/60 px-1 text-center font-fantasy text-sm text-ink outline-none transition-colors focus:border-hover"
+        className="h-8 w-14 rounded border border-rule bg-bg/60 px-1 text-center font-fantasy text-base text-ink outline-none transition-colors focus:border-hover"
       />
       <button
         type="button"
         onClick={() => apply(onDamage)}
-        className="h-7 rounded border border-rust/60 bg-transparent px-2 font-fantasy text-[10px] uppercase tracking-widest text-[#f1c2c2] transition-colors hover:bg-rust/15"
+        className="h-8 flex-1 rounded border border-rust/60 bg-transparent px-2 font-fantasy text-[11px] uppercase tracking-widest text-[#f1c2c2] transition-colors hover:bg-rust/15"
       >
         Damage
       </button>
       <button
         type="button"
         onClick={() => apply(onHeal)}
-        className="h-7 rounded border border-leaf/60 bg-transparent px-2 font-fantasy text-[10px] uppercase tracking-widest text-[#c2e8c2] transition-colors hover:bg-leaf/15"
+        className="h-8 flex-1 rounded border border-leaf/60 bg-transparent px-2 font-fantasy text-[11px] uppercase tracking-widest text-[#c2e8c2] transition-colors hover:bg-leaf/15"
       >
         Heal
       </button>
       <button
         type="button"
         onClick={() => apply(onTemp)}
-        className="h-7 rounded border border-[#7da7c9]/60 bg-transparent px-2 font-fantasy text-[10px] uppercase tracking-widest text-[#9dc3e0] transition-colors hover:bg-[#7da7c9]/15"
+        className="h-8 flex-1 rounded border border-[#7da7c9]/60 bg-transparent px-2 font-fantasy text-[11px] uppercase tracking-widest text-[#9dc3e0] transition-colors hover:bg-[#7da7c9]/15"
       >
         Temp
       </button>
