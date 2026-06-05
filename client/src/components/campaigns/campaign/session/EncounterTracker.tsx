@@ -58,7 +58,7 @@ export const EncounterTracker = ({ isDM }: EncounterTrackerProps) => {
         )}
       </div>
 
-      <ul className="flex flex-col gap-2">
+      <ul className="custom-scrollbar-x -mx-1 flex snap-x snap-mandatory gap-3 px-1 pb-2">
         {participants.map((p, idx) => (
           <EncounterParticipantCard
             key={p.id}

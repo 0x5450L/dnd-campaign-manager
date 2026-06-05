@@ -12,10 +12,10 @@ export const InitiativeBlock = ({ value, isActive }: InitiativeBlockProps) => {
           : "border-rule text-gold"
       }`}
     >
-      <span className="text-[8px] uppercase tracking-[0.18em] text-faint">
+      <span className="font-fantasy text-[11px] font-bold uppercase tracking-[0.22em] text-gold-bright">
         Init
       </span>
-      <span className="text-xl font-bold leading-none">{value}</span>
+      <span className="text-2xl font-bold leading-none">{value}</span>
     </div>
   );
 };

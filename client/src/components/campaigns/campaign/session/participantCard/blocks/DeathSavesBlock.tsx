@@ -30,7 +30,7 @@ const Dot = ({
       onClick={onClick}
       disabled={disabled}
       aria-label={`${variant} ${filled ? "marked" : "empty"}`}
-      className={`h-3 w-3 rounded-full border transition-colors ${color} ${
+      className={`h-3.5 w-3.5 rounded-full border transition-colors ${color} ${
         disabled ? "cursor-default" : "cursor-pointer hover:border-hover"
       }`}
     />
@@ -44,13 +44,13 @@ export const DeathSavesBlock = ({
   onRecord,
 }: DeathSavesBlockProps) => {
   return (
-    <div className="flex items-center justify-between gap-3 rounded border border-rust/40 bg-rust/5 px-2 py-1.5">
-      <span className="font-fantasy text-[10px] uppercase tracking-[0.18em] text-[#f1c2c2]">
+    <div className="flex items-center justify-between gap-3 rounded border border-rust/40 bg-rust/5 px-2 py-2">
+      <span className="font-fantasy text-[11px] uppercase tracking-[0.18em] text-[#f1c2c2]">
         Death saves
       </span>
       <div className="flex items-center gap-3">
-        <div className="flex items-center gap-1">
-          <span className="text-[9px] uppercase text-faint">Succ</span>
+        <div className="flex items-center gap-1.5">
+          <span className="text-[10px] uppercase text-faint">Succ</span>
           {[0, 1, 2].map((i) => (
             <Dot
               key={`s-${i}`}
@@ -61,8 +61,8 @@ export const DeathSavesBlock = ({
             />
           ))}
         </div>
-        <div className="flex items-center gap-1">
-          <span className="text-[9px] uppercase text-faint">Fail</span>
+        <div className="flex items-center gap-1.5">
+          <span className="text-[10px] uppercase text-faint">Fail</span>
           {[0, 1, 2].map((i) => (
             <Dot
               key={`f-${i}`}
