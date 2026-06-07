@@ -7,6 +7,7 @@ import type {
   PresenceStatus,
   SessionEvent,
 } from "../../types/session";
+import type { ParticipantPatch } from "../../state/liveSession/liveSessionReducer";
 
 export type LiveSessionContextType = {
   session: CampaignSessionDTO | null;
@@ -32,12 +33,12 @@ export type LiveSessionContextType = {
   toggleCondition: (participantId: string, condition: string) => void;
   setVisibility: (participantId: string, isVisible: boolean) => void;
   setAcHidden: (participantId: string, acHidden: boolean) => void;
-  setTypeHidden: (participantId: string, typeHidden: boolean) => void;
   recordDeathSave: (
     participantId: string,
     outcome: "success" | "failure",
   ) => void;
   resetDeathSaves: (participantId: string) => void;
+  updateParticipant: (participantId: string, patch: ParticipantPatch) => void;
 };
 
 export const LiveSessionContext = createContext<LiveSessionContextType | null>(null);

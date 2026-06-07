@@ -8,6 +8,7 @@ import { LiveSessionContext, type LiveSessionContextType } from "./LiveSessionCo
 import {
   initialLiveSessionState,
   liveSessionReducer,
+  type ParticipantPatch,
 } from "../../state/liveSession/liveSessionReducer";
 import type {
   CampaignSessionDTO,
@@ -273,13 +274,6 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
     [],
   );
 
-  const setTypeHidden = useCallback(
-    (participantId: string, typeHidden: boolean) => {
-      dispatch({ type: "SET_TYPE_HIDDEN", participantId, typeHidden });
-    },
-    [],
-  );
-
   const recordDeathSave = useCallback(
     (participantId: string, outcome: "success" | "failure") => {
       dispatch({ type: "RECORD_DEATH_SAVE", participantId, outcome });
@@ -290,6 +284,13 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
   const resetDeathSaves = useCallback((participantId: string) => {
     dispatch({ type: "RESET_DEATH_SAVES", participantId });
   }, []);
+
+  const updateParticipant = useCallback(
+    (participantId: string, patch: ParticipantPatch) => {
+      dispatch({ type: "UPDATE_PARTICIPANT", participantId, patch });
+    },
+    [],
+  );
 
   const presenceFor = useCallback(
     (userId: string): PresenceStatus =>
@@ -330,9 +331,9 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
       toggleCondition,
       setVisibility,
       setAcHidden,
-      setTypeHidden,
       recordDeathSave,
       resetDeathSaves,
+      updateParticipant,
     }),
     [
       state,
@@ -350,9 +351,9 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
       toggleCondition,
       setVisibility,
       setAcHidden,
-      setTypeHidden,
       recordDeathSave,
       resetDeathSaves,
+      updateParticipant,
     ],
   );
 

@@ -38,6 +38,12 @@ body {
   min-height: 100vh;
 }
 
+@layer base {
+  button:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
 /* ── Section card (attacks, features, proficiencies) ── */
 .cs-section-card {
   border: 1.5px solid var(--color-rule);

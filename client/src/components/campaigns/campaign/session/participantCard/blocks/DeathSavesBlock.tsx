@@ -1,41 +1,42 @@
+type DeathSaveVariant = "success" | "failure";
+
 type DeathSavesBlockProps = {
   successes: number;
   failures: number;
   canEdit: boolean;
-  onRecord: (outcome: "success" | "failure") => void;
+  onRecord: (outcome: DeathSaveVariant) => void;
 };
 
-const Dot = ({
+const checkStyle = (filled: boolean, variant: DeathSaveVariant) => {
+  if (!filled) return "border-rule";
+  return variant === "success"
+    ? "border-[#b0c4d8] bg-[#b0c4d8]/20 text-[#c8dcea]"
+    : "border-[#3a1518] bg-[#1a0a0c] text-[#6b2a2a]";
+};
+
+const Check = ({
   filled,
   variant,
   onClick,
   disabled,
 }: {
   filled: boolean;
-  variant: "success" | "failure";
+  variant: DeathSaveVariant;
   onClick?: () => void;
   disabled: boolean;
-}) => {
-  const color =
-    variant === "success"
-      ? filled
-        ? "border-[#b0c4d8] bg-[#b0c4d8]/40"
-        : "border-rule"
-      : filled
-        ? "border-rust bg-rust/40"
-        : "border-rule";
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      aria-label={`${variant} ${filled ? "marked" : "empty"}`}
-      className={`h-3.5 w-3.5 rounded-full border transition-colors ${color} ${
-        disabled ? "cursor-default" : "cursor-pointer hover:border-hover"
-      }`}
-    />
-  );
-};
+}) => (
+  <button
+    type="button"
+    onClick={onClick}
+    disabled={disabled}
+    aria-label={`${variant} ${filled ? "marked" : "empty"}`}
+    className={`flex h-5 w-5 items-center justify-center rounded border-2 transition-colors ${checkStyle(filled, variant)} ${
+      disabled ? "" : "hover:border-hover"
+    }`}
+  >
+    {filled && <span className="text-sm leading-none">✦</span>}
+  </button>
+);
 
 export const DeathSavesBlock = ({
   successes,
@@ -44,15 +45,15 @@ export const DeathSavesBlock = ({
   onRecord,
 }: DeathSavesBlockProps) => {
   return (
-    <div className="flex items-center justify-between gap-3 rounded border border-rust/40 bg-rust/5 px-2 py-2">
-      <span className="font-fantasy text-[11px] uppercase tracking-[0.18em] text-[#f1c2c2]">
+    <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 rounded border border-rule bg-bg/40 px-2.5 py-2">
+      <span className="whitespace-nowrap font-fantasy text-xs sm:text-sm uppercase tracking-[0.18em] text-faint">
         Death saves
       </span>
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 sm:gap-4">
         <div className="flex items-center gap-1.5">
-          <span className="text-[10px] uppercase text-faint">Succ</span>
+          <span className="text-xs uppercase text-faint">Succ</span>
           {[0, 1, 2].map((i) => (
-            <Dot
+            <Check
               key={`s-${i}`}
               filled={i < successes}
               variant="success"
@@ -62,9 +63,9 @@ export const DeathSavesBlock = ({
           ))}
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="text-[10px] uppercase text-faint">Fail</span>
+          <span className="text-xs uppercase text-faint">Fail</span>
           {[0, 1, 2].map((i) => (
-            <Dot
+            <Check
               key={`f-${i}`}
               filled={i < failures}
               variant="failure"

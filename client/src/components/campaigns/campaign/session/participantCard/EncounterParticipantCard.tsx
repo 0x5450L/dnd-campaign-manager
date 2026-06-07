@@ -9,57 +9,15 @@ import HpControls from "./blocks/HpControls";
 import ConditionsPicker from "./blocks/ConditionsPicker";
 import AttackAbilitiesStrip from "./blocks/AttackAbilitiesStrip";
 import DeathSavesBlock from "./blocks/DeathSavesBlock";
-import ParticipantDetailsModal from "./ParticipantDetailsModal";
+import ParticipantDetailsModal from "./modal/ParticipantDetailsModal";
+import VisibilityToggle from "./blocks/VisibilityToggle";
+import { InfoIcon } from "./blocks/icons";
 
 type EncounterParticipantCardProps = {
   participant: EncounterParticipantDTO;
   isActive: boolean;
   isDM: boolean;
 };
-
-const InfoIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className="h-3.5 w-3.5"
-  >
-    <circle cx="12" cy="12" r="10" />
-    <line x1="12" y1="16" x2="12" y2="12" />
-    <line x1="12" y1="8" x2="12.01" y2="8" />
-  </svg>
-);
-
-const EyeIcon = ({ open }: { open: boolean }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className="h-3.5 w-3.5"
-  >
-    {open ? (
-      <>
-        <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" />
-        <circle cx="12" cy="12" r="3" />
-      </>
-    ) : (
-      <>
-        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 19c-7 0-10-7-10-7a18.45 18.45 0 0 1 5.06-5.94" />
-        <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 10 7 10 7a18.5 18.5 0 0 1-2.16 3.19" />
-        <path d="M14.12 14.12A3 3 0 1 1 9.88 9.88" />
-        <line x1="2" y1="2" x2="22" y2="22" />
-      </>
-    )}
-  </svg>
-);
 
 export const EncounterParticipantCard = ({
   participant,
@@ -71,7 +29,7 @@ export const EncounterParticipantCard = ({
     grantTempHp,
     toggleCondition,
     setVisibility,
-    setTypeHidden,
+    setAcHidden,
     recordDeathSave,
   } = useLiveSession();
   const [detailsOpen, setDetailsOpen] = useState(false);
@@ -101,6 +59,11 @@ export const EncounterParticipantCard = ({
             value={participant.armorClass}
             hidden={participant.acHidden}
             isDM={isDM}
+            onToggleHidden={
+              isDM
+                ? () => setAcHidden(participant.id, !participant.acHidden)
+                : undefined
+            }
           />
 
           <div className="flex min-w-0 flex-1 flex-col gap-1">
@@ -110,41 +73,14 @@ export const EncounterParticipantCard = ({
               </span>
             </div>
             <div className="flex flex-wrap items-center gap-1.5">
-              <TypeBadge
-                type={participant.type}
-                hidden={participant.typeHidden}
-                isDM={isDM}
-                onToggleHidden={
-                  isDM
-                    ? () =>
-                        setTypeHidden(participant.id, !participant.typeHidden)
-                    : undefined
-                }
-              />
+              <TypeBadge type={participant.type} />
               {isDM && (
-                <button
-                  type="button"
-                  onClick={() =>
+                <VisibilityToggle
+                  isVisible={participant.isVisible}
+                  onToggle={() =>
                     setVisibility(participant.id, !participant.isVisible)
                   }
-                  aria-label={
-                    participant.isVisible
-                      ? "Hide from players"
-                      : "Reveal to players"
-                  }
-                  title={
-                    participant.isVisible
-                      ? "Visible to players"
-                      : "Hidden from players"
-                  }
-                  className={`flex h-6 w-6 items-center justify-center rounded border transition-colors ${
-                    participant.isVisible
-                      ? "border-rule text-faint hover:border-hover hover:text-ink"
-                      : "border-[#7a5aa5]/60 bg-[#7a5aa5]/15 text-[#c8b0e0] hover:bg-[#7a5aa5]/25"
-                  }`}
-                >
-                  <EyeIcon open={participant.isVisible} />
-                </button>
+                />
               )}
               <button
                 type="button"

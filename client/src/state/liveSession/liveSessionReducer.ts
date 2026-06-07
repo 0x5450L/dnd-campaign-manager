@@ -17,6 +17,10 @@ export type LiveSessionState = {
   events: SessionEvent[];
 };
 
+export type ParticipantPatch = Partial<
+  Omit<EncounterParticipantDTO, "id" | "encounterId" | "createdAt" | "updatedAt">
+>;
+
 export type LiveSessionAction =
   | { type: "START_SESSION"; session: CampaignSessionDTO; presence: MemberPresence[] }
   | { type: "END_SESSION" }
@@ -29,13 +33,13 @@ export type LiveSessionAction =
   | { type: "TOGGLE_CONDITION"; participantId: string; condition: string }
   | { type: "SET_VISIBILITY"; participantId: string; isVisible: boolean }
   | { type: "SET_AC_HIDDEN"; participantId: string; acHidden: boolean }
-  | { type: "SET_TYPE_HIDDEN"; participantId: string; typeHidden: boolean }
   | {
       type: "RECORD_DEATH_SAVE";
       participantId: string;
       outcome: "success" | "failure";
     }
   | { type: "RESET_DEATH_SAVES"; participantId: string }
+  | { type: "UPDATE_PARTICIPANT"; participantId: string; patch: ParticipantPatch }
   | { type: "ADD_PARTICIPANT"; participant: EncounterParticipantDTO }
   | { type: "REMOVE_PARTICIPANT"; participantId: string }
   | {
@@ -234,13 +238,6 @@ export const liveSessionReducer = (
       return { ...state, participants };
     }
 
-    case "SET_TYPE_HIDDEN": {
-      const participants = state.participants.map((p) =>
-        p.id === action.participantId ? { ...p, typeHidden: action.typeHidden } : p,
-      );
-      return { ...state, participants };
-    }
-
     case "RECORD_DEATH_SAVE": {
       const target = state.participants.find((p) => p.id === action.participantId);
       if (!target) return state;
@@ -268,6 +265,19 @@ export const liveSessionReducer = (
           ),
         ),
       };
+    }
+
+    case "UPDATE_PARTICIPANT": {
+      const target = state.participants.find((p) => p.id === action.participantId);
+      if (!target) return state;
+      const merged = { ...target, ...action.patch };
+      merged.maxHp = Math.max(1, merged.maxHp);
+      merged.currentHp = clampHp(merged.currentHp, merged.maxHp);
+      merged.tempHp = Math.max(0, merged.tempHp);
+      const participants = state.participants
+        .map((p) => (p.id === action.participantId ? merged : p))
+        .sort((a, b) => b.sortOrder - a.sortOrder);
+      return { ...state, participants };
     }
 
     case "RESET_DEATH_SAVES": {
