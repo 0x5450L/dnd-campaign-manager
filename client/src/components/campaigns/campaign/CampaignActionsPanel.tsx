@@ -4,6 +4,12 @@ import ConfirmDialog from "../../ui/ConfirmDialog";
 import CreateInvite from "./CreateInvite";
 import { useCampaignCharacters } from "./characters/controller/useCampaignCharacters";
 
+const PANEL_LABEL =
+  "font-fantasy text-xs font-bold uppercase tracking-[0.16em] text-gold-bright";
+
+const SUB_PANEL =
+  "flex flex-1 flex-col gap-3 rounded-md border border-rule/50 bg-bg/30 p-3";
+
 type CampaignActionsPanelProps = {
   campaignId: string;
   isDM: boolean;
@@ -30,34 +36,36 @@ function CampaignActionsPanel({
 
   return (
     <div className="cs-section-card flex h-full flex-col gap-3 p-4">
-      <div className="flex flex-wrap items-center gap-2">
-        {isDM ? (
-          <CommonButton onClick={openCharactersSidebar} size="sm">
-            Characters ({characters.length})
-          </CommonButton>
-        ) : (
-          <CommonButton onClick={openMyCharacter} size="sm">
-            {myCharacter ? "My character" : "Create character"}
-          </CommonButton>
-        )}
-        {isDM && hasChanges && (
-          <CommonButton onClick={onSave} variant="accept" size="sm">
-            Save
-          </CommonButton>
-        )}
-        {isDM && (
-          <CommonButton
-            onClick={() => setShowDeleteConfirm(true)}
-            variant="decline"
-            size="sm"
-          >
-            Delete
-          </CommonButton>
-        )}
+      <div className={SUB_PANEL}>
+        <span className={PANEL_LABEL}>Manage</span>
+        <div className="flex flex-wrap items-center gap-2">
+          {isDM ? (
+            <CommonButton onClick={openCharactersSidebar} size="sm">
+              Characters ({characters.length})
+            </CommonButton>
+          ) : (
+            <CommonButton onClick={openMyCharacter} size="sm">
+              {myCharacter ? "My character" : "Create character"}
+            </CommonButton>
+          )}
+          {isDM && hasChanges && (
+            <CommonButton onClick={onSave} variant="accept" size="sm">
+              Save
+            </CommonButton>
+          )}
+          {isDM && (
+            <CommonButton
+              onClick={() => setShowDeleteConfirm(true)}
+              variant="decline"
+              size="sm"
+            >
+              Delete
+            </CommonButton>
+          )}
+        </div>
       </div>
 
-      <div className="mt-auto flex flex-col gap-3">
-        <div className="h-px w-full bg-rule/60" />
+      <div className={SUB_PANEL}>
         <CreateInvite campaignId={campaignId} />
       </div>
 
