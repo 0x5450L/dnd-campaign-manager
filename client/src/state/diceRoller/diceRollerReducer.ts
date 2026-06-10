@@ -8,6 +8,8 @@ export type DiceRollerState = {
   lastResult: RollResult | null;
   history: DiceHistoryEntry[];
   error: string | null;
+  sessionActive: boolean;
+  shareToSession: boolean;
 };
 
 export const HISTORY_LIMIT = 30;
@@ -23,7 +25,9 @@ export type DiceRollerAction =
   | { type: "FINISH_ROLL"; result: RollResult }
   | { type: "CLEAR_HISTORY" }
   | { type: "REPLAY"; entry: DiceHistoryEntry }
-  | { type: "HYDRATE"; history: DiceHistoryEntry[] };
+  | { type: "HYDRATE"; history: DiceHistoryEntry[] }
+  | { type: "SET_SESSION_ACTIVE"; active: boolean }
+  | { type: "SET_SHARE_TO_SESSION"; enabled: boolean };
 
 export const initialDiceRollerState: DiceRollerState = {
   isOpen: false,
@@ -33,6 +37,8 @@ export const initialDiceRollerState: DiceRollerState = {
   lastResult: null,
   history: [],
   error: null,
+  sessionActive: false,
+  shareToSession: false,
 };
 
 export const diceRollerReducer = (
@@ -69,5 +75,13 @@ export const diceRollerReducer = (
       return { ...state, history: [] };
     case "HYDRATE":
       return { ...state, history: action.history };
+    case "SET_SESSION_ACTIVE":
+      return {
+        ...state,
+        sessionActive: action.active,
+        shareToSession: action.active ? state.shareToSession : false,
+      };
+    case "SET_SHARE_TO_SESSION":
+      return { ...state, shareToSession: action.enabled };
   }
 };

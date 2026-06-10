@@ -6,6 +6,8 @@ import type {
   RollResult,
 } from "../../types/dice";
 
+export type DiceSessionSink = (result: RollResult) => void;
+
 export type DiceRollerContextType = {
   isOpen: boolean;
   isRolling: boolean;
@@ -14,6 +16,8 @@ export type DiceRollerContextType = {
   lastResult: RollResult | null;
   history: DiceHistoryEntry[];
   error: string | null;
+  sessionActive: boolean;
+  shareToSession: boolean;
 
   open: () => void;
   close: () => void;
@@ -28,6 +32,9 @@ export type DiceRollerContextType = {
   rerollFromHistory: (entry: DiceHistoryEntry) => void;
   showHistoryResult: (entry: DiceHistoryEntry) => void;
   clearHistory: () => void;
+
+  setShareToSession: (enabled: boolean) => void;
+  registerSessionSink: (sink: DiceSessionSink | null) => void;
 };
 
 export const DiceRollerContext = createContext<DiceRollerContextType | null>(null);

@@ -28,7 +28,7 @@ export const SessionEventFeed = () => {
   const { events } = useLiveSession();
 
   return (
-    <div className="cs-section-card flex h-full min-h-[280px] flex-col gap-2 p-4">
+    <div className="cs-section-card flex h-[220px] flex-col gap-2 p-3">
       <div className="flex items-center justify-between">
         <span className="cs-section-title !p-0 !text-left">Session log</span>
         <span className="text-[10px] uppercase tracking-[0.12em] text-faint">

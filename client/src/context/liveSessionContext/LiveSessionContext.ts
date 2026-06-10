@@ -5,9 +5,13 @@ import type {
   EncounterParticipantDTO,
   MemberPresence,
   PresenceStatus,
+  SessionDiceRoll,
   SessionEvent,
 } from "../../types/session";
-import type { ParticipantPatch } from "../../state/liveSession/liveSessionReducer";
+import type {
+  ParticipantPatch,
+  SessionRollInput,
+} from "../../state/liveSession/liveSessionReducer";
 
 export type LiveSessionContextType = {
   session: CampaignSessionDTO | null;
@@ -15,6 +19,7 @@ export type LiveSessionContextType = {
   participants: EncounterParticipantDTO[];
   presence: MemberPresence[];
   events: SessionEvent[];
+  rolls: SessionDiceRoll[];
 
   presenceFor: (userId: string) => PresenceStatus;
   activeParticipant: EncounterParticipantDTO | null;
@@ -39,6 +44,7 @@ export type LiveSessionContextType = {
   ) => void;
   resetDeathSaves: (participantId: string) => void;
   updateParticipant: (participantId: string, patch: ParticipantPatch) => void;
+  logRoll: (roll: SessionRollInput) => void;
 };
 
 export const LiveSessionContext = createContext<LiveSessionContextType | null>(null);

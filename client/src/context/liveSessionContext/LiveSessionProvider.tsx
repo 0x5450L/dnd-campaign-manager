@@ -9,6 +9,7 @@ import {
   initialLiveSessionState,
   liveSessionReducer,
   type ParticipantPatch,
+  type SessionRollInput,
 } from "../../state/liveSession/liveSessionReducer";
 import type {
   CampaignSessionDTO,
@@ -17,6 +18,7 @@ import type {
   MemberPresence,
   ParticipantAbilityScore,
   PresenceStatus,
+  SpellSlotLevel,
 } from "../../types/session";
 import type { Campaign } from "../../types/campaigns";
 
@@ -74,6 +76,17 @@ const goblinBossAbilities: ParticipantAbilityScore[] = [
   { name: "cha", score: 10 },
 ];
 
+const wizardSpellSlots: SpellSlotLevel[] = [
+  { level: 1, total: 4, used: 1 },
+  { level: 2, total: 3, used: 0 },
+  { level: 3, total: 2, used: 0 },
+];
+
+const goblinBossSpellSlots: SpellSlotLevel[] = [
+  { level: 1, total: 3, used: 0 },
+  { level: 2, total: 1, used: 0 },
+];
+
 const goblinScoutAbilities: ParticipantAbilityScore[] = [
   { name: "str", score: 8 },
   { name: "dex", score: 14 },
@@ -110,6 +123,7 @@ const seedParticipants = (
       abilityScores: null,
       spellAbility: null,
       proficiencyBonus: 2,
+      spellSlots: idx === 0 ? wizardSpellSlots : null,
       deathSaveSuccesses: 0,
       deathSaveFailures: 0,
       createdAt: now,
@@ -136,6 +150,7 @@ const seedParticipants = (
       abilityScores: goblinBossAbilities,
       spellAbility: "wis",
       proficiencyBonus: 2,
+      spellSlots: goblinBossSpellSlots,
       deathSaveSuccesses: 0,
       deathSaveFailures: 0,
       createdAt: now,
@@ -292,6 +307,10 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
     [],
   );
 
+  const logRoll = useCallback((roll: SessionRollInput) => {
+    dispatch({ type: "LOG_ROLL", roll });
+  }, []);
+
   const presenceFor = useCallback(
     (userId: string): PresenceStatus =>
       state.presence.find((p) => p.userId === userId)?.status ?? "offline",
@@ -315,6 +334,7 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
       participants: state.participants,
       presence: state.presence,
       events: state.events,
+      rolls: state.rolls,
 
       presenceFor,
       activeParticipant,
@@ -334,6 +354,7 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
       recordDeathSave,
       resetDeathSaves,
       updateParticipant,
+      logRoll,
     }),
     [
       state,
@@ -354,6 +375,7 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
       recordDeathSave,
       resetDeathSaves,
       updateParticipant,
+      logRoll,
     ],
   );
 

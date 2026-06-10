@@ -77,11 +77,7 @@ function CampaignPage() {
   if (!campaign) {
     return (
       <div className="mx-auto flex max-w-3xl flex-col gap-4 p-4">
-        {message ? (
-          <p className="text-rust">{message}</p>
-        ) : (
-          <p className="text-dim">Campaign not found.</p>
-        )}
+        {message ? <p className="text-rust">{message}</p> : <p className="text-dim">Campaign not found.</p>}
         <CommonButton onClick={() => navigate("/campaigns")} variant="secondary" size="sm">
           &larr; Campaigns
         </CommonButton>
@@ -90,23 +86,19 @@ function CampaignPage() {
   }
 
   return (
-    <CampaignCharactersController
-      campaignId={campaign.id}
-      dmId={campaign.dmId}
-      currentUserId={user?.id ?? null}
-    >
+    <CampaignCharactersController campaignId={campaign.id} dmId={campaign.dmId} currentUserId={user?.id ?? null}>
       <LiveSessionProvider campaign={campaign}>
         <div className="mx-auto flex min-h-[calc(100vh-53px)] w-full max-w-7xl flex-col gap-3 p-3 sm:p-4">
-          <CampaignHeaderBar
-            campaign={campaign}
-            isDM={isDM}
-            onChange={setCampaign}
-          />
+          <CampaignHeaderBar campaign={campaign} isDM={isDM} onChange={setCampaign} />
 
           {isLoading ? (
             <p className="m-auto text-gold-bright">Loading campaign...</p>
           ) : (
             <>
+              <SessionPanel isDM={isDM} />
+              
+              <PartyRow members={campaign.members} dmId={campaign.dmId} isDM={isDM} />
+
               <div className="grid items-stretch gap-3 md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
                 <CampaignDetails campaign={campaign} isDM={isDM} onChange={setCampaign} />
                 <CampaignActionsPanel
@@ -117,14 +109,6 @@ function CampaignPage() {
                   onDeleteCampaign={handleDeleteCampaign}
                 />
               </div>
-
-              <PartyRow
-                members={campaign.members}
-                dmId={campaign.dmId}
-                isDM={isDM}
-              />
-
-              <SessionPanel isDM={isDM} />
             </>
           )}
         </div>

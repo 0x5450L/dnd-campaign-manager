@@ -14,6 +14,8 @@ export const DiceRoller = () => {
     mode,
     lastResult,
     error,
+    sessionActive,
+    shareToSession,
     close,
     toggle,
     setFormula,
@@ -21,6 +23,7 @@ export const DiceRoller = () => {
     addDie,
     clearFormula,
     roll,
+    setShareToSession,
   } = useDiceRoller();
 
   useEffect(() => {
@@ -56,14 +59,22 @@ export const DiceRoller = () => {
             <span className="font-fantasy text-base uppercase tracking-[0.14em] text-gold">
               Dice Roller
             </span>
-            <button
-              type="button"
-              onClick={close}
-              aria-label="Close"
-              className="cursor-pointer rounded border-0 bg-transparent px-2 py-1 text-xl leading-none text-dim transition-colors hover:bg-surface-light/30 hover:text-ink"
-            >
-              ✕
-            </button>
+            <div className="flex items-center gap-2">
+              {sessionActive && (
+                <SessionShareToggle
+                  enabled={shareToSession}
+                  onToggle={() => setShareToSession(!shareToSession)}
+                />
+              )}
+              <button
+                type="button"
+                onClick={close}
+                aria-label="Close"
+                className="cursor-pointer rounded border-0 bg-transparent px-2 py-1 text-xl leading-none text-dim transition-colors hover:bg-surface-light/30 hover:text-ink"
+              >
+                ✕
+              </button>
+            </div>
           </div>
 
           <DiceResult result={lastResult} isRolling={isRolling} error={error} />
@@ -144,6 +155,41 @@ export const DiceRoller = () => {
     </>
   );
 };
+
+type SessionShareToggleProps = {
+  enabled: boolean;
+  onToggle: () => void;
+};
+
+const SessionShareToggle = ({ enabled, onToggle }: SessionShareToggleProps) => (
+  <button
+    type="button"
+    role="switch"
+    aria-checked={enabled}
+    onClick={onToggle}
+    title={enabled ? "Rolls are shared with the session" : "Share rolls with the session"}
+    className={`flex cursor-pointer items-center gap-2 rounded-full border px-2.5 py-1 transition-colors ${
+      enabled
+        ? "border-leaf bg-leaf/10 text-leaf-soft"
+        : "border-rule bg-transparent text-faint hover:border-hover hover:text-dim"
+    }`}
+  >
+    <span className="font-fantasy text-[10px] uppercase tracking-[0.14em]">
+      To session
+    </span>
+    <span
+      className={`relative h-3.5 w-7 shrink-0 rounded-full border transition-colors ${
+        enabled ? "border-leaf bg-leaf/30" : "border-rule bg-bg/60"
+      }`}
+    >
+      <span
+        className={`absolute top-1/2 h-2.5 w-2.5 -translate-y-1/2 rounded-full transition-[left,background-color] duration-150 ${
+          enabled ? "left-[14px] bg-leaf" : "left-[2px] bg-faint"
+        }`}
+      />
+    </span>
+  </button>
+);
 
 type QuickDieProps = {
   type: DiceType;

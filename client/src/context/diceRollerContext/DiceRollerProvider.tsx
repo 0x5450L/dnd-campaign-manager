@@ -9,6 +9,7 @@ import {
 import {
   DiceRollerContext,
   type DiceRollerContextType,
+  type DiceSessionSink,
 } from "./DiceRollerContext";
 import {
   diceRollerReducer,
@@ -46,6 +47,12 @@ const loadHistory = (): DiceHistoryEntry[] => {
 export const DiceRollerProvider = ({ children }: Props) => {
   const [state, dispatch] = useReducer(diceRollerReducer, initialDiceRollerState);
   const rollTimerRef = useRef<number | null>(null);
+  const sessionSinkRef = useRef<DiceSessionSink | null>(null);
+  const shareToSessionRef = useRef(false);
+
+  useEffect(() => {
+    shareToSessionRef.current = state.shareToSession;
+  }, [state.shareToSession]);
 
   useEffect(() => {
     const history = loadHistory();
@@ -109,6 +116,9 @@ export const DiceRollerProvider = ({ children }: Props) => {
         rollTimerRef.current = window.setTimeout(() => {
           const result = rollTerms(adjusted, normalized, opts.label);
           dispatch({ type: "FINISH_ROLL", result });
+          if (shareToSessionRef.current && sessionSinkRef.current) {
+            sessionSinkRef.current(result);
+          }
           rollTimerRef.current = null;
         }, ROLL_ANIMATION_MS);
       } catch (e) {
@@ -140,6 +150,16 @@ export const DiceRollerProvider = ({ children }: Props) => {
 
   const clearHistory = useCallback(() => dispatch({ type: "CLEAR_HISTORY" }), []);
 
+  const setShareToSession = useCallback(
+    (enabled: boolean) => dispatch({ type: "SET_SHARE_TO_SESSION", enabled }),
+    [],
+  );
+
+  const registerSessionSink = useCallback((sink: DiceSessionSink | null) => {
+    sessionSinkRef.current = sink;
+    dispatch({ type: "SET_SESSION_ACTIVE", active: sink !== null });
+  }, []);
+
   const value = useMemo<DiceRollerContextType>(
     () => ({
       isOpen: state.isOpen,
@@ -149,6 +169,8 @@ export const DiceRollerProvider = ({ children }: Props) => {
       lastResult: state.lastResult,
       history: state.history,
       error: state.error,
+      sessionActive: state.sessionActive,
+      shareToSession: state.shareToSession,
 
       open,
       close,
@@ -161,6 +183,8 @@ export const DiceRollerProvider = ({ children }: Props) => {
       rerollFromHistory,
       showHistoryResult,
       clearHistory,
+      setShareToSession,
+      registerSessionSink,
     }),
     [
       state,
@@ -175,6 +199,8 @@ export const DiceRollerProvider = ({ children }: Props) => {
       rerollFromHistory,
       showHistoryResult,
       clearHistory,
+      setShareToSession,
+      registerSessionSink,
     ],
   );
 
