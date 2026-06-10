@@ -15,7 +15,7 @@ export const DiceHistory = () => {
         type="button"
         onClick={() => setExpanded((v) => !v)}
         aria-expanded={expanded}
-        className="flex cursor-pointer items-center justify-between rounded px-1 py-1 text-left transition-colors hover:bg-white/5"
+        className="flex cursor-pointer items-center justify-between rounded px-1 py-1 text-left transition-colors hover:bg-surface-light/30"
       >
         <span className="font-fantasy text-sm uppercase tracking-widest text-faint">
           History
@@ -85,9 +85,9 @@ type ItemProps = {
 
 const HistoryItem = ({ entry, onClick, onReroll }: ItemProps) => {
   const totalColor = entry.critSuccess
-    ? "text-[#b6e0b6]"
+    ? "text-leaf-soft"
     : entry.critFail
-      ? "text-[#f0a6a6]"
+      ? "text-rust-soft"
       : "text-gold-bright";
 
   const handleReroll = (e: React.MouseEvent) => {

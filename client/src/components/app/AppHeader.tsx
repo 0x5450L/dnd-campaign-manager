@@ -13,10 +13,10 @@ function Header() {
   };
 
   return (
-    <header className="flex items-center justify-between px-6 py-3 bg-gray-900/80 border-b border-gray-700">
+    <header className="flex items-center justify-between px-6 py-3 bg-bg/80 border-b border-rule">
       <button
         onClick={() => navigate("/")}
-        className="text-lg font-bold text-amber-400 hover:text-amber-300 transition-colors duration-200 cursor-pointer"
+        className="text-lg font-bold text-gold hover:text-gold-bright transition-colors duration-200 cursor-pointer"
       >
         DnD Campaign Manager
       </button>
@@ -24,8 +24,8 @@ function Header() {
       {user && (
         <div className="flex  items-center gap-4">
           <InvitesDropdown />
-          <span className="text-sm text-gray-400">{user.displayName}</span>
-          <CommonButton onClick={handleLogout} variant="secondary" size="sm" className="hover:text-red-400">
+          <span className="text-sm text-dim">{user.displayName}</span>
+          <CommonButton onClick={handleLogout} variant="secondary" size="sm" className="hover:text-rust">
             Logout
           </CommonButton>
         </div>

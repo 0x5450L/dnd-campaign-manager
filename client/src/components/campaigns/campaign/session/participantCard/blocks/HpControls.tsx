@@ -55,21 +55,21 @@ export const HpControls = ({
       <button
         type="button"
         onClick={() => apply(onDamage)}
-        className={`${styles.button} flex-1 rounded border border-rust/60 bg-transparent px-2 font-fantasy uppercase tracking-widest text-[#f1c2c2] transition-colors hover:bg-rust/15`}
+        className={`${styles.button} flex-1 rounded border border-rust/60 bg-transparent px-2 font-fantasy uppercase tracking-widest text-rust-soft transition-colors hover:bg-rust/15`}
       >
         Damage
       </button>
       <button
         type="button"
         onClick={() => apply(onHeal)}
-        className={`${styles.button} flex-1 rounded border border-leaf/60 bg-transparent px-2 font-fantasy uppercase tracking-widest text-[#c2e8c2] transition-colors hover:bg-leaf/15`}
+        className={`${styles.button} flex-1 rounded border border-leaf/60 bg-transparent px-2 font-fantasy uppercase tracking-widest text-leaf-soft transition-colors hover:bg-leaf/15`}
       >
         Heal
       </button>
       <button
         type="button"
         onClick={() => apply(onTemp)}
-        className={`${styles.button} flex-1 rounded border border-[#7da7c9]/60 bg-transparent px-2 font-fantasy uppercase tracking-widest text-[#9dc3e0] transition-colors hover:bg-[#7da7c9]/15`}
+        className={`${styles.button} flex-1 rounded border border-frost/60 bg-transparent px-2 font-fantasy uppercase tracking-widest text-frost-soft transition-colors hover:bg-frost/15`}
       >
         Temp
       </button>

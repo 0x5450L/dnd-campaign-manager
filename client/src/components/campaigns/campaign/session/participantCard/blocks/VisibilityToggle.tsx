@@ -17,7 +17,7 @@ export const VisibilityToggle = ({
     className={`flex h-6 w-6 items-center justify-center rounded border transition-colors ${
       isVisible
         ? "border-rule text-faint hover:border-hover hover:text-ink"
-        : "border-[#7a5aa5]/60 bg-[#7a5aa5]/15 text-[#c8b0e0] hover:bg-[#7a5aa5]/25"
+        : "border-arcane/60 bg-arcane/15 text-arcane-soft hover:bg-arcane/25"
     }`}
   >
     <EyeIcon open={isVisible} />

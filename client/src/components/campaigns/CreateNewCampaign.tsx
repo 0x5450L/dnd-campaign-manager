@@ -43,16 +43,16 @@ function CreateNewCampaign() {
   };
 
   return (
-    <div className="bg-gray-800/50 p-6 rounded-xl border border-gray-700">
-      <h2 className="text-lg font-semibold text-gray-200 mb-4">Create New Campaign</h2>
+    <div className="bg-surface/50 p-6 rounded-xl border border-rule">
+      <h2 className="text-lg font-semibold text-ink mb-4">Create New Campaign</h2>
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
         <CommonInput type="text" name="name" placeholder="Campaign Name *" variant="boxed" />
-        {nameError && <p className="text-red-400 text-sm">{nameError}</p>}
+        {nameError && <p className="text-rust text-sm">{nameError}</p>}
         <CommonInput type="text" name="description" placeholder="Description (optional)" variant="boxed" />
         <CommonInput type="text" name="setting" placeholder="Setting (optional)" variant="boxed" />
         <CommonInput type="text" name="imageUrl" placeholder="Image URL (optional)" variant="boxed" />
         <CommonButton type="submit">Create Campaign</CommonButton>
-        {createCampaignError && <p className="text-red-400 text-sm">{createCampaignError}</p>}
+        {createCampaignError && <p className="text-rust text-sm">{createCampaignError}</p>}
       </form>
     </div>
   );

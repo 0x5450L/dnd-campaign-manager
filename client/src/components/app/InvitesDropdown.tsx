@@ -59,7 +59,7 @@ function InvitesDropdown() {
     <div className="relative flex items-center justify-center" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative text-gray-400 hover:text-amber-300 transition-colors duration-200 cursor-pointer"
+        className="relative text-dim hover:text-gold-bright transition-colors duration-200 cursor-pointer"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -76,30 +76,30 @@ function InvitesDropdown() {
         </svg>
 
         {invites.length > 0 && (
-          <span className="absolute -top-1.5 -right-1.5 bg-amber-500 text-white text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center">
+          <span className="absolute -top-1.5 -right-1.5 bg-gold text-ink text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center">
             {invites.length}
           </span>
         )}
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-8 w-80 bg-gray-800 border border-gray-700 rounded-xl shadow-lg z-50 overflow-hidden">
-          <div className="px-4 py-3 border-b border-gray-700">
-            <h3 className="text-sm font-semibold text-gray-200">
+        <div className="absolute right-0 top-8 w-80 bg-surface border border-rule rounded-xl shadow-lg z-50 overflow-hidden">
+          <div className="px-4 py-3 border-b border-rule">
+            <h3 className="text-sm font-semibold text-ink">
               Invites {invites.length > 0 && `(${invites.length})`}
             </h3>
           </div>
 
           {invites.length === 0 ? (
-            <div className="px-4 py-6 text-center text-sm text-gray-500">No pending invites</div>
+            <div className="px-4 py-6 text-center text-sm text-faint">No pending invites</div>
           ) : (
             <ul className="max-h-64 overflow-y-auto">
               {invites.map((invite) => (
-                <li key={invite.id} className="px-4 py-3 border-b border-gray-700/50 last:border-b-0">
+                <li key={invite.id} className="px-4 py-3 border-b border-rule/50 last:border-b-0">
                   <div className="flex flex-col gap-2">
                     <div>
-                      <p className="text-sm font-medium text-gray-200">{invite.campaign?.name ?? "Unknown campaign"}</p>
-                      <p className="text-xs text-gray-500">DM: {invite.campaign?.dm.displayName ?? "Unknown"}</p>
+                      <p className="text-sm font-medium text-ink">{invite.campaign?.name ?? "Unknown campaign"}</p>
+                      <p className="text-xs text-faint">DM: {invite.campaign?.dm.displayName ?? "Unknown"}</p>
                     </div>
                     <div className="flex gap-2 justify-end">
                       <CommonButton

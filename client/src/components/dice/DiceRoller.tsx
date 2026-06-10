@@ -60,7 +60,7 @@ export const DiceRoller = () => {
               type="button"
               onClick={close}
               aria-label="Close"
-              className="cursor-pointer rounded border-0 bg-transparent px-2 py-1 text-xl leading-none text-dim transition-colors hover:bg-white/5 hover:text-ink"
+              className="cursor-pointer rounded border-0 bg-transparent px-2 py-1 text-xl leading-none text-dim transition-colors hover:bg-surface-light/30 hover:text-ink"
             >
               ✕
             </button>
@@ -97,7 +97,7 @@ export const DiceRoller = () => {
                   type="button"
                   onClick={clearFormula}
                   aria-label="Clear formula"
-                  className="absolute right-1.5 top-1/2 -translate-y-1/2 cursor-pointer rounded px-2 py-1 text-base leading-none text-faint transition-colors hover:bg-white/5 hover:text-ink"
+                  className="absolute right-1.5 top-1/2 -translate-y-1/2 cursor-pointer rounded px-2 py-1 text-base leading-none text-faint transition-colors hover:bg-surface-light/30 hover:text-ink"
                 >
                   ×
                 </button>
@@ -177,9 +177,9 @@ const ModeButton = ({ mode, label, current, onSelect }: ModeButtonProps) => {
   const variant = !active
     ? "border-rule text-dim hover:border-hover hover:text-ink"
     : mode === "advantage"
-      ? "border-leaf bg-leaf/10 text-[#c2e8c2]"
+      ? "border-leaf bg-leaf/10 text-leaf-soft"
       : mode === "disadvantage"
-        ? "border-rust bg-rust/10 text-[#f1c2c2]"
+        ? "border-rust bg-rust/10 text-rust-soft"
         : "border-gold-dim bg-gold/10 text-gold-bright";
   return (
     <button

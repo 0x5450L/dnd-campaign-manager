@@ -23,11 +23,11 @@ function ConfirmDialog({
       onClick={onCancel}
     >
       <div
-        className="bg-gray-800 border border-gray-700 rounded-xl p-6 max-w-sm w-full mx-4 flex flex-col gap-4"
+        className="bg-surface border border-rule rounded-xl p-6 max-w-sm w-full mx-4 flex flex-col gap-4"
         onClick={(e) => e.stopPropagation()}
       >
-        <h3 className="text-lg font-semibold text-gray-200">{title}</h3>
-        <p className="text-sm text-gray-400">{message}</p>
+        <h3 className="text-lg font-semibold text-ink">{title}</h3>
+        <p className="text-sm text-dim">{message}</p>
         <div className="flex gap-3 justify-end">
           <CommonButton onClick={onCancel} variant="secondary" size="sm">
             {cancelLabel}

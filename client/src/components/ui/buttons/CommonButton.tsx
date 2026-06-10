@@ -14,9 +14,9 @@ const variantStyles: Record<NonNullable<CommonButtonProps["variant"]>, string> =
   secondary:
     "border border-rule bg-transparent text-dim font-fantasy uppercase tracking-widest hover:text-ink hover:border-hover hover:bg-surface-light/30 active:scale-[0.97]",
   accept:
-    "border border-leaf/70 bg-leaf/15 text-[#c2e8c2] font-fantasy font-bold uppercase tracking-widest hover:bg-leaf/25 hover:brightness-110 active:scale-[0.97]",
+    "border border-leaf/70 bg-leaf/15 text-leaf-soft font-fantasy font-bold uppercase tracking-widest hover:bg-leaf/25 hover:brightness-110 active:scale-[0.97]",
   decline:
-    "border border-rust/70 bg-rust/15 text-[#f1c2c2] font-fantasy font-bold uppercase tracking-widest hover:bg-rust/25 hover:brightness-110 active:scale-[0.97]",
+    "border border-rust/70 bg-rust/15 text-rust-soft font-fantasy font-bold uppercase tracking-widest hover:bg-rust/25 hover:brightness-110 active:scale-[0.97]",
 };
 
 const sizeStyles: Record<NonNullable<CommonButtonProps["size"]>, string> = {

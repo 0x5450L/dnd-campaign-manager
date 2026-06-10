@@ -63,7 +63,7 @@ const SheetTopActions = ({
           type="button"
           onClick={() => onForceSave(state)}
           aria-label="Save character sheet"
-          className="w-10 h-10 rounded-full bg-amber-700/90 hover:bg-amber-600 text-amber-50 border border-amber-500 cursor-pointer transition-colors duration-200 flex items-center justify-center shadow-lg backdrop-blur-sm"
+          className="w-10 h-10 rounded-full bg-gold-dim/90 hover:bg-gold-dim text-gold-bright border border-gold cursor-pointer transition-colors duration-200 flex items-center justify-center shadow-lg backdrop-blur-sm"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -83,7 +83,7 @@ const SheetTopActions = ({
         type="button"
         onClick={onClose}
         aria-label="Close character sheet"
-        className="w-10 h-10 rounded-full bg-gray-800/90 hover:bg-gray-700 text-gray-200 border border-gray-600 cursor-pointer transition-colors duration-200 flex items-center justify-center shadow-lg backdrop-blur-sm"
+        className="w-10 h-10 rounded-full bg-surface/90 hover:bg-surface-light text-ink border border-rule cursor-pointer transition-colors duration-200 flex items-center justify-center shadow-lg backdrop-blur-sm"
       >
         <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
           <path
@@ -212,16 +212,16 @@ export const CharacterSheet = ({
         onClick={(e) => e.stopPropagation()}
       >
         {isLoading ? (
-          <div className="flex items-center justify-center min-h-[50vh] text-amber-400">
+          <div className="flex items-center justify-center min-h-[50vh] text-gold">
             Loading character...
           </div>
         ) : error ? (
-          <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4 text-red-400">
+          <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4 text-rust">
             <p>{error}</p>
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded bg-gray-800 text-gray-200 hover:bg-gray-700"
+              className="px-4 py-2 rounded bg-surface text-ink hover:bg-surface-light"
             >
               Close
             </button>

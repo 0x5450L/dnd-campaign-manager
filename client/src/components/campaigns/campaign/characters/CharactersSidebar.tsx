@@ -62,17 +62,17 @@ function CharactersSidebar({
         role="dialog"
         aria-modal="true"
         aria-label="Campaign characters"
-        className={`fixed top-0 right-0 h-full z-40 w-full sm:w-[420px] bg-bg border-l border-gray-700 shadow-2xl flex flex-col transition-transform duration-300 ease-out ${
+        className={`fixed top-0 right-0 h-full z-40 w-full sm:w-[420px] bg-bg border-l border-rule shadow-2xl flex flex-col transition-transform duration-300 ease-out ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        <header className="flex items-center justify-between gap-2 px-4 py-3 border-b border-gray-700 shrink-0">
-          <h2 className="text-lg font-semibold text-amber-300">Characters</h2>
+        <header className="flex items-center justify-between gap-2 px-4 py-3 border-b border-rule shrink-0">
+          <h2 className="text-lg font-semibold text-gold-bright">Characters</h2>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close characters sidebar"
-            className="w-9 h-9 rounded-md text-gray-400 hover:text-gray-200 hover:bg-gray-700/60 flex items-center justify-center cursor-pointer transition-colors duration-150"
+            className="w-9 h-9 rounded-md text-dim hover:text-ink hover:bg-surface-light/60 flex items-center justify-center cursor-pointer transition-colors duration-150"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -89,7 +89,7 @@ function CharactersSidebar({
           </button>
         </header>
 
-        <div role="tablist" aria-label="Character groups" className="flex border-b border-gray-700 shrink-0">
+        <div role="tablist" aria-label="Character groups" className="flex border-b border-rule shrink-0">
           <button
             type="button"
             role="tab"
@@ -97,12 +97,12 @@ function CharactersSidebar({
             onClick={() => setActiveTab("players")}
             className={`flex-1 py-3 text-sm font-medium transition-colors duration-150 cursor-pointer border-b-2 ${
               activeTab === "players"
-                ? "text-amber-300 border-amber-500"
-                : "text-gray-400 hover:text-gray-200 border-transparent"
+                ? "text-gold-bright border-gold"
+                : "text-dim hover:text-ink border-transparent"
             }`}
           >
             Players
-            <span className="ml-1.5 text-xs text-gray-500">({players.length})</span>
+            <span className="ml-1.5 text-xs text-faint">({players.length})</span>
           </button>
           <button
             type="button"
@@ -111,12 +111,12 @@ function CharactersSidebar({
             onClick={() => setActiveTab("npcs")}
             className={`flex-1 py-3 text-sm font-medium transition-colors duration-150 cursor-pointer border-b-2 ${
               activeTab === "npcs"
-                ? "text-amber-300 border-amber-500"
-                : "text-gray-400 hover:text-gray-200 border-transparent"
+                ? "text-gold-bright border-gold"
+                : "text-dim hover:text-ink border-transparent"
             }`}
           >
             NPCs
-            <span className="ml-1.5 text-xs text-gray-500">({npcs.length})</span>
+            <span className="ml-1.5 text-xs text-faint">({npcs.length})</span>
           </button>
         </div>
 

@@ -41,12 +41,12 @@ function InvitePage() {
 
   return (
     <div className="flex items-center justify-center h-[calc(100vh-53px)]">
-      <div className="bg-gray-800/50 p-6 rounded-xl border border-gray-700 flex flex-col gap-4 h-fit min-w-72">
-        <h1 className="text-3xl font-bold text-amber-400">Invite</h1>
+      <div className="bg-surface/50 p-6 rounded-xl border border-rule flex flex-col gap-4 h-fit min-w-72">
+        <h1 className="text-3xl font-bold text-gold">Invite</h1>
 
-        {isLoading && <p className="text-sm text-gray-400">Loading...</p>}
-        {success && <p className="text-sm text-green-400">{success}</p>}
-        {!success && error && <p className="text-sm text-red-400">{error}</p>}
+        {isLoading && <p className="text-sm text-dim">Loading...</p>}
+        {success && <p className="text-sm text-leaf">{success}</p>}
+        {!success && error && <p className="text-sm text-rust">{error}</p>}
       </div>
     </div>
   );

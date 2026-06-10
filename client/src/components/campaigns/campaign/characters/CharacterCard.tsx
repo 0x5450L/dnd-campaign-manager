@@ -8,9 +8,9 @@ type CharacterCardProps = {
 };
 
 const typeChipStyles: Record<CharacterType, string> = {
-  player: "bg-blue-600/20 text-blue-300 border-blue-700/40",
-  npc: "bg-amber-600/20 text-amber-300 border-amber-700/40",
-  monster: "bg-red-600/20 text-red-300 border-red-700/40",
+  player: "bg-frost/20 text-frost-soft border-frost/40",
+  npc: "bg-gold-dim/20 text-gold-bright border-gold-dim/40",
+  monster: "bg-rust/20 text-rust-soft border-rust/40",
 };
 
 const typeLabel: Record<CharacterType, string> = {
@@ -20,9 +20,9 @@ const typeLabel: Record<CharacterType, string> = {
 };
 
 const getHpBarColor = (ratio: number) => {
-  if (ratio >= 0.66) return "bg-green-500";
-  if (ratio >= 0.33) return "bg-amber-500";
-  return "bg-red-500";
+  if (ratio >= 0.66) return "bg-leaf";
+  if (ratio >= 0.33) return "bg-gold";
+  return "bg-rust";
 };
 
 function CharacterCard({ character, isOwnedByDm, onOpen, onDelete }: CharacterCardProps) {
@@ -47,12 +47,12 @@ function CharacterCard({ character, isOwnedByDm, onOpen, onDelete }: CharacterCa
           handleOpen();
         }
       }}
-      className="group w-full text-left bg-gray-800/50 hover:bg-gray-700/50 border border-gray-700 hover:border-amber-700/50 rounded-xl p-4 transition-colors duration-200 cursor-pointer flex flex-col gap-3 focus:outline-none focus:ring-2 focus:ring-amber-600/50"
+      className="group w-full text-left bg-surface/50 hover:bg-surface-light/50 border border-rule hover:border-gold-dim/50 rounded-xl p-4 transition-colors duration-200 cursor-pointer flex flex-col gap-3 focus:outline-none focus:ring-2 focus:ring-gold-dim/50"
     >
       <div className="flex items-start justify-between gap-2">
         <div className="flex flex-col min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <h3 className="text-base font-semibold text-amber-300 truncate">
+            <h3 className="text-base font-semibold text-gold-bright truncate">
               {character.name || "Unnamed"}
             </h3>
             <span
@@ -61,7 +61,7 @@ function CharacterCard({ character, isOwnedByDm, onOpen, onDelete }: CharacterCa
               {typeLabel[character.type]}
             </span>
           </div>
-          <p className="text-xs text-gray-400 mt-0.5 truncate">
+          <p className="text-xs text-dim mt-0.5 truncate">
             {character.race || "—"}
             {character.characterClass ? ` · ${character.characterClass}` : ""}
           </p>
@@ -71,7 +71,7 @@ function CharacterCard({ character, isOwnedByDm, onOpen, onDelete }: CharacterCa
           type="button"
           aria-label={`Delete ${character.name}`}
           onClick={handleDelete}
-          className="shrink-0 w-8 h-8 rounded-md text-gray-500 hover:text-red-400 hover:bg-red-900/20 flex items-center justify-center transition-colors duration-150 cursor-pointer"
+          className="shrink-0 w-8 h-8 rounded-md text-faint hover:text-rust hover:bg-rust/20 flex items-center justify-center transition-colors duration-150 cursor-pointer"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -92,16 +92,16 @@ function CharacterCard({ character, isOwnedByDm, onOpen, onDelete }: CharacterCa
 
       <div className="flex flex-col gap-1.5">
         <div className="flex items-center justify-between text-xs">
-          <span className="text-gray-400 font-medium">HP</span>
-          <span className="text-gray-300 tabular-nums">
+          <span className="text-dim font-medium">HP</span>
+          <span className="text-dim tabular-nums">
             {character.currentHp}
-            <span className="text-gray-500"> / {character.maxHp || "—"}</span>
+            <span className="text-faint"> / {character.maxHp || "—"}</span>
             {character.tempHp > 0 && (
-              <span className="text-blue-300"> +{character.tempHp}</span>
+              <span className="text-frost-soft"> +{character.tempHp}</span>
             )}
           </span>
         </div>
-        <div className="h-1.5 bg-gray-900/60 rounded-full overflow-hidden">
+        <div className="h-1.5 bg-bg/60 rounded-full overflow-hidden">
           <div
             className={`h-full transition-all duration-300 ${getHpBarColor(hpRatio)}`}
             style={{ width: `${hpRatio * 100}%` }}
@@ -110,7 +110,7 @@ function CharacterCard({ character, isOwnedByDm, onOpen, onDelete }: CharacterCa
       </div>
 
       <div className="flex items-center justify-between text-xs">
-        <div className="flex items-center gap-1.5 text-gray-400">
+        <div className="flex items-center gap-1.5 text-dim">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -123,9 +123,9 @@ function CharacterCard({ character, isOwnedByDm, onOpen, onDelete }: CharacterCa
           >
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
           </svg>
-          <span className="text-gray-300 font-medium tabular-nums">AC {character.armorClass}</span>
+          <span className="text-dim font-medium tabular-nums">AC {character.armorClass}</span>
         </div>
-        <span className="text-gray-500 truncate max-w-[55%]" title={ownerLabel}>
+        <span className="text-faint truncate max-w-[55%]" title={ownerLabel}>
           {ownerLabel}
         </span>
       </div>

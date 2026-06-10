@@ -13,32 +13,32 @@ function CampaignsListItem({ campaign }: { campaign: Campaign }) {
   return (
     <li
       onClick={() => navigate(`/campaigns/${campaign.id}`)}
-      className={`bg-gray-800/50 p-4 rounded-xl border transition-colors duration-200 cursor-pointer w-full ${
+      className={`bg-surface/50 p-4 rounded-xl border transition-colors duration-200 cursor-pointer w-full ${
         isDM
-          ? "border-amber-700/40 hover:border-amber-500/60"
-          : "border-gray-700 hover:border-blue-500/50"
+          ? "border-gold-dim/40 hover:border-gold/60"
+          : "border-rule hover:border-frost/50"
       }`}
     >
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-amber-300">{campaign.name}</h3>
+        <h3 className="text-lg font-semibold text-gold-bright">{campaign.name}</h3>
         <div className="flex items-center gap-2">
           {myRole && (
             <span
               className={`text-xs font-semibold px-2 py-0.5 rounded ${
                 isDM
-                  ? "bg-amber-600/20 text-amber-300"
-                  : "bg-blue-600/20 text-blue-300"
+                  ? "bg-gold-dim/20 text-gold-bright"
+                  : "bg-frost/20 text-frost-soft"
               }`}
             >
               {myRole}
             </span>
           )}
-          <span className="text-xs text-gray-500">{campaign.members.length} members</span>
+          <span className="text-xs text-faint">{campaign.members.length} members</span>
         </div>
       </div>
-      <p className="text-sm text-gray-400 mt-1">DM: {campaign.dm.displayName}</p>
-      {campaign.description && <p className="text-sm text-gray-300 mt-2">{campaign.description}</p>}
-      {campaign.setting && <p className="text-xs text-gray-500 mt-1">Setting: {campaign.setting}</p>}
+      <p className="text-sm text-dim mt-1">DM: {campaign.dm.displayName}</p>
+      {campaign.description && <p className="text-sm text-dim mt-2">{campaign.description}</p>}
+      {campaign.setting && <p className="text-xs text-faint mt-1">Setting: {campaign.setting}</p>}
     </li>
   );
 }

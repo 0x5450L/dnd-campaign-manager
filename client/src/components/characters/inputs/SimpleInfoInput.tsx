@@ -20,9 +20,9 @@ export const SimpleInfoInput = ({
         value={value}
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
-        className={`bg-transparent border-0 p-1 outline-none text-gray-200 text-sm ${alignClass}`}
+        className={`bg-transparent border-0 p-1 outline-none text-ink text-sm ${alignClass}`}
       />
-      <span className={`text-gray-500 text-[10px] uppercase tracking-wider pt-1 border-t border-gray-600 ${alignClass}`}>
+      <span className={`text-faint text-[10px] uppercase tracking-wider pt-1 border-t border-rule ${alignClass}`}>
         {label}
       </span>
     </label>

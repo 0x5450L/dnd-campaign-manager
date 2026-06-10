@@ -29,13 +29,13 @@ function Login({ handleRedirect }: { handleRedirect: () => void }) {
       });
   };
   return (
-    <div className="flex flex-col items-center gap-4 bg-gray-800/50 p-8 rounded-xl border border-gray-700 w-80">
-      <h2 className="text-xl font-bold text-gray-200">Login</h2>
+    <div className="flex flex-col items-center gap-4 bg-surface/50 p-8 rounded-xl border border-rule w-80">
+      <h2 className="text-xl font-bold text-ink">Login</h2>
       <form onSubmit={handleSubmit} className="flex flex-col gap-3 w-full">
         <CommonInput type="email" name="email" placeholder="Email" variant="boxed" />
         <CommonInput type="password" name="password" placeholder="Password" variant="boxed" />
         <CommonButton type="submit">Login</CommonButton>
-        {loginError && <p className="text-red-400 text-sm">{loginError}</p>}
+        {loginError && <p className="text-rust text-sm">{loginError}</p>}
       </form>
     </div>
   );

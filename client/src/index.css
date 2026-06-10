@@ -25,6 +25,22 @@
   --color-dim: #9a9a9a;
   --color-faint: #7a7a8a;
 
+  /* Semantic accents */
+  --color-leaf-soft: #c2e8c2;
+  --color-rust-soft: #f1c2c2;
+
+  --color-frost: #7da7c9;
+  --color-frost-soft: #9dc3e0;
+  --color-frost-bright: #c8dcea;
+  --color-frost-dim: #b0c4d8;
+
+  --color-arcane: #7a5aa5;
+  --color-arcane-soft: #c8b0e0;
+
+  --color-fail: #6b2a2a;
+  --color-fail-border: #3a1518;
+  --color-fail-bg: #1a0a0c;
+
   /* Fonts */
   --font-fantasy: "Cinzel", "Palatino Linotype", Georgia, serif;
   --font-fantasy-decorative: "Cinzel Decorative", "Cinzel", serif;
@@ -209,15 +225,15 @@ body {
 }
 
 .cs-death-check.success {
-  border-color: #b0c4d8;
-  background: rgba(176, 196, 216, 0.2);
-  color: #c8dcea;
+  border-color: var(--color-frost-dim);
+  background: color-mix(in srgb, var(--color-frost-dim) 20%, transparent);
+  color: var(--color-frost-bright);
 }
 
 .cs-death-check.fail {
-  border-color: #3a1518;
-  background: #1a0a0c;
-  color: #6b2a2a;
+  border-color: var(--color-fail-border);
+  background: var(--color-fail-bg);
+  color: var(--color-fail);
 }
 
 /* ── Skill row ── */
@@ -285,20 +301,20 @@ body {
 }
 
 .cs-input-wrap.required-empty::after {
-  background: #3a1518;
+  background: var(--color-fail-border);
   height: 2px;
 }
 
 .cs-input-wrap.required-empty:focus-within::after {
-  background: linear-gradient(90deg, transparent, #6b2a2a 30%, #6b2a2a 70%, transparent);
+  background: linear-gradient(90deg, transparent, var(--color-fail) 30%, var(--color-fail) 70%, transparent);
 }
 
 .cs-input-wrap.required-empty + .cs-label {
-  color: #6b2a2a;
+  color: var(--color-fail);
 }
 
 .cs-input-wrap.required-empty .cs-input::placeholder {
-  color: rgba(107, 42, 42, 0.55);
+  color: color-mix(in srgb, var(--color-fail) 55%, transparent);
 }
 
 .cs-input-wrap[data-required] + .cs-label::after {

@@ -16,7 +16,7 @@ export const StatInput = ({
   return (
     <label className="flex flex-col items-center gap-0.5">
       {label && (
-        <span className="text-gray-500 text-[10px] uppercase tracking-wider">{label}</span>
+        <span className="text-faint text-[10px] uppercase tracking-wider">{label}</span>
       )}
       <NumericInput
         value={value}
@@ -24,7 +24,7 @@ export const StatInput = ({
         min={min}
         max={max}
         defaultValue={min ?? 0}
-        className="border border-gray-600 rounded text-gray-200 text-sm p-1 w-12 focus:border-amber-500"
+        className="border border-rule rounded text-ink text-sm p-1 w-12 focus:border-gold"
       />
     </label>
   );

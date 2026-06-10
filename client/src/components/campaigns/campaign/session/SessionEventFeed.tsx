@@ -28,14 +28,14 @@ export const SessionEventFeed = () => {
   const { events } = useLiveSession();
 
   return (
-    <div className="cs-section-card flex flex-col gap-2 p-4">
+    <div className="cs-section-card flex h-full min-h-[280px] flex-col gap-2 p-4">
       <div className="flex items-center justify-between">
         <span className="cs-section-title !p-0 !text-left">Session log</span>
         <span className="text-[10px] uppercase tracking-[0.12em] text-faint">
           {events.length} events
         </span>
       </div>
-      <ul className="flex max-h-[280px] flex-col gap-1 overflow-y-auto pr-1">
+      <ul className="custom-scrollbar flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto pr-1">
         {events.length === 0 && (
           <li className="px-2 py-3 text-center text-xs text-faint">
             Nothing has happened yet.

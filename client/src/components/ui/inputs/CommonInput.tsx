@@ -39,7 +39,7 @@ function CommonInput({
     onChange?.(e.target.value);
   };
 
-  const defaultTextColor = inputClassName ? "" : "text-gray-200";
+  const defaultTextColor = inputClassName ? "" : "text-ink";
 
   if (variant === "boxed") {
     return (
@@ -70,15 +70,15 @@ function CommonInput({
     );
   }
 
-  const labelTextColor = error ? "text-red-400" : "text-gray-400";
+  const labelTextColor = error ? "text-rust" : "text-dim";
   const inputBorderColor = error
-    ? "border-red-400"
+    ? "border-rust"
     : disabled
       ? "border-transparent"
-      : "border-gray-700 hover:border-amber-500/50 focus-within:border-amber-500";
+      : "border-rule hover:border-gold/50 focus-within:border-gold";
   const baseInputStyles = disabled
     ? "bg-transparent cursor-default"
-    : "bg-gray-700/30 focus:outline-none focus:border-amber-500";
+    : "bg-surface-light/30 focus:outline-none focus:border-gold";
 
   return (
     <div>

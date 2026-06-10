@@ -10,8 +10,8 @@ type DeathSavesBlockProps = {
 const checkStyle = (filled: boolean, variant: DeathSaveVariant) => {
   if (!filled) return "border-rule";
   return variant === "success"
-    ? "border-[#b0c4d8] bg-[#b0c4d8]/20 text-[#c8dcea]"
-    : "border-[#3a1518] bg-[#1a0a0c] text-[#6b2a2a]";
+    ? "border-frost-dim bg-frost-dim/20 text-frost-bright"
+    : "border-fail-border bg-fail-bg text-fail";
 };
 
 const Check = ({

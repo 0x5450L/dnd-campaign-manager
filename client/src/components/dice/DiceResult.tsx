@@ -92,9 +92,9 @@ const DiceRow = ({ term }: { term: Extract<RolledTerm, { kind: "dice" }> }) => {
           const variant = r.dropped
             ? "bg-transparent text-ink/45 line-through"
             : isMax && r.sides === 20
-              ? "bg-leaf/25 text-[#c2e8c2]"
+              ? "bg-leaf/25 text-leaf-soft"
               : isMin && r.sides === 20
-                ? "bg-rust/25 text-[#f1c2c2]"
+                ? "bg-rust/25 text-rust-soft"
                 : "bg-faint/20 text-ink";
           return (
             <span key={i} className={`${base} ${variant}`} title={`d${r.sides}: ${r.value}`}>

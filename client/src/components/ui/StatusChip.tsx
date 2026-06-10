@@ -23,8 +23,8 @@ export const StatusChip = ({ state, onDismiss }: StatusChipProps) => {
       aria-label={`${message} (click to dismiss)`}
       className={`h-10 px-3 max-w-[14rem] rounded-full border cursor-pointer transition-colors duration-200 flex items-center gap-2 shadow-lg backdrop-blur-sm ${
         isSuccess
-          ? "bg-emerald-700/90 hover:bg-emerald-600 border-emerald-500 text-emerald-50"
-          : "bg-red-700/90 hover:bg-red-600 border-red-500 text-red-50"
+          ? "bg-leaf/90 hover:bg-leaf border-leaf text-ink"
+          : "bg-rust/90 hover:bg-rust border-rust text-ink"
       }`}
     >
       {isSuccess ? (

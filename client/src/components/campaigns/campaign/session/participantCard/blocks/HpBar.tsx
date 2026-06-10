@@ -24,7 +24,7 @@ export const HpBar = ({ currentHp, maxHp, tempHp, hidden }: HpBarProps) => {
     <div className="flex items-center gap-2">
       <div className="relative h-3 flex-1 overflow-hidden rounded-full border border-rule bg-bg/70">
         {hidden ? (
-          <div className="absolute inset-0 bg-[#9aa3b2]/30" />
+          <div className="absolute inset-0 bg-dim/30" />
         ) : (
           <div
             className={`absolute left-0 top-0 h-full transition-[width] ${hpBarColor(Math.round(hpRatio * 100))}`}
@@ -33,7 +33,7 @@ export const HpBar = ({ currentHp, maxHp, tempHp, hidden }: HpBarProps) => {
         )}
         {tempVisible && (
           <div
-            className="absolute top-0 h-full bg-[#7da7c9] transition-[left,width]"
+            className="absolute top-0 h-full bg-frost transition-[left,width]"
             style={{ left: `${hpPercent}%`, width: `${tempPercent}%` }}
           />
         )}
@@ -48,7 +48,7 @@ export const HpBar = ({ currentHp, maxHp, tempHp, hidden }: HpBarProps) => {
         <span className="text-xs text-ink">
           {hidden ? "??/??" : `${currentHp}/${maxHp}`}
         </span>
-        <span className="text-[11px] text-[#9dc3e0]">
+        <span className="text-[11px] text-frost-soft">
           {hidden ? "+??" : `+${tempHp}`}
         </span>
       </div>

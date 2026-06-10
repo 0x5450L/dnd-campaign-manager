@@ -64,7 +64,7 @@ export const ArmorClassBlock = ({
           title={hidden ? "AC hidden from players" : "AC visible to players"}
           className={`absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full border bg-surface transition-colors ${
             hidden
-              ? "border-[#7a5aa5]/60 text-[#c8b0e0]"
+              ? "border-arcane/60 text-arcane-soft"
               : "border-rule text-faint hover:text-ink"
           }`}
         >
