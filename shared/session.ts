@@ -37,6 +37,12 @@ export type ParticipantAbilityScore = {
   score: number;
 };
 
+export type SpellSlotLevel = {
+  level: number;
+  total: number;
+  used: number;
+};
+
 export type EncounterParticipantDTO = {
   id: string;
   encounterId: string;
@@ -56,6 +62,7 @@ export type EncounterParticipantDTO = {
   abilityScores: ParticipantAbilityScore[] | null;
   spellAbility: AbilityName | null;
   proficiencyBonus: number | null;
+  spellSlots?: SpellSlotLevel[] | null;
   deathSaveSuccesses: number;
   deathSaveFailures: number;
   createdAt: string;
@@ -108,6 +115,7 @@ export type CreateParticipantPayload = {
   abilityScores?: ParticipantAbilityScore[] | null;
   spellAbility?: AbilityName | null;
   proficiencyBonus?: number | null;
+  spellSlots?: SpellSlotLevel[] | null;
   attacks?: CharacterAttackInput[];
 };
 
@@ -126,6 +134,7 @@ export type UpdateParticipantPayload = Partial<{
   abilityScores: ParticipantAbilityScore[] | null;
   spellAbility: AbilityName | null;
   proficiencyBonus: number | null;
+  spellSlots: SpellSlotLevel[] | null;
   deathSaveSuccesses: number;
   deathSaveFailures: number;
 }>;

@@ -5,6 +5,7 @@ import type {
   MemberPresence,
   ParticipantType,
   PresenceStatus,
+  SessionDiceRoll,
   SessionEvent,
   SessionEventKind,
 } from "../../types/session";
@@ -15,7 +16,10 @@ export type LiveSessionState = {
   participants: EncounterParticipantDTO[];
   presence: MemberPresence[];
   events: SessionEvent[];
+  rolls: SessionDiceRoll[];
 };
+
+export type SessionRollInput = Omit<SessionDiceRoll, "id" | "at">;
 
 export type ParticipantPatch = Partial<
   Omit<EncounterParticipantDTO, "id" | "encounterId" | "createdAt" | "updatedAt">
@@ -42,6 +46,7 @@ export type LiveSessionAction =
   | { type: "UPDATE_PARTICIPANT"; participantId: string; patch: ParticipantPatch }
   | { type: "ADD_PARTICIPANT"; participant: EncounterParticipantDTO }
   | { type: "REMOVE_PARTICIPANT"; participantId: string }
+  | { type: "LOG_ROLL"; roll: SessionRollInput }
   | {
       type: "LOG_EVENT";
       kind: SessionEventKind;
@@ -50,6 +55,7 @@ export type LiveSessionAction =
     };
 
 export const EVENT_LIMIT = 40;
+export const ROLL_LIMIT = 30;
 
 export const initialLiveSessionState: LiveSessionState = {
   session: null,
@@ -57,6 +63,7 @@ export const initialLiveSessionState: LiveSessionState = {
   participants: [],
   presence: [],
   events: [],
+  rolls: [],
 };
 
 const makeEvent = (
@@ -96,6 +103,7 @@ export const liveSessionReducer = (
         session: null,
         encounter: null,
         participants: [],
+        rolls: [],
         presence: state.presence.map((p) => ({ ...p, status: "offline" as PresenceStatus })),
         events: pushEvent(state.events, makeEvent("session_ended", "Session ended")),
       };
@@ -325,6 +333,18 @@ export const liveSessionReducer = (
         ...state,
         participants: state.participants.filter((p) => p.id !== action.participantId),
       };
+
+    case "LOG_ROLL": {
+      const roll: SessionDiceRoll = {
+        ...action.roll,
+        id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        at: new Date().toISOString(),
+      };
+      return {
+        ...state,
+        rolls: [roll, ...state.rolls].slice(0, ROLL_LIMIT),
+      };
+    }
 
     case "LOG_EVENT":
       return {

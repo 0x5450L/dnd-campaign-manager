@@ -18,6 +18,7 @@ import AbilityScoresStrip from "./AbilityScoresStrip";
 import AttacksBlock from "./AttacksBlock";
 import EditableText from "./EditableText";
 import SpellAbilitySelect from "./SpellAbilitySelect";
+import SpellSlotsBlock from "./SpellSlotsBlock";
 import StatInput from "./StatInput";
 
 type ParticipantDetailsModalProps = {
@@ -226,6 +227,17 @@ export const ParticipantDetailsModal = ({
               </span>
             </div>
           )}
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <span className="text-xs sm:text-sm uppercase tracking-[0.18em] text-faint">
+            Spell slots
+          </span>
+          <SpellSlotsBlock
+            slots={participant.spellSlots ?? null}
+            editable={isDM}
+            onChange={(spellSlots) => patch({ spellSlots })}
+          />
         </div>
 
         <AttacksBlock
