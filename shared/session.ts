@@ -20,6 +20,16 @@ export type CampaignSessionDTO = {
   endedAt: string | null;
 };
 
+export type SessionDiceRollDTO = {
+  id: string;
+  actorName: string;
+  expression: string;
+  total: number;
+  critSuccess: boolean;
+  critFail: boolean;
+  at: string;
+};
+
 export type EncounterDTO = {
   id: string;
   name: string | null;

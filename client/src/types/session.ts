@@ -7,6 +7,7 @@ import type {
   SessionStatus,
   EncounterStatus,
   SpellSlotLevel,
+  SessionDiceRollDTO,
 } from "../../../shared/session";
 
 export type {
@@ -19,6 +20,8 @@ export type {
   EncounterStatus,
   SpellSlotLevel,
 };
+
+export type SessionDiceRoll = SessionDiceRollDTO;
 
 export type PresenceStatus = "connected" | "away" | "offline";
 
@@ -49,12 +52,3 @@ export type SessionEvent = {
   actorName?: string;
 };
 
-export type SessionDiceRoll = {
-  id: string;
-  actorName: string;
-  expression: string;
-  total: number;
-  critSuccess: boolean;
-  critFail: boolean;
-  at: string;
-};

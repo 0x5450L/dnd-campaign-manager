@@ -19,7 +19,7 @@ export type LiveSessionState = {
   rolls: SessionDiceRoll[];
 };
 
-export type SessionRollInput = Omit<SessionDiceRoll, "id" | "at">;
+export type SessionRollInput = Omit<SessionDiceRoll, "id" | "at" | "actorName">;
 
 export type ParticipantPatch = Partial<
   Omit<EncounterParticipantDTO, "id" | "encounterId" | "createdAt" | "updatedAt">
@@ -46,7 +46,7 @@ export type LiveSessionAction =
   | { type: "UPDATE_PARTICIPANT"; participantId: string; patch: ParticipantPatch }
   | { type: "ADD_PARTICIPANT"; participant: EncounterParticipantDTO }
   | { type: "REMOVE_PARTICIPANT"; participantId: string }
-  | { type: "LOG_ROLL"; roll: SessionRollInput }
+  | { type: "ROLL_LOGGED"; roll: SessionDiceRoll }
   | {
       type: "LOG_EVENT";
       kind: SessionEventKind;
@@ -334,17 +334,11 @@ export const liveSessionReducer = (
         participants: state.participants.filter((p) => p.id !== action.participantId),
       };
 
-    case "LOG_ROLL": {
-      const roll: SessionDiceRoll = {
-        ...action.roll,
-        id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-        at: new Date().toISOString(),
-      };
+    case "ROLL_LOGGED":
       return {
         ...state,
-        rolls: [roll, ...state.rolls].slice(0, ROLL_LIMIT),
+        rolls: [action.roll, ...state.rolls].slice(0, ROLL_LIMIT),
       };
-    }
 
     case "LOG_EVENT":
       return {

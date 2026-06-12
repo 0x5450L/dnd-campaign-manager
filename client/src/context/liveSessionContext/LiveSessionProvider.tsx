@@ -1,10 +1,12 @@
 import {
   useCallback,
+  useEffect,
   useMemo,
   useReducer,
   type ReactNode,
 } from "react";
 import { LiveSessionContext, type LiveSessionContextType } from "./LiveSessionContext";
+import { getSocket } from "../../services/socket";
 import {
   initialLiveSessionState,
   liveSessionReducer,
@@ -21,6 +23,7 @@ import type {
   SpellSlotLevel,
 } from "../../types/session";
 import type { Campaign } from "../../types/campaigns";
+import type { RollLoggedPayload } from "../../../../shared/socketEvents";
 
 type Props = {
   campaign: Campaign;
@@ -212,6 +215,26 @@ const seedParticipants = (
 export const LiveSessionProvider = ({ campaign, children }: Props) => {
   const [state, dispatch] = useReducer(liveSessionReducer, initialLiveSessionState);
 
+  useEffect(() => {
+    const socket = getSocket();
+    socket.emit("campaign:join", campaign.id, (response) => {
+      if (!response.ok) {
+        console.error(`campaign:join failed: ${response.errorCode}`);
+      }
+    });
+
+    const handleRollLogged = (payload: RollLoggedPayload) => {
+      if (payload.campaignId !== campaign.id) return;
+      dispatch({ type: "ROLL_LOGGED", roll: payload.roll });
+    };
+    socket.on("roll_logged", handleRollLogged);
+
+    return () => {
+      socket.off("roll_logged", handleRollLogged);
+      socket.emit("campaign:leave", campaign.id);
+    };
+  }, [campaign.id]);
+
   const startSession = useCallback(() => {
     dispatch({
       type: "START_SESSION",
@@ -307,9 +330,12 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
     [],
   );
 
-  const logRoll = useCallback((roll: SessionRollInput) => {
-    dispatch({ type: "LOG_ROLL", roll });
-  }, []);
+  const logRoll = useCallback(
+    (roll: SessionRollInput) => {
+      getSocket().emit("roll:log", { campaignId: campaign.id, ...roll });
+    },
+    [campaign.id],
+  );
 
   const presenceFor = useCallback(
     (userId: string): PresenceStatus =>
