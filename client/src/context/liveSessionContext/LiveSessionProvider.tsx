@@ -3,6 +3,7 @@ import {
   useEffect,
   useMemo,
   useReducer,
+  useRef,
   type ReactNode,
 } from "react";
 import { LiveSessionContext, type LiveSessionContextType } from "./LiveSessionContext";
@@ -14,7 +15,6 @@ import {
   type SessionRollInput,
 } from "../../state/liveSession/liveSessionReducer";
 import type {
-  CampaignSessionDTO,
   EncounterDTO,
   EncounterParticipantDTO,
   MemberPresence,
@@ -23,7 +23,12 @@ import type {
   SpellSlotLevel,
 } from "../../types/session";
 import type { Campaign } from "../../types/campaigns";
-import type { RollLoggedPayload } from "../../../../shared/socketEvents";
+import type {
+  PresenceChangedPayload,
+  RollLoggedPayload,
+  SessionEndedPayload,
+  SessionStartedPayload,
+} from "../../../../shared/socketEvents";
 
 type Props = {
   campaign: Campaign;
@@ -33,26 +38,15 @@ type Props = {
 const newId = (prefix: string) =>
   `${prefix}-${Math.random().toString(36).slice(2, 10)}`;
 
-const seedPresence = (campaign: Campaign): MemberPresence[] =>
-  campaign.members.map((m, idx) => ({
+const presenceFromUserIds = (
+  campaign: Campaign,
+  connectedUserIds: string[],
+): MemberPresence[] => {
+  const connected = new Set(connectedUserIds);
+  return campaign.members.map((m) => ({
     userId: m.userId,
-    status: idx === 0 ? "connected" : ("offline" as PresenceStatus),
+    status: connected.has(m.userId) ? "connected" : "offline",
   }));
-
-const seedSession = (campaign: Campaign): CampaignSessionDTO => {
-  const now = new Date().toISOString();
-  return {
-    id: newId("session"),
-    number: 1,
-    status: "active",
-    title: "Session in progress",
-    summary: null,
-    notes: null,
-    campaignId: campaign.id,
-    startedAt: now,
-    updatedAt: now,
-    endedAt: null,
-  };
 };
 
 const seedEncounter = (campaignSessionId: string): EncounterDTO => {
@@ -215,58 +209,88 @@ const seedParticipants = (
 export const LiveSessionProvider = ({ campaign, children }: Props) => {
   const [state, dispatch] = useReducer(liveSessionReducer, initialLiveSessionState);
 
+  const campaignRef = useRef(campaign);
+  useEffect(() => {
+    campaignRef.current = campaign;
+  }, [campaign]);
+
   useEffect(() => {
     const socket = getSocket();
-    socket.emit("campaign:join", campaign.id, (response) => {
-      if (!response.ok) {
-        console.error(`campaign:join failed: ${response.errorCode}`);
-      }
-    });
+
+    const join = () => {
+      socket.emit("campaign:join", campaign.id, (response) => {
+        if (!response.ok) {
+          console.error(`campaign:join failed: ${response.errorCode}`);
+          return;
+        }
+        if (response.activeSession) {
+          dispatch({ type: "HYDRATE_SESSION", session: response.activeSession });
+        }
+      });
+    };
+
+    join();
+    socket.on("connect", join);
 
     const handleRollLogged = (payload: RollLoggedPayload) => {
       if (payload.campaignId !== campaign.id) return;
       dispatch({ type: "ROLL_LOGGED", roll: payload.roll });
     };
+
+    const handleSessionStarted = (payload: SessionStartedPayload) => {
+      if (payload.campaignId !== campaign.id) return;
+      dispatch({ type: "START_SESSION", session: payload.session });
+    };
+
+    const handleSessionEnded = (payload: SessionEndedPayload) => {
+      if (payload.campaignId !== campaign.id) return;
+      dispatch({ type: "END_SESSION" });
+    };
+
+    const handlePresenceChanged = (payload: PresenceChangedPayload) => {
+      if (payload.campaignId !== campaign.id) return;
+      dispatch({
+        type: "REPLACE_PRESENCE",
+        presence: presenceFromUserIds(campaignRef.current, payload.userIds),
+      });
+    };
+
     socket.on("roll_logged", handleRollLogged);
+    socket.on("session_started", handleSessionStarted);
+    socket.on("session_ended", handleSessionEnded);
+    socket.on("presence_changed", handlePresenceChanged);
 
     return () => {
+      socket.off("connect", join);
       socket.off("roll_logged", handleRollLogged);
+      socket.off("session_started", handleSessionStarted);
+      socket.off("session_ended", handleSessionEnded);
+      socket.off("presence_changed", handlePresenceChanged);
       socket.emit("campaign:leave", campaign.id);
     };
   }, [campaign.id]);
 
   const startSession = useCallback(() => {
-    dispatch({
-      type: "START_SESSION",
-      session: seedSession(campaign),
-      presence: seedPresence(campaign),
+    getSocket().emit("session:start", { campaignId: campaign.id }, (response) => {
+      if (!response.ok) {
+        console.error(`session:start failed: ${response.errorCode}`);
+      }
     });
-  }, [campaign]);
+  }, [campaign.id]);
 
   const endSession = useCallback(() => {
-    dispatch({ type: "END_SESSION" });
-  }, []);
-
-  const togglePresence = useCallback(
-    (userId: string) => {
-      const current =
-        state.presence.find((p) => p.userId === userId)?.status ?? "offline";
-      const next: PresenceStatus =
-        current === "connected" ? "offline" : "connected";
-      dispatch({ type: "SET_PRESENCE", userId, status: next });
-      const member = campaign.members.find((m) => m.userId === userId);
-      if (member) {
-        dispatch({
-          type: "LOG_EVENT",
-          kind: next === "connected" ? "member_joined" : "member_left",
-          message: `${member.user.displayName} ${
-            next === "connected" ? "joined the session" : "left the session"
-          }`,
-        });
-      }
-    },
-    [state.presence, campaign.members],
-  );
+    const sessionId = state.session?.id;
+    if (!sessionId) return;
+    getSocket().emit(
+      "session:end",
+      { campaignId: campaign.id, sessionId },
+      (response) => {
+        if (!response.ok) {
+          console.error(`session:end failed: ${response.errorCode}`);
+        }
+      },
+    );
+  }, [campaign.id, state.session?.id]);
 
   const startEncounter = useCallback(() => {
     if (!state.session) return;
@@ -368,7 +392,6 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
 
       startSession,
       endSession,
-      togglePresence,
       startEncounter,
       endEncounter,
       advanceTurn,
@@ -389,7 +412,6 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
       connectedCount,
       startSession,
       endSession,
-      togglePresence,
       startEncounter,
       endEncounter,
       advanceTurn,

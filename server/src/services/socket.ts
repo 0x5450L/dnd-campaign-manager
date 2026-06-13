@@ -2,16 +2,59 @@ import type { Server as HttpServer } from 'node:http';
 import { randomUUID } from 'node:crypto';
 import { DefaultEventsMap, Server } from 'socket.io';
 
+import type { CampaignSession } from '@prisma/client';
+
 import type {
   SocketClientToServerEvents,
   SocketServerToClientEvents,
   SocketData,
 } from '../../../shared/socketEvents';
+import type { CampaignSessionDTO } from '../../../shared/session';
 import { getTokenFromCookie } from '../utils/cookies';
 import { verifyToken } from '../utils/jwt';
-import { requireCampaignAccess, requireEncounterAccess } from '../utils/accessControl';
+import {
+  requireCampaignAccess,
+  requireCampaignDM,
+  requireEncounterAccess,
+} from '../utils/accessControl';
 import { AppError } from '../utils/errors';
 import prisma from './prisma';
+
+const campaignRoom = (campaignId: string) => `campaign:${campaignId}`;
+
+const toSessionDTO = (session: CampaignSession): CampaignSessionDTO => ({
+  id: session.id,
+  number: session.number,
+  status: session.status,
+  title: session.title,
+  summary: session.summary,
+  notes: session.notes,
+  campaignId: session.campaignId,
+  startedAt: session.startedAt.toISOString(),
+  updatedAt: session.updatedAt.toISOString(),
+  endedAt: session.endedAt ? session.endedAt.toISOString() : null,
+});
+
+const findActiveSession = (campaignId: string) =>
+  prisma.campaignSession.findFirst({
+    where: { campaignId, status: 'active' },
+    orderBy: { number: 'desc' },
+  });
+
+const broadcastPresence = async (campaignId: string, excludeSocketId?: string) => {
+  const sockets = await getIo().in(campaignRoom(campaignId)).fetchSockets();
+  const userIds = [
+    ...new Set(
+      sockets
+        .filter((s) => s.id !== excludeSocketId)
+        .map((s) => s.data.userId),
+    ),
+  ];
+  getIo().to(campaignRoom(campaignId)).emit('presence_changed', {
+    campaignId,
+    userIds,
+  });
+};
 
 export type AppIo = Server<
   SocketClientToServerEvents,
@@ -86,8 +129,10 @@ export const initSocket = (httpServer: HttpServer): AppIo => {
     socket.on('campaign:join', async (campaignId, ack) => {
       try {
         await requireCampaignAccess(socket.data.userId, campaignId);
-        await socket.join(`campaign:${campaignId}`);
-        ack({ ok: true });
+        await socket.join(campaignRoom(campaignId));
+        const active = await findActiveSession(campaignId);
+        ack({ ok: true, activeSession: active ? toSessionDTO(active) : null });
+        await broadcastPresence(campaignId);
       } catch (error) {
         if (error instanceof AppError && error.statusCode === 404) {
           return ack({ ok: false, errorCode: 'forbidden' });
@@ -97,12 +142,82 @@ export const initSocket = (httpServer: HttpServer): AppIo => {
       }
     });
 
-    socket.on('campaign:leave', (campaignId) => {
-      socket.leave(`campaign:${campaignId}`);
+    socket.on('campaign:leave', async (campaignId) => {
+      await socket.leave(campaignRoom(campaignId));
+      await broadcastPresence(campaignId);
+    });
+
+    socket.on('session:start', async (payload, ack) => {
+      try {
+        await requireCampaignDM(socket.data.userId, payload.campaignId);
+
+        let session = await findActiveSession(payload.campaignId);
+        if (!session) {
+          const { _max } = await prisma.campaignSession.aggregate({
+            where: { campaignId: payload.campaignId },
+            _max: { number: true },
+          });
+          const title = payload.title?.trim();
+          session = await prisma.campaignSession.create({
+            data: {
+              campaignId: payload.campaignId,
+              number: (_max.number ?? 0) + 1,
+              ...(title ? { title } : {}),
+            },
+          });
+        }
+
+        getIo()
+          .to(campaignRoom(payload.campaignId))
+          .emit('session_started', {
+            campaignId: payload.campaignId,
+            session: toSessionDTO(session),
+          });
+        ack({ ok: true });
+      } catch (error) {
+        if (error instanceof AppError && error.statusCode === 404) {
+          return ack({ ok: false, errorCode: 'forbidden' });
+        }
+        console.error('session:start failed', error);
+        ack({ ok: false, errorCode: 'internal' });
+      }
+    });
+
+    socket.on('session:end', async (payload, ack) => {
+      try {
+        await requireCampaignDM(socket.data.userId, payload.campaignId);
+
+        const existing = await prisma.campaignSession.findFirst({
+          where: { id: payload.sessionId, campaignId: payload.campaignId },
+          select: { id: true },
+        });
+        if (!existing) {
+          return ack({ ok: false, errorCode: 'forbidden' });
+        }
+
+        await prisma.campaignSession.update({
+          where: { id: payload.sessionId },
+          data: { status: 'ended', endedAt: new Date() },
+        });
+
+        getIo()
+          .to(campaignRoom(payload.campaignId))
+          .emit('session_ended', {
+            campaignId: payload.campaignId,
+            sessionId: payload.sessionId,
+          });
+        ack({ ok: true });
+      } catch (error) {
+        if (error instanceof AppError && error.statusCode === 404) {
+          return ack({ ok: false, errorCode: 'forbidden' });
+        }
+        console.error('session:end failed', error);
+        ack({ ok: false, errorCode: 'internal' });
+      }
     });
 
     socket.on('roll:log', (payload) => {
-      const room = `campaign:${payload.campaignId}`;
+      const room = campaignRoom(payload.campaignId);
       if (!socket.rooms.has(room)) return;
 
       getIo().to(room).emit('roll_logged', {
@@ -117,6 +232,14 @@ export const initSocket = (httpServer: HttpServer): AppIo => {
           at: new Date().toISOString(),
         },
       });
+    });
+
+    socket.on('disconnecting', () => {
+      for (const room of socket.rooms) {
+        if (room.startsWith('campaign:')) {
+          void broadcastPresence(room.slice('campaign:'.length), socket.id);
+        }
+      }
     });
 
     socket.on('disconnect', () => {

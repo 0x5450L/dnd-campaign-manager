@@ -4,7 +4,6 @@ import type {
   EncounterParticipantDTO,
   MemberPresence,
   ParticipantType,
-  PresenceStatus,
   SessionDiceRoll,
   SessionEvent,
   SessionEventKind,
@@ -26,9 +25,10 @@ export type ParticipantPatch = Partial<
 >;
 
 export type LiveSessionAction =
-  | { type: "START_SESSION"; session: CampaignSessionDTO; presence: MemberPresence[] }
+  | { type: "START_SESSION"; session: CampaignSessionDTO }
+  | { type: "HYDRATE_SESSION"; session: CampaignSessionDTO }
   | { type: "END_SESSION" }
-  | { type: "SET_PRESENCE"; userId: string; status: PresenceStatus }
+  | { type: "REPLACE_PRESENCE"; presence: MemberPresence[] }
   | { type: "START_ENCOUNTER"; encounter: EncounterDTO; participants: EncounterParticipantDTO[] }
   | { type: "END_ENCOUNTER" }
   | { type: "ADVANCE_TURN" }
@@ -93,8 +93,14 @@ export const liveSessionReducer = (
       return {
         ...state,
         session: action.session,
-        presence: action.presence,
         events: pushEvent(state.events, makeEvent("session_started", "Session started")),
+      };
+
+    case "HYDRATE_SESSION":
+      return {
+        ...initialLiveSessionState,
+        session: action.session,
+        presence: state.presence,
       };
 
     case "END_SESSION":
@@ -104,19 +110,11 @@ export const liveSessionReducer = (
         encounter: null,
         participants: [],
         rolls: [],
-        presence: state.presence.map((p) => ({ ...p, status: "offline" as PresenceStatus })),
         events: pushEvent(state.events, makeEvent("session_ended", "Session ended")),
       };
 
-    case "SET_PRESENCE": {
-      const exists = state.presence.some((p) => p.userId === action.userId);
-      const presence = exists
-        ? state.presence.map((p) =>
-            p.userId === action.userId ? { ...p, status: action.status } : p,
-          )
-        : [...state.presence, { userId: action.userId, status: action.status }];
-      return { ...state, presence };
-    }
+    case "REPLACE_PRESENCE":
+      return { ...state, presence: action.presence };
 
     case "START_ENCOUNTER":
       return {

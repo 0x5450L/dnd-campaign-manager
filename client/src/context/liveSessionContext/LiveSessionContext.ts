@@ -27,7 +27,6 @@ export type LiveSessionContextType = {
 
   startSession: () => void;
   endSession: () => void;
-  togglePresence: (userId: string) => void;
 
   startEncounter: () => void;
   endEncounter: () => void;

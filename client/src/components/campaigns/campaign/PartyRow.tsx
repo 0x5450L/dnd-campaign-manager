@@ -22,8 +22,8 @@ const initialsOf = (name: string) =>
     .map((part) => part[0]?.toUpperCase() ?? "")
     .join("") || "?";
 
-export const PartyRow = ({ members, dmId, isDM }: PartyRowProps) => {
-  const { session, presenceFor, togglePresence } = useLiveSession();
+export const PartyRow = ({ members, dmId }: PartyRowProps) => {
+  const { session, presenceFor } = useLiveSession();
   const sessionActive = !!session;
 
   return (
@@ -67,17 +67,6 @@ export const PartyRow = ({ members, dmId, isDM }: PartyRowProps) => {
               >
                 {isMemberDM ? "DM" : "Player"}
               </span>
-
-              {isDM && sessionActive && !isMemberDM && (
-                <button
-                  type="button"
-                  onClick={() => togglePresence(member.userId)}
-                  className="cs-btn-ghost shrink-0 !py-0.5 text-[10px]"
-                  title="Toggle mock presence (debug)"
-                >
-                  {status === "connected" ? "Kick" : "Sim"}
-                </button>
-              )}
             </li>
           );
         })}
