@@ -1,8 +1,12 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useCampaigns } from "../../hooks/useCampaigns";
+import {
+  useCampaignQuery,
+  useDeleteCampaignMutation,
+  useUpdateCampaignMutation,
+} from "../../queries/campaigns";
 import { useAuth } from "../../hooks/useAuth";
-import { useSSE } from "../../hooks/useSSE";
+import { useNotificationStore } from "../../state/notifications/notificationStore";
 import type { Campaign } from "../../types/campaigns";
 import CommonButton from "../../components/ui/buttons/CommonButton";
 import CampaignDetails from "../../components/campaigns/campaign/CampaignDetails";
@@ -15,69 +19,72 @@ import SessionPanel from "../../components/campaigns/campaign/session/SessionPan
 
 function CampaignPage() {
   const { id } = useParams();
-  const { deleteCampaign, fetchCampaign, updateCampaign, message, fetchCampaigns, isLoading } = useCampaigns();
-  const { subscribe } = useSSE();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const notify = useNotificationStore((s) => s.notify);
+
+  const { data: serverCampaign, isLoading, isError, error } = useCampaignQuery(id);
+  const updateCampaign = useUpdateCampaignMutation();
+  const deleteCampaign = useDeleteCampaignMutation();
 
   const [campaign, setCampaign] = useState<Campaign | null>(null);
-  const [originalCampaign, setOriginalCampaign] = useState<Campaign | null>(null);
+  const [syncedStamp, setSyncedStamp] = useState<string | null>(null);
+
+  const stamp = serverCampaign ? `${serverCampaign.id}:${serverCampaign.updatedAt}` : null;
+  if (serverCampaign && stamp !== syncedStamp) {
+    setCampaign(serverCampaign);
+    setSyncedStamp(stamp);
+  }
 
   const isDM = user?.id === campaign?.dmId;
 
   const hasChanges = !!(
     campaign &&
-    originalCampaign &&
-    (campaign.name !== originalCampaign.name ||
-      campaign.description !== originalCampaign.description ||
-      campaign.setting !== originalCampaign.setting ||
-      campaign.imageUrl !== originalCampaign.imageUrl)
+    serverCampaign &&
+    (campaign.name !== serverCampaign.name ||
+      campaign.description !== serverCampaign.description ||
+      campaign.setting !== serverCampaign.setting ||
+      campaign.imageUrl !== serverCampaign.imageUrl)
   );
 
-  useEffect(() => {
-    if (!id) return;
-    fetchCampaign(id)
-      .then((data) => {
-        setCampaign(data);
-        setOriginalCampaign(data);
-      })
-      .catch((error) => console.error("Error fetching campaign:", error));
-  }, [id, fetchCampaign]);
-
-  useEffect(() => {
-    const unsubscribe = subscribe("member_joined", (data: unknown) => {
-      if ((data as { campaignId: string }).campaignId !== id) return;
-      fetchCampaign(id as string).then((data) => {
-        if (!data) return;
-        setCampaign(data);
-        setOriginalCampaign(data);
-      });
-    });
-    return unsubscribe;
-  }, [id, subscribe, fetchCampaign]);
-
-  const handleSave = async () => {
+  const handleSave = () => {
     if (!campaign || !hasChanges) return;
-    const updated = await updateCampaign(campaign.id, {
-      name: campaign.name,
-      description: campaign.description,
-      setting: campaign.setting,
-      imageUrl: campaign.imageUrl,
-    });
-    if (updated) {
-      setOriginalCampaign({ ...campaign, ...updated });
-    }
-    fetchCampaigns();
+    updateCampaign.mutate(
+      {
+        id: campaign.id,
+        payload: {
+          name: campaign.name,
+          description: campaign.description,
+          setting: campaign.setting,
+          imageUrl: campaign.imageUrl,
+        },
+      },
+      {
+        onError: (err) => notify((err as Error).message, "error"),
+      }
+    );
   };
 
   const handleDeleteCampaign = () => {
-    if (id) deleteCampaign(id);
+    if (!id) return;
+    deleteCampaign.mutate(id, {
+      onSuccess: () => navigate("/campaigns"),
+      onError: (err) => notify((err as Error).message, "error"),
+    });
   };
+
+  if (isLoading && !campaign) {
+    return <p className="m-auto text-gold-bright">Loading campaign...</p>;
+  }
 
   if (!campaign) {
     return (
       <div className="mx-auto flex max-w-3xl flex-col gap-4 p-4">
-        {message ? <p className="text-rust">{message}</p> : <p className="text-dim">Campaign not found.</p>}
+        {isError ? (
+          <p className="text-rust">{(error as Error).message}</p>
+        ) : (
+          <p className="text-dim">Campaign not found.</p>
+        )}
         <CommonButton onClick={() => navigate("/campaigns")} variant="secondary" size="sm">
           &larr; Campaigns
         </CommonButton>
@@ -91,26 +98,20 @@ function CampaignPage() {
         <div className="mx-auto flex min-h-[calc(100vh-53px)] w-full max-w-7xl flex-col gap-3 p-3 sm:p-4">
           <CampaignHeaderBar campaign={campaign} isDM={isDM} onChange={setCampaign} />
 
-          {isLoading ? (
-            <p className="m-auto text-gold-bright">Loading campaign...</p>
-          ) : (
-            <>
-              <SessionPanel isDM={isDM} />
-              
-              <PartyRow members={campaign.members} dmId={campaign.dmId} isDM={isDM} />
+          <SessionPanel isDM={isDM} />
 
-              <div className="grid items-stretch gap-3 md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
-                <CampaignDetails campaign={campaign} isDM={isDM} onChange={setCampaign} />
-                <CampaignActionsPanel
-                  campaignId={campaign.id}
-                  isDM={isDM}
-                  hasChanges={hasChanges}
-                  onSave={handleSave}
-                  onDeleteCampaign={handleDeleteCampaign}
-                />
-              </div>
-            </>
-          )}
+          <PartyRow members={campaign.members} dmId={campaign.dmId} isDM={isDM} />
+
+          <div className="grid items-stretch gap-3 md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+            <CampaignDetails campaign={campaign} isDM={isDM} onChange={setCampaign} />
+            <CampaignActionsPanel
+              campaignId={campaign.id}
+              isDM={isDM}
+              hasChanges={hasChanges}
+              onSave={handleSave}
+              onDeleteCampaign={handleDeleteCampaign}
+            />
+          </div>
         </div>
       </LiveSessionProvider>
     </CampaignCharactersController>

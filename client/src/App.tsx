@@ -4,7 +4,7 @@ import AuthPage from "./pages/AuthPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import CampaignsPage from "./pages/campaigns/CampaignsPage";
 import CampaignPage from "./pages/campaigns/CampaignPage";
-import { CampaignsProvider } from "./context/campaignsContext/CampaignsProvider";
+import { CampaignsRealtimeSync } from "./queries/CampaignsRealtimeSync";
 import InvitePage from "./pages/InvitePage";
 import NotFound from "./pages/NotFound";
 
@@ -13,7 +13,7 @@ function App() {
     <Routes>
       <Route element={<ProtectedRoute />}>
         <Route path="/" element={<HomePage />} />
-        <Route element={<CampaignsProvider />}>
+        <Route element={<CampaignsRealtimeSync />}>
           <Route path="/campaigns" element={<CampaignsPage />} />
           <Route path="/campaigns/:id" element={<CampaignPage />} />
         </Route>

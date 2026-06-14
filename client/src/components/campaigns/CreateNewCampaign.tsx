@@ -1,25 +1,24 @@
 import { useState } from "react";
-import { createCampaign } from "../../services/api/campaigns";
 import type { ApiError } from "../../services/api/errors";
-import { useCampaigns } from "../../hooks/useCampaigns";
+import { useCreateCampaignMutation } from "../../queries/campaigns";
 import { useAuth } from "../../hooks/useAuth";
 import CommonButton from "../ui/buttons/CommonButton";
 import CommonInput from "../ui/inputs/CommonInput";
 
 function CreateNewCampaign() {
-  const { fetchCampaigns } = useCampaigns();
   const { user } = useAuth();
+  const createCampaign = useCreateCampaignMutation();
   const [nameError, setNameError] = useState<string | null>(null);
   const [createCampaignError, setCreateCampaignError] = useState<string | null>(null);
 
   const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!user) {
-      //TODO: In future, make a unutorized campaign
       setCreateCampaignError("You must be logged in to create a campaign");
       return;
     }
-    const formData = new FormData(e.target as HTMLFormElement);
+    const form = e.currentTarget;
+    const formData = new FormData(form);
     const name = formData.get("name") as string;
     const description = formData.get("description") as string;
     const setting = formData.get("setting") as string;
@@ -29,17 +28,19 @@ function CreateNewCampaign() {
       return;
     }
 
-    createCampaign(name, description, setting, imageUrl)
-      .then(async () => {
-        await fetchCampaigns();
-        e.target.reset();
-        setNameError(null);
-        setCreateCampaignError(null);
-      })
-      .catch((error: ApiError) => {
-        setCreateCampaignError(error.data.error.message);
-        console.error(error.data.error.message);
-      });
+    createCampaign.mutate(
+      { name, description, setting, imageUrl },
+      {
+        onSuccess: () => {
+          form.reset();
+          setNameError(null);
+          setCreateCampaignError(null);
+        },
+        onError: (error) => {
+          setCreateCampaignError((error as ApiError).data.error.message);
+        },
+      }
+    );
   };
 
   return (
@@ -51,7 +52,9 @@ function CreateNewCampaign() {
         <CommonInput type="text" name="description" placeholder="Description (optional)" variant="boxed" />
         <CommonInput type="text" name="setting" placeholder="Setting (optional)" variant="boxed" />
         <CommonInput type="text" name="imageUrl" placeholder="Image URL (optional)" variant="boxed" />
-        <CommonButton type="submit">Create Campaign</CommonButton>
+        <CommonButton type="submit" disabled={createCampaign.isPending}>
+          {createCampaign.isPending ? "Creating..." : "Create Campaign"}
+        </CommonButton>
         {createCampaignError && <p className="text-rust text-sm">{createCampaignError}</p>}
       </form>
     </div>

@@ -21,6 +21,13 @@ export type GetCampaignResponse = CreateCampaignResponse;
 
 export type UpdateCampaignResponse = CreateCampaignResponse;
 
+export type CreateCampaignInput = {
+  name: string;
+  description?: string;
+  setting?: string;
+  imageUrl?: string;
+}
+
 export type UpdateCampaignPayload = {
   name?: string;
   description?: string;

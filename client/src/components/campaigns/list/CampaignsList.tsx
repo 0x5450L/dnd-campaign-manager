@@ -1,23 +1,24 @@
 import CampaignsListItem from "./CampaignsListItem";
-import { useCampaigns } from "../../../hooks/useCampaigns";
+import { useCampaignsQuery } from "../../../queries/campaigns";
 import type { Campaign } from "../../../types/campaigns";
 
 function CampaignsList() {
-  const { campaigns, message, isLoading } = useCampaigns();
+  const { data: campaigns, isLoading, isError, error } = useCampaignsQuery();
 
   if (isLoading) {
     return <p className="text-gold">Loading campaigns...</p>;
   }
 
-  return (
-    <div>
-      <p className="text-sm text-dim mb-3">{message}</p>
+  if (isError) {
+    return <p className="text-rust">{(error as Error).message}</p>;
+  }
 
-      <ul className="flex flex-col gap-3">
-        {campaigns &&
-          campaigns.map((campaign: Campaign) => <CampaignsListItem key={campaign.id} campaign={campaign} />)}
-      </ul>
-    </div>
+  return (
+    <ul className="flex flex-col gap-3">
+      {campaigns?.map((campaign: Campaign) => (
+        <CampaignsListItem key={campaign.id} campaign={campaign} />
+      ))}
+    </ul>
   );
 }
 
