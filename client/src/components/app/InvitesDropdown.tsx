@@ -1,31 +1,17 @@
 import { useEffect, useRef, useState } from "react";
-import { getMyInvites, respondToInvite } from "../../services/api/invites";
-import type { Invite } from "../../types/invites";
-import type { ApiError } from "../../services/api/errors";
 import CommonButton from "../ui/buttons/CommonButton";
-import { useAuth } from "../../hooks/useAuth";
-import { useSSE } from "../../hooks/useSSE";
+import {
+  useInvitesRealtimeSync,
+  useMyInvitesQuery,
+  useRespondToInviteMutation,
+} from "../../queries/invites";
 
 function InvitesDropdown() {
-  const { subscribe } = useSSE();
-  const { user } = useAuth();
-  const [invites, setInvites] = useState<Invite[]>([]);
+  useInvitesRealtimeSync();
+  const { data: invites = [] } = useMyInvitesQuery();
+  const respondMutation = useRespondToInviteMutation();
   const [isOpen, setIsOpen] = useState(false);
-  const [loadingTokens, setLoadingTokens] = useState<Set<string>>(new Set());
   const dropdownRef = useRef<HTMLDivElement>(null);
-
-  const fetchInvites = () => {
-    getMyInvites()
-      .then((data) => setInvites(data.invites))
-      .catch(() => setInvites([]));
-  };
-
-  useEffect(() => {
-    if (!user) return;
-    fetchInvites();
-    const unsubscribe = subscribe("invite_created", () => fetchInvites());
-    return unsubscribe;
-  }, [user]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -37,22 +23,11 @@ function InvitesDropdown() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const isResponding = (token: string) =>
+    respondMutation.isPending && respondMutation.variables?.token === token;
+
   const handleRespond = (token: string, action: "accept" | "reject") => {
-    setLoadingTokens((prev) => new Set(prev).add(token));
-    respondToInvite(token, action)
-      .then(() => {
-        setInvites((prev) => prev.filter((inv) => inv.token !== token));
-      })
-      .catch((error: ApiError) => {
-        console.error(error.data.error.message);
-      })
-      .finally(() => {
-        setLoadingTokens((prev) => {
-          const next = new Set(prev);
-          next.delete(token);
-          return next;
-        });
-      });
+    respondMutation.mutate({ token, action });
   };
 
   return (
@@ -106,7 +81,7 @@ function InvitesDropdown() {
                         onClick={() => handleRespond(invite.token, "reject")}
                         variant="decline"
                         size="sm"
-                        disabled={loadingTokens.has(invite.token)}
+                        disabled={isResponding(invite.token)}
                       >
                         Reject
                       </CommonButton>
@@ -114,7 +89,7 @@ function InvitesDropdown() {
                         onClick={() => handleRespond(invite.token, "accept")}
                         variant="accept"
                         size="sm"
-                        disabled={loadingTokens.has(invite.token)}
+                        disabled={isResponding(invite.token)}
                       >
                         Accept
                       </CommonButton>
