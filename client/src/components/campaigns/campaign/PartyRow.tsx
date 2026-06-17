@@ -1,11 +1,18 @@
+import { useState } from "react";
 import type { Campaign } from "../../../types/campaigns";
 import type { PresenceStatus } from "../../../types/session";
 import { useLiveSession } from "../../../context/liveSessionContext/useLiveSession";
+import { useRemoveMemberMutation } from "../../../queries/members";
+import { useNotificationStore } from "../../../state/notifications/notificationStore";
+import ConfirmDialog from "../../ui/ConfirmDialog";
+
+type Member = Campaign["members"][number];
 
 type PartyRowProps = {
   members: Campaign["members"];
   dmId: string;
   isDM: boolean;
+  campaignId: string;
 };
 
 const dotForStatus = (status: PresenceStatus) => {
@@ -22,9 +29,25 @@ const initialsOf = (name: string) =>
     .map((part) => part[0]?.toUpperCase() ?? "")
     .join("") || "?";
 
-export const PartyRow = ({ members, dmId }: PartyRowProps) => {
+export const PartyRow = ({ members, dmId, isDM, campaignId }: PartyRowProps) => {
   const { session, presenceFor } = useLiveSession();
   const sessionActive = !!session;
+  const removeMember = useRemoveMemberMutation();
+  const notify = useNotificationStore((s) => s.notify);
+  const [memberToKick, setMemberToKick] = useState<Member | null>(null);
+
+  const handleConfirmKick = () => {
+    if (!memberToKick) return;
+    const target = memberToKick;
+    setMemberToKick(null);
+    removeMember.mutate(
+      { campaignId, userId: target.userId },
+      {
+        onSuccess: () => notify(`${target.user.displayName} was removed from the party`, "success"),
+        onError: (err) => notify((err as Error).message, "error"),
+      },
+    );
+  };
 
   return (
     <div className="cs-section-card flex flex-col gap-2 p-3">
@@ -43,6 +66,7 @@ export const PartyRow = ({ members, dmId }: PartyRowProps) => {
         {members.map((member) => {
           const status = sessionActive ? presenceFor(member.userId) : "offline";
           const isMemberDM = member.userId === dmId;
+          const canKick = isDM && !isMemberDM;
           return (
             <li
               key={member.id}
@@ -67,10 +91,42 @@ export const PartyRow = ({ members, dmId }: PartyRowProps) => {
               >
                 {isMemberDM ? "DM" : "Player"}
               </span>
+
+              {canKick && (
+                <button
+                  type="button"
+                  onClick={() => setMemberToKick(member)}
+                  aria-label={`Remove ${member.user.displayName} from the campaign`}
+                  title="Remove from campaign"
+                  className="ml-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-transparent text-faint transition-colors duration-150 hover:border-rust/50 hover:bg-rust/15 hover:text-rust focus-visible:border-rust/50 focus-visible:text-rust focus-visible:outline-none"
+                >
+                  <svg
+                    viewBox="0 0 16 16"
+                    className="h-3 w-3"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  >
+                    <path d="M4 4l8 8M12 4l-8 8" />
+                  </svg>
+                </button>
+              )}
             </li>
           );
         })}
       </ul>
+
+      {memberToKick && (
+        <ConfirmDialog
+          title="Remove member"
+          message={`Remove "${memberToKick.user.displayName}" from the campaign? Their characters will stay in the campaign.`}
+          confirmLabel="Remove"
+          cancelLabel="Cancel"
+          onConfirm={handleConfirmKick}
+          onCancel={() => setMemberToKick(null)}
+        />
+      )}
     </div>
   );
 };

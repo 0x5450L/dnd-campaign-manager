@@ -16,6 +16,7 @@ type CampaignActionsPanelProps = {
   hasChanges: boolean;
   onSave: () => void;
   onDeleteCampaign: () => void;
+  onLeaveCampaign: () => void;
 };
 
 function CampaignActionsPanel({
@@ -24,14 +25,21 @@ function CampaignActionsPanel({
   hasChanges,
   onSave,
   onDeleteCampaign,
+  onLeaveCampaign,
 }: CampaignActionsPanelProps) {
   const { characters, myCharacter, openCharactersSidebar, openMyCharacter } =
     useCampaignCharacters();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
 
   const handleConfirmDelete = () => {
     setShowDeleteConfirm(false);
     onDeleteCampaign();
+  };
+
+  const handleConfirmLeave = () => {
+    setShowLeaveConfirm(false);
+    onLeaveCampaign();
   };
 
   return (
@@ -62,6 +70,15 @@ function CampaignActionsPanel({
               Delete
             </CommonButton>
           )}
+          {!isDM && (
+            <CommonButton
+              onClick={() => setShowLeaveConfirm(true)}
+              variant="decline"
+              size="sm"
+            >
+              Leave
+            </CommonButton>
+          )}
         </div>
       </div>
 
@@ -77,6 +94,17 @@ function CampaignActionsPanel({
           cancelLabel="Cancel"
           onConfirm={handleConfirmDelete}
           onCancel={() => setShowDeleteConfirm(false)}
+        />
+      )}
+
+      {showLeaveConfirm && (
+        <ConfirmDialog
+          title="Leave Campaign"
+          message="Are you sure you want to leave this campaign? Your characters will stay in the campaign."
+          confirmLabel="Leave"
+          cancelLabel="Cancel"
+          onConfirm={handleConfirmLeave}
+          onCancel={() => setShowLeaveConfirm(false)}
         />
       )}
     </div>

@@ -3,8 +3,33 @@ import prisma from "../services/prisma";
 import { Router } from "express";
 import { asyncHandler } from "../utils/asyncHandler";
 import { AppError } from "../utils/errors";
-import { requireCampaignDM } from "../utils/accessControl";
+import { requireCampaignAccess, requireCampaignDM } from "../utils/accessControl";
 import { pickDefined } from "../utils/payload";
+import { notifyClient } from "../services/sseClients";
+
+const removeMemberAndNotify = async (campaignId: string, targetUserId: string) => {
+  const membership = await prisma.campaignMember.findUnique({
+    where: { userId_campaignId: { userId: targetUserId, campaignId } },
+    include: { user: { select: { email: true } } },
+  });
+
+  if (!membership) {
+    throw new AppError(404, 'Member not found');
+  }
+
+  await prisma.campaignMember.delete({
+    where: { userId_campaignId: { userId: targetUserId, campaignId } },
+  });
+
+  const remaining = await prisma.campaignMember.findMany({
+    where: { campaignId },
+    include: { user: { select: { email: true } } },
+  });
+
+  const event = { type: 'member_left' as const, campaignId, userId: targetUserId };
+  remaining.forEach((member) => notifyClient(member.user.email, event));
+  notifyClient(membership.user.email, event);
+};
 
 const router = Router();
 
@@ -154,6 +179,37 @@ router.patch('/:id', authMiddleware, asyncHandler(async (req, res) => {
   });
 
   res.json({ status: 'ok', message: 'Campaign updated successfully', campaign: updatedCampaign });
+}));
+
+router.post('/:id/leave', authMiddleware, asyncHandler(async (req, res) => {
+  const userId = req.userId!;
+  const campaignId = req.params.id as string;
+
+  const campaign = await requireCampaignAccess(userId, campaignId);
+
+  if (campaign.dmId === userId) {
+    throw new AppError(400, 'The DM cannot leave the campaign. Delete it instead.');
+  }
+
+  await removeMemberAndNotify(campaignId, userId);
+
+  res.json({ status: 'ok', message: 'You left the campaign', campaignId, userId });
+}));
+
+router.delete('/:id/members/:userId', authMiddleware, asyncHandler(async (req, res) => {
+  const requesterId = req.userId!;
+  const campaignId = req.params.id as string;
+  const targetUserId = req.params.userId as string;
+
+  const campaign = await requireCampaignDM(requesterId, campaignId);
+
+  if (targetUserId === campaign.dmId) {
+    throw new AppError(400, 'The DM cannot be removed from the campaign.');
+  }
+
+  await removeMemberAndNotify(campaignId, targetUserId);
+
+  res.json({ status: 'ok', message: 'Member removed', campaignId, userId: targetUserId });
 }));
 
 export default router;

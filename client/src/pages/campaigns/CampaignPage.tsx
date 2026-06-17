@@ -5,6 +5,7 @@ import {
   useDeleteCampaignMutation,
   useUpdateCampaignMutation,
 } from "../../queries/campaigns";
+import { useLeaveCampaignMutation } from "../../queries/members";
 import { useAuth } from "../../hooks/useAuth";
 import { useNotificationStore } from "../../state/notifications/notificationStore";
 import type { Campaign } from "../../types/campaigns";
@@ -26,6 +27,7 @@ function CampaignPage() {
   const { data: serverCampaign, isLoading, isError, error } = useCampaignQuery(id);
   const updateCampaign = useUpdateCampaignMutation();
   const deleteCampaign = useDeleteCampaignMutation();
+  const leaveCampaign = useLeaveCampaignMutation();
 
   const [campaign, setCampaign] = useState<Campaign | null>(null);
   const [syncedStamp, setSyncedStamp] = useState<string | null>(null);
@@ -73,6 +75,14 @@ function CampaignPage() {
     });
   };
 
+  const handleLeaveCampaign = () => {
+    if (!id) return;
+    leaveCampaign.mutate(id, {
+      onSuccess: () => navigate("/campaigns"),
+      onError: (err) => notify((err as Error).message, "error"),
+    });
+  };
+
   if (isLoading && !campaign) {
     return <p className="m-auto text-gold-bright">Loading campaign...</p>;
   }
@@ -100,7 +110,7 @@ function CampaignPage() {
 
           <SessionPanel isDM={isDM} />
 
-          <PartyRow members={campaign.members} dmId={campaign.dmId} isDM={isDM} />
+          <PartyRow members={serverCampaign?.members ?? campaign.members} dmId={campaign.dmId} isDM={isDM} campaignId={campaign.id} />
 
           <div className="grid items-stretch gap-3 md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
             <CampaignDetails campaign={campaign} isDM={isDM} onChange={setCampaign} />
@@ -110,6 +120,7 @@ function CampaignPage() {
               hasChanges={hasChanges}
               onSave={handleSave}
               onDeleteCampaign={handleDeleteCampaign}
+              onLeaveCampaign={handleLeaveCampaign}
             />
           </div>
         </div>

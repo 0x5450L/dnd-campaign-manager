@@ -9,13 +9,21 @@ export const CampaignsRealtimeSync = () => {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    return subscribe("member_joined", (data: unknown) => {
+    const handleMembershipChange = (data: unknown) => {
       queryClient.invalidateQueries({ queryKey: campaignKeys.lists() });
       const campaignId = (data as { campaignId?: string }).campaignId;
       if (campaignId) {
         queryClient.invalidateQueries({ queryKey: campaignKeys.detail(campaignId) });
       }
-    });
+    };
+
+    const unsubJoined = subscribe("member_joined", handleMembershipChange);
+    const unsubLeft = subscribe("member_left", handleMembershipChange);
+
+    return () => {
+      unsubJoined();
+      unsubLeft();
+    };
   }, [subscribe, queryClient]);
 
   return <Outlet />;
