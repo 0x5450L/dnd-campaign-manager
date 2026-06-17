@@ -1,16 +1,16 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { CharacterSheetProvider } from "../../context/characterSheetContext/CharacterSheetProvider";
 import { useCharacterSheet } from "../../context/characterSheetContext/useCharacterSheet";
 import { useIsMobile } from "../../hooks/useMediaQuery";
 import { MobileCharacterSheet } from "./layouts/MobileCharacterSheet";
 import { DesktopCharacterSheet } from "./layouts/DesktopCharacterSheet";
 import type { CharacterSheetState } from "../../types/characters/characterSheet";
-import type { Character, CharacterType } from "../../types/characters/characters";
+import type { CharacterType } from "../../types/characters/characters";
 import {
-  createCharacter,
-  getCharacter,
-  updateCharacter,
-} from "../../services/api/characters";
+  useCharacterQuery,
+  useCreateCharacterMutation,
+  useUpdateCharacterMutation,
+} from "../../queries/characters";
 import {
   dtoToSheetState,
   sheetStateToCreatePayload,
@@ -24,7 +24,7 @@ type CharacterSheetProps = {
   characterId?: string;
   campaignId: string;
   defaultType?: CharacterType;
-  onSaved?: (character: Character) => void;
+  onCreated?: (id: string) => void;
 };
 
 const CharacterSheetInner = ({
@@ -103,65 +103,23 @@ export const CharacterSheet = ({
   characterId,
   campaignId,
   defaultType = "player",
-  onSaved,
+  onCreated,
 }: CharacterSheetProps) => {
-  const [loadedCharacter, setLoadedCharacter] = useState<Character | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { data: loadedCharacter, isLoading, error } = useCharacterQuery(characterId);
+  const createCharacterMutation = useCreateCharacterMutation();
+  const updateCharacterMutation = useUpdateCharacterMutation();
   const [saveStatus, setSaveStatus] = useState<StatusChipState>({ status: "idle" });
 
-  useEffect(() => {
-    if (!isOpen) return;
-
-    let cancelled = false;
-
-    queueMicrotask(() => {
-      if (cancelled) return;
-      setSaveStatus({ status: "idle" });
-    });
-
-    if (!characterId) {
-      queueMicrotask(() => {
-        if (cancelled) return;
-        setLoadedCharacter(null);
-        setError(null);
-        setIsLoading(false);
-      });
-      return () => {
-        cancelled = true;
-      };
-    }
-
-    queueMicrotask(() => {
-      if (cancelled) return;
-      setIsLoading(true);
-      setError(null);
-    });
-
-    getCharacter(characterId)
-      .then((res) => {
-        if (cancelled) return;
-        setLoadedCharacter(res.character);
-      })
-      .catch((err) => {
-        if (cancelled) return;
-        console.error("Error loading character:", err);
-        setError("Failed to load character.");
-      })
-      .finally(() => {
-        if (!cancelled) setIsLoading(false);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [isOpen, characterId]);
+  const handleClose = useCallback(() => {
+    setSaveStatus({ status: "idle" });
+    onClose();
+  }, [onClose]);
 
   useEffect(() => {
     if (!isOpen) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") handleClose();
     };
     window.addEventListener("keydown", handleKeyDown);
 
@@ -172,26 +130,36 @@ export const CharacterSheet = ({
       window.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = prevOverflow;
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, handleClose]);
 
   const initialState = useMemo(
     () => (loadedCharacter ? dtoToSheetState(loadedCharacter) : undefined),
     [loadedCharacter],
   );
 
-  const handleSave = async (state: CharacterSheetState) => {
-    try {
-      const res = loadedCharacter
-        ? await updateCharacter(loadedCharacter.id, sheetStateToUpdatePayload(state))
-        : await createCharacter(sheetStateToCreatePayload(state, campaignId, defaultType));
+  const handleSaveError = (err: unknown) => {
+    console.error("Error saving character:", err);
+    const message = err instanceof Error ? err.message : "Save failed";
+    setSaveStatus({ status: "error", message });
+  };
 
-      setLoadedCharacter(res.character);
-      onSaved?.(res.character);
-      setSaveStatus({ status: "success" });
-    } catch (err) {
-      console.error("Error saving character:", err);
-      const message = err instanceof Error ? err.message : "Save failed";
-      setSaveStatus({ status: "error", message });
+  const handleSave = (state: CharacterSheetState) => {
+    if (loadedCharacter) {
+      updateCharacterMutation.mutate(
+        { id: loadedCharacter.id, payload: sheetStateToUpdatePayload(state) },
+        {
+          onSuccess: () => setSaveStatus({ status: "success" }),
+          onError: handleSaveError,
+        },
+      );
+    } else {
+      createCharacterMutation.mutate(sheetStateToCreatePayload(state, campaignId, defaultType), {
+        onSuccess: (character) => {
+          setSaveStatus({ status: "success" });
+          onCreated?.(character.id);
+        },
+        onError: handleSaveError,
+      });
     }
   };
 
@@ -205,7 +173,7 @@ export const CharacterSheet = ({
       role="dialog"
       aria-modal="true"
       aria-label="Character sheet"
-      onClick={onClose}
+      onClick={handleClose}
     >
       <div
         className="relative min-h-full w-full bg-bg"
@@ -217,10 +185,10 @@ export const CharacterSheet = ({
           </div>
         ) : error ? (
           <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4 text-rust">
-            <p>{error}</p>
+            <p>Failed to load character.</p>
             <button
               type="button"
-              onClick={onClose}
+              onClick={handleClose}
               className="px-4 py-2 rounded bg-surface text-ink hover:bg-surface-light"
             >
               Close
@@ -232,12 +200,12 @@ export const CharacterSheet = ({
             initialState={initialState}
           >
             <SheetTopActions
-              onClose={onClose}
+              onClose={handleClose}
               onForceSave={handleSave}
               saveStatus={saveStatus}
               onDismissStatus={dismissStatus}
             />
-            <CharacterSheetInner onClose={onClose} onForceSave={handleSave} />
+            <CharacterSheetInner onClose={handleClose} onForceSave={handleSave} />
           </CharacterSheetProvider>
         )}
       </div>

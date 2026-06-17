@@ -1,8 +1,11 @@
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
+import { useCallback, useMemo, useState, type ReactNode } from "react";
 import type { Character, CharacterType } from "../../../../../types/characters/characters";
 import { CharacterSheet } from "../../../../characters/CharacterSheet";
-import { useSSE } from "../../../../../hooks/useSSE";
-import { deleteCharacter, getCampaignCharacters } from "../../../../../services/api/characters";
+import {
+  useCampaignCharactersQuery,
+  useCharactersRealtimeSync,
+  useDeleteCharacterMutation,
+} from "../../../../../queries/characters";
 import ConfirmDialog from "../../../../ui/ConfirmDialog";
 import CharactersSidebar from "../CharactersSidebar";
 import { CampaignCharactersContext } from "./CampaignCharactersContext";
@@ -19,14 +22,18 @@ type CampaignCharactersControllerProps = {
   children: ReactNode;
 };
 
+const EMPTY_CHARACTERS: Character[] = [];
+
 function CampaignCharactersController({
   campaignId,
   dmId,
   currentUserId,
   children,
 }: CampaignCharactersControllerProps) {
-  const { subscribe } = useSSE();
-  const [characters, setCharacters] = useState<Character[]>([]);
+  const { data: characters = EMPTY_CHARACTERS } = useCampaignCharactersQuery(campaignId);
+  useCharactersRealtimeSync(campaignId);
+  const deleteCharacterMutation = useDeleteCharacterMutation();
+
   const [sheetMode, setSheetMode] = useState<SheetMode>({ kind: "closed" });
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [characterToDelete, setCharacterToDelete] = useState<Character | null>(null);
@@ -40,39 +47,6 @@ function CampaignCharactersController({
         : null,
     [characters, currentUserId],
   );
-
-  const refetchCharacters = useCallback(() => {
-    getCampaignCharacters(campaignId)
-      .then((res) => setCharacters(res.characters))
-      .catch((error) => console.error("Error fetching characters:", error));
-  }, [campaignId]);
-
-  useEffect(() => {
-    refetchCharacters();
-  }, [refetchCharacters]);
-
-  useEffect(() => {
-    const matchesCampaign = (data: unknown) =>
-      (data as { campaignId?: string }).campaignId === campaignId;
-
-    const unsubCreated = subscribe("character_created", (data) => {
-      if (matchesCampaign(data)) refetchCharacters();
-    });
-    const unsubUpdated = subscribe("character_updated", (data) => {
-      if (matchesCampaign(data)) refetchCharacters();
-    });
-    const unsubDeleted = subscribe("character_deleted", (data) => {
-      if (!matchesCampaign(data)) return;
-      const { characterId } = data as { characterId: string };
-      setCharacters((prev) => prev.filter((c) => c.id !== characterId));
-    });
-
-    return () => {
-      unsubCreated();
-      unsubUpdated();
-      unsubDeleted();
-    };
-  }, [campaignId, subscribe, refetchCharacters]);
 
   const openCharactersSidebar = useCallback(() => setIsSidebarOpen(true), []);
 
@@ -92,23 +66,13 @@ function CampaignCharactersController({
     setSheetMode({ kind: "create", type: "npc" });
   };
 
-  const handleCharacterSaved = (saved: Character) => {
-    setCharacters((prev) => {
-      const exists = prev.some((c) => c.id === saved.id);
-      return exists ? prev.map((c) => (c.id === saved.id ? saved : c)) : [...prev, saved];
-    });
-  };
-
-  const handleConfirmDeleteCharacter = async () => {
+  const handleConfirmDeleteCharacter = () => {
     if (!characterToDelete) return;
     const target = characterToDelete;
     setCharacterToDelete(null);
-    try {
-      await deleteCharacter(target.id);
-      setCharacters((prev) => prev.filter((c) => c.id !== target.id));
-    } catch (error) {
-      console.error("Error deleting character:", error);
-    }
+    deleteCharacterMutation.mutate(target.id, {
+      onError: (error) => console.error("Error deleting character:", error),
+    });
   };
 
   const contextValue = useMemo(
@@ -154,7 +118,7 @@ function CampaignCharactersController({
         characterId={sheetMode.kind === "edit" ? sheetMode.characterId : undefined}
         defaultType={sheetMode.kind === "create" ? sheetMode.type : "player"}
         campaignId={campaignId}
-        onSaved={handleCharacterSaved}
+        onCreated={(id) => setSheetMode({ kind: "edit", characterId: id })}
         onClose={() => setSheetMode({ kind: "closed" })}
       />
     </CampaignCharactersContext.Provider>
