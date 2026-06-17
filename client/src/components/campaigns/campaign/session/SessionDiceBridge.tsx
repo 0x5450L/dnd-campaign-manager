@@ -1,9 +1,9 @@
 import { useEffect } from "react";
-import { useDiceRoller } from "../../../../context/diceRollerContext/useDiceRoller";
+import { useDiceRollerStore } from "../../../../state/diceRoller/diceRollerStore";
 import { useLiveSession } from "../../../../context/liveSessionContext/useLiveSession";
 
 export const SessionDiceBridge = () => {
-  const { registerSessionSink } = useDiceRoller();
+  const registerSessionSink = useDiceRollerStore((s) => s.registerSessionSink);
   const { session, logRoll } = useLiveSession();
 
   const sessionIsActive = session?.status === "active";

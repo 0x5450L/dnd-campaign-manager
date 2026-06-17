@@ -1,10 +1,13 @@
 import { useState } from "react";
-import { useDiceRoller } from "../../context/diceRollerContext/useDiceRoller";
+import { useDiceRollerStore } from "../../state/diceRoller/diceRollerStore";
 import type { DiceHistoryEntry } from "../../types/dice";
+import { formatRollExpression } from "../../utils/diceFormat";
 
 export const DiceHistory = () => {
-  const { history, clearHistory, rerollFromHistory, showHistoryResult } =
-    useDiceRoller();
+  const history = useDiceRollerStore((s) => s.history);
+  const clearHistory = useDiceRollerStore((s) => s.clearHistory);
+  const rerollFromHistory = useDiceRollerStore((s) => s.rerollFromHistory);
+  const showHistoryResult = useDiceRollerStore((s) => s.showHistoryResult);
   const [expanded, setExpanded] = useState(false);
 
   const isEmpty = history.length === 0;
@@ -109,7 +112,7 @@ const HistoryItem = ({ entry, onClick, onReroll }: ItemProps) => {
       className="grid cursor-pointer grid-cols-[1fr_auto_auto] items-center gap-3 rounded border border-transparent bg-surface/50 px-3 py-2 text-sm transition-colors hover:border-rule hover:bg-surface"
     >
       <span className="overflow-hidden text-ellipsis whitespace-nowrap font-fantasy text-ink">
-        {entry.expression}
+        {formatRollExpression(entry.expression)}
       </span>
       <span className={`min-w-[32px] text-right font-fantasy text-base font-bold ${totalColor}`}>
         {entry.total}

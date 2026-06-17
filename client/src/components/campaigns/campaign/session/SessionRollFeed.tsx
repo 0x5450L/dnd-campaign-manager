@@ -2,6 +2,7 @@ import { useLiveSession } from "../../../../context/liveSessionContext/useLiveSe
 import type { SessionDiceRoll } from "../../../../types/session";
 import { DICE_TYPES, type DiceType } from "../../../../types/dice";
 import DiceShape from "../../../dice/DiceShape";
+import { formatRollExpression } from "../../../../utils/diceFormat";
 
 const formatTime = (iso: string) => {
   const d = new Date(iso);
@@ -9,13 +10,6 @@ const formatTime = (iso: string) => {
   const mm = String(d.getMinutes()).padStart(2, "0");
   return `${hh}:${mm}`;
 };
-
-const formatExpression = (expression: string) =>
-  expression.replace(
-    /(\d*)d(\d+)(kh|kl)(\d+)/gi,
-    (_match, _count, sides, kind, keep) =>
-      `${keep}D${sides} ${kind.toLowerCase() === "kh" ? "adv" : "dis"}`,
-  );
 
 const usedDiceTypes = (expression: string): DiceType[] => {
   const seen = new Set<DiceType>();
@@ -93,7 +87,7 @@ export const SessionRollFeed = () => {
 
               <div className="min-w-0">
                 <span className="block truncate font-fantasy text-sm tracking-wide text-ink">
-                  {formatExpression(roll.expression)}
+                  {formatRollExpression(roll.expression)}
                 </span>
                 <span className="block truncate text-[11px] text-faint">
                   {roll.actorName}

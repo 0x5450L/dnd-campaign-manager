@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useDiceRoller } from "../../context/diceRollerContext/useDiceRoller";
+import { useDiceRollerStore } from "../../state/diceRoller/diceRollerStore";
 import { DICE_TYPES, type AdvDis, type DiceType } from "../../types/dice";
 import DiceShape from "./DiceShape";
 import DiceResult from "./DiceResult";
@@ -7,24 +7,22 @@ import DiceHistory from "./DiceHistory";
 import CommonButton from "../ui/buttons/CommonButton";
 
 export const DiceRoller = () => {
-  const {
-    isOpen,
-    isRolling,
-    formula,
-    mode,
-    lastResult,
-    error,
-    sessionActive,
-    shareToSession,
-    close,
-    toggle,
-    setFormula,
-    setMode,
-    addDie,
-    clearFormula,
-    roll,
-    setShareToSession,
-  } = useDiceRoller();
+  const isOpen = useDiceRollerStore((s) => s.isOpen);
+  const isRolling = useDiceRollerStore((s) => s.isRolling);
+  const formula = useDiceRollerStore((s) => s.formula);
+  const mode = useDiceRollerStore((s) => s.mode);
+  const lastResult = useDiceRollerStore((s) => s.lastResult);
+  const error = useDiceRollerStore((s) => s.error);
+  const sessionActive = useDiceRollerStore((s) => s.sessionActive);
+  const shareToSession = useDiceRollerStore((s) => s.shareToSession);
+  const close = useDiceRollerStore((s) => s.close);
+  const toggle = useDiceRollerStore((s) => s.toggle);
+  const setFormula = useDiceRollerStore((s) => s.setFormula);
+  const setMode = useDiceRollerStore((s) => s.setMode);
+  const addDie = useDiceRollerStore((s) => s.addDie);
+  const clearFormula = useDiceRollerStore((s) => s.clearFormula);
+  const roll = useDiceRollerStore((s) => s.roll);
+  const setShareToSession = useDiceRollerStore((s) => s.setShareToSession);
 
   useEffect(() => {
     if (!isOpen) return;
