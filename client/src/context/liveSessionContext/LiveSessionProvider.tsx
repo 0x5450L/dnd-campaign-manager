@@ -6,6 +6,7 @@ import {
   useRef,
   type ReactNode,
 } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { LiveSessionContext, type LiveSessionContextType } from "./LiveSessionContext";
 import { getSocket } from "../../services/socket";
 import {
@@ -14,17 +15,10 @@ import {
   type ParticipantPatch,
   type SessionRollInput,
 } from "../../state/liveSession/liveSessionReducer";
-import type {
-  MemberPresence,
-  PresenceStatus,
-} from "../../types/session";
-import type {
-  EncounterDTO,
-  EncounterParticipantDTO,
-  ParticipantAbilityScore,
-  SpellSlotLevel,
-} from "../../types/encounter";
+import type { MemberPresence, PresenceStatus } from "../../types/session";
 import type { Campaign } from "../../types/campaigns";
+import { encounterKeys, useActiveEncounterQuery } from "../../queries/encounters";
+import { createEncounter, updateEncounter } from "../../services/api/encounters";
 import type {
   PresenceChangedPayload,
   RollLoggedPayload,
@@ -37,9 +31,6 @@ type Props = {
   children: ReactNode;
 };
 
-const newId = (prefix: string) =>
-  `${prefix}-${Math.random().toString(36).slice(2, 10)}`;
-
 const presenceFromUserIds = (
   campaign: Campaign,
   connectedUserIds: string[],
@@ -51,165 +42,14 @@ const presenceFromUserIds = (
   }));
 };
 
-const seedEncounter = (campaignSessionId: string): EncounterDTO => {
-  const now = new Date().toISOString();
-  return {
-    id: newId("enc"),
-    name: "Goblin Ambush",
-    status: "active",
-    round: 1,
-    currentTurnIndex: 0,
-    campaignSessionId,
-    startedAt: now,
-    updatedAt: now,
-    endedAt: null,
-  };
-};
-
-const goblinBossAbilities: ParticipantAbilityScore[] = [
-  { name: "str", score: 15 },
-  { name: "dex", score: 14 },
-  { name: "con", score: 12 },
-  { name: "int", score: 10 },
-  { name: "wis", score: 8 },
-  { name: "cha", score: 10 },
-];
-
-const wizardSpellSlots: SpellSlotLevel[] = [
-  { level: 1, total: 4, used: 1 },
-  { level: 2, total: 3, used: 0 },
-  { level: 3, total: 2, used: 0 },
-];
-
-const goblinBossSpellSlots: SpellSlotLevel[] = [
-  { level: 1, total: 3, used: 0 },
-  { level: 2, total: 1, used: 0 },
-];
-
-const goblinScoutAbilities: ParticipantAbilityScore[] = [
-  { name: "str", score: 8 },
-  { name: "dex", score: 14 },
-  { name: "con", score: 10 },
-  { name: "int", score: 10 },
-  { name: "wis", score: 8 },
-  { name: "cha", score: 8 },
-];
-
-const seedParticipants = (
-  encounterId: string,
-  campaign: Campaign,
-): EncounterParticipantDTO[] => {
-  const now = new Date().toISOString();
-  const players: EncounterParticipantDTO[] = campaign.members
-    .filter((m) => m.role === "player")
-    .slice(0, 4)
-    .map((m, idx) => ({
-      id: newId("p"),
-      encounterId,
-      characterId: null,
-      type: "pc",
-      name: m.user.displayName,
-      sortOrder: 18 - idx * 2,
-      maxHp: 28 + idx * 4,
-      currentHp: 28 + idx * 4,
-      tempHp: 0,
-      armorClass: 15 + (idx % 3),
-      attacks: [],
-      conditions: [],
-      isVisible: true,
-      acHidden: false,
-      typeHidden: false,
-      abilityScores: null,
-      spellAbility: null,
-      proficiencyBonus: 2,
-      spellSlots: idx === 0 ? wizardSpellSlots : null,
-      deathSaveSuccesses: 0,
-      deathSaveFailures: 0,
-      createdAt: now,
-      updatedAt: now,
-    }));
-
-  const monsters: EncounterParticipantDTO[] = [
-    {
-      id: newId("p"),
-      encounterId,
-      characterId: null,
-      type: "monster",
-      name: "Goblin Boss",
-      sortOrder: 17,
-      maxHp: 21,
-      currentHp: 21,
-      tempHp: 0,
-      armorClass: 17,
-      attacks: [],
-      conditions: [],
-      isVisible: true,
-      acHidden: true,
-      typeHidden: false,
-      abilityScores: goblinBossAbilities,
-      spellAbility: "wis",
-      proficiencyBonus: 2,
-      spellSlots: goblinBossSpellSlots,
-      deathSaveSuccesses: 0,
-      deathSaveFailures: 0,
-      createdAt: now,
-      updatedAt: now,
-    },
-    {
-      id: newId("p"),
-      encounterId,
-      characterId: null,
-      type: "monster",
-      name: "Goblin Scout A",
-      sortOrder: 14,
-      maxHp: 7,
-      currentHp: 7,
-      tempHp: 0,
-      armorClass: 13,
-      attacks: [],
-      conditions: [],
-      isVisible: true,
-      acHidden: true,
-      typeHidden: false,
-      abilityScores: goblinScoutAbilities,
-      spellAbility: null,
-      proficiencyBonus: 2,
-      deathSaveSuccesses: 0,
-      deathSaveFailures: 0,
-      createdAt: now,
-      updatedAt: now,
-    },
-    {
-      id: newId("p"),
-      encounterId,
-      characterId: null,
-      type: "monster",
-      name: "Goblin Scout B",
-      sortOrder: 12,
-      maxHp: 7,
-      currentHp: 7,
-      tempHp: 0,
-      armorClass: 13,
-      attacks: [],
-      conditions: [],
-      isVisible: false,
-      acHidden: true,
-      typeHidden: true,
-      abilityScores: goblinScoutAbilities,
-      spellAbility: null,
-      proficiencyBonus: 2,
-      deathSaveSuccesses: 0,
-      deathSaveFailures: 0,
-      createdAt: now,
-      updatedAt: now,
-    },
-  ];
-
-  return [...players, ...monsters].sort((a, b) => b.sortOrder - a.sortOrder);
-};
-
 export const LiveSessionProvider = ({ campaign, children }: Props) => {
   const [state, dispatch] = useReducer(liveSessionReducer, initialLiveSessionState);
+  const queryClient = useQueryClient();
+
+  const sessionId = state.session?.id;
+  const encounterQuery = useActiveEncounterQuery(sessionId);
+  const encounter = encounterQuery.data ?? null;
+  const participants = useMemo(() => encounter?.participants ?? [], [encounter]);
 
   const campaignRef = useRef(campaign);
   useEffect(() => {
@@ -281,7 +121,6 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
   }, [campaign.id]);
 
   const endSession = useCallback(() => {
-    const sessionId = state.session?.id;
     if (!sessionId) return;
     getSocket().emit(
       "session:end",
@@ -292,18 +131,19 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
         }
       },
     );
-  }, [campaign.id, state.session?.id]);
+  }, [campaign.id, sessionId]);
 
-  const startEncounter = useCallback(() => {
-    if (!state.session) return;
-    const encounter = seedEncounter(state.session.id);
-    const participants = seedParticipants(encounter.id, campaign);
-    dispatch({ type: "START_ENCOUNTER", encounter, participants });
-  }, [state.session, campaign]);
+  const startEncounter = useCallback(async () => {
+    if (!sessionId) return;
+    await createEncounter(sessionId, {});
+    queryClient.invalidateQueries({ queryKey: encounterKeys.list(sessionId) });
+  }, [sessionId, queryClient]);
 
-  const endEncounter = useCallback(() => {
-    dispatch({ type: "END_ENCOUNTER" });
-  }, []);
+  const endEncounter = useCallback(async () => {
+    if (!encounter || !sessionId) return;
+    await updateEncounter(encounter.id, { status: "ended" });
+    queryClient.invalidateQueries({ queryKey: encounterKeys.list(sessionId) });
+  }, [encounter, sessionId, queryClient]);
 
   const advanceTurn = useCallback(() => {
     dispatch({ type: "ADVANCE_TURN" });
@@ -370,9 +210,9 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
   );
 
   const activeParticipant = useMemo(() => {
-    if (!state.encounter || state.participants.length === 0) return null;
-    return state.participants[state.encounter.currentTurnIndex] ?? null;
-  }, [state.encounter, state.participants]);
+    if (!encounter || participants.length === 0) return null;
+    return participants[encounter.currentTurnIndex] ?? null;
+  }, [encounter, participants]);
 
   const connectedCount = useMemo(
     () => state.presence.filter((p) => p.status === "connected").length,
@@ -382,8 +222,8 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
   const value = useMemo<LiveSessionContextType>(
     () => ({
       session: state.session,
-      encounter: state.encounter,
-      participants: state.participants,
+      encounter,
+      participants,
       presence: state.presence,
       events: state.events,
       rolls: state.rolls,
@@ -408,7 +248,12 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
       logRoll,
     }),
     [
-      state,
+      state.session,
+      state.presence,
+      state.events,
+      state.rolls,
+      encounter,
+      participants,
       presenceFor,
       activeParticipant,
       connectedCount,
