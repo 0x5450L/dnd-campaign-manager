@@ -1,4 +1,4 @@
-import type { ParticipantAbilityScore } from "../../../../../../types/session";
+import type { ParticipantAbilityScore } from "../../../../../../types/encounter";
 import { ABILITY_NAMES } from "../../../../../../constants/dnd";
 import { formatAbilityModifier } from "../../../../../../utils/dndMath";
 import EditableNumber from "../blocks/EditableNumber";

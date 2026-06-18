@@ -1,24 +1,12 @@
 import type {
   CampaignSessionDTO,
-  EncounterDTO,
-  EncounterParticipantDTO,
-  ParticipantAbilityScore,
-  ParticipantType,
   SessionStatus,
-  EncounterStatus,
-  SpellSlotLevel,
   SessionDiceRollDTO,
 } from "../../../shared/session";
 
 export type {
   CampaignSessionDTO,
-  EncounterDTO,
-  EncounterParticipantDTO,
-  ParticipantAbilityScore,
-  ParticipantType,
   SessionStatus,
-  EncounterStatus,
-  SpellSlotLevel,
 };
 
 export type SessionDiceRoll = SessionDiceRollDTO;
@@ -51,4 +39,3 @@ export type SessionEvent = {
   at: string;
   actorName?: string;
 };
-

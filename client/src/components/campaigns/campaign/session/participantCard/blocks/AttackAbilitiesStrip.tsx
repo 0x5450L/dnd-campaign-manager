@@ -1,4 +1,4 @@
-import type { ParticipantAbilityScore } from "../../../../../../types/session";
+import type { ParticipantAbilityScore } from "../../../../../../types/encounter";
 import {
   formatAbilityModifier,
   formatSigned,

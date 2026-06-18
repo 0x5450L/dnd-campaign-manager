@@ -1,4 +1,4 @@
-import type { ParticipantType } from "../../../../../../types/session";
+import type { ParticipantType } from "../../../../../../types/encounter";
 
 type TypeBadgeProps = {
   type: ParticipantType;

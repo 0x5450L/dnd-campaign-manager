@@ -1,4 +1,4 @@
-import type { SpellSlotLevel } from "../../../../../../types/session";
+import type { SpellSlotLevel } from "../../../../../../types/encounter";
 
 type SpellSlotsBlockProps = {
   slots: SpellSlotLevel[] | null;

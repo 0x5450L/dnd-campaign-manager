@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { ParticipantAbilityScore } from "../../../../../../types/session";
+import type { ParticipantAbilityScore } from "../../../../../../types/encounter";
 import { SPELLCASTING_ABILITY_NAMES } from "../../../../../../constants/dnd";
 import StatTile from "./StatTile";
 

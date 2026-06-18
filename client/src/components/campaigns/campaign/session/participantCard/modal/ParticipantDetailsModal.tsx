@@ -3,7 +3,7 @@ import { useLiveSession } from "../../../../../../context/liveSessionContext/use
 import type {
   EncounterParticipantDTO,
   ParticipantAbilityScore,
-} from "../../../../../../types/session";
+} from "../../../../../../types/encounter";
 import { calcModifier, formatSigned } from "../../../../../../utils/dndMath";
 import ArmorClassBlock from "../blocks/ArmorClassBlock";
 import ConditionsPicker from "../blocks/ConditionsPicker";

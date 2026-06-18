@@ -1,13 +1,15 @@
 import type {
   CampaignSessionDTO,
-  EncounterDTO,
-  EncounterParticipantDTO,
   MemberPresence,
-  ParticipantType,
   SessionDiceRoll,
   SessionEvent,
   SessionEventKind,
 } from "../../types/session";
+import type {
+  EncounterDTO,
+  EncounterParticipantDTO,
+  ParticipantType,
+} from "../../types/encounter";
 
 export type LiveSessionState = {
   session: CampaignSessionDTO | null;

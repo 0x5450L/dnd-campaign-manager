@@ -1,13 +1,15 @@
 import { createContext } from "react";
 import type {
   CampaignSessionDTO,
-  EncounterDTO,
-  EncounterParticipantDTO,
   MemberPresence,
   PresenceStatus,
   SessionDiceRoll,
   SessionEvent,
 } from "../../types/session";
+import type {
+  EncounterDTO,
+  EncounterParticipantDTO,
+} from "../../types/encounter";
 import type {
   ParticipantPatch,
   SessionRollInput,

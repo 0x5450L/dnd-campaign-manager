@@ -15,13 +15,15 @@ import {
   type SessionRollInput,
 } from "../../state/liveSession/liveSessionReducer";
 import type {
+  MemberPresence,
+  PresenceStatus,
+} from "../../types/session";
+import type {
   EncounterDTO,
   EncounterParticipantDTO,
-  MemberPresence,
   ParticipantAbilityScore,
-  PresenceStatus,
   SpellSlotLevel,
-} from "../../types/session";
+} from "../../types/encounter";
 import type { Campaign } from "../../types/campaigns";
 import type {
   PresenceChangedPayload,
