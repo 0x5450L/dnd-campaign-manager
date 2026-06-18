@@ -12,10 +12,19 @@ import type {
   BulkInitiativePayload,
   BulkCreateParticipantsPayload,
   EncounterParticipantDTO,
+  ParticipantAbilityScore,
+  SpellSlotLevel,
 } from "../../../shared/session";
-import { EncounterParticipant } from "@prisma/client";
+import type { AbilityName } from "../../../shared/dnd";
+import { EncounterParticipant, Prisma } from "@prisma/client";
 import { CharacterAttackDTO } from "../../../shared/character";
 import { getIo } from "../services/socket";
+
+const jsonInput = <T>(value: T | null | undefined): Prisma.InputJsonValue | typeof Prisma.DbNull | undefined => {
+  if (value === undefined) return undefined;
+  if (value === null) return Prisma.DbNull;
+  return value as unknown as Prisma.InputJsonValue;
+};
 
 const mapParticipantToDTO = (participant: EncounterParticipant): EncounterParticipantDTO => {
   return {
@@ -32,6 +41,12 @@ const mapParticipantToDTO = (participant: EncounterParticipant): EncounterPartic
     attacks: participant.attacks as unknown as CharacterAttackDTO[] | [],
     conditions: participant.conditions,
     isVisible: participant.isVisible,
+    acHidden: participant.acHidden,
+    typeHidden: participant.typeHidden,
+    abilityScores: participant.abilityScores as unknown as ParticipantAbilityScore[] | null,
+    spellAbility: participant.spellAbility as AbilityName | null,
+    proficiencyBonus: participant.proficiencyBonus,
+    spellSlots: participant.spellSlots as unknown as SpellSlotLevel[] | null,
     deathSaveSuccesses: participant.deathSaveSuccesses,
     deathSaveFailures: participant.deathSaveFailures,
     createdAt: participant.createdAt.toISOString(),
@@ -260,6 +275,12 @@ router.post<{ id: string }>('/:id/participants', authMiddleware, asyncHandler(as
         conditions: body.conditions,
         isVisible: body.isVisible,
         attacks: body.attacks,
+        acHidden: body.acHidden,
+        typeHidden: body.typeHidden,
+        spellAbility: body.spellAbility,
+        proficiencyBonus: body.proficiencyBonus,
+        abilityScores: jsonInput(body.abilityScores),
+        spellSlots: jsonInput(body.spellSlots),
       }),
     },
   });
@@ -306,6 +327,12 @@ router.post<{ id: string }>('/:id/participants/bulk', authMiddleware, asyncHandl
         conditions: p.conditions,
         isVisible: p.isVisible,
         attacks: p.attacks,
+        acHidden: p.acHidden,
+        typeHidden: p.typeHidden,
+        spellAbility: p.spellAbility,
+        proficiencyBonus: p.proficiencyBonus,
+        abilityScores: jsonInput(p.abilityScores),
+        spellSlots: jsonInput(p.spellSlots),
       }),
     })),
   });
@@ -349,6 +376,12 @@ router.patch<{ id: string; pid: string }>('/:id/participants/:pid', authMiddlewa
       armorClass: body.armorClass,
       attacks: body.attacks,
       isVisible: body.isVisible,
+      acHidden: body.acHidden,
+      typeHidden: body.typeHidden,
+      spellAbility: body.spellAbility,
+      proficiencyBonus: body.proficiencyBonus,
+      abilityScores: jsonInput(body.abilityScores),
+      spellSlots: jsonInput(body.spellSlots),
     }
     : {};
 
