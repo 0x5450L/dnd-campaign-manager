@@ -5,6 +5,7 @@ model CampaignSession {
   startedAt  DateTime      @default(now()) @map("started_at")
   updatedAt  DateTime      @updatedAt @map("updated_at")
   endedAt    DateTime?     @map("ended_at")
+  lastActiveAt DateTime?   @map("last_active_at")
   title      String?
   summary    String?
   notes      String?

@@ -22,6 +22,13 @@ import prisma from './prisma';
 
 const campaignRoom = (campaignId: string) => `campaign:${campaignId}`;
 
+const SESSION_IDLE_TIMEOUT_MS = 60 * 60 * 1000;
+
+const isSessionStale = (session: { lastActiveAt: Date | null; startedAt: Date }) => {
+  const lastActive = session.lastActiveAt ?? session.startedAt;
+  return Date.now() - lastActive.getTime() > SESSION_IDLE_TIMEOUT_MS;
+};
+
 const toSessionDTO = (session: CampaignSession): CampaignSessionDTO => ({
   id: session.id,
   number: session.number,
@@ -54,6 +61,13 @@ const broadcastPresence = async (campaignId: string, excludeSocketId?: string) =
     campaignId,
     userIds,
   });
+
+  if (userIds.length > 0) {
+    await prisma.campaignSession.updateMany({
+      where: { campaignId, status: 'active' },
+      data: { lastActiveAt: new Date() },
+    });
+  }
 };
 
 export type AppIo = Server<
@@ -129,8 +143,24 @@ export const initSocket = (httpServer: HttpServer): AppIo => {
     socket.on('campaign:join', async (campaignId, ack) => {
       try {
         await requireCampaignAccess(socket.data.userId, campaignId);
+
+        const occupantsBeforeJoin = await getIo().in(campaignRoom(campaignId)).fetchSockets();
+        const wasEmpty = occupantsBeforeJoin.length === 0;
+
         await socket.join(campaignRoom(campaignId));
-        const active = await findActiveSession(campaignId);
+
+        let active = await findActiveSession(campaignId);
+        if (active && wasEmpty && isSessionStale(active)) {
+          await prisma.campaignSession.update({
+            where: { id: active.id },
+            data: { status: 'ended', endedAt: new Date() },
+          });
+          getIo()
+            .to(campaignRoom(campaignId))
+            .emit('session_ended', { campaignId, sessionId: active.id });
+          active = null;
+        }
+
         ack({ ok: true, activeSession: active ? toSessionDTO(active) : null });
         await broadcastPresence(campaignId);
       } catch (error) {
