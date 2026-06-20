@@ -3,6 +3,7 @@ export {
   parseDiceToSidesNumber,
   getLevelFromXp,
   getXpFromLevel,
+  clamp,
   getProficiencyBonus,
   SPELL_SAVE_DC_BASE,
   XP_THRESHOLDS,
@@ -11,9 +12,6 @@ export {
 } from "../../../shared/dndMath";
 
 import { calcModifier as toModifier } from "../../../shared/dndMath";
-
-export const clamp = (v: number, min: number, max: number): number =>
-  Math.max(min, Math.min(max, v));
 
 export const formatSigned = (value: number): string =>
   value >= 0 ? `+${value}` : `${value}`;
