@@ -2,6 +2,8 @@ import { useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   advanceTurn as advanceTurnRequest,
+  createParticipant as createParticipantRequest,
+  deleteParticipant as deleteParticipantRequest,
   listEncounters,
   setInitiative as setInitiativeRequest,
   updateParticipant as updateParticipantRequest,
@@ -10,6 +12,7 @@ import { useAuth } from "../../hooks/useAuth";
 import { getSocket } from "../../services/socket";
 import type {
   BulkInitiativePayload,
+  CreateParticipantPayload,
   EncounterParticipantDTO,
   UpdateParticipantPayload,
 } from "../../types/encounter";
@@ -119,6 +122,52 @@ export const useSetInitiativeMutation = (campaignSessionId: string | undefined) 
       queryClient.setQueryData<EncounterList>(key, (list) =>
         setParticipants(list, encounterId, participants),
       );
+    },
+  });
+};
+
+type CreateParticipantVars = {
+  encounterId: string;
+  payload: CreateParticipantPayload;
+};
+
+export const useCreateParticipantMutation = (campaignSessionId: string | undefined) => {
+  const queryClient = useQueryClient();
+  const key = encounterKeys.list(campaignSessionId ?? "");
+
+  return useMutation({
+    mutationFn: async ({ encounterId, payload }: CreateParticipantVars) =>
+      (await createParticipantRequest(encounterId, payload)).participant,
+    onSuccess: (participant, { encounterId }) => {
+      queryClient.setQueryData<EncounterList>(key, (list) =>
+        replaceParticipant(list, encounterId, participant),
+      );
+    },
+  });
+};
+
+type RemoveParticipantVars = {
+  encounterId: string;
+  participantId: string;
+};
+
+export const useRemoveParticipantMutation = (campaignSessionId: string | undefined) => {
+  const queryClient = useQueryClient();
+  const key = encounterKeys.list(campaignSessionId ?? "");
+
+  return useMutation({
+    mutationFn: async ({ encounterId, participantId }: RemoveParticipantVars) =>
+      deleteParticipantRequest(encounterId, participantId),
+    onMutate: async ({ encounterId, participantId }) => {
+      await queryClient.cancelQueries({ queryKey: key });
+      const previous = queryClient.getQueryData<EncounterList>(key);
+      queryClient.setQueryData<EncounterList>(key, (list) =>
+        removeParticipant(list, encounterId, participantId),
+      );
+      return { previous };
+    },
+    onError: (_error, _vars, context) => {
+      if (context?.previous) queryClient.setQueryData(key, context.previous);
     },
   });
 };

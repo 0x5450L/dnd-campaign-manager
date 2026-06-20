@@ -15,13 +15,21 @@ import {
   type SessionRollInput,
 } from "../../state/liveSession/liveSessionReducer";
 import type { MemberPresence, PresenceStatus } from "../../types/session";
-import type { UpdateParticipantPayload } from "../../types/encounter";
+import type {
+  CreateParticipantPayload,
+  EncounterParticipantDTO,
+  UpdateParticipantPayload,
+} from "../../types/encounter";
+import { useAuth } from "../../hooks/useAuth";
+import { useCampaignCharactersQuery } from "../../queries/characters";
 import type { Campaign } from "../../types/campaigns";
 import {
   encounterKeys,
   useActiveEncounterQuery,
   useAdvanceTurnMutation,
+  useCreateParticipantMutation,
   useEncounterRealtimeSync,
+  useRemoveParticipantMutation,
   useUpdateParticipantMutation,
 } from "../../queries/encounters";
 import { createEncounter, updateEncounter } from "../../services/api/encounters";
@@ -64,9 +72,28 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
   const encounter = encounterQuery.data ?? null;
   const participants = useMemo(() => encounter?.participants ?? [], [encounter]);
 
+  const { user } = useAuth();
+  const { data: campaignCharacters } = useCampaignCharactersQuery(campaign.id);
+  const myCharacterIds = useMemo(
+    () =>
+      new Set(
+        (campaignCharacters ?? [])
+          .filter((c) => c.userId === user?.id)
+          .map((c) => c.id),
+      ),
+    [campaignCharacters, user?.id],
+  );
+  const isOwnParticipant = useCallback(
+    (participant: EncounterParticipantDTO) =>
+      participant.characterId !== null && myCharacterIds.has(participant.characterId),
+    [myCharacterIds],
+  );
+
   useEncounterRealtimeSync(campaign.id, sessionId);
   const { mutate: mutateParticipant } = useUpdateParticipantMutation(sessionId);
   const { mutate: mutateAdvanceTurn } = useAdvanceTurnMutation(sessionId);
+  const { mutate: mutateCreateParticipant } = useCreateParticipantMutation(sessionId);
+  const { mutate: mutateRemoveParticipant } = useRemoveParticipantMutation(sessionId);
 
   const campaignRef = useRef(campaign);
   useEffect(() => {
@@ -261,6 +288,22 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
     [encounter, mutateParticipant],
   );
 
+  const addParticipant = useCallback(
+    (input: CreateParticipantPayload) => {
+      if (!encounter) return;
+      mutateCreateParticipant({ encounterId: encounter.id, payload: input });
+    },
+    [encounter, mutateCreateParticipant],
+  );
+
+  const removeParticipant = useCallback(
+    (participantId: string) => {
+      if (!encounter) return;
+      mutateRemoveParticipant({ encounterId: encounter.id, participantId });
+    },
+    [encounter, mutateRemoveParticipant],
+  );
+
   const logRoll = useCallback(
     (roll: SessionRollInput) => {
       getSocket().emit("roll:log", { campaignId: campaign.id, ...roll });
@@ -294,6 +337,7 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
       rolls: state.rolls,
 
       presenceFor,
+      isOwnParticipant,
       activeParticipant,
       connectedCount,
 
@@ -310,6 +354,8 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
       recordDeathSave,
       resetDeathSaves,
       updateParticipant,
+      addParticipant,
+      removeParticipant,
       logRoll,
     }),
     [
@@ -320,6 +366,7 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
       encounter,
       participants,
       presenceFor,
+      isOwnParticipant,
       activeParticipant,
       connectedCount,
       startSession,
@@ -335,6 +382,8 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
       recordDeathSave,
       resetDeathSaves,
       updateParticipant,
+      addParticipant,
+      removeParticipant,
       logRoll,
     ],
   );

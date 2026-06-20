@@ -7,6 +7,7 @@ import type {
   SessionEvent,
 } from "../../types/session";
 import type {
+  CreateParticipantPayload,
   EncounterDTO,
   EncounterParticipantDTO,
   UpdateParticipantPayload,
@@ -43,6 +44,9 @@ export type LiveSessionContextType = {
   ) => void;
   resetDeathSaves: (participantId: string) => void;
   updateParticipant: (participantId: string, payload: UpdateParticipantPayload) => void;
+  addParticipant: (input: CreateParticipantPayload) => void;
+  removeParticipant: (participantId: string) => void;
+  isOwnParticipant: (participant: EncounterParticipantDTO) => boolean;
   logRoll: (roll: SessionRollInput) => void;
 };
 

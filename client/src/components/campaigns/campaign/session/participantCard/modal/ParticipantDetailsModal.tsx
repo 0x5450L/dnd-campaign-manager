@@ -1,69 +1,53 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import type { EncounterParticipantDTO } from "../../../../../../types/encounter";
+import { diffParticipant } from "../../../../../../utils/encounterParticipant";
 import { useLiveSession } from "../../../../../../context/liveSessionContext/useLiveSession";
-import type {
-  EncounterParticipantDTO,
-  ParticipantAbilityScore,
-} from "../../../../../../types/encounter";
-import { calcModifier, formatSigned, SPELL_SAVE_DC_BASE } from "../../../../../../utils/dndMath";
-import {
-  applyDamage,
-  applyHealing,
-  applyTempHp,
-  diffParticipant,
-  incrementDeathSave,
-  toggleConditionInList,
-} from "../../../../../../utils/encounterParticipant";
-import ArmorClassBlock from "../blocks/ArmorClassBlock";
-import ConditionsPicker from "../blocks/ConditionsPicker";
-import DeathSavesBlock from "../blocks/DeathSavesBlock";
-import HpBar from "../blocks/HpBar";
-import HpControls from "../blocks/HpControls";
-import InitiativeBlock from "../blocks/InitiativeBlock";
 import TypeBadge from "../blocks/TypeBadge";
 import VisibilityToggle from "../blocks/VisibilityToggle";
 import { CheckIcon, CloseIcon } from "../blocks/icons";
-import AbilityScoresStrip from "./AbilityScoresStrip";
-import AttacksBlock from "./AttacksBlock";
 import EditableText from "./EditableText";
-import SpellAbilitySelect from "./SpellAbilitySelect";
-import SpellSlotsBlock from "./SpellSlotsBlock";
-import StatInput from "./StatInput";
+import ParticipantEditorBody from "./ParticipantEditorBody";
 
 type ParticipantDetailsModalProps = {
   participant: EncounterParticipantDTO;
   isDM: boolean;
+  isOwner: boolean;
   onClose: () => void;
-};
-
-type AbilityName = ParticipantAbilityScore["name"];
-
-const setScore = (
-  scores: ParticipantAbilityScore[] | null,
-  name: AbilityName,
-  score: number,
-): ParticipantAbilityScore[] => {
-  const base = scores ?? [];
-  const exists = base.some((s) => s.name === name);
-  return exists
-    ? base.map((s) => (s.name === name ? { ...s, score } : s))
-    : [...base, { name, score }];
 };
 
 export const ParticipantDetailsModal = ({
   participant,
   isDM,
+  isOwner,
   onClose,
 }: ParticipantDetailsModalProps) => {
   const { updateParticipant } = useLiveSession();
 
+  const canManage = isDM;
+  const canEditOwn = isDM || isOwner;
+
   const [savedParticipant, setSavedParticipant] = useState(participant);
   const [draft, setDraft] = useState(participant);
+  const externalRef = useRef(participant);
 
   const updateDraft = (fields: Partial<EncounterParticipantDTO>) =>
     setDraft((current) => ({ ...current, ...fields }));
 
   const pendingPatch = diffParticipant(savedParticipant, draft);
   const hasUnsavedChanges = Object.keys(pendingPatch).length > 0;
+
+  useEffect(() => {
+    setDraft((currentDraft) => {
+      const localChanges = diffParticipant(externalRef.current, currentDraft);
+      const merged: EncounterParticipantDTO = { ...participant };
+      for (const key of Object.keys(localChanges)) {
+        (merged as Record<string, unknown>)[key] = (currentDraft as Record<string, unknown>)[key];
+      }
+      return merged;
+    });
+    setSavedParticipant(participant);
+    externalRef.current = participant;
+  }, [participant]);
 
   const commitChanges = () => {
     if (!hasUnsavedChanges) return;
@@ -84,20 +68,6 @@ export const ParticipantDetailsModal = ({
     return () => document.removeEventListener("keydown", onKey);
   });
 
-  const spellScore = draft.spellAbility
-    ? draft.abilityScores?.find((s) => s.name === draft.spellAbility)?.score
-    : undefined;
-  const spellMod = typeof spellScore === "number" ? calcModifier(spellScore) : null;
-  const spellDerived =
-    spellMod !== null && draft.proficiencyBonus !== null
-      ? {
-          dc: SPELL_SAVE_DC_BASE + draft.proficiencyBonus + spellMod,
-          attack: draft.proficiencyBonus + spellMod,
-        }
-      : null;
-
-  const hasDeathSaves = draft.deathSaveSuccesses > 0 || draft.deathSaveFailures > 0;
-
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
@@ -110,24 +80,22 @@ export const ParticipantDetailsModal = ({
         <div className="flex items-center justify-between gap-3">
           <EditableText
             value={draft.name}
-            editable={isDM}
+            editable={canEditOwn}
             onCommit={(name) => updateDraft({ name })}
             ariaLabel="Participant name"
             className={`w-full truncate font-fantasy text-xl sm:text-2xl font-bold text-gold-bright ${
-              isDM
-                ? "rounded border-b border-transparent focus:border-rule"
-                : ""
+              canEditOwn ? "rounded border-b border-transparent focus:border-rule" : ""
             }`}
           />
           <div className="flex shrink-0 items-center gap-2">
             <TypeBadge type={draft.type} />
-            {isDM && (
+            {canManage && (
               <VisibilityToggle
                 isVisible={draft.isVisible}
                 onToggle={() => updateDraft({ isVisible: !draft.isVisible })}
               />
             )}
-            {isDM && hasUnsavedChanges && (
+            {canEditOwn && hasUnsavedChanges && (
               <button
                 type="button"
                 onClick={commitChanges}
@@ -148,154 +116,12 @@ export const ParticipantDetailsModal = ({
           </div>
         </div>
 
-        <div className="flex flex-wrap items-stretch gap-2.5">
-          <InitiativeBlock
-            value={draft.sortOrder}
-            isActive={false}
-            size="lg"
-            onChange={isDM ? (sortOrder) => updateDraft({ sortOrder }) : undefined}
-          />
-          <ArmorClassBlock
-            value={draft.armorClass}
-            hidden={draft.acHidden}
-            isDM={isDM}
-            size="lg"
-            onChange={isDM ? (armorClass) => updateDraft({ armorClass }) : undefined}
-            onToggleHidden={isDM ? () => updateDraft({ acHidden: !draft.acHidden }) : undefined}
-          />
-          <StatInput
-            label="Cur"
-            value={draft.currentHp}
-            editable={isDM}
-            onCommit={(currentHp) => updateDraft({ currentHp })}
-            min={0}
-          />
-          <StatInput
-            label="Max"
-            value={draft.maxHp}
-            editable={isDM}
-            onCommit={(maxHp) => updateDraft({ maxHp })}
-            min={1}
-          />
-          <StatInput
-            label="Tmp"
-            value={draft.tempHp}
-            editable={isDM}
-            onCommit={(tempHp) => updateDraft({ tempHp })}
-            min={0}
-          />
-        </div>
-
-        <HpBar
-          currentHp={draft.currentHp}
-          maxHp={draft.maxHp}
-          tempHp={draft.tempHp}
-          hidden={false}
+        <ParticipantEditorBody
+          draft={draft}
+          updateDraft={updateDraft}
+          canEditOwn={canEditOwn}
+          canManage={canManage}
         />
-
-        {isDM && (
-          <HpControls
-            size="lg"
-            onDamage={(amount) => updateDraft(applyDamage(draft, amount))}
-            onHeal={(amount) => updateDraft(applyHealing(draft, amount))}
-            onTemp={(amount) => updateDraft(applyTempHp(draft, amount))}
-          />
-        )}
-
-        <div className="flex flex-col gap-1.5">
-          <span className="text-xs sm:text-sm uppercase tracking-[0.18em] text-faint">
-            Ability scores
-          </span>
-          <AbilityScoresStrip
-            scores={draft.abilityScores}
-            editable={isDM}
-            onScoreChange={(name, score) =>
-              updateDraft({ abilityScores: setScore(draft.abilityScores, name, score) })
-            }
-          />
-        </div>
-
-        <div className="flex flex-wrap items-stretch gap-2.5">
-          <SpellAbilitySelect
-            value={draft.spellAbility}
-            editable={isDM}
-            onChange={(spellAbility) => updateDraft({ spellAbility })}
-          />
-          <StatInput
-            label="Prof"
-            value={draft.proficiencyBonus ?? 0}
-            editable={isDM}
-            onCommit={(proficiencyBonus) => updateDraft({ proficiencyBonus })}
-            min={0}
-          />
-          {spellDerived && (
-            <div className="flex h-16 sm:h-20 min-w-36 grow-[2] basis-0 flex-col items-center justify-center gap-1 sm:gap-1.5 rounded-md border border-rule bg-bg/60 font-fantasy">
-              <span className="text-sm sm:text-base leading-none text-dim">
-                Save DC{" "}
-                <span className="font-bold text-ink">{spellDerived.dc}</span>
-              </span>
-              <span className="text-sm sm:text-base leading-none text-dim">
-                Spell atk{" "}
-                <span className="font-bold text-ink">
-                  {formatSigned(spellDerived.attack)}
-                </span>
-              </span>
-            </div>
-          )}
-        </div>
-
-        <div className="flex flex-col gap-1.5">
-          <span className="text-xs sm:text-sm uppercase tracking-[0.18em] text-faint">
-            Spell slots
-          </span>
-          <SpellSlotsBlock
-            slots={draft.spellSlots ?? null}
-            editable={isDM}
-            onChange={(spellSlots) => updateDraft({ spellSlots })}
-          />
-        </div>
-
-        <AttacksBlock
-          attacks={draft.attacks}
-          editable={isDM}
-          onChange={(attacks) => updateDraft({ attacks })}
-        />
-
-        {draft.type === "pc" && (
-          <div className="flex flex-col gap-1">
-            <DeathSavesBlock
-              successes={draft.deathSaveSuccesses}
-              failures={draft.deathSaveFailures}
-              canEdit={isDM}
-              onRecord={(outcome) => updateDraft(incrementDeathSave(draft, outcome))}
-            />
-            {isDM && (
-              <button
-                type="button"
-                onClick={() =>
-                  updateDraft({ deathSaveSuccesses: 0, deathSaveFailures: 0 })
-                }
-                disabled={!hasDeathSaves}
-                className="self-end text-xs sm:text-sm uppercase tracking-widest text-faint transition-colors hover:text-ink disabled:opacity-40"
-              >
-                Reset saves
-              </button>
-            )}
-          </div>
-        )}
-
-        <div className="flex flex-col gap-1.5">
-          <span className="text-xs sm:text-sm uppercase tracking-[0.18em] text-faint">
-            Conditions
-          </span>
-          <ConditionsPicker
-            active={draft.conditions}
-            isDM={isDM}
-            onToggle={(condition) =>
-              updateDraft({ conditions: toggleConditionInList(draft.conditions, condition) })
-            }
-          />
-        </div>
       </div>
     </div>
   );

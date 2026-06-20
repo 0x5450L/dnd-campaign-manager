@@ -22,6 +22,7 @@ import {
   broadcastInitiative,
   broadcastParticipantUpdate,
 } from "./encounterBroadcasts";
+import { seedPartyForEncounter } from "./partySeed";
 
 const router = Router();
 
@@ -47,15 +48,21 @@ router.post('/', authMiddleware, asyncHandler(async (req, res) => {
       campaignSessionId,
       ...pickDefined({ name: trimOrNull(name) }),
     },
-    include: { participants: true },
   });
 
-  res.json({ status: 'ok', message: 'Encounter created', encounter });
+  await seedPartyForEncounter(encounter.id, session.campaignId);
+
+  const created = await prisma.encounter.findUniqueOrThrow({
+    where: { id: encounter.id },
+    include: { participants: { orderBy: { sortOrder: 'asc' } } },
+  });
+
+  res.json({ status: 'ok', message: 'Encounter created', encounter: created });
 
   try {
     getIo()
       .to(`campaign:${session.campaignId}`)
-      .emit('encounter_updated', { campaignId: session.campaignId, encounter: mapEncounterToDTO(encounter) });
+      .emit('encounter_updated', { campaignId: session.campaignId, encounter: mapEncounterToDTO(created) });
   } catch (error) {
     console.error('encounter_updated broadcast failed', error);
   }
@@ -260,7 +267,7 @@ router.post<{ id: string }>('/:id/participants', authMiddleware, asyncHandler(as
     throw new AppError(400, 'type, name, sortOrder, maxHp, currentHp, armorClass are required');
   }
 
-  await requireEncounterDM(userId, id);
+  const access = await requireEncounterDM(userId, id);
 
   const participant = await prisma.encounterParticipant.create({
     data: {
@@ -288,6 +295,14 @@ router.post<{ id: string }>('/:id/participants', authMiddleware, asyncHandler(as
   });
 
   res.json({ status: 'ok', participant });
+
+  try {
+    const campaignId = access.campaignSession.campaign.id;
+    const dmId = access.campaignSession.campaign.dmId;
+    await broadcastParticipantUpdate(campaignId, dmId, id, mapParticipantToDTO(participant), false);
+  } catch (error) {
+    console.error('participant add broadcast failed', error);
+  }
 }));
 
 router.post<{ id: string }>('/:id/participants/bulk', authMiddleware, asyncHandler(async (req, res) => {
@@ -373,19 +388,24 @@ router.patch<{ id: string; pid: string }>('/:id/participants/:pid', authMiddlewa
 
   const wasVisible = participant.isVisible;
 
-  const dmOnlyFields = isDM
+  const characterFields = isDM || isOwner
     ? {
       name: body.name,
       maxHp: body.maxHp,
       armorClass: body.armorClass,
       attacks: body.attacks,
-      isVisible: body.isVisible,
-      acHidden: body.acHidden,
-      typeHidden: body.typeHidden,
       spellAbility: body.spellAbility,
       proficiencyBonus: body.proficiencyBonus,
       abilityScores: jsonInput(body.abilityScores),
       spellSlots: jsonInput(body.spellSlots),
+    }
+    : {};
+
+  const dmOnlyFields = isDM
+    ? {
+      isVisible: body.isVisible,
+      acHidden: body.acHidden,
+      typeHidden: body.typeHidden,
     }
     : {};
 
@@ -396,6 +416,7 @@ router.patch<{ id: string; pid: string }>('/:id/participants/:pid', authMiddlewa
     deathSaveSuccesses: body.deathSaveSuccesses,
     deathSaveFailures: body.deathSaveFailures,
     sortOrder: body.sortOrder,
+    ...characterFields,
     ...dmOnlyFields,
   });
 
@@ -451,7 +472,7 @@ router.delete<{ id: string; pid: string }>('/:id/participants/:pid', authMiddlew
   const userId = req.userId!;
   const { id, pid } = req.params;
 
-  await requireEncounterDM(userId, id);
+  const access = await requireEncounterDM(userId, id);
 
   const participant = await prisma.encounterParticipant.findUnique({
     where: { id: pid },
@@ -465,6 +486,15 @@ router.delete<{ id: string; pid: string }>('/:id/participants/:pid', authMiddlew
   await prisma.encounterParticipant.delete({ where: { id: pid } });
 
   res.json({ status: 'ok', message: 'Participant deleted' });
+
+  try {
+    const campaignId = access.campaignSession.campaign.id;
+    getIo()
+      .to(`campaign:${campaignId}`)
+      .emit('participant_removed', { campaignId, encounterId: id, participantId: pid });
+  } catch (error) {
+    console.error('participant_removed broadcast failed', error);
+  }
 }));
 
 export default router;

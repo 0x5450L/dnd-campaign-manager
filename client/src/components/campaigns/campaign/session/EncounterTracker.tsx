@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { useLiveSession } from "../../../../context/liveSessionContext/useLiveSession";
 import CommonButton from "../../../ui/buttons/CommonButton";
 import EncounterParticipantCard from "./participantCard/EncounterParticipantCard";
+import AddParticipantModal from "./AddParticipantModal";
 
 type EncounterTrackerProps = {
   isDM: boolean;
@@ -14,7 +16,9 @@ export const EncounterTracker = ({ isDM }: EncounterTrackerProps) => {
     startEncounter,
     endEncounter,
     advanceTurn,
+    isOwnParticipant,
   } = useLiveSession();
+  const [isAddOpen, setIsAddOpen] = useState(false);
 
   if (!encounter || encounter.status === "ended") {
     return (
@@ -48,6 +52,9 @@ export const EncounterTracker = ({ isDM }: EncounterTrackerProps) => {
         </div>
         {isDM && (
           <div className="flex items-center gap-2">
+            <CommonButton onClick={() => setIsAddOpen(true)} variant="secondary" size="sm">
+              + Add
+            </CommonButton>
             <CommonButton onClick={advanceTurn} size="sm">
               Next turn
             </CommonButton>
@@ -65,9 +72,12 @@ export const EncounterTracker = ({ isDM }: EncounterTrackerProps) => {
             participant={p}
             isActive={idx === encounter.currentTurnIndex}
             isDM={isDM}
+            isOwner={isOwnParticipant(p)}
           />
         ))}
       </ul>
+
+      {isAddOpen && <AddParticipantModal onClose={() => setIsAddOpen(false)} />}
     </div>
   );
 };

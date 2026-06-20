@@ -11,18 +11,20 @@ import AttackAbilitiesStrip from "./blocks/AttackAbilitiesStrip";
 import DeathSavesBlock from "./blocks/DeathSavesBlock";
 import ParticipantDetailsModal from "./modal/ParticipantDetailsModal";
 import VisibilityToggle from "./blocks/VisibilityToggle";
-import { InfoIcon } from "./blocks/icons";
+import { InfoIcon, TrashIcon } from "./blocks/icons";
 
 type EncounterParticipantCardProps = {
   participant: EncounterParticipantDTO;
   isActive: boolean;
   isDM: boolean;
+  isOwner: boolean;
 };
 
 export const EncounterParticipantCard = ({
   participant,
   isActive,
   isDM,
+  isOwner,
 }: EncounterParticipantCardProps) => {
   const {
     adjustHp,
@@ -31,12 +33,14 @@ export const EncounterParticipantCard = ({
     setVisibility,
     setAcHidden,
     recordDeathSave,
+    removeParticipant,
   } = useLiveSession();
   const [detailsOpen, setDetailsOpen] = useState(false);
 
   const fullyHidden = !participant.isVisible && !isDM;
   if (fullyHidden) return null;
 
+  const canEditOwn = isDM || isOwner;
   const isDownedPc = participant.currentHp === 0 && participant.type === "pc";
   const hiddenForDm = !participant.isVisible && isDM;
 
@@ -90,6 +94,16 @@ export const EncounterParticipantCard = ({
               >
                 <InfoIcon />
               </button>
+              {isDM && (
+                <button
+                  type="button"
+                  onClick={() => removeParticipant(participant.id)}
+                  aria-label={`Remove ${participant.name}`}
+                  className="flex h-6 w-6 items-center justify-center rounded border border-rule text-faint transition-colors hover:border-rust hover:text-rust"
+                >
+                  <TrashIcon />
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -101,7 +115,7 @@ export const EncounterParticipantCard = ({
           hidden={!participant.isVisible}
         />
 
-        {isDM && (
+        {canEditOwn && (
           <HpControls
             onDamage={(amount) => adjustHp(participant.id, -amount)}
             onHeal={(amount) => adjustHp(participant.id, amount)}
@@ -121,14 +135,14 @@ export const EncounterParticipantCard = ({
           <DeathSavesBlock
             successes={participant.deathSaveSuccesses}
             failures={participant.deathSaveFailures}
-            canEdit={isDM}
+            canEdit={canEditOwn}
             onRecord={(outcome) => recordDeathSave(participant.id, outcome)}
           />
         )}
 
         <ConditionsPicker
           active={participant.conditions}
-          isDM={isDM}
+          isDM={canEditOwn}
           onToggle={(c) => toggleCondition(participant.id, c)}
         />
       </li>
@@ -137,6 +151,7 @@ export const EncounterParticipantCard = ({
         <ParticipantDetailsModal
           participant={participant}
           isDM={isDM}
+          isOwner={isOwner}
           onClose={() => setDetailsOpen(false)}
         />
       )}
