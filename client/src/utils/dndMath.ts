@@ -4,6 +4,7 @@ export {
   getLevelFromXp,
   getXpFromLevel,
   getProficiencyBonus,
+  SPELL_SAVE_DC_BASE,
   XP_THRESHOLDS,
   MIN_LEVEL,
   MAX_LEVEL,

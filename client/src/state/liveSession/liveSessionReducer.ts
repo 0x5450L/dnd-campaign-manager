@@ -10,6 +10,7 @@ import type {
   EncounterParticipantDTO,
   ParticipantType,
 } from "../../types/encounter";
+import { clamp } from "../../utils/dndMath";
 
 export type LiveSessionState = {
   session: CampaignSessionDTO | null;
@@ -83,8 +84,7 @@ const makeEvent = (
 const pushEvent = (events: SessionEvent[], event: SessionEvent): SessionEvent[] =>
   [event, ...events].slice(0, EVENT_LIMIT);
 
-const clampHp = (value: number, max: number) =>
-  Math.max(0, Math.min(value, max));
+const clampHp = (value: number, max: number) => clamp(value, 0, max);
 
 export const liveSessionReducer = (
   state: LiveSessionState,

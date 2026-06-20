@@ -1,5 +1,6 @@
 import type {
   CampaignSessionDTO,
+  EncounterDTO,
   EncounterParticipantDTO,
   SessionDiceRollDTO,
 } from "./session";
@@ -33,8 +34,26 @@ export type PresenceChangedPayload = {
 };
 
 export type ParticipantUpdatedPayload = {
+  campaignId: string;
   encounterId: string;
   participant: EncounterParticipantDTO;
+};
+
+export type ParticipantRemovedPayload = {
+  campaignId: string;
+  encounterId: string;
+  participantId: string;
+};
+
+export type EncounterUpdatedPayload = {
+  campaignId: string;
+  encounter: EncounterDTO;
+};
+
+export type InitiativeUpdatedPayload = {
+  campaignId: string;
+  encounterId: string;
+  participants: EncounterParticipantDTO[];
 };
 
 export type RollLogPayload = {
@@ -62,6 +81,9 @@ export type SocketClientToServerEvents = {
 }
 export type SocketServerToClientEvents = {
   'participant_updated': (payload: ParticipantUpdatedPayload) => void;
+  'participant_removed': (payload: ParticipantRemovedPayload) => void;
+  'encounter_updated': (payload: EncounterUpdatedPayload) => void;
+  'initiative_updated': (payload: InitiativeUpdatedPayload) => void;
   'roll_logged': (payload: RollLoggedPayload) => void;
   'session_started': (payload: SessionStartedPayload) => void;
   'session_ended': (payload: SessionEndedPayload) => void;

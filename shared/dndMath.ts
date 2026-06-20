@@ -1,3 +1,5 @@
+import { clamp } from "../client/src/utils/dndMath";
+
 export const XP_THRESHOLDS = [
   0,       // level 1
   300,     // level 2
@@ -24,6 +26,8 @@ export const XP_THRESHOLDS = [
 export const MIN_LEVEL = 1;
 export const MAX_LEVEL = 20;
 
+export const SPELL_SAVE_DC_BASE = 8;
+
 export const calcModifier = (score: number): number =>
   Math.floor((score - 10) / 2);
 
@@ -39,7 +43,7 @@ export const getLevelFromXp = (xp: number): number => {
 };
 
 export const getXpFromLevel = (level: number): number => {
-  const clamped = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, Math.floor(level)));
+  const clamped = clamp(level, MIN_LEVEL, MAX_LEVEL);
   return XP_THRESHOLDS[clamped - 1];
 };
 

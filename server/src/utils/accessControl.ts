@@ -46,7 +46,7 @@ export const requireEncounterDM = async (
       campaignSession: { campaign: { dmId: userId } },
     },
     include: {
-      campaignSession: { select: { campaign: { select: { dmId: true } } } },
+      campaignSession: { select: { campaign: { select: { id: true, dmId: true } } } },
     },
   });
 
@@ -67,7 +67,7 @@ export const requireEncounterAccess = async (
       campaignSession: { campaign: { members: { some: { userId } } } },
     },
     include: {
-      campaignSession: { select: { campaign: { select: { dmId: true } } } },
+      campaignSession: { select: { campaign: { select: { id: true, dmId: true } } } },
     },
   });
 

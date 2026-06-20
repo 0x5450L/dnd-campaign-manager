@@ -1,58 +1,27 @@
 import { Router } from "express";
-import { authMiddleware } from "../middleware/auth";
-import prisma from "../services/prisma";
-import { asyncHandler } from "../utils/asyncHandler";
-import { AppError } from "../utils/errors";
-import { requireEncounterDM } from "../utils/accessControl";
-import { pickDefined, trimOrNull } from "../utils/payload";
+import { authMiddleware } from "../../middleware/auth";
+import prisma from "../../services/prisma";
+import { asyncHandler } from "../../utils/asyncHandler";
+import { AppError } from "../../utils/errors";
+import { requireEncounterDM } from "../../utils/accessControl";
+import { pickDefined, trimOrNull } from "../../utils/payload";
 import type {
   UpdateEncounterPayload,
   CreateParticipantPayload,
   UpdateParticipantPayload,
   BulkInitiativePayload,
   BulkCreateParticipantsPayload,
-  EncounterParticipantDTO,
-  ParticipantAbilityScore,
-  SpellSlotLevel,
-} from "../../../shared/session";
-import type { AbilityName } from "../../../shared/dnd";
-import { EncounterParticipant, Prisma } from "@prisma/client";
-import { CharacterAttackDTO } from "../../../shared/character";
-import { getIo } from "../services/socket";
-
-const jsonInput = <T>(value: T | null | undefined): Prisma.InputJsonValue | typeof Prisma.DbNull | undefined => {
-  if (value === undefined) return undefined;
-  if (value === null) return Prisma.DbNull;
-  return value as unknown as Prisma.InputJsonValue;
-};
-
-const mapParticipantToDTO = (participant: EncounterParticipant): EncounterParticipantDTO => {
-  return {
-    id: participant.id,
-    encounterId: participant.encounterId,
-    characterId: participant.characterId,
-    name: participant.name,
-    type: participant.type,
-    sortOrder: participant.sortOrder,
-    maxHp: participant.maxHp,
-    currentHp: participant.currentHp,
-    tempHp: participant.tempHp,
-    armorClass: participant.armorClass,
-    attacks: participant.attacks as unknown as CharacterAttackDTO[] | [],
-    conditions: participant.conditions,
-    isVisible: participant.isVisible,
-    acHidden: participant.acHidden,
-    typeHidden: participant.typeHidden,
-    abilityScores: participant.abilityScores as unknown as ParticipantAbilityScore[] | null,
-    spellAbility: participant.spellAbility as AbilityName | null,
-    proficiencyBonus: participant.proficiencyBonus,
-    spellSlots: participant.spellSlots as unknown as SpellSlotLevel[] | null,
-    deathSaveSuccesses: participant.deathSaveSuccesses,
-    deathSaveFailures: participant.deathSaveFailures,
-    createdAt: participant.createdAt.toISOString(),
-    updatedAt: participant.updatedAt.toISOString(),
-  };
-};
+} from "../../../../shared/session";
+import { getIo } from "../../services/socket";
+import {
+  jsonInput,
+  mapEncounterToDTO,
+  mapParticipantToDTO,
+} from "./encounterMappers";
+import {
+  broadcastInitiative,
+  broadcastParticipantUpdate,
+} from "./encounterBroadcasts";
 
 const router = Router();
 
@@ -66,7 +35,7 @@ router.post('/', authMiddleware, asyncHandler(async (req, res) => {
 
   const session = await prisma.campaignSession.findUnique({
     where: { id: campaignSessionId, campaign: { dmId: userId } },
-    select: { id: true },
+    select: { id: true, campaignId: true },
   });
 
   if (!session) {
@@ -82,6 +51,14 @@ router.post('/', authMiddleware, asyncHandler(async (req, res) => {
   });
 
   res.json({ status: 'ok', message: 'Encounter created', encounter });
+
+  try {
+    getIo()
+      .to(`campaign:${session.campaignId}`)
+      .emit('encounter_updated', { campaignId: session.campaignId, encounter: mapEncounterToDTO(encounter) });
+  } catch (error) {
+    console.error('encounter_updated broadcast failed', error);
+  }
 }));
 
 router.get('/', authMiddleware, asyncHandler(async (req, res) => {
@@ -153,7 +130,7 @@ router.patch<{ id: string }>('/:id', authMiddleware, asyncHandler(async (req, re
   const { id } = req.params;
   const { status, name } = req.body as UpdateEncounterPayload;
 
-  await requireEncounterDM(userId, id);
+  const access = await requireEncounterDM(userId, id);
 
   const encounter = await prisma.encounter.update({
     where: { id },
@@ -168,6 +145,14 @@ router.patch<{ id: string }>('/:id', authMiddleware, asyncHandler(async (req, re
 
   res.json({ status: 'ok', encounter });
 
+  try {
+    const campaignId = access.campaignSession.campaign.id;
+    getIo()
+      .to(`campaign:${campaignId}`)
+      .emit('encounter_updated', { campaignId, encounter: mapEncounterToDTO(encounter) });
+  } catch (error) {
+    console.error('encounter_updated broadcast failed', error);
+  }
 }));
 
 router.delete<{ id: string }>('/:id', authMiddleware, asyncHandler(async (req, res) => {
@@ -202,6 +187,15 @@ router.post<{ id: string }>('/:id/next-turn', authMiddleware, asyncHandler(async
   });
 
   res.json({ status: 'ok', encounter: updated });
+
+  try {
+    const campaignId = encounter.campaignSession.campaign.id;
+    getIo()
+      .to(`campaign:${campaignId}`)
+      .emit('encounter_updated', { campaignId, encounter: mapEncounterToDTO(updated) });
+  } catch (error) {
+    console.error('encounter_updated broadcast failed', error);
+  }
 }));
 
 router.patch<{ id: string }>('/:id/initiative', authMiddleware, asyncHandler(async (req, res) => {
@@ -213,7 +207,7 @@ router.patch<{ id: string }>('/:id/initiative', authMiddleware, asyncHandler(asy
     throw new AppError(400, 'entries array is required');
   }
 
-  await requireEncounterDM(userId, id);
+  const access = await requireEncounterDM(userId, id);
 
   const ids = entries.map((e) => e.participantId);
   const owned = await prisma.encounterParticipant.findMany({
@@ -240,6 +234,14 @@ router.patch<{ id: string }>('/:id/initiative', authMiddleware, asyncHandler(asy
   });
 
   res.json({ status: 'ok', participants });
+
+  try {
+    const campaignId = access.campaignSession.campaign.id;
+    const dmId = access.campaignSession.campaign.dmId;
+    await broadcastInitiative(campaignId, dmId, id, participants.map(mapParticipantToDTO));
+  } catch (error) {
+    console.error('initiative_updated broadcast failed', error);
+  }
 }));
 
 router.post<{ id: string }>('/:id/participants', authMiddleware, asyncHandler(async (req, res) => {
@@ -352,7 +354,7 @@ router.patch<{ id: string; pid: string }>('/:id/participants/:pid', authMiddlewa
       encounter: {
         select: {
           id: true,
-          campaignSession: { select: { campaign: { select: { dmId: true } } } },
+          campaignSession: { select: { campaign: { select: { id: true, dmId: true } } } },
         },
       },
     },
@@ -368,6 +370,8 @@ router.patch<{ id: string; pid: string }>('/:id/participants/:pid', authMiddlewa
   if (!isDM && !isOwner) {
     throw new AppError(403, 'You can only modify your own character or as DM');
   }
+
+  const wasVisible = participant.isVisible;
 
   const dmOnlyFields = isDM
     ? {
@@ -403,9 +407,11 @@ router.patch<{ id: string; pid: string }>('/:id/participants/:pid', authMiddlewa
   res.json({ status: 'ok', participant: updated });
 
   try {
-    getIo().to(`encounter:${id}`).emit('participant_updated', { encounterId: id, participant: mapParticipantToDTO(updated) });
+    const dmId = participant.encounter.campaignSession.campaign.dmId;
+    const campaignId = participant.encounter.campaignSession.campaign.id;
+    await broadcastParticipantUpdate(campaignId, dmId, id, mapParticipantToDTO(updated), wasVisible);
   } catch (error) {
-    console.error('participant_updated broadcast failed', error);
+    console.error('participant broadcast failed', error);
   }
 }));
 

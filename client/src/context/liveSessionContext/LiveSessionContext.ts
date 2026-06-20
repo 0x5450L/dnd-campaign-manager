@@ -9,11 +9,9 @@ import type {
 import type {
   EncounterDTO,
   EncounterParticipantDTO,
+  UpdateParticipantPayload,
 } from "../../types/encounter";
-import type {
-  ParticipantPatch,
-  SessionRollInput,
-} from "../../state/liveSession/liveSessionReducer";
+import type { SessionRollInput } from "../../state/liveSession/liveSessionReducer";
 
 export type LiveSessionContextType = {
   session: CampaignSessionDTO | null;
@@ -44,7 +42,7 @@ export type LiveSessionContextType = {
     outcome: "success" | "failure",
   ) => void;
   resetDeathSaves: (participantId: string) => void;
-  updateParticipant: (participantId: string, patch: ParticipantPatch) => void;
+  updateParticipant: (participantId: string, payload: UpdateParticipantPayload) => void;
   logRoll: (roll: SessionRollInput) => void;
 };
 

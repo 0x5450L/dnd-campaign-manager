@@ -1,10 +1,18 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLiveSession } from "../../../../../../context/liveSessionContext/useLiveSession";
 import type {
   EncounterParticipantDTO,
   ParticipantAbilityScore,
 } from "../../../../../../types/encounter";
-import { calcModifier, formatSigned } from "../../../../../../utils/dndMath";
+import { calcModifier, formatSigned, SPELL_SAVE_DC_BASE } from "../../../../../../utils/dndMath";
+import {
+  applyDamage,
+  applyHealing,
+  applyTempHp,
+  diffParticipant,
+  incrementDeathSave,
+  toggleConditionInList,
+} from "../../../../../../utils/encounterParticipant";
 import ArmorClassBlock from "../blocks/ArmorClassBlock";
 import ConditionsPicker from "../blocks/ConditionsPicker";
 import DeathSavesBlock from "../blocks/DeathSavesBlock";
@@ -13,7 +21,7 @@ import HpControls from "../blocks/HpControls";
 import InitiativeBlock from "../blocks/InitiativeBlock";
 import TypeBadge from "../blocks/TypeBadge";
 import VisibilityToggle from "../blocks/VisibilityToggle";
-import { CloseIcon } from "../blocks/icons";
+import { CheckIcon, CloseIcon } from "../blocks/icons";
 import AbilityScoresStrip from "./AbilityScoresStrip";
 import AttacksBlock from "./AttacksBlock";
 import EditableText from "./EditableText";
@@ -46,49 +54,54 @@ export const ParticipantDetailsModal = ({
   isDM,
   onClose,
 }: ParticipantDetailsModalProps) => {
-  const {
-    adjustHp,
-    grantTempHp,
-    toggleCondition,
-    setVisibility,
-    setAcHidden,
-    recordDeathSave,
-    resetDeathSaves,
-    updateParticipant,
-  } = useLiveSession();
+  const { updateParticipant } = useLiveSession();
+
+  const [savedParticipant, setSavedParticipant] = useState(participant);
+  const [draft, setDraft] = useState(participant);
+
+  const updateDraft = (fields: Partial<EncounterParticipantDTO>) =>
+    setDraft((current) => ({ ...current, ...fields }));
+
+  const pendingPatch = diffParticipant(savedParticipant, draft);
+  const hasUnsavedChanges = Object.keys(pendingPatch).length > 0;
+
+  const commitChanges = () => {
+    if (!hasUnsavedChanges) return;
+    updateParticipant(participant.id, pendingPatch);
+    setSavedParticipant(draft);
+  };
+
+  const saveAndClose = () => {
+    if (hasUnsavedChanges) updateParticipant(participant.id, pendingPatch);
+    onClose();
+  };
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") saveAndClose();
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
-  }, [onClose]);
+  });
 
-  const patch = (fields: Parameters<typeof updateParticipant>[1]) =>
-    updateParticipant(participant.id, fields);
-
-  const spellScore = participant.spellAbility
-    ? participant.abilityScores?.find((s) => s.name === participant.spellAbility)
-        ?.score
+  const spellScore = draft.spellAbility
+    ? draft.abilityScores?.find((s) => s.name === draft.spellAbility)?.score
     : undefined;
-  const spellMod =
-    typeof spellScore === "number" ? calcModifier(spellScore) : null;
+  const spellMod = typeof spellScore === "number" ? calcModifier(spellScore) : null;
   const spellDerived =
-    spellMod !== null && participant.proficiencyBonus !== null
+    spellMod !== null && draft.proficiencyBonus !== null
       ? {
-          dc: 8 + participant.proficiencyBonus + spellMod,
-          attack: participant.proficiencyBonus + spellMod,
+          dc: SPELL_SAVE_DC_BASE + draft.proficiencyBonus + spellMod,
+          attack: draft.proficiencyBonus + spellMod,
         }
       : null;
 
-  const hasDeathSaves =
-    participant.deathSaveSuccesses > 0 || participant.deathSaveFailures > 0;
+  const hasDeathSaves = draft.deathSaveSuccesses > 0 || draft.deathSaveFailures > 0;
 
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
-      onClick={onClose}
+      onClick={saveAndClose}
     >
       <div
         onClick={(e) => e.stopPropagation()}
@@ -96,9 +109,9 @@ export const ParticipantDetailsModal = ({
       >
         <div className="flex items-center justify-between gap-3">
           <EditableText
-            value={participant.name}
+            value={draft.name}
             editable={isDM}
-            onCommit={(name) => patch({ name })}
+            onCommit={(name) => updateDraft({ name })}
             ariaLabel="Participant name"
             className={`w-full truncate font-fantasy text-xl sm:text-2xl font-bold text-gold-bright ${
               isDM
@@ -107,20 +120,28 @@ export const ParticipantDetailsModal = ({
             }`}
           />
           <div className="flex shrink-0 items-center gap-2">
-            <TypeBadge type={participant.type} />
+            <TypeBadge type={draft.type} />
             {isDM && (
               <VisibilityToggle
-                isVisible={participant.isVisible}
-                onToggle={() =>
-                  setVisibility(participant.id, !participant.isVisible)
-                }
+                isVisible={draft.isVisible}
+                onToggle={() => updateDraft({ isVisible: !draft.isVisible })}
               />
+            )}
+            {isDM && hasUnsavedChanges && (
+              <button
+                type="button"
+                onClick={commitChanges}
+                aria-label="Save changes"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded border border-leaf/70 bg-leaf/15 text-leaf-soft transition-colors hover:bg-leaf/25 hover:brightness-110"
+              >
+                <CheckIcon />
+              </button>
             )}
             <button
               type="button"
-              onClick={onClose}
+              onClick={saveAndClose}
               aria-label="Close"
-              className="ml-4 flex h-8 w-8 shrink-0 items-center justify-center rounded border border-rule text-faint transition-colors hover:border-hover hover:text-ink"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded border border-rule text-faint transition-colors hover:border-hover hover:text-ink"
             >
               <CloseIcon />
             </button>
@@ -129,59 +150,55 @@ export const ParticipantDetailsModal = ({
 
         <div className="flex flex-wrap items-stretch gap-2.5">
           <InitiativeBlock
-            value={participant.sortOrder}
+            value={draft.sortOrder}
             isActive={false}
             size="lg"
-            onChange={isDM ? (sortOrder) => patch({ sortOrder }) : undefined}
+            onChange={isDM ? (sortOrder) => updateDraft({ sortOrder }) : undefined}
           />
           <ArmorClassBlock
-            value={participant.armorClass}
-            hidden={participant.acHidden}
+            value={draft.armorClass}
+            hidden={draft.acHidden}
             isDM={isDM}
             size="lg"
-            onChange={isDM ? (armorClass) => patch({ armorClass }) : undefined}
-            onToggleHidden={
-              isDM
-                ? () => setAcHidden(participant.id, !participant.acHidden)
-                : undefined
-            }
+            onChange={isDM ? (armorClass) => updateDraft({ armorClass }) : undefined}
+            onToggleHidden={isDM ? () => updateDraft({ acHidden: !draft.acHidden }) : undefined}
           />
           <StatInput
             label="Cur"
-            value={participant.currentHp}
+            value={draft.currentHp}
             editable={isDM}
-            onCommit={(currentHp) => patch({ currentHp })}
+            onCommit={(currentHp) => updateDraft({ currentHp })}
             min={0}
           />
           <StatInput
             label="Max"
-            value={participant.maxHp}
+            value={draft.maxHp}
             editable={isDM}
-            onCommit={(maxHp) => patch({ maxHp })}
+            onCommit={(maxHp) => updateDraft({ maxHp })}
             min={1}
           />
           <StatInput
             label="Tmp"
-            value={participant.tempHp}
+            value={draft.tempHp}
             editable={isDM}
-            onCommit={(tempHp) => patch({ tempHp })}
+            onCommit={(tempHp) => updateDraft({ tempHp })}
             min={0}
           />
         </div>
 
         <HpBar
-          currentHp={participant.currentHp}
-          maxHp={participant.maxHp}
-          tempHp={participant.tempHp}
+          currentHp={draft.currentHp}
+          maxHp={draft.maxHp}
+          tempHp={draft.tempHp}
           hidden={false}
         />
 
         {isDM && (
           <HpControls
             size="lg"
-            onDamage={(amount) => adjustHp(participant.id, -amount)}
-            onHeal={(amount) => adjustHp(participant.id, amount)}
-            onTemp={(amount) => grantTempHp(participant.id, amount)}
+            onDamage={(amount) => updateDraft(applyDamage(draft, amount))}
+            onHeal={(amount) => updateDraft(applyHealing(draft, amount))}
+            onTemp={(amount) => updateDraft(applyTempHp(draft, amount))}
           />
         )}
 
@@ -190,27 +207,25 @@ export const ParticipantDetailsModal = ({
             Ability scores
           </span>
           <AbilityScoresStrip
-            scores={participant.abilityScores}
+            scores={draft.abilityScores}
             editable={isDM}
             onScoreChange={(name, score) =>
-              patch({
-                abilityScores: setScore(participant.abilityScores, name, score),
-              })
+              updateDraft({ abilityScores: setScore(draft.abilityScores, name, score) })
             }
           />
         </div>
 
         <div className="flex flex-wrap items-stretch gap-2.5">
           <SpellAbilitySelect
-            value={participant.spellAbility}
+            value={draft.spellAbility}
             editable={isDM}
-            onChange={(spellAbility) => patch({ spellAbility })}
+            onChange={(spellAbility) => updateDraft({ spellAbility })}
           />
           <StatInput
             label="Prof"
-            value={participant.proficiencyBonus ?? 0}
+            value={draft.proficiencyBonus ?? 0}
             editable={isDM}
-            onCommit={(proficiencyBonus) => patch({ proficiencyBonus })}
+            onCommit={(proficiencyBonus) => updateDraft({ proficiencyBonus })}
             min={0}
           />
           {spellDerived && (
@@ -234,30 +249,32 @@ export const ParticipantDetailsModal = ({
             Spell slots
           </span>
           <SpellSlotsBlock
-            slots={participant.spellSlots ?? null}
+            slots={draft.spellSlots ?? null}
             editable={isDM}
-            onChange={(spellSlots) => patch({ spellSlots })}
+            onChange={(spellSlots) => updateDraft({ spellSlots })}
           />
         </div>
 
         <AttacksBlock
-          attacks={participant.attacks}
+          attacks={draft.attacks}
           editable={isDM}
-          onChange={(attacks) => patch({ attacks })}
+          onChange={(attacks) => updateDraft({ attacks })}
         />
 
-        {participant.type === "pc" && (
+        {draft.type === "pc" && (
           <div className="flex flex-col gap-1">
             <DeathSavesBlock
-              successes={participant.deathSaveSuccesses}
-              failures={participant.deathSaveFailures}
+              successes={draft.deathSaveSuccesses}
+              failures={draft.deathSaveFailures}
               canEdit={isDM}
-              onRecord={(outcome) => recordDeathSave(participant.id, outcome)}
+              onRecord={(outcome) => updateDraft(incrementDeathSave(draft, outcome))}
             />
             {isDM && (
               <button
                 type="button"
-                onClick={() => resetDeathSaves(participant.id)}
+                onClick={() =>
+                  updateDraft({ deathSaveSuccesses: 0, deathSaveFailures: 0 })
+                }
                 disabled={!hasDeathSaves}
                 className="self-end text-xs sm:text-sm uppercase tracking-widest text-faint transition-colors hover:text-ink disabled:opacity-40"
               >
@@ -272,9 +289,11 @@ export const ParticipantDetailsModal = ({
             Conditions
           </span>
           <ConditionsPicker
-            active={participant.conditions}
+            active={draft.conditions}
             isDM={isDM}
-            onToggle={(c) => toggleCondition(participant.id, c)}
+            onToggle={(condition) =>
+              updateDraft({ conditions: toggleConditionInList(draft.conditions, condition) })
+            }
           />
         </div>
       </div>
