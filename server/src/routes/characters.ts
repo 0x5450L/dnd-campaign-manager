@@ -128,7 +128,7 @@ router.patch<{ id: string }>('/:id', authMiddleware, asyncHandler(async (req, re
     name, type, race, characterClass, background, alignment, notes, experience,
     speed, hitDiceType, hitDiceUsed, maxHp, currentHp, tempHp,
     deathSaveSuccesses, deathSaveFailures, armorClass, usesShield, inspiration,
-    abilityScores, skills, attacks,
+    spellSlots, abilityScores, skills, attacks,
   } = req.body as UpdateCharacterPayload;
 
   const character = await prisma.character.update({
@@ -138,6 +138,7 @@ router.patch<{ id: string }>('/:id', authMiddleware, asyncHandler(async (req, re
         name, type, race, characterClass, background, alignment, notes, experience,
         speed, hitDiceType, hitDiceUsed, maxHp, currentHp, tempHp,
         deathSaveSuccesses, deathSaveFailures, armorClass, usesShield, inspiration,
+        spellSlots,
       }),
 
       ...(abilityScores !== undefined && abilityScores.length > 0 && {

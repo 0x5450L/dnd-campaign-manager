@@ -19,7 +19,7 @@ import InitiativeBlock from "../blocks/InitiativeBlock";
 import AbilityScoresStrip from "./AbilityScoresStrip";
 import AttacksBlock from "./AttacksBlock";
 import SpellAbilitySelect from "./SpellAbilitySelect";
-import SpellSlotsBlock from "./SpellSlotsBlock";
+import { SpellSlotsTracker } from "../../../../../spells/SpellSlotsTracker";
 import StatInput from "./StatInput";
 
 type AbilityName = ParticipantAbilityScore["name"];
@@ -158,16 +158,11 @@ export const ParticipantEditorBody = ({
         )}
       </div>
 
-      <div className="flex flex-col gap-1.5">
-        <span className="text-xs sm:text-sm uppercase tracking-[0.18em] text-faint">
-          Spell slots
-        </span>
-        <SpellSlotsBlock
-          slots={draft.spellSlots ?? null}
-          editable={canEditOwn}
-          onChange={(spellSlots) => updateDraft({ spellSlots })}
-        />
-      </div>
+      <SpellSlotsTracker
+        slots={draft.spellSlots ?? null}
+        editable={canEditOwn}
+        onChange={(spellSlots) => updateDraft({ spellSlots })}
+      />
 
       <AttacksBlock
         attacks={draft.attacks}

@@ -1,5 +1,5 @@
-import type { AbilityName } from "../../../../shared/dnd";
-export type { AbilityName };
+import type { AbilityName, SpellSlotLevel } from "../../../../shared/dnd";
+export type { AbilityName, SpellSlotLevel };
 
 export type AbilityState = {
   score: number;
@@ -52,6 +52,9 @@ export type CharacterSheetState = {
 
   // Attacks
   attacks: Attack[];
+
+  // Spellcasting
+  spellSlots: SpellSlotLevel[] | null;
 
   // Text blocks
   classFeatures: string;

@@ -90,6 +90,7 @@ export const dtoToSheetState = (
   inspiration: dto.inspiration,
 
   attacks: buildAttacksFromDto(dto.attacks),
+  spellSlots: dto.spellSlots ?? null,
 
   notes: dto.notes ?? "",
 });
@@ -153,4 +154,5 @@ export const sheetStateToUpdatePayload = (
   abilityScores: sheetAbilitiesToDtos(state.abilities),
   skills: sheetSkillsToDtos(state.skills),
   attacks: sheetAttacksToInputs(state.attacks),
+  spellSlots: state.spellSlots,
 });

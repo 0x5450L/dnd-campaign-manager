@@ -1,4 +1,4 @@
-import type { AbilityName } from "./dnd";
+import type { AbilityName, SpellSlotLevel } from "./dnd";
 
 export type CharacterType = "player" | "npc" | "monster";
 
@@ -63,6 +63,7 @@ export type CharacterDTO = {
   abilityScores: CharacterAbilityDTO[];
   skills: CharacterSkillDTO[];
   attacks: CharacterAttackDTO[];
+  spellSlots?: SpellSlotLevel[] | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -101,4 +102,5 @@ export type UpdateCharacterPayload = Partial<{
   abilityScores: CharacterAbilityDTO[];
   skills: CharacterSkillDTO[];
   attacks: CharacterAttackInput[];
+  spellSlots: SpellSlotLevel[] | null;
 }>;

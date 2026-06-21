@@ -56,6 +56,8 @@ export const createInitialCharacterSheet = (): CharacterSheetState => ({
     notes: "",
   })),
 
+  spellSlots: null,
+
   classFeatures: "",
   racialTraits: "",
   feats: "",

@@ -9,6 +9,7 @@ import { AbilityScore } from "../blocks/AbilityScore";
 import { CombatStats } from "../blocks/CombatStats";
 import { ClassFeatures } from "../blocks/ClassFeatures";
 import { AttacksTable } from "../blocks/AttacksTable";
+import { SpellSlots } from "../blocks/SpellSlots";
 import { TextBlock } from "../inputs/TextBlock";
 import { Proficiencies } from "../blocks/Proficiencies";
 
@@ -114,6 +115,10 @@ export const DesktopCharacterSheet = () => {
 
           <div className="order-4 lg:order-0">
             <AttacksTable attacks={state.attacks} onUpdate={updateAttack} onAdd={addAttack} onRemove={removeAttack} />
+          </div>
+
+          <div className="order-4 lg:order-0">
+            <SpellSlots />
           </div>
 
           <div className="grid grid-cols-1 gap-3 order-7 sm:grid-cols-2 lg:order-0">

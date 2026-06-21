@@ -1,5 +1,7 @@
 import type { CharacterAttackDTO, CharacterAttackInput } from "./character";
-import type { AbilityName, DiceRollDTO } from "./dnd";
+import type { AbilityName, DiceRollDTO, SpellSlotLevel } from "./dnd";
+
+export type { SpellSlotLevel };
 
 export type SessionStatus = "active" | "paused" | "ended";
 
@@ -45,12 +47,6 @@ export type EncounterDTO = {
 export type ParticipantAbilityScore = {
   name: AbilityName;
   score: number;
-};
-
-export type SpellSlotLevel = {
-  level: number;
-  total: number;
-  used: number;
 };
 
 export type EncounterParticipantDTO = {

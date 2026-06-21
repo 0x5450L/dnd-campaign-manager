@@ -12,6 +12,7 @@ import { HitDice } from "../blocks/HitDice";
 import { DeathSaves } from "../blocks/DeathSaves";
 import { CombatStats } from "../blocks/CombatStats";
 import { AttacksTable } from "../blocks/AttacksTable";
+import { SpellSlots } from "../blocks/SpellSlots";
 import { AbilityScore } from "../blocks/AbilityScore";
 import { CharacterLore } from "../blocks/CharacterLore";
 import { ClassFeatures } from "../blocks/ClassFeatures";
@@ -88,6 +89,7 @@ export const MobileCharacterSheet = ({ onClose, onForceSave }: MobileCharacterSh
               onAdd={addAttack}
               onRemove={removeAttack}
             />
+            <SpellSlots />
           </>
         )}
 
