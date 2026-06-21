@@ -19,6 +19,7 @@ model Character {
   armorClass              Int                    @default(10)
   usesShield              Boolean                @default(false)
   inspiration             Boolean                @default(false)
+  spellSlots              Json?                  @map("spell_slots")
   campaignId              String
   userId                  String
   createdAt               DateTime               @default(now()) @map("created_at")
