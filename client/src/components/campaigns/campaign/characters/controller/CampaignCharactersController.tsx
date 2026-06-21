@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import type { Character, CharacterType } from "../../../../../types/characters/characters";
 import { CharacterSheet } from "../../../../characters/CharacterSheet";
 import {
@@ -6,6 +6,8 @@ import {
   useCharactersRealtimeSync,
   useDeleteCharacterMutation,
 } from "../../../../../queries/characters";
+import { useLiveSession } from "../../../../../context/liveSessionContext/useLiveSession";
+import { useNotificationStore } from "../../../../../state/notifications/notificationStore";
 import ConfirmDialog from "../../../../ui/ConfirmDialog";
 import CharactersSidebar from "../CharactersSidebar";
 import { CampaignCharactersContext } from "./CampaignCharactersContext";
@@ -33,12 +35,15 @@ function CampaignCharactersController({
   const { data: characters = EMPTY_CHARACTERS } = useCampaignCharactersQuery(campaignId);
   useCharactersRealtimeSync(campaignId);
   const deleteCharacterMutation = useDeleteCharacterMutation();
+  const { encounter } = useLiveSession();
+  const notify = useNotificationStore((s) => s.notify);
 
   const [sheetMode, setSheetMode] = useState<SheetMode>({ kind: "closed" });
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [characterToDelete, setCharacterToDelete] = useState<Character | null>(null);
 
   const isDM = currentUserId !== null && currentUserId === dmId;
+  const isSheetLocked = !isDM && encounter !== null;
 
   const myCharacter = useMemo(
     () =>
@@ -51,12 +56,34 @@ function CampaignCharactersController({
   const openCharactersSidebar = useCallback(() => setIsSidebarOpen(true), []);
 
   const openMyCharacter = useCallback(() => {
+    if (isSheetLocked) {
+      notify("Character sheet is locked during combat — use your participant card.", "info");
+      return;
+    }
     if (myCharacter) {
       setSheetMode({ kind: "edit", characterId: myCharacter.id });
     } else {
       setSheetMode({ kind: "create", type: "player" });
     }
-  }, [myCharacter]);
+  }, [isSheetLocked, notify, myCharacter]);
+
+  const [wasLocked, setWasLocked] = useState(isSheetLocked);
+  if (wasLocked !== isSheetLocked) {
+    setWasLocked(isSheetLocked);
+    if (isSheetLocked && sheetMode.kind !== "closed") {
+      setSheetMode({ kind: "closed" });
+    }
+  }
+
+  const lockNotifiedRef = useRef(isSheetLocked);
+  useEffect(() => {
+    if (isSheetLocked && !lockNotifiedRef.current) {
+      lockNotifiedRef.current = true;
+      notify("Combat started — character sheet is locked.", "info");
+    } else if (!isSheetLocked) {
+      lockNotifiedRef.current = false;
+    }
+  }, [isSheetLocked, notify]);
 
   const handleOpenCharacterFromSidebar = (character: Character) => {
     setSheetMode({ kind: "edit", characterId: character.id });
@@ -80,10 +107,11 @@ function CampaignCharactersController({
       characters,
       myCharacter,
       isDM,
+      isSheetLocked,
       openCharactersSidebar,
       openMyCharacter,
     }),
-    [characters, myCharacter, isDM, openCharactersSidebar, openMyCharacter],
+    [characters, myCharacter, isDM, isSheetLocked, openCharactersSidebar, openMyCharacter],
   );
 
   return (

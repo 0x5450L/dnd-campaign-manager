@@ -109,8 +109,18 @@ export const useCharactersRealtimeSync = (campaignId: string | undefined) => {
     });
     const unsubUpdated = subscribe("character_updated", (data) => {
       if (!matchesCampaign(data)) return;
+      const { characterId, character } = data as {
+        characterId?: string;
+        character?: Character;
+      };
+      if (character && characterId) {
+        queryClient.setQueryData(characterKeys.detail(characterId), character);
+        queryClient.setQueryData<Character[]>(characterKeys.list(campaignId), (current) =>
+          upsertIntoList(current, character),
+        );
+        return;
+      }
       invalidateList();
-      const { characterId } = data as { characterId?: string };
       if (characterId) {
         queryClient.invalidateQueries({ queryKey: characterKeys.detail(characterId) });
       }

@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { EncounterStatus } from "@prisma/client";
 import { authMiddleware } from "../middleware/auth";
 import prisma from "../services/prisma";
 import { notifyClient } from "../services/sseClients";
@@ -124,6 +125,20 @@ router.patch<{ id: string }>('/:id', authMiddleware, asyncHandler(async (req, re
     throw new AppError(404, 'Character not found or you are not the owner of it');
   }
 
+  const isDM = currentCharacter.campaign.dmId === userId;
+  if (!isDM) {
+    const activeEncounter = await prisma.encounter.findFirst({
+      where: {
+        status: EncounterStatus.active,
+        campaignSession: { campaignId: currentCharacter.campaignId },
+      },
+      select: { id: true },
+    });
+    if (activeEncounter) {
+      throw new AppError(403, 'Character sheet is locked during an active encounter');
+    }
+  }
+
   const {
     name, type, race, characterClass, background, alignment, notes, experience,
     speed, hitDiceType, hitDiceUsed, maxHp, currentHp, tempHp,
@@ -189,6 +204,7 @@ router.patch<{ id: string }>('/:id', authMiddleware, asyncHandler(async (req, re
       type: 'character_updated',
       characterId: character.id,
       campaignId: character.campaignId,
+      character,
     });
   });
 }));

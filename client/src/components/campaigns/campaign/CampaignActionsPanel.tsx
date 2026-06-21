@@ -27,7 +27,7 @@ function CampaignActionsPanel({
   onDeleteCampaign,
   onLeaveCampaign,
 }: CampaignActionsPanelProps) {
-  const { characters, myCharacter, openCharactersSidebar, openMyCharacter } =
+  const { characters, myCharacter, isSheetLocked, openCharactersSidebar, openMyCharacter } =
     useCampaignCharacters();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
@@ -52,8 +52,12 @@ function CampaignActionsPanel({
               Characters ({characters.length})
             </CommonButton>
           ) : (
-            <CommonButton onClick={openMyCharacter} size="sm">
-              {myCharacter ? "My character" : "Create character"}
+            <CommonButton onClick={openMyCharacter} size="sm" disabled={isSheetLocked}>
+              {isSheetLocked
+                ? "Locked in combat"
+                : myCharacter
+                  ? "My character"
+                  : "Create character"}
             </CommonButton>
           )}
           {isDM && hasChanges && (

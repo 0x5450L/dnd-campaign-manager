@@ -103,8 +103,8 @@ function CampaignPage() {
   }
 
   return (
-    <CampaignCharactersController campaignId={campaign.id} dmId={campaign.dmId} currentUserId={user?.id ?? null}>
-      <LiveSessionProvider campaign={campaign}>
+    <LiveSessionProvider campaign={campaign}>
+      <CampaignCharactersController campaignId={campaign.id} dmId={campaign.dmId} currentUserId={user?.id ?? null}>
         <div className="mx-auto flex min-h-[calc(100vh-53px)] w-full max-w-7xl flex-col gap-3 p-3 sm:p-4">
           <CampaignHeaderBar campaign={campaign} isDM={isDM} onChange={setCampaign} />
 
@@ -124,8 +124,8 @@ function CampaignPage() {
             />
           </div>
         </div>
-      </LiveSessionProvider>
-    </CampaignCharactersController>
+      </CampaignCharactersController>
+    </LiveSessionProvider>
   );
 }
 

@@ -2,6 +2,7 @@ import {
   useCallback,
   useMemo,
   useReducer,
+  useState,
   type ReactNode,
 } from "react";
 import {
@@ -27,11 +28,18 @@ import {
   parseDiceToSidesNumber,
 } from "../../utils/dndMath";
 import { createInitialCharacterSheet } from "../../constants/characterSheet";
+import { sheetStateToUpdatePayload } from "../../utils/characterSheetMapping";
 
 type Props = {
   children: ReactNode;
   initialState?: Partial<CharacterSheetState>;
+  serverState?: Partial<CharacterSheetState>;
 };
+
+const serverFingerprint = (partial: Partial<CharacterSheetState>): string =>
+  JSON.stringify(
+    sheetStateToUpdatePayload({ ...createInitialCharacterSheet(), ...partial }),
+  );
 
 const buildInitialState = (
   overrides?: Partial<CharacterSheetState>,
@@ -40,12 +48,27 @@ const buildInitialState = (
   ...overrides,
 });
 
-export const CharacterSheetProvider = ({ children, initialState }: Props) => {
+export const CharacterSheetProvider = ({ children, initialState, serverState }: Props) => {
   const [state, dispatch] = useReducer(
     characterSheetReducer,
     initialState,
     buildInitialState,
   );
+
+  const [serverBaseline, setServerBaseline] = useState<string | null>(null);
+  if (serverState) {
+    const incoming = serverFingerprint(serverState);
+    if (incoming !== serverBaseline) {
+      const current = serverFingerprint(state);
+      const sheetIsClean = serverBaseline === null || current === serverBaseline;
+      if (sheetIsClean || current === incoming) {
+        if (current !== incoming) {
+          dispatch({ type: "SET_FIELD", payload: serverState });
+        }
+        setServerBaseline(incoming);
+      }
+    }
+  }
 
   const setField = useCallback(
     <K extends keyof CharacterSheetState>(

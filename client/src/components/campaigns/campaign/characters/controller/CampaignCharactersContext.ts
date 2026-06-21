@@ -5,6 +5,7 @@ export type CampaignCharactersContextValue = {
   characters: Character[];
   myCharacter: Character | null;
   isDM: boolean;
+  isSheetLocked: boolean;
   openCharactersSidebar: () => void;
   openMyCharacter: () => void;
 };

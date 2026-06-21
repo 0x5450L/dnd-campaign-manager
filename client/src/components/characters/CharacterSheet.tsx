@@ -198,6 +198,7 @@ export const CharacterSheet = ({
           <CharacterSheetProvider
             key={loadedCharacter?.id ?? "new"}
             initialState={initialState}
+            serverState={initialState}
           >
             <SheetTopActions
               onClose={handleClose}
