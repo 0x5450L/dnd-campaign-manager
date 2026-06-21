@@ -1,4 +1,4 @@
-import { Encounter, EncounterParticipant, Prisma } from "@prisma/client";
+import { Encounter, EncounterParticipant } from "@prisma/client";
 import type {
   EncounterDTO,
   EncounterParticipantDTO,
@@ -7,14 +7,9 @@ import type {
 } from "../../../../shared/session";
 import type { AbilityName } from "../../../../shared/dnd";
 import type { CharacterAttackDTO } from "../../../../shared/character";
+import { jsonInput } from "../../utils/payload";
 
-export const jsonInput = <T>(
-  value: T | null | undefined,
-): Prisma.InputJsonValue | typeof Prisma.DbNull | undefined => {
-  if (value === undefined) return undefined;
-  if (value === null) return Prisma.DbNull;
-  return value as unknown as Prisma.InputJsonValue;
-};
+export { jsonInput };
 
 export const mapParticipantToDTO = (
   participant: EncounterParticipant,

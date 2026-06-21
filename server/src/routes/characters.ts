@@ -5,7 +5,7 @@ import { notifyClient } from "../services/sseClients";
 import { asyncHandler } from "../utils/asyncHandler";
 import { AppError } from "../utils/errors";
 import { requireCampaignAccess } from "../utils/accessControl";
-import { pickDefined } from "../utils/payload";
+import { jsonInput, pickDefined } from "../utils/payload";
 import {
   ABILITY_NAMES,
   DEFAULT_ABILITY_SCORE,
@@ -138,8 +138,9 @@ router.patch<{ id: string }>('/:id', authMiddleware, asyncHandler(async (req, re
         name, type, race, characterClass, background, alignment, notes, experience,
         speed, hitDiceType, hitDiceUsed, maxHp, currentHp, tempHp,
         deathSaveSuccesses, deathSaveFailures, armorClass, usesShield, inspiration,
-        spellSlots,
       }),
+
+      ...(spellSlots !== undefined && { spellSlots: jsonInput(spellSlots) }),
 
       ...(abilityScores !== undefined && abilityScores.length > 0 && {
         abilityScores: {
