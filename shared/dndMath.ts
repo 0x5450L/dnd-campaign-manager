@@ -26,6 +26,8 @@ export const MAX_LEVEL = 20;
 
 export const SPELL_SAVE_DC_BASE = 8;
 
+export const SHIELD_AC_BONUS = 2;
+
 export const clamp = (value: number, min: number, max: number): number =>
   Math.max(min, Math.min(max, value));
 

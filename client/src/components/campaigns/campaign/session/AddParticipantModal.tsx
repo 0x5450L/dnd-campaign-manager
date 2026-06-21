@@ -34,6 +34,7 @@ const blankParticipant = (type: ParticipantType): EncounterParticipantDTO => ({
   isVisible: true,
   acHidden: false,
   typeHidden: false,
+  usesShield: false,
   abilityScores: null,
   spellAbility: null,
   proficiencyBonus: null,

@@ -29,6 +29,7 @@ export const mapParticipantToDTO = (
   isVisible: participant.isVisible,
   acHidden: participant.acHidden,
   typeHidden: participant.typeHidden,
+  usesShield: participant.usesShield,
   abilityScores: participant.abilityScores as unknown as ParticipantAbilityScore[] | null,
   spellAbility: participant.spellAbility as AbilityName | null,
   proficiencyBonus: participant.proficiencyBonus,

@@ -16,7 +16,7 @@ export const HitPoints = () => {
             value={state.currentHp}
             onChange={(v) => setField("currentHp", v)}
             min={0}
-            max={9999}
+            max={state.maxHp}
             className="cs-input text-center text-lg font-semibold font-fantasy"
           />
         </div>
@@ -42,7 +42,10 @@ export const HitPoints = () => {
           <div className="cs-input-wrap w-full">
             <NumericInput
               value={state.maxHp}
-              onChange={(v) => setField("maxHp", v)}
+              onChange={(v) => {
+                setField("maxHp", v);
+                if (state.currentHp > v) setField("currentHp", v);
+              }}
               min={0}
               max={9999}
               className="cs-input text-center text-xs"

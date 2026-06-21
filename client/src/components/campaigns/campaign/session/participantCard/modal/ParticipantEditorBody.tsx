@@ -76,26 +76,31 @@ export const ParticipantEditorBody = ({
           value={draft.armorClass}
           hidden={draft.acHidden}
           isDM={canManage}
+          usesShield={draft.usesShield}
           size="lg"
           onChange={canEditOwn ? (armorClass) => updateDraft({ armorClass }) : undefined}
           onToggleHidden={canManage ? () => updateDraft({ acHidden: !draft.acHidden }) : undefined}
+          onToggleShield={canEditOwn ? () => updateDraft({ usesShield: !draft.usesShield }) : undefined}
         />
         <StatInput
-          label="Cur"
+          label="Cur HP"
           value={draft.currentHp}
           editable={canEditOwn}
           onCommit={(currentHp) => updateDraft({ currentHp })}
           min={0}
+          max={draft.maxHp}
         />
         <StatInput
-          label="Max"
+          label="Max HP"
           value={draft.maxHp}
           editable={canEditOwn}
-          onCommit={(maxHp) => updateDraft({ maxHp })}
+          onCommit={(maxHp) =>
+            updateDraft({ maxHp, currentHp: Math.min(draft.currentHp, maxHp) })
+          }
           min={1}
         />
         <StatInput
-          label="Tmp"
+          label="Tmp HP"
           value={draft.tempHp}
           editable={canEditOwn}
           onCommit={(tempHp) => updateDraft({ tempHp })}

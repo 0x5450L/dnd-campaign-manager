@@ -20,6 +20,7 @@ export const seedPartyForEncounter = async (encounterId: string, campaignId: str
       currentHp: character.currentHp,
       tempHp: character.tempHp,
       armorClass: character.armorClass,
+      usesShield: character.usesShield,
       deathSaveSuccesses: character.deathSaveSuccesses,
       deathSaveFailures: character.deathSaveFailures,
       proficiencyBonus: getProficiencyBonus(getLevelFromXp(character.experience)),

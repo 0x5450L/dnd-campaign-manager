@@ -32,6 +32,7 @@ export const EncounterParticipantCard = ({
     toggleCondition,
     setVisibility,
     setAcHidden,
+    setShield,
     recordDeathSave,
     removeParticipant,
   } = useLiveSession();
@@ -63,9 +64,15 @@ export const EncounterParticipantCard = ({
             value={participant.armorClass}
             hidden={participant.acHidden}
             isDM={isDM}
+            usesShield={participant.usesShield}
             onToggleHidden={
               isDM
                 ? () => setAcHidden(participant.id, !participant.acHidden)
+                : undefined
+            }
+            onToggleShield={
+              canEditOwn
+                ? () => setShield(participant.id, !participant.usesShield)
                 : undefined
             }
           />

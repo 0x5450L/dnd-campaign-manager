@@ -253,6 +253,14 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
     [encounter, mutateParticipant],
   );
 
+  const setShield = useCallback(
+    (participantId: string, usesShield: boolean) => {
+      if (!encounter) return;
+      mutateParticipant({ encounterId: encounter.id, participantId, payload: { usesShield } });
+    },
+    [encounter, mutateParticipant],
+  );
+
   const recordDeathSave = useCallback(
     (participantId: string, outcome: "success" | "failure") => {
       if (!encounter) return;
@@ -351,6 +359,7 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
       toggleCondition,
       setVisibility,
       setAcHidden,
+      setShield,
       recordDeathSave,
       resetDeathSaves,
       updateParticipant,
@@ -379,6 +388,7 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
       toggleCondition,
       setVisibility,
       setAcHidden,
+      setShield,
       recordDeathSave,
       resetDeathSaves,
       updateParticipant,

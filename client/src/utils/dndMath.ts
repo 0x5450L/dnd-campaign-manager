@@ -6,6 +6,7 @@ export {
   clamp,
   getProficiencyBonus,
   SPELL_SAVE_DC_BASE,
+  SHIELD_AC_BONUS,
   XP_THRESHOLDS,
   MIN_LEVEL,
   MAX_LEVEL,

@@ -68,6 +68,7 @@ const SCALAR_FIELDS = [
   "armorClass",
   "isVisible",
   "acHidden",
+  "usesShield",
   "spellAbility",
   "proficiencyBonus",
   "deathSaveSuccesses",

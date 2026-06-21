@@ -65,6 +65,7 @@ export type EncounterParticipantDTO = {
   isVisible: boolean;
   acHidden: boolean;
   typeHidden: boolean;
+  usesShield: boolean;
   abilityScores: ParticipantAbilityScore[] | null;
   spellAbility: AbilityName | null;
   proficiencyBonus: number | null;
@@ -118,6 +119,7 @@ export type CreateParticipantPayload = {
   isVisible?: boolean;
   acHidden?: boolean;
   typeHidden?: boolean;
+  usesShield?: boolean;
   abilityScores?: ParticipantAbilityScore[] | null;
   spellAbility?: AbilityName | null;
   proficiencyBonus?: number | null;
@@ -137,6 +139,7 @@ export type UpdateParticipantPayload = Partial<{
   isVisible: boolean;
   acHidden: boolean;
   typeHidden: boolean;
+  usesShield: boolean;
   abilityScores: ParticipantAbilityScore[] | null;
   spellAbility: AbilityName | null;
   proficiencyBonus: number | null;

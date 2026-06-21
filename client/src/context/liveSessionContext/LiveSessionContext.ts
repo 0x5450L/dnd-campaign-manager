@@ -38,6 +38,7 @@ export type LiveSessionContextType = {
   toggleCondition: (participantId: string, condition: string) => void;
   setVisibility: (participantId: string, isVisible: boolean) => void;
   setAcHidden: (participantId: string, acHidden: boolean) => void;
+  setShield: (participantId: string, usesShield: boolean) => void;
   recordDeathSave: (
     participantId: string,
     outcome: "success" | "failure",

@@ -1,10 +1,11 @@
 import { NumericInput } from "../inputs/NumericInput";
 import { useCharacterSheet } from "../../../context/characterSheetContext/useCharacterSheet";
+import { SHIELD_AC_BONUS } from "../../../utils/dndMath";
 
 export const ArmorClass = () => {
   const { state, setField, toggleShield } = useCharacterSheet();
   const { ac, usesShield } = state;
-  const displayAc = usesShield ? ac + 2 : ac;
+  const displayAc = usesShield ? ac + SHIELD_AC_BONUS : ac;
 
   return (
     <div className={`cs-ac-shield ${usesShield ? "active" : ""}`}>
@@ -30,7 +31,7 @@ export const ArmorClass = () => {
         <span className="cs-ac-shield-label">Armor Class</span>
         <NumericInput
           value={displayAc}
-          onChange={(v) => setField("ac", usesShield ? v - 2 : v)}
+          onChange={(v) => setField("ac", usesShield ? v - SHIELD_AC_BONUS : v)}
           min={0}
           max={30}
           defaultValue={10}

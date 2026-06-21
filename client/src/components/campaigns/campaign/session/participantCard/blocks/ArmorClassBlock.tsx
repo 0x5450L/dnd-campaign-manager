@@ -1,31 +1,39 @@
+import { SHIELD_AC_BONUS } from "../../../../../../utils/dndMath";
 import EditableNumber from "./EditableNumber";
-import { ShieldIcon } from "./icons";
+import { ShieldIcon, ShieldPlusIcon } from "./icons";
 import { STAT_BLOCK_SIZES, type StatBlockSize } from "./statBlockSizes";
 
 type ArmorClassBlockProps = {
   value: number;
   hidden: boolean;
   isDM: boolean;
+  usesShield?: boolean;
   size?: StatBlockSize;
   onChange?: (value: number) => void;
   onToggleHidden?: () => void;
+  onToggleShield?: () => void;
 };
 
 export const ArmorClassBlock = ({
   value,
   hidden,
   isDM,
+  usesShield = false,
   size = "md",
   onChange,
   onToggleHidden,
+  onToggleShield,
 }: ArmorClassBlockProps) => {
   const styles = STAT_BLOCK_SIZES[size];
   const masked = hidden && !isDM;
+  const displayValue = value + (usesShield ? SHIELD_AC_BONUS : 0);
   const valueColor = masked
     ? "text-faint"
-    : hidden && isDM
-      ? "text-dim"
-      : "text-ink";
+    : usesShield
+      ? "text-gold-bright"
+      : hidden && isDM
+        ? "text-dim"
+        : "text-ink";
 
   return (
     <div
@@ -44,16 +52,16 @@ export const ArmorClassBlock = ({
         </span>
       ) : onChange ? (
         <EditableNumber
-          value={value}
+          value={displayValue}
           editable
-          onCommit={onChange}
+          onCommit={(v) => onChange(usesShield ? v - SHIELD_AC_BONUS : v)}
           min={0}
           ariaLabel="Armor class"
           className={`${styles.input} font-fantasy font-bold leading-none ${valueColor}`}
         />
       ) : (
         <span className={`${styles.value} font-bold leading-none ${valueColor}`}>
-          {value}
+          {displayValue}
         </span>
       )}
       {isDM && onToggleHidden && (
@@ -69,6 +77,25 @@ export const ArmorClassBlock = ({
           }`}
         >
           <ShieldIcon question={hidden} />
+        </button>
+      )}
+      {onToggleShield && (
+        <button
+          type="button"
+          onClick={onToggleShield}
+          aria-label={usesShield ? "Lower shield" : "Raise shield"}
+          title={
+            usesShield
+              ? `Shield up (+${SHIELD_AC_BONUS} AC)`
+              : `Raise shield (+${SHIELD_AC_BONUS} AC)`
+          }
+          className={`absolute -bottom-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full border transition-colors ${
+            usesShield
+              ? "border-gold bg-gold/25 text-gold-bright"
+              : "border-rule bg-surface text-faint hover:text-ink"
+          }`}
+        >
+          <ShieldPlusIcon />
         </button>
       )}
     </div>
