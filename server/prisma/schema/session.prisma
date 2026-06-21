@@ -51,6 +51,7 @@ model EncounterParticipant {
   isVisible          Boolean         @default(true) @map("is_visible")
   acHidden           Boolean         @default(false) @map("ac_hidden")
   typeHidden         Boolean         @default(false) @map("type_hidden")
+  usesShield         Boolean         @default(false) @map("uses_shield")
   abilityScores      Json?           @map("ability_scores")
   spellSlots         Json?           @map("spell_slots")
   spellAbility       AbilityName?    @map("spell_ability")
