@@ -25,7 +25,6 @@ export type DiceRollerAction =
   | { type: "FINISH_ROLL"; result: RollResult }
   | { type: "CLEAR_HISTORY" }
   | { type: "REPLAY"; entry: DiceHistoryEntry }
-  | { type: "HYDRATE"; history: DiceHistoryEntry[] }
   | { type: "SET_SESSION_ACTIVE"; active: boolean }
   | { type: "SET_SHARE_TO_SESSION"; enabled: boolean };
 
@@ -73,8 +72,6 @@ export const diceRollerReducer = (
       return { ...state, lastResult: action.entry, isOpen: true };
     case "CLEAR_HISTORY":
       return { ...state, history: [] };
-    case "HYDRATE":
-      return { ...state, history: action.history };
     case "SET_SESSION_ACTIVE":
       return {
         ...state,
