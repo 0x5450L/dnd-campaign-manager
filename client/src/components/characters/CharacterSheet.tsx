@@ -24,6 +24,7 @@ type CharacterSheetProps = {
   characterId?: string;
   campaignId: string;
   defaultType?: CharacterType;
+  seedState?: Partial<CharacterSheetState>;
   onCreated?: (id: string) => void;
 };
 
@@ -103,6 +104,7 @@ export const CharacterSheet = ({
   characterId,
   campaignId,
   defaultType = "player",
+  seedState,
   onCreated,
 }: CharacterSheetProps) => {
   const { data: loadedCharacter, isLoading, error } = useCharacterQuery(characterId);
@@ -133,8 +135,8 @@ export const CharacterSheet = ({
   }, [isOpen, handleClose]);
 
   const initialState = useMemo(
-    () => (loadedCharacter ? dtoToSheetState(loadedCharacter) : undefined),
-    [loadedCharacter],
+    () => (loadedCharacter ? dtoToSheetState(loadedCharacter) : seedState),
+    [loadedCharacter, seedState],
   );
 
   const handleSaveError = (err: unknown) => {
@@ -155,8 +157,16 @@ export const CharacterSheet = ({
     } else {
       createCharacterMutation.mutate(sheetStateToCreatePayload(state, campaignId, defaultType), {
         onSuccess: (character) => {
-          setSaveStatus({ status: "success" });
-          onCreated?.(character.id);
+          updateCharacterMutation.mutate(
+            { id: character.id, payload: sheetStateToUpdatePayload(state) },
+            {
+              onSuccess: () => {
+                setSaveStatus({ status: "success" });
+                onCreated?.(character.id);
+              },
+              onError: handleSaveError,
+            },
+          );
         },
         onError: handleSaveError,
       });
@@ -198,7 +208,7 @@ export const CharacterSheet = ({
           <CharacterSheetProvider
             key={loadedCharacter?.id ?? "new"}
             initialState={initialState}
-            serverState={initialState}
+            serverState={loadedCharacter ? initialState : undefined}
           >
             <SheetTopActions
               onClose={handleClose}

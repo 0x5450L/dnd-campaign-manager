@@ -13,6 +13,7 @@ type CharactersSidebarProps = {
   dmId: string;
   onOpenCharacter: (character: Character) => void;
   onCreateNpc: () => void;
+  onOpenBestiary: () => void;
   onDeleteCharacter: (character: Character) => void;
 };
 
@@ -23,6 +24,7 @@ function CharactersSidebar({
   dmId,
   onOpenCharacter,
   onCreateNpc,
+  onOpenBestiary,
   onDeleteCharacter,
 }: CharactersSidebarProps) {
   const [activeTab, setActiveTab] = useState<CharactersSidebarTab>("players");
@@ -121,9 +123,12 @@ function CharactersSidebar({
         </div>
 
         {activeTab === "npcs" && (
-          <div className="px-4 pt-3 shrink-0">
-            <CommonButton onClick={onCreateNpc} size="sm" className="w-full">
+          <div className="px-4 pt-3 shrink-0 flex gap-2">
+            <CommonButton onClick={onCreateNpc} size="sm" className="flex-1">
               + New NPC
+            </CommonButton>
+            <CommonButton onClick={onOpenBestiary} size="sm" variant="secondary" className="flex-1">
+              + From bestiary
             </CommonButton>
           </div>
         )}

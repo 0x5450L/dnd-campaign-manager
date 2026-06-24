@@ -1,5 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import type { Character, CharacterType } from "../../../../../types/characters/characters";
+import type { CharacterSheetState } from "../../../../../types/characters/characterSheet";
+import {
+  srdMonsterToSheetState,
+  type SrdMonster,
+} from "../../../../../utils/srdMonsterMapping";
 import { CharacterSheet } from "../../../../characters/CharacterSheet";
 import {
   useCampaignCharactersQuery,
@@ -10,12 +15,14 @@ import { useLiveSession } from "../../../../../context/liveSessionContext/useLiv
 import { useNotificationStore } from "../../../../../state/notifications/notificationStore";
 import ConfirmDialog from "../../../../ui/ConfirmDialog";
 import CharactersSidebar from "../CharactersSidebar";
+import MonsterBrowser from "../MonsterBrowser";
 import { CampaignCharactersContext } from "./CampaignCharactersContext";
 
 type SheetMode =
   | { kind: "closed" }
   | { kind: "edit"; characterId: string }
-  | { kind: "create"; type: CharacterType };
+  | { kind: "create"; type: CharacterType }
+  | { kind: "preview"; seed: Partial<CharacterSheetState> };
 
 type CampaignCharactersControllerProps = {
   campaignId: string;
@@ -40,6 +47,7 @@ function CampaignCharactersController({
 
   const [sheetMode, setSheetMode] = useState<SheetMode>({ kind: "closed" });
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isBestiaryOpen, setIsBestiaryOpen] = useState(false);
   const [characterToDelete, setCharacterToDelete] = useState<Character | null>(null);
 
   const isDM = currentUserId !== null && currentUserId === dmId;
@@ -93,6 +101,16 @@ function CampaignCharactersController({
     setSheetMode({ kind: "create", type: "npc" });
   };
 
+  const handleOpenBestiary = () => {
+    setIsSidebarOpen(false);
+    setIsBestiaryOpen(true);
+  };
+
+  const handleSelectMonster = (monster: SrdMonster) => {
+    setIsBestiaryOpen(false);
+    setSheetMode({ kind: "preview", seed: srdMonsterToSheetState(monster) });
+  };
+
   const handleConfirmDeleteCharacter = () => {
     if (!characterToDelete) return;
     const target = characterToDelete;
@@ -119,15 +137,24 @@ function CampaignCharactersController({
       {children}
 
       {isDM && (
-        <CharactersSidebar
-          isOpen={isSidebarOpen}
-          onClose={() => setIsSidebarOpen(false)}
-          characters={characters}
-          dmId={dmId}
-          onOpenCharacter={handleOpenCharacterFromSidebar}
-          onCreateNpc={handleCreateNpc}
-          onDeleteCharacter={(c) => setCharacterToDelete(c)}
-        />
+        <>
+          <CharactersSidebar
+            isOpen={isSidebarOpen}
+            onClose={() => setIsSidebarOpen(false)}
+            characters={characters}
+            dmId={dmId}
+            onOpenCharacter={handleOpenCharacterFromSidebar}
+            onCreateNpc={handleCreateNpc}
+            onOpenBestiary={handleOpenBestiary}
+            onDeleteCharacter={(c) => setCharacterToDelete(c)}
+          />
+
+          <MonsterBrowser
+            isOpen={isBestiaryOpen}
+            onClose={() => setIsBestiaryOpen(false)}
+            onSelectMonster={handleSelectMonster}
+          />
+        </>
       )}
 
       {characterToDelete && (
@@ -144,7 +171,14 @@ function CampaignCharactersController({
       <CharacterSheet
         isOpen={sheetMode.kind !== "closed"}
         characterId={sheetMode.kind === "edit" ? sheetMode.characterId : undefined}
-        defaultType={sheetMode.kind === "create" ? sheetMode.type : "player"}
+        defaultType={
+          sheetMode.kind === "preview"
+            ? "monster"
+            : sheetMode.kind === "create"
+              ? sheetMode.type
+              : "player"
+        }
+        seedState={sheetMode.kind === "preview" ? sheetMode.seed : undefined}
         campaignId={campaignId}
         onCreated={(id) => setSheetMode({ kind: "edit", characterId: id })}
         onClose={() => setSheetMode({ kind: "closed" })}
