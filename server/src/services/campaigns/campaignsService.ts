@@ -9,7 +9,12 @@ import type {
   UpdateCampaignInput,
 } from "./campaignsRepository";
 import { requireCampaignName } from "./campaignsValidation";
-import { notifyMemberLeft } from "./campaignsNotifications";
+import {
+  notifyCampaignDeleted,
+  notifyCampaignUpdated,
+  notifyInvitesRevoked,
+  notifyMemberLeft,
+} from "./campaignsNotifications";
 
 const removeMemberAndNotify = async (campaignId: string, targetUserId: string) => {
   const membership = await campaignsRepo.findMembership(campaignId, targetUserId);
@@ -56,7 +61,21 @@ export const getCampaign = async (userId: string, id: string) => {
 
 export const deleteCampaign = async (userId: string, id: string) => {
   await requireCampaignDM(userId, id);
+  const members = await campaignsRepo.listMembersWithEmail(id);
+  const inviteEmails = await campaignsRepo.listInviteEmails(id);
   await campaignsRepo.deleteCampaignCascade(id);
+
+  try {
+    notifyCampaignDeleted(members, id);
+  } catch (error) {
+    console.error("campaign_deleted notify failed", error);
+  }
+
+  try {
+    notifyInvitesRevoked(inviteEmails);
+  } catch (error) {
+    console.error("invite_revoked notify failed", error);
+  }
 };
 
 export const updateCampaign = async (
@@ -65,7 +84,15 @@ export const updateCampaign = async (
   body: UpdateCampaignInput,
 ) => {
   await requireCampaignDM(userId, id);
-  return campaignsRepo.updateCampaign(id, body);
+  const campaign = await campaignsRepo.updateCampaign(id, body);
+
+  try {
+    notifyCampaignUpdated(campaign.members, campaign);
+  } catch (error) {
+    console.error("campaign_updated notify failed", error);
+  }
+
+  return campaign;
 };
 
 export const leaveCampaign = async (userId: string, id: string) => {

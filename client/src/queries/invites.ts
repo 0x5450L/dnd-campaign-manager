@@ -37,8 +37,13 @@ export const useInvitesRealtimeSync = () => {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    return subscribe("invite_created", () => {
+    const invalidate = () =>
       queryClient.invalidateQueries({ queryKey: inviteKeys.mine() });
-    });
+    const unsubscribeCreated = subscribe("invite_created", invalidate);
+    const unsubscribeRevoked = subscribe("invite_revoked", invalidate);
+    return () => {
+      unsubscribeCreated();
+      unsubscribeRevoked();
+    };
   }, [subscribe, queryClient]);
 };

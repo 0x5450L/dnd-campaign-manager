@@ -1,12 +1,19 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { SSEContext } from "./SSEContext";
+import { useAuth } from "../../hooks/useAuth";
 
 export const SSEProvider = ({ children }: { children: React.ReactNode }) => {
+  const { user } = useAuth();
   const eventSourceRef = useRef<EventSource | null>(null);
   const listenersRef = useRef<Map<string, Set<(data: unknown) => void>>>(new Map());
 
   useEffect(() => {
-    const eventSource = new EventSource("/api/invites/stream");
+    const token = localStorage.getItem("dndCampaignManagerJWT");
+    if (!user || !token) return;
+
+    const eventSource = new EventSource(
+      `/api/invites/stream?token=${encodeURIComponent(token)}`,
+    );
     eventSourceRef.current = eventSource;
 
     eventSource.onmessage = (event) => {
@@ -18,7 +25,7 @@ export const SSEProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     return () => eventSource.close();
-  }, []);
+  }, [user]);
 
   const subscribe = useCallback((eventType: string, callback: (data: unknown) => void) => {
     if (!listenersRef.current.has(eventType)) {

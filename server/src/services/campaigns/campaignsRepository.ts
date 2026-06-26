@@ -56,9 +56,21 @@ export const findUserCampaign = (id: string, userId: string) =>
 
 export const deleteCampaignCascade = (campaignId: string) =>
   prisma.$transaction(async (tx) => {
+    await tx.campaignInvite.deleteMany({ where: { campaignId } });
     await tx.campaignMember.deleteMany({ where: { campaignId } });
+    await tx.character.deleteMany({ where: { campaignId } });
     await tx.campaign.delete({ where: { id: campaignId } });
   });
+
+export const listInviteEmails = async (campaignId: string): Promise<string[]> => {
+  const invites = await prisma.campaignInvite.findMany({
+    where: { campaignId, email: { not: null } },
+    select: { email: true },
+  });
+  return invites
+    .map((invite) => invite.email)
+    .filter((email): email is string => email !== null);
+};
 
 export const updateCampaign = (id: string, input: UpdateCampaignInput) =>
   prisma.campaign.update({
@@ -71,6 +83,7 @@ export const updateCampaign = (id: string, input: UpdateCampaignInput) =>
         imageUrl: input.imageUrl,
       }),
     },
+    include: campaignWithMembersInclude,
   });
 
 export const findMembership = (campaignId: string, userId: string) =>
