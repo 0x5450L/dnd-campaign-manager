@@ -1,215 +1,54 @@
-import { authMiddleware } from "../middleware/auth";
-import prisma from "../services/prisma";
 import { Router } from "express";
+import { authMiddleware } from "../middleware/auth";
 import { asyncHandler } from "../utils/asyncHandler";
-import { AppError } from "../utils/errors";
-import { requireCampaignAccess, requireCampaignDM } from "../utils/accessControl";
-import { pickDefined } from "../utils/payload";
-import { notifyClient } from "../services/sseClients";
-
-const removeMemberAndNotify = async (campaignId: string, targetUserId: string) => {
-  const membership = await prisma.campaignMember.findUnique({
-    where: { userId_campaignId: { userId: targetUserId, campaignId } },
-    include: { user: { select: { email: true } } },
-  });
-
-  if (!membership) {
-    throw new AppError(404, 'Member not found');
-  }
-
-  await prisma.campaignMember.delete({
-    where: { userId_campaignId: { userId: targetUserId, campaignId } },
-  });
-
-  const remaining = await prisma.campaignMember.findMany({
-    where: { campaignId },
-    include: { user: { select: { email: true } } },
-  });
-
-  const event = { type: 'member_left' as const, campaignId, userId: targetUserId };
-  remaining.forEach((member) => notifyClient(member.user.email, event));
-  notifyClient(membership.user.email, event);
-};
+import * as campaignsService from "../services/campaigns/campaignsService";
 
 const router = Router();
 
-router.post('/create', authMiddleware, asyncHandler(async (req, res) => {
-  const userId = req.userId!;
-  const { name, description, setting, imageUrl } = req.body;
+router.post("/create", authMiddleware, asyncHandler(async (req, res) => {
+  const campaign = await campaignsService.createCampaign(req.userId!, req.body);
+  res.json({ status: "ok", message: "Campaign created successfully", campaign });
+}));
 
-  if (!name) {
-    throw new AppError(400, 'Campaign name is required');
-  }
-
-  const { id, dm } = await prisma.$transaction(async (tx) => {
-    const { id } = await tx.campaign.create({
-      data: {
-        dmId: userId,
-        name,
-        description,
-        setting,
-        imageUrl,
-      },
-    });
-
-    const dm = await tx.campaignMember.create({
-      data: {
-        userId,
-        campaignId: id,
-        role: 'dm',
-      },
-    });
-
-    return { id, dm };
+router.get("/", authMiddleware, asyncHandler(async (req, res) => {
+  const campaigns = await campaignsService.listCampaigns(req.userId!);
+  res.json({
+    status: "ok",
+    message:
+      campaigns.length <= 0
+        ? "You have no campaigns. Create one!"
+        : "Campaigns retrieved successfully",
+    campaigns,
   });
-
-  res.json({ status: 'ok', message: 'Campaign created successfully', campaign: { id, dm, name, description, setting, imageUrl } });
 }));
 
-router.get('/', authMiddleware, asyncHandler(async (req, res) => {
-  const userId = req.userId!;
-
-  const campaigns = await prisma.campaign.findMany({
-    where: {
-      members: {
-        some: {
-          userId,
-        },
-      },
-    },
-    include: {
-      dm: {
-        select: {
-          id: true,
-          displayName: true,
-          email: true,
-        },
-      },
-      members: {
-        include: {
-          user: {
-            select: {
-              id: true,
-              displayName: true,
-              email: true,
-            },
-          },
-        },
-      },
-    },
-  });
-
-  res.json({ status: 'ok', message: campaigns.length <= 0 ? 'You have no campaigns. Create one!' : 'Campaigns retrieved successfully', campaigns });
+router.get<{ id: string }>("/:id", authMiddleware, asyncHandler(async (req, res) => {
+  const campaign = await campaignsService.getCampaign(req.userId!, req.params.id);
+  res.json({ status: "ok", message: "Campaign retrieved successfully", campaign });
 }));
 
-router.get('/:id', authMiddleware, asyncHandler(async (req, res) => {
-  const userId = req.userId!;
-  const campaignId = req.params.id as string;
-
-  const campaign = await prisma.campaign.findUnique({
-    where: {
-      id: campaignId,
-      members: {
-        some: {
-          userId,
-        },
-      },
-    },
-    include: {
-      dm: {
-        select: {
-          id: true,
-          displayName: true,
-          email: true,
-        },
-      },
-      members: {
-        include: {
-          user: {
-            select: {
-              id: true,
-              displayName: true,
-              email: true,
-            },
-          },
-        },
-      },
-    },
-  });
-
-  if (!campaign) {
-    throw new AppError(404, 'Campaign not found');
-  }
-
-  res.json({ status: 'ok', message: 'Campaign retrieved successfully', campaign });
+router.delete<{ id: string }>("/delete/:id", authMiddleware, asyncHandler(async (req, res) => {
+  await campaignsService.deleteCampaign(req.userId!, req.params.id);
+  res.json({ status: "ok", message: "Campaign deleted successfully" });
 }));
 
-router.delete('/delete/:id', authMiddleware, asyncHandler(async (req, res) => {
-  const campaignId = req.params.id as string;
-  const userId = req.userId!;
-
-  await requireCampaignDM(userId, campaignId);
-
-  await prisma.$transaction(async (tx) => {
-    await tx.campaignMember.deleteMany({ where: { campaignId } });
-    await tx.campaign.delete({ where: { id: campaignId } });
-  });
-
-  res.json({ status: 'ok', message: 'Campaign deleted successfully' });
+router.patch<{ id: string }>("/:id", authMiddleware, asyncHandler(async (req, res) => {
+  const campaign = await campaignsService.updateCampaign(req.userId!, req.params.id, req.body);
+  res.json({ status: "ok", message: "Campaign updated successfully", campaign });
 }));
 
-router.patch('/:id', authMiddleware, asyncHandler(async (req, res) => {
-  const userId = req.userId!;
-  const campaignId = req.params.id as string;
-  const { name, description, setting, imageUrl } = req.body as {
-    name?: string;
-    description?: string | null;
-    setting?: string | null;
-    imageUrl?: string | null;
-  };
-
-  await requireCampaignDM(userId, campaignId);
-
-  const updatedCampaign = await prisma.campaign.update({
-    where: { id: campaignId },
-    data: {
-      ...(name?.trim() && { name: name.trim() }),
-      ...pickDefined({ description, setting, imageUrl }),
-    },
-  });
-
-  res.json({ status: 'ok', message: 'Campaign updated successfully', campaign: updatedCampaign });
+router.post<{ id: string }>("/:id/leave", authMiddleware, asyncHandler(async (req, res) => {
+  await campaignsService.leaveCampaign(req.userId!, req.params.id);
+  res.json({ status: "ok", message: "You left the campaign", campaignId: req.params.id, userId: req.userId! });
 }));
 
-router.post('/:id/leave', authMiddleware, asyncHandler(async (req, res) => {
-  const userId = req.userId!;
-  const campaignId = req.params.id as string;
-
-  const campaign = await requireCampaignAccess(userId, campaignId);
-
-  if (campaign.dmId === userId) {
-    throw new AppError(400, 'The DM cannot leave the campaign. Delete it instead.');
-  }
-
-  await removeMemberAndNotify(campaignId, userId);
-
-  res.json({ status: 'ok', message: 'You left the campaign', campaignId, userId });
-}));
-
-router.delete('/:id/members/:userId', authMiddleware, asyncHandler(async (req, res) => {
-  const requesterId = req.userId!;
-  const campaignId = req.params.id as string;
-  const targetUserId = req.params.userId as string;
-
-  const campaign = await requireCampaignDM(requesterId, campaignId);
-
-  if (targetUserId === campaign.dmId) {
-    throw new AppError(400, 'The DM cannot be removed from the campaign.');
-  }
-
-  await removeMemberAndNotify(campaignId, targetUserId);
-
-  res.json({ status: 'ok', message: 'Member removed', campaignId, userId: targetUserId });
-}));
+router.delete<{ id: string; userId: string }>(
+  "/:id/members/:userId",
+  authMiddleware,
+  asyncHandler(async (req, res) => {
+    await campaignsService.removeMember(req.userId!, req.params.id, req.params.userId);
+    res.json({ status: "ok", message: "Member removed", campaignId: req.params.id, userId: req.params.userId });
+  }),
+);
 
 export default router;
