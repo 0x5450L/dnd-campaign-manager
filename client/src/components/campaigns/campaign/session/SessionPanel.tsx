@@ -1,4 +1,4 @@
-import { useLiveSession } from "../../../../context/liveSessionContext/useLiveSession";
+import { useLiveSession } from "../../../../hooks/useLiveSession";
 import SessionBanner from "./SessionBanner";
 import StartSessionCTA from "./StartSessionCTA";
 import EncounterTracker from "./EncounterTracker";

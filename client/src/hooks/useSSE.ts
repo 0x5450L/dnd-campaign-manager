@@ -1,5 +1,5 @@
-  import { useContext } from "react";
-  import { SSEContext } from "../context/SSEContext/SSEContext";
+import { useContext } from "react";
+import { SSEContext } from "../context/SSEContext/SSEContext";
 
 export const useSSE = () => {
   const context = useContext(SSEContext);

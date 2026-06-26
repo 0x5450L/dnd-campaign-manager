@@ -11,7 +11,7 @@ import {
   useCharactersRealtimeSync,
   useDeleteCharacterMutation,
 } from "../../../../../queries/characters";
-import { useLiveSession } from "../../../../../context/liveSessionContext/useLiveSession";
+import { useLiveSession } from "../../../../../hooks/useLiveSession";
 import { useNotificationStore } from "../../../../../state/notifications/notificationStore";
 import ConfirmDialog from "../../../../ui/ConfirmDialog";
 import CharactersSidebar from "../CharactersSidebar";

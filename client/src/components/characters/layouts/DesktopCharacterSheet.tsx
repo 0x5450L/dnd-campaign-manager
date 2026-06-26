@@ -1,4 +1,4 @@
-import { useCharacterSheet } from "../../../context/characterSheetContext/useCharacterSheet";
+import { useCharacterSheet } from "../../../hooks/useCharacterSheet";
 import type { AbilityName } from "../../../types/characters/characterSheet";
 import { CharacterLore } from "../blocks/CharacterLore";
 import { ArmorClass } from "../blocks/ArmorClass";

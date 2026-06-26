@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { CharacterSheetContext } from "./CharacterSheetContext";
+import { CharacterSheetContext } from "../context/characterSheetContext/CharacterSheetContext";
 
 export const useCharacterSheet = () => {
   const ctx = useContext(CharacterSheetContext);

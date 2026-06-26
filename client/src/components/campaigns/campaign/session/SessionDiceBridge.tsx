@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useDiceRollerStore } from "../../../../state/diceRoller/diceRollerStore";
-import { useLiveSession } from "../../../../context/liveSessionContext/useLiveSession";
+import { useLiveSession } from "../../../../hooks/useLiveSession";
 
 export const SessionDiceBridge = () => {
   const registerSessionSink = useDiceRollerStore((s) => s.registerSessionSink);

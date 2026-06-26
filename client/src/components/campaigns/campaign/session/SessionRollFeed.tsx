@@ -1,4 +1,4 @@
-import { useLiveSession } from "../../../../context/liveSessionContext/useLiveSession";
+import { useLiveSession } from "../../../../hooks/useLiveSession";
 import type { SessionDiceRoll } from "../../../../types/session";
 import { DICE_TYPES, type DiceType } from "../../../../types/dice";
 import DiceShape from "../../../dice/DiceShape";

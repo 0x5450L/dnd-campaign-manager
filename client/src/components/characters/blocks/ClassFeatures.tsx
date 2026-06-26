@@ -1,4 +1,4 @@
-import { useCharacterSheet } from "../../../context/characterSheetContext/useCharacterSheet";
+import { useCharacterSheet } from "../../../hooks/useCharacterSheet";
 
 export const ClassFeatures = () => {
   const { state, setField } = useCharacterSheet();

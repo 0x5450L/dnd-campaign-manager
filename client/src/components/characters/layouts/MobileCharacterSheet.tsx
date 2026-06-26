@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useCharacterSheet } from "../../../context/characterSheetContext/useCharacterSheet";
+import { useCharacterSheet } from "../../../hooks/useCharacterSheet";
 import type {
   AbilityName,
   CharacterSheetState,

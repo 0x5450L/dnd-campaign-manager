@@ -1,4 +1,4 @@
-import { useCharacterSheet } from "../../../context/characterSheetContext/useCharacterSheet";
+import { useCharacterSheet } from "../../../hooks/useCharacterSheet";
 import { SpellSlotsTracker } from "../../spells/SpellSlotsTracker";
 
 export const SpellSlots = () => {

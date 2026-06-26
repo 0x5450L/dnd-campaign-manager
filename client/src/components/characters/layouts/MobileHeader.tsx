@@ -1,4 +1,4 @@
-import { useCharacterSheet } from "../../../context/characterSheetContext/useCharacterSheet";
+import { useCharacterSheet } from "../../../hooks/useCharacterSheet";
 import type { CharacterSheetState } from "../../../types/characters/characterSheet";
 
 type MobileHeaderProps = {

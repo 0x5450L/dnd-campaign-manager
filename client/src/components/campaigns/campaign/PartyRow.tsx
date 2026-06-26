@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { Campaign } from "../../../types/campaigns";
 import type { PresenceStatus } from "../../../types/session";
-import { useLiveSession } from "../../../context/liveSessionContext/useLiveSession";
+import { useLiveSession } from "../../../hooks/useLiveSession";
 import { useRemoveMemberMutation } from "../../../queries/members";
 import { useNotificationStore } from "../../../state/notifications/notificationStore";
 import ConfirmDialog from "../../ui/ConfirmDialog";

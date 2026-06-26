@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { EncounterParticipantDTO } from "../../../../../../types/encounter";
 import { diffParticipant } from "../../../../../../utils/encounterParticipant";
-import { useLiveSession } from "../../../../../../context/liveSessionContext/useLiveSession";
+import { useLiveSession } from "../../../../../../hooks/useLiveSession";
 import TypeBadge from "../blocks/TypeBadge";
 import VisibilityToggle from "../blocks/VisibilityToggle";
 import { CheckIcon, CloseIcon } from "../blocks/icons";

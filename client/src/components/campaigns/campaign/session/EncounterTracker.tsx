@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useLiveSession } from "../../../../context/liveSessionContext/useLiveSession";
+import { useLiveSession } from "../../../../hooks/useLiveSession";
 import CommonButton from "../../../ui/buttons/CommonButton";
 import EncounterParticipantCard from "./participantCard/EncounterParticipantCard";
 import AddParticipantModal from "./AddParticipantModal";

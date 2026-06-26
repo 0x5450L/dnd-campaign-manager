@@ -1,4 +1,4 @@
-import { useLiveSession } from "../../../../context/liveSessionContext/useLiveSession";
+import { useLiveSession } from "../../../../hooks/useLiveSession";
 import CommonButton from "../../../ui/buttons/CommonButton";
 
 type StartSessionCTAProps = {

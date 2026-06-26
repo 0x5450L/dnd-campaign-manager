@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useLiveSession } from "../../../../../context/liveSessionContext/useLiveSession";
+import { useLiveSession } from "../../../../../hooks/useLiveSession";
 import type { EncounterParticipantDTO } from "../../../../../types/encounter";
 import InitiativeBlock from "./blocks/InitiativeBlock";
 import ArmorClassBlock from "./blocks/ArmorClassBlock";

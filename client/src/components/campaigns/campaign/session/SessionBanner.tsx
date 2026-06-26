@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLiveSession } from "../../../../context/liveSessionContext/useLiveSession";
+import { useLiveSession } from "../../../../hooks/useLiveSession";
 
 type SessionBannerProps = {
   isDM: boolean;

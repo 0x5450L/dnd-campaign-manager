@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { CharacterSheetProvider } from "../../context/characterSheetContext/CharacterSheetProvider";
-import { useCharacterSheet } from "../../context/characterSheetContext/useCharacterSheet";
+import { useCharacterSheet } from "../../hooks/useCharacterSheet";
 import { useIsMobile } from "../../hooks/useMediaQuery";
 import { MobileCharacterSheet } from "./layouts/MobileCharacterSheet";
 import { DesktopCharacterSheet } from "./layouts/DesktopCharacterSheet";
