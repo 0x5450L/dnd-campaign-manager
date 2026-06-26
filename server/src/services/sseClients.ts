@@ -1,4 +1,4 @@
-import type { Response } from "express";
+import type { Request, Response } from "express";
 
 const clients = new Map<string, Response[]>();
 
@@ -17,5 +17,17 @@ export const notifyClient = (email: string, data: any) => {
   const clientList = clients.get(email) || [];
   clientList.forEach((client) => {
     client.write(`data: ${JSON.stringify(data)}\n\n`);
+  });
+};
+
+export const openSseStream = (req: Request, res: Response, email: string) => {
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+  res.write(`\n`);
+
+  addClient(email, res);
+  req.on("close", () => {
+    removeClient(email, res);
   });
 };
