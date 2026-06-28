@@ -1,10 +1,10 @@
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../../hooks/useAuth";
+import { useMeQuery } from "../../../queries/auth";
 import type { Campaign } from "../../../types/campaigns";
 
 function CampaignsListItem({ campaign }: { campaign: Campaign }) {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { data: user } = useMeQuery();
 
   const myMembership = campaign.members.find((m) => m.userId === user?.id);
   const myRole = myMembership?.role;

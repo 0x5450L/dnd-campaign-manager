@@ -1,12 +1,12 @@
 import { useState } from "react";
 import type { ApiError } from "../../services/api/errors";
 import { useCreateCampaignMutation } from "../../queries/campaigns";
-import { useAuth } from "../../hooks/useAuth";
+import { useMeQuery } from "../../queries/auth";
 import CommonButton from "../ui/buttons/CommonButton";
 import CommonInput from "../ui/inputs/CommonInput";
 
 function CreateNewCampaign() {
-  const { user } = useAuth();
+  const { data: user } = useMeQuery();
   const createCampaign = useCreateCampaignMutation();
   const [nameError, setNameError] = useState<string | null>(null);
   const [createCampaignError, setCreateCampaignError] = useState<string | null>(null);

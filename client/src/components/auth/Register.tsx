@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { useAuth } from "../../hooks/useAuth";
+import { useAuthActions } from "../../queries/auth";
 import { register } from "../../services/api/auth";
 import type { ApiError } from "../../services/api/errors";
 import CommonButton from "../ui/buttons/CommonButton";
 import CommonInput from "../ui/inputs/CommonInput";
 
 function Register({ handleRedirect }: { handleRedirect: () => void }) {
-  const { setAuth } = useAuth();
+  const { setAuth } = useAuthActions();
   const [registerError, setRegisterError] = useState<string | null>(null);
 
   const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {

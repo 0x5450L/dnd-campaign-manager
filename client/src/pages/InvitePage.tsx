@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
+import { useMeQuery } from "../queries/auth";
 import { respondToInvite } from "../services/api/invites";
 import type { ApiError } from "../services/api/errors";
 
 function InvitePage() {
   const { token } = useParams();
-  const { user } = useAuth();
+  const { data: user } = useMeQuery();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

@@ -20,7 +20,7 @@ import type {
   EncounterParticipantDTO,
   UpdateParticipantPayload,
 } from "../../types/encounter";
-import { useAuth } from "../../hooks/useAuth";
+import { useMeQuery } from "../../queries/auth";
 import { useCampaignCharactersQuery } from "../../queries/characters";
 import type { Campaign } from "../../types/campaigns";
 import {
@@ -72,7 +72,7 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
   const encounter = encounterQuery.data ?? null;
   const participants = useMemo(() => encounter?.participants ?? [], [encounter]);
 
-  const { user } = useAuth();
+  const { data: user } = useMeQuery();
   const { data: campaignCharacters } = useCampaignCharactersQuery(campaign.id);
   const myCharacterIds = useMemo(
     () =>

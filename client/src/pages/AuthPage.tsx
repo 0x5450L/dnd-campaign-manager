@@ -2,14 +2,14 @@ import { useState } from "react";
 import Login from "../components/auth/Login";
 import Register from "../components/auth/Register";
 import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
+import { useMeQuery } from "../queries/auth";
 
 function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [searchParams] = useSearchParams();
   const redirect = searchParams.get("redirect");
   const navigate = useNavigate();
-  const { user, isLoading } = useAuth();
+  const { data: user, isLoading } = useMeQuery();
 
   if (isLoading) {
     return <div>Loading...</div>;

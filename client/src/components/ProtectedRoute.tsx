@@ -1,10 +1,10 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
+import { useMeQuery } from "../queries/auth";
 import Header from "./app/AppHeader";
 import DiceRoller from "./dice/DiceRoller";
 
 function ProtectedRoute() {
-  const { user, isLoading } = useAuth();
+  const { data: user, isLoading } = useMeQuery();
   if (isLoading) {
     return <div>Loading...</div>;
   }

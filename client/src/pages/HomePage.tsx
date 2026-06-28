@@ -1,9 +1,9 @@
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
+import { useMeQuery } from "../queries/auth";
 import CommonButton from "../components/ui/buttons/CommonButton";
 
 function HomePage() {
-  const { user } = useAuth();
+  const { data: user } = useMeQuery();
   const navigate = useNavigate();
 
   return (

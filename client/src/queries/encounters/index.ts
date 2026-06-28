@@ -8,7 +8,7 @@ import {
   setInitiative as setInitiativeRequest,
   updateParticipant as updateParticipantRequest,
 } from "../../services/api/encounters";
-import { useAuth } from "../../hooks/useAuth";
+import { useAuthStore } from "../../state/auth/authStore";
 import { getSocket } from "../../services/socket";
 import type {
   BulkInitiativePayload,
@@ -41,7 +41,7 @@ export const encounterKeys = {
 };
 
 export const useActiveEncounterQuery = (campaignSessionId: string | undefined) => {
-  const { token } = useAuth();
+  const token = useAuthStore((s) => s.token);
   return useQuery({
     queryKey: encounterKeys.list(campaignSessionId ?? ""),
     queryFn: async () => (await listEncounters(campaignSessionId as string)).encounters,

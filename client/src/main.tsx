@@ -6,18 +6,15 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import "./index.css";
 import App from "./App";
 import { queryClient } from "./lib/queryClient";
-import { AuthProvider } from "./context/authContext/AuthProvider";
 import { SSEProvider } from "./context/SSEContext/SSEProvider";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <AuthProvider>
-          <SSEProvider>
-            <App />
-          </SSEProvider>
-        </AuthProvider>
+        <SSEProvider>
+          <App />
+        </SSEProvider>
       </BrowserRouter>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>

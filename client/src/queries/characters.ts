@@ -12,7 +12,7 @@ import type {
   CreateCharacterPayload,
   UpdateCharacterPayload,
 } from "../types/characters/characters";
-import { useAuth } from "../hooks/useAuth";
+import { useAuthStore } from "../state/auth/authStore";
 import { useSSE } from "../hooks/useSSE";
 
 export const characterKeys = {
@@ -24,7 +24,7 @@ export const characterKeys = {
 };
 
 export const useCampaignCharactersQuery = (campaignId: string | undefined) => {
-  const { token } = useAuth();
+  const token = useAuthStore((s) => s.token);
   return useQuery({
     queryKey: characterKeys.list(campaignId ?? ""),
     queryFn: async () => (await getCampaignCharacters(campaignId as string)).characters,
@@ -33,7 +33,7 @@ export const useCampaignCharactersQuery = (campaignId: string | undefined) => {
 };
 
 export const useCharacterQuery = (id: string | undefined) => {
-  const { token } = useAuth();
+  const token = useAuthStore((s) => s.token);
   return useQuery({
     queryKey: characterKeys.detail(id ?? ""),
     queryFn: async () => (await getCharacter(id as string)).character,

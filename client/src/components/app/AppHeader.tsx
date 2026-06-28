@@ -1,10 +1,11 @@
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth";
+import { useMeQuery, useAuthActions } from "../../queries/auth";
 import CommonButton from "../ui/buttons/CommonButton";
 import InvitesDropdown from "./InvitesDropdown";
 
 function Header() {
-  const { user, logout } = useAuth();
+  const { data: user } = useMeQuery();
+  const { logout } = useAuthActions();
   const navigate = useNavigate();
 
   const handleLogout = () => {

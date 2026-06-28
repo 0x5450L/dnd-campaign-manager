@@ -6,7 +6,7 @@ import {
   useUpdateCampaignMutation,
 } from "../../queries/campaigns";
 import { useLeaveCampaignMutation } from "../../queries/members";
-import { useAuth } from "../../hooks/useAuth";
+import { useMeQuery } from "../../queries/auth";
 import { useNotificationStore } from "../../state/notifications/notificationStore";
 import type { Campaign } from "../../types/campaigns";
 import CommonButton from "../../components/ui/buttons/CommonButton";
@@ -20,7 +20,7 @@ import SessionPanel from "../../components/campaigns/campaign/session/SessionPan
 
 function CampaignPage() {
   const { id } = useParams();
-  const { user } = useAuth();
+  const { data: user } = useMeQuery();
   const navigate = useNavigate();
   const notify = useNotificationStore((s) => s.notify);
 

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { searchSrdMonsters } from "../services/api/srd";
-import { useAuth } from "../hooks/useAuth";
+import { useAuthStore } from "../state/auth/authStore";
 
 export const srdKeys = {
   all: ["srd"] as const,
@@ -10,7 +10,7 @@ export const srdKeys = {
 };
 
 export const useSrdMonsterSearchQuery = (search: string) => {
-  const { token } = useAuth();
+  const token = useAuthStore((s) => s.token);
   const trimmed = search.trim();
   return useQuery({
     queryKey: srdKeys.monsterSearch(trimmed),

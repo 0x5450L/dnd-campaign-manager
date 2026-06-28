@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getMyInvites, respondToInvite } from "../services/api/invites";
 import type { Invite } from "../types/invites";
-import { useAuth } from "../hooks/useAuth";
+import { useMeQuery } from "./auth";
 import { useSSE } from "../hooks/useSSE";
 
 export const inviteKeys = {
@@ -11,7 +11,7 @@ export const inviteKeys = {
 };
 
 export const useMyInvitesQuery = () => {
-  const { user } = useAuth();
+  const { data: user } = useMeQuery();
   return useQuery({
     queryKey: inviteKeys.mine(),
     queryFn: async () => (await getMyInvites()).invites,

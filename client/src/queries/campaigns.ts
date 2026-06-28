@@ -7,7 +7,7 @@ import {
   updateCampaign,
 } from "../services/api/campaigns";
 import type { Campaign, CreateCampaignInput, UpdateCampaignPayload } from "../types/campaigns";
-import { useAuth } from "../hooks/useAuth";
+import { useAuthStore } from "../state/auth/authStore";
 
 export const campaignKeys = {
   all: ["campaigns"] as const,
@@ -17,7 +17,7 @@ export const campaignKeys = {
 };
 
 export const useCampaignsQuery = () => {
-  const { token } = useAuth();
+  const token = useAuthStore((s) => s.token);
   return useQuery({
     queryKey: campaignKeys.lists(),
     queryFn: async () => (await getCampaigns()).campaigns,
@@ -26,7 +26,7 @@ export const useCampaignsQuery = () => {
 };
 
 export const useCampaignQuery = (id: string | undefined) => {
-  const { token } = useAuth();
+  const token = useAuthStore((s) => s.token);
   return useQuery({
     queryKey: campaignKeys.detail(id ?? ""),
     queryFn: async () => (await getCampaign(id as string)).campaign,

@@ -1,4 +1,4 @@
-import { useAuth } from "../../hooks/useAuth";
+import { useAuthActions } from "../../queries/auth";
 import { login } from "../../services/api/auth";
 import { useState } from "react";
 import type { ApiError } from "../../services/api/errors";
@@ -6,7 +6,7 @@ import CommonButton from "../ui/buttons/CommonButton";
 import CommonInput from "../ui/inputs/CommonInput";
 
 function Login({ handleRedirect }: { handleRedirect: () => void }) {
-  const { setAuth } = useAuth();
+  const { setAuth } = useAuthActions();
   const [loginError, setLoginError] = useState<string | null>(null);
 
   const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
