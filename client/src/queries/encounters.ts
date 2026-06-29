@@ -7,21 +7,21 @@ import {
   listEncounters,
   setInitiative as setInitiativeRequest,
   updateParticipant as updateParticipantRequest,
-} from "../../services/api/encounters";
-import { useAuthStore } from "../../state/auth/authStore";
-import { getSocket } from "../../services/socket";
+} from "../services/api/encounters";
+import { useAuthStore } from "../state/auth/authStore";
+import { getSocket } from "../services/socket";
 import type {
   BulkInitiativePayload,
   CreateParticipantPayload,
   EncounterParticipantDTO,
   UpdateParticipantPayload,
-} from "../../types/encounter";
+} from "../types/encounter";
 import type {
   EncounterUpdatedPayload,
   InitiativeUpdatedPayload,
   ParticipantRemovedPayload,
   ParticipantUpdatedPayload,
-} from "../../../../shared/socketEvents";
+} from "../../../shared/socketEvents";
 import {
   mapEncounter,
   patchEncounterScalar,
@@ -30,7 +30,7 @@ import {
   replaceParticipant,
   setParticipants,
   type EncounterList,
-} from "../../utils/encounterCache";
+} from "../utils/encounterCache";
 
 export const encounterKeys = {
   all: ["encounters"] as const,
