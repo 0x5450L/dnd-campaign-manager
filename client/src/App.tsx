@@ -4,7 +4,7 @@ import AuthPage from "./pages/AuthPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import CampaignsPage from "./pages/campaigns/CampaignsPage";
 import CampaignPage from "./pages/campaigns/CampaignPage";
-import { CampaignsRealtimeSync } from "./queries/CampaignsRealtimeSync";
+import { CampaignsRealtimeSync } from "./components/campaigns/CampaignsRealtimeSync";
 import InvitePage from "./pages/InvitePage";
 import NotFound from "./pages/NotFound";
 

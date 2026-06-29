@@ -30,7 +30,7 @@ import {
   replaceParticipant,
   setParticipants,
   type EncounterList,
-} from "./encounterCache";
+} from "../../utils/encounterCache";
 
 export const encounterKeys = {
   all: ["encounters"] as const,

@@ -2,7 +2,7 @@ import type {
   EncounterDTO,
   EncounterParticipantDTO,
   EncounterWithParticipantsDTO,
-} from "../../types/encounter";
+} from "../types/encounter";
 
 export type EncounterList = EncounterWithParticipantsDTO[];
 
