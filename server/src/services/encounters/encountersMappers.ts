@@ -4,9 +4,9 @@ import type {
   EncounterParticipantDTO,
   ParticipantAbilityScore,
   SpellSlotLevel,
-} from "../../../../shared/session";
-import type { AbilityName } from "../../../../shared/dnd";
-import type { CharacterAttackDTO } from "../../../../shared/character";
+} from "../../../../shared/dto/session";
+import type { AbilityName } from "../../../../shared/types/dnd";
+import type { CharacterAttackDTO } from "../../../../shared/dto/character";
 import { jsonInput } from "../../utils/payload";
 
 export { jsonInput };

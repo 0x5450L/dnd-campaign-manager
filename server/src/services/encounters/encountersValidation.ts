@@ -2,7 +2,7 @@ import { AppError } from "../../utils/errors";
 import type {
   BulkInitiativeEntry,
   CreateParticipantPayload,
-} from "../../../../shared/session";
+} from "../../../../shared/dto/session";
 
 export const requireCampaignSessionId = (
   value: string | undefined,

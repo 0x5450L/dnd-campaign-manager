@@ -45,7 +45,7 @@ import type {
   RollLoggedPayload,
   SessionEndedPayload,
   SessionStartedPayload,
-} from "../../../../shared/socketEvents";
+} from "../../../../shared/dto/socketEvents";
 
 type Props = {
   campaign: Campaign;

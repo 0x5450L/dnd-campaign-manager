@@ -1,4 +1,4 @@
-import type { AbilityName, SpellSlotLevel } from "../../../../shared/dnd";
+import type { AbilityName, SpellSlotLevel } from "../../../../shared/types/dnd";
 export type { AbilityName, SpellSlotLevel };
 
 export type AbilityState = {

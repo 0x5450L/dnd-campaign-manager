@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { authMiddleware } from "../middleware/auth";
 import { asyncHandler } from "../utils/asyncHandler";
-import type { UpdateSessionPayload } from "../../../shared/session";
+import type { UpdateSessionPayload } from "../../../shared/dto/session";
 import * as sessionsService from "../services/sessions/sessionsService";
 
 const router = Router();

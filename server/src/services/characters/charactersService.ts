@@ -3,7 +3,7 @@ import { requireCampaignAccess } from "../../utils/accessControl";
 import type {
   CreateCharacterPayload,
   UpdateCharacterPayload,
-} from "../../../../shared/character";
+} from "../../../../shared/dto/character";
 import * as charactersRepo from "./charactersRepository";
 import type { CharacterWithCampaignAccess } from "./charactersRepository";
 import {

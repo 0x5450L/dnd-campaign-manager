@@ -1,6 +1,6 @@
-import { ABILITY_NAMES, SKILL_DEFINITIONS } from "../../../shared/dnd";
-import type { AbilityName } from "../../../shared/dnd";
-import type { SrdMonster, SrdMonsterAction } from "../../../shared/srd";
+import { ABILITY_NAMES, SKILL_DEFINITIONS } from "../../../shared/constants/dnd";
+import type { AbilityName } from "../../../shared/types/dnd";
+import type { SrdMonster, SrdMonsterAction } from "../../../shared/dto/srd";
 import { MIN_ATTACKS } from "../constants/characterSheet";
 import type {
   AbilityState,
@@ -9,7 +9,7 @@ import type {
   SkillDef,
 } from "../types/characters/characterSheet";
 
-export type { SrdMonster } from "../../../shared/srd";
+export type { SrdMonster } from "../../../shared/dto/srd";
 
 const buildAbilities = (
   monster: SrdMonster,

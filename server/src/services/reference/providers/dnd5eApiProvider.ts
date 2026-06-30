@@ -1,13 +1,5 @@
-import {
-  SRD_CATEGORY,
-  SRD_SOURCE,
-  type SrdCategory,
-  type SrdCondition,
-  type SrdConditionSummary,
-  type SrdListPage,
-  type SrdQuery,
-  type SrdSource,
-} from "../../../../../shared/srd";
+import { SRD_CATEGORY, SRD_SOURCE } from "../../../../../shared/constants/srd";
+import type { SrdCategory, SrdCondition, SrdConditionSummary, SrdListPage, SrdQuery, SrdSource } from "../../../../../shared/dto/srd";
 import { AbstractContentProvider } from "./abstractContentProvider";
 import { ProviderRequestError } from "./providerErrors";
 

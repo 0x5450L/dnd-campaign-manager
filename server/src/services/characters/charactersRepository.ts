@@ -9,7 +9,7 @@ import {
 import type {
   CreateCharacterPayload,
   UpdateCharacterPayload,
-} from "../../../../shared/character";
+} from "../../../../shared/dto/character";
 
 const characterSheetInclude = {
   abilityScores: true,

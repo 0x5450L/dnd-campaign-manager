@@ -1,17 +1,6 @@
-import type { AbilityName } from "../../../../../shared/dnd";
-import {
-  SRD_CATEGORY,
-  SRD_SOURCE,
-  type SrdCategory,
-  type SrdCondition,
-  type SrdConditionSummary,
-  type SrdListPage,
-  type SrdMonster,
-  type SrdMonsterAction,
-  type SrdMonsterSummary,
-  type SrdQuery,
-  type SrdSource,
-} from "../../../../../shared/srd";
+import type { AbilityName } from "../../../../../shared/types/dnd";
+import { SRD_CATEGORY, SRD_SOURCE } from "../../../../../shared/constants/srd";
+import type { SrdCategory, SrdCondition, SrdConditionSummary, SrdListPage, SrdMonster, SrdMonsterAction, SrdMonsterSummary, SrdQuery, SrdSource } from "../../../../../shared/dto/srd";
 import { AbstractContentProvider } from "./abstractContentProvider";
 import { ProviderRequestError } from "./providerErrors";
 

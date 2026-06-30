@@ -7,7 +7,7 @@ import type {
   CreateParticipantPayload,
   UpdateEncounterPayload,
   UpdateParticipantPayload,
-} from "../../../../shared/session";
+} from "../../../../shared/dto/session";
 import * as encountersRepo from "./encountersRepository";
 import { mapEncounterToDTO, mapParticipantToDTO } from "./encountersMappers";
 import {

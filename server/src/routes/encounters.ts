@@ -7,7 +7,7 @@ import type {
   CreateParticipantPayload,
   UpdateEncounterPayload,
   UpdateParticipantPayload,
-} from "../../../shared/session";
+} from "../../../shared/dto/session";
 import * as encountersService from "../services/encounters/encountersService";
 
 const router = Router();

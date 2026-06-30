@@ -1,17 +1,4 @@
-import type {
-  SrdCategory,
-  SrdCondition,
-  SrdConditionSummary,
-  SrdItem,
-  SrdItemSummary,
-  SrdListPage,
-  SrdMonster,
-  SrdMonsterSummary,
-  SrdQuery,
-  SrdSource,
-  SrdSpell,
-  SrdSpellSummary,
-} from "../../../../../shared/srd";
+import type { SrdCategory, SrdCondition, SrdConditionSummary, SrdItem, SrdItemSummary, SrdListPage, SrdMonster, SrdMonsterSummary, SrdQuery, SrdSource, SrdSpell, SrdSpellSummary } from "../../../../../shared/dto/srd";
 
 export interface ContentProvider {
   readonly id: SrdSource;

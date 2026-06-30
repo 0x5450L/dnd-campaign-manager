@@ -1,9 +1,5 @@
-import {
-  SRD_CATEGORY,
-  SRD_SOURCE,
-  type SrdCategory,
-  type SrdSource,
-} from "../../../../../shared/srd";
+import { SRD_CATEGORY, SRD_SOURCE } from "../../../../../shared/constants/srd";
+import type { SrdCategory, SrdSource } from "../../../../../shared/dto/srd";
 
 export type ProviderRouting = Record<SrdCategory, SrdSource[]>;
 

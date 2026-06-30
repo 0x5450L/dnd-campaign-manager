@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { authMiddleware } from "../middleware/auth";
 import { asyncHandler } from "../utils/asyncHandler";
-import type { UpdateCharacterPayload } from "../../../shared/character";
+import type { UpdateCharacterPayload } from "../../../shared/dto/character";
 import * as charactersService from "../services/characters/charactersService";
 
 const router = Router();

@@ -1,4 +1,4 @@
-import type { SrdCategory, SrdSource } from "../../../../../shared/srd";
+import type { SrdCategory, SrdSource } from "../../../../../shared/dto/srd";
 
 export class ProviderUnsupportedError extends Error {
   constructor(

@@ -1,4 +1,4 @@
-import { ABILITY_NAMES, SKILL_DEFINITIONS } from "../../../shared/dnd";
+import { ABILITY_NAMES, SKILL_DEFINITIONS } from "../../../shared/constants/dnd";
 import { MIN_ATTACKS } from "../constants/characterSheet";
 import { getLevelFromXp } from "./dndMath";
 import type {

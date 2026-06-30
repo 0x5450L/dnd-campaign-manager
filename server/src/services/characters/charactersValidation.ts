@@ -1,5 +1,5 @@
 import { AppError } from "../../utils/errors";
-import type { CreateCharacterPayload } from "../../../../shared/character";
+import type { CreateCharacterPayload } from "../../../../shared/dto/character";
 
 export const requireCreateCharacterFields = (body: CreateCharacterPayload) => {
   if (

@@ -2,7 +2,7 @@ import { getIo } from "../socket";
 import type {
   EncounterDTO,
   EncounterParticipantDTO,
-} from "../../../../shared/session";
+} from "../../../../shared/dto/session";
 
 export const broadcastEncounterUpdated = (
   campaignId: string,

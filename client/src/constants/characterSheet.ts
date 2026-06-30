@@ -4,7 +4,7 @@ import type {
   CharacterSheetState,
   SkillDef,
 } from "../types/characters/characterSheet";
-import { SKILL_DEFINITIONS } from "../../../shared/dnd";
+import { SKILL_DEFINITIONS } from "../../../shared/constants/dnd";
 
 export const MIN_ATTACKS = 3;
 

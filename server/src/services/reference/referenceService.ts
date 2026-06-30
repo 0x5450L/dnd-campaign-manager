@@ -1,17 +1,5 @@
-import {
-  SRD_CATEGORY,
-  type SrdCategory,
-  type SrdCondition,
-  type SrdConditionSummary,
-  type SrdItem,
-  type SrdItemSummary,
-  type SrdListPage,
-  type SrdMonster,
-  type SrdMonsterSummary,
-  type SrdQuery,
-  type SrdSpell,
-  type SrdSpellSummary,
-} from "../../../../shared/srd";
+import { SRD_CATEGORY } from "../../../../shared/constants/srd";
+import type { SrdCategory, SrdCondition, SrdConditionSummary, SrdItem, SrdItemSummary, SrdListPage, SrdMonster, SrdMonsterSummary, SrdQuery, SrdSpell, SrdSpellSummary } from "../../../../shared/dto/srd";
 import type { CacheStore } from "./cache/cacheStore";
 import type { ProviderRouter } from "./providers/providerRouter";
 import { referenceKeys } from "./referenceKeys";

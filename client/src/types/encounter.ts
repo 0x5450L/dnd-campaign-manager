@@ -12,7 +12,7 @@ import type {
   UpdateParticipantPayload,
   BulkInitiativePayload,
   BulkCreateParticipantsPayload,
-} from "../../../shared/session";
+} from "../../../shared/dto/session";
 
 export type {
   EncounterDTO,

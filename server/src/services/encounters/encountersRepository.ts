@@ -1,11 +1,11 @@
 import { Prisma } from "@prisma/client";
 import prisma from "../prisma";
 import { jsonInput, pickDefined, trimOrNull } from "../../utils/payload";
-import { getLevelFromXp, getProficiencyBonus } from "../../../../shared/dndMath";
+import { getLevelFromXp, getProficiencyBonus } from "../../../../shared/utils/dndMath";
 import type {
   BulkInitiativeEntry,
   CreateParticipantPayload,
-} from "../../../../shared/session";
+} from "../../../../shared/dto/session";
 
 const bySortOrder = { sortOrder: "asc" } as const;
 

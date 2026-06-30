@@ -5,4 +5,5 @@
  * This thin re-export exists so server code can import via a stable internal path
  * (`../constants/dnd`) without caring about the shared layout.
  */
-export * from "../../../shared/dnd";
+export * from "../../../shared/constants/dnd";
+export * from "../../../shared/types/dnd";

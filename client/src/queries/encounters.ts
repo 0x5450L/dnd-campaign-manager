@@ -21,7 +21,7 @@ import type {
   InitiativeUpdatedPayload,
   ParticipantRemovedPayload,
   ParticipantUpdatedPayload,
-} from "../../../shared/socketEvents";
+} from "../../../shared/dto/socketEvents";
 import {
   mapEncounter,
   patchEncounterScalar,
