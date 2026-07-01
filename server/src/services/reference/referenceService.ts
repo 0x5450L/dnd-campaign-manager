@@ -1,5 +1,5 @@
 import { SRD_CATEGORY } from "../../../../shared/constants/srd";
-import type { SrdCategory, SrdCondition, SrdConditionSummary, SrdItem, SrdItemSummary, SrdListPage, SrdMonster, SrdMonsterSummary, SrdQuery, SrdSpell, SrdSpellSummary } from "../../../../shared/dto/srd";
+import type { SrdCategory, SrdCondition, SrdConditionSummary, SrdItem, SrdItemSummary, SrdListPage, SrdCreature, SrdCreatureSummary, SrdQuery, SrdSpell, SrdSpellSummary } from "../../../../shared/dto/srd";
 import type { CacheStore } from "./cache/cacheStore";
 import type { ProviderRouter } from "./providers/providerRouter";
 import { referenceKeys } from "./referenceKeys";
@@ -27,15 +27,15 @@ export class ReferenceService {
     );
   }
 
-  getMonster(slug: string): Promise<SrdMonster | null> {
+  getCreature(slug: string): Promise<SrdCreature | null> {
     return this.resolveDetail(SRD_CATEGORY.Monster, slug, () =>
-      this.router.getMonster(slug),
+      this.router.getCreature(slug),
     );
   }
 
-  searchMonsters(query: SrdQuery): Promise<SrdListPage<SrdMonsterSummary>> {
+  searchCreatures(query: SrdQuery): Promise<SrdListPage<SrdCreatureSummary>> {
     return this.resolveSearch(SRD_CATEGORY.Monster, query, () =>
-      this.router.searchMonsters(query),
+      this.router.searchCreatures(query),
     );
   }
 

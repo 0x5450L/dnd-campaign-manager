@@ -30,7 +30,7 @@ router.get(
   authMiddleware,
   asyncHandler(async (req, res) => {
     const search = typeof req.query.search === "string" ? req.query.search : undefined;
-    const page = await getReferenceService().searchMonsters({
+    const page = await getReferenceService().searchCreatures({
       search,
       limit: parseLimit(req.query.limit),
       offset: parseOffset(req.query.offset),
@@ -44,11 +44,11 @@ router.get<{ slug: string }>(
   authMiddleware,
   asyncHandler(async (req, res) => {
     const { slug } = req.params;
-    const monster = await getReferenceService().getMonster(slug);
-    if (!monster) {
-      throw new AppError(404, "Monster not found");
+    const creature = await getReferenceService().getCreature(slug);
+    if (!creature) {
+      throw new AppError(404, "Creature not found");
     }
-    res.json(monster);
+    res.json(creature);
   }),
 );
 

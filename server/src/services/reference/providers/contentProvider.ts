@@ -1,4 +1,4 @@
-import type { SrdCategory, SrdCondition, SrdConditionSummary, SrdItem, SrdItemSummary, SrdListPage, SrdMonster, SrdMonsterSummary, SrdQuery, SrdSource, SrdSpell, SrdSpellSummary } from "../../../../../shared/dto/srd";
+import type { SrdCategory, SrdCondition, SrdConditionSummary, SrdItem, SrdItemSummary, SrdListPage, SrdCreature, SrdCreatureSummary, SrdQuery, SrdSource, SrdSpell, SrdSpellSummary } from "../../../../../shared/dto/srd";
 
 export interface ContentProvider {
   readonly id: SrdSource;
@@ -7,8 +7,8 @@ export interface ContentProvider {
   getSpell(slug: string): Promise<SrdSpell | null>;
   searchSpells(query: SrdQuery): Promise<SrdListPage<SrdSpellSummary>>;
 
-  getMonster(slug: string): Promise<SrdMonster | null>;
-  searchMonsters(query: SrdQuery): Promise<SrdListPage<SrdMonsterSummary>>;
+  getCreature(slug: string): Promise<SrdCreature | null>;
+  searchCreatures(query: SrdQuery): Promise<SrdListPage<SrdCreatureSummary>>;
 
   getItem(slug: string): Promise<SrdItem | null>;
   searchItems(query: SrdQuery): Promise<SrdListPage<SrdItemSummary>>;

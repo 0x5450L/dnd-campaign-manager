@@ -1,7 +1,10 @@
 import { SRD_CATEGORY } from "../../../../../shared/constants/srd";
-import type { SrdCategory, SrdCondition, SrdConditionSummary, SrdItem, SrdItemSummary, SrdListPage, SrdMonster, SrdMonsterSummary, SrdQuery, SrdSource, SrdSpell, SrdSpellSummary } from "../../../../../shared/dto/srd";
+import type { SrdCategory, SrdCondition, SrdConditionSummary, SrdItem, SrdItemSummary, SrdListPage, SrdCreature, SrdCreatureSummary, SrdQuery, SrdSource, SrdSpell, SrdSpellSummary } from "../../../../../shared/dto/srd";
 import type { ContentProvider } from "./contentProvider";
-import { ProviderRequestError, ProviderUnsupportedError } from "./providerErrors";
+import {
+  ProviderRequestError,
+  ProviderUnsupportedError,
+} from "./providerErrors";
 
 const DEFAULT_TIMEOUT_MS = 8000;
 
@@ -19,11 +22,11 @@ export abstract class AbstractContentProvider implements ContentProvider {
     return this.unsupported(SRD_CATEGORY.Spell);
   }
 
-  async getMonster(_slug: string): Promise<SrdMonster | null> {
+  async getCreature(_slug: string): Promise<SrdCreature | null> {
     return this.unsupported(SRD_CATEGORY.Monster);
   }
 
-  async searchMonsters(_query: SrdQuery): Promise<SrdListPage<SrdMonsterSummary>> {
+  async searchCreatures(_query: SrdQuery): Promise<SrdListPage<SrdCreatureSummary>> {
     return this.unsupported(SRD_CATEGORY.Monster);
   }
 
@@ -73,6 +76,17 @@ export abstract class AbstractContentProvider implements ContentProvider {
       throw new ProviderRequestError(this.id, null, `${this.id} request failed: ${reason}`);
     } finally {
       clearTimeout(timer);
+    }
+  }
+
+  protected async getOrNull<TResponse>(path: string): Promise<TResponse | null> {
+    try {
+      return await this.getJson<TResponse>(path);
+    } catch (error) {
+      if (error instanceof ProviderRequestError && error.status === 404) {
+        return null;
+      }
+      throw error;
     }
   }
 

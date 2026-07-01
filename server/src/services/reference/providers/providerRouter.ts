@@ -1,5 +1,5 @@
 import { SRD_CATEGORY } from "../../../../../shared/constants/srd";
-import type { SrdCategory, SrdCondition, SrdConditionSummary, SrdItem, SrdItemSummary, SrdListPage, SrdMonster, SrdMonsterSummary, SrdQuery, SrdSource, SrdSpell, SrdSpellSummary } from "../../../../../shared/dto/srd";
+import type { SrdCategory, SrdCondition, SrdConditionSummary, SrdItem, SrdItemSummary, SrdListPage, SrdCreature, SrdCreatureSummary, SrdQuery, SrdSource, SrdSpell, SrdSpellSummary } from "../../../../../shared/dto/srd";
 import type { ContentProvider } from "./contentProvider";
 import { NoProviderAvailableError } from "./providerErrors";
 import { DEFAULT_ROUTING, type ProviderRouting } from "./routing";
@@ -22,13 +22,13 @@ export class ProviderRouter {
     return this.run(SRD_CATEGORY.Spell, (provider) => provider.searchSpells(query));
   }
 
-  getMonster(slug: string): Promise<SrdMonster | null> {
-    return this.run(SRD_CATEGORY.Monster, (provider) => provider.getMonster(slug));
+  getCreature(slug: string): Promise<SrdCreature | null> {
+    return this.run(SRD_CATEGORY.Monster, (provider) => provider.getCreature(slug));
   }
 
-  searchMonsters(query: SrdQuery): Promise<SrdListPage<SrdMonsterSummary>> {
+  searchCreatures(query: SrdQuery): Promise<SrdListPage<SrdCreatureSummary>> {
     return this.run(SRD_CATEGORY.Monster, (provider) =>
-      provider.searchMonsters(query),
+      provider.searchCreatures(query),
     );
   }
 
