@@ -4,6 +4,8 @@ import { useCharacterSheet } from "../../hooks/useCharacterSheet";
 import { useIsMobile } from "../../hooks/useMediaQuery";
 import { MobileCharacterSheet } from "./character/MobileCharacterSheet";
 import { DesktopCharacterSheet } from "./character/DesktopCharacterSheet";
+import { MobileCreatureSheet } from "./creature/MobileCreatureSheet";
+import { DesktopCreatureSheet } from "./creature/DesktopCreatureSheet";
 import type { CharacterSheetState } from "../../types/characters/characterSheet";
 import type { CharacterType } from "../../types/characters/characters";
 import {
@@ -29,13 +31,24 @@ type CharacterSheetProps = {
 };
 
 const CharacterSheetInner = ({
+  sheetType,
   onClose,
   onForceSave,
 }: {
+  sheetType: CharacterType;
   onClose: () => void;
   onForceSave?: (state: CharacterSheetState) => void;
 }) => {
   const isMobile = useIsMobile();
+
+  if (sheetType === "monster") {
+    return isMobile ? (
+      <MobileCreatureSheet onClose={onClose} onForceSave={onForceSave} />
+    ) : (
+      <DesktopCreatureSheet />
+    );
+  }
+
   return isMobile ? (
     <MobileCharacterSheet onClose={onClose} onForceSave={onForceSave} />
   ) : (
@@ -108,6 +121,7 @@ export const CharacterSheet = ({
   onCreated,
 }: CharacterSheetProps) => {
   const { data: loadedCharacter, isLoading, error } = useCharacterQuery(characterId);
+  const sheetType: CharacterType = loadedCharacter?.type ?? defaultType;
   const createCharacterMutation = useCreateCharacterMutation();
   const updateCharacterMutation = useUpdateCharacterMutation();
   const [saveStatus, setSaveStatus] = useState<StatusChipState>({ status: "idle" });
@@ -216,7 +230,7 @@ export const CharacterSheet = ({
               saveStatus={saveStatus}
               onDismissStatus={dismissStatus}
             />
-            <CharacterSheetInner onClose={handleClose} onForceSave={handleSave} />
+            <CharacterSheetInner sheetType={sheetType} onClose={handleClose} onForceSave={handleSave} />
           </CharacterSheetProvider>
         )}
       </div>

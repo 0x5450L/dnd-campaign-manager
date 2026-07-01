@@ -7,9 +7,10 @@ type CombatStatsProps = {
   size: string;
   proficiencyBonus: number;
   passivePerception: number;
-  hasInspiration: boolean;
+  hasInspiration?: boolean;
+  showInspiration?: boolean;
   onUpdate: (field: string, value: number | string) => void;
-  onToggleInspiration: () => void;
+  onToggleInspiration?: () => void;
 };
 
 export const CombatStats = ({
@@ -18,7 +19,8 @@ export const CombatStats = ({
   size,
   proficiencyBonus,
   passivePerception,
-  hasInspiration,
+  hasInspiration = false,
+  showInspiration = true,
   onUpdate,
   onToggleInspiration,
 }: CombatStatsProps) => {
@@ -94,7 +96,7 @@ export const CombatStats = ({
 
       <div className="flex flex-col justify-evenly items-center flex-1 min-w-0 gap-2 sm:gap-3">
         {sizeSelect}
-        {inspirationToggle}
+        {showInspiration && inspirationToggle}
       </div>
     </div>
   );
