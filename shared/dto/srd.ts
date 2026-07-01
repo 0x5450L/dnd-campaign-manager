@@ -51,18 +51,18 @@ export interface SrdSpell extends SrdSpellSummary {
   classes: string[];
 }
 
-export interface SrdMonsterSummary extends SrdRef {
+export interface SrdCreatureSummary extends SrdRef {
   source: SrdSource;
   challengeRating: number;
   type: string | null;
 }
 
-export interface SrdMonsterAction {
+export interface SrdCreatureAction {
   name: string;
   description: string;
 }
 
-export interface SrdMonster extends SrdMonsterSummary {
+export interface SrdCreature extends SrdCreatureSummary {
   size: string | null;
   alignment: string | null;
   armorClass: number;
@@ -79,9 +79,9 @@ export interface SrdMonster extends SrdMonsterSummary {
   damageResistances: string | null;
   damageImmunities: string | null;
   conditionImmunities: string | null;
-  specialAbilities: SrdMonsterAction[];
-  actions: SrdMonsterAction[];
-  legendaryActions: SrdMonsterAction[];
+  specialAbilities: SrdCreatureAction[];
+  actions: SrdCreatureAction[];
+  legendaryActions: SrdCreatureAction[];
 }
 
 export interface SrdItemSummary extends SrdRef {
@@ -107,7 +107,7 @@ export interface SrdCondition extends SrdConditionSummary {
 
 export interface SrdCategoryShape {
   spell: { summary: SrdSpellSummary; detail: SrdSpell };
-  monster: { summary: SrdMonsterSummary; detail: SrdMonster };
+  monster: { summary: SrdCreatureSummary; detail: SrdCreature };
   item: { summary: SrdItemSummary; detail: SrdItem };
   condition: { summary: SrdConditionSummary; detail: SrdCondition };
 }
