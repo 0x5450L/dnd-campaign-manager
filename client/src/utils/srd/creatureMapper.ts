@@ -9,7 +9,8 @@ import type {
   CharacterSheetState,
   SkillDef,
 } from "../../types/characters/characterSheet";
-import { buildAttacks, buildNotes } from "./creatureNotesFormatter";
+import { buildAttacks } from "./creatureActionParser";
+import { buildNotes } from "./creatureNotesFormatter";
 
 const buildAbilities = (
   creature: SrdCreature,

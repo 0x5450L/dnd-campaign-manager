@@ -1,28 +1,4 @@
 import type { SrdCreature, SrdCreatureAction } from "../../../../shared/dto/srd";
-import { MIN_ATTACKS } from "../../constants/characterSheet";
-import type { Attack } from "../../types/characters/characterSheet";
-
-const makeEmptyAttack = (): Attack => ({
-  id: crypto.randomUUID(),
-  name: "",
-  attackBonus: "",
-  damage: "",
-  notes: "",
-});
-
-export const buildAttacks = (actions: SrdCreatureAction[]): Attack[] => {
-  const mapped: Attack[] = actions.map((action) => ({
-    id: crypto.randomUUID(),
-    name: action.name,
-    attackBonus: "",
-    damage: "",
-    notes: action.description,
-  }));
-  while (mapped.length < MIN_ATTACKS) {
-    mapped.push(makeEmptyAttack());
-  }
-  return mapped;
-};
 
 const labelled = (title: string, body: string | null): string | null =>
   body && body.trim() !== "" ? `${title}: ${body}` : null;
