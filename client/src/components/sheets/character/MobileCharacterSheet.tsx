@@ -4,20 +4,20 @@ import type {
   AbilityName,
   CharacterSheetState,
 } from "../../../types/characters/characterSheet";
-import { MobileHeader } from "./MobileHeader";
-import { MobileTabBar, type MobileTab } from "./MobileTabBar";
-import { ArmorClass } from "../blocks/ArmorClass";
-import { HitPoints } from "../blocks/HitPoints";
-import { HitDice } from "../blocks/HitDice";
-import { DeathSaves } from "../blocks/DeathSaves";
-import { CombatStats } from "../blocks/CombatStats";
-import { AttacksTable } from "../blocks/AttacksTable";
-import { SpellSlots } from "../blocks/SpellSlots";
-import { AbilityScore } from "../blocks/AbilityScore";
-import { CharacterLore } from "../blocks/CharacterLore";
-import { ClassFeatures } from "../blocks/ClassFeatures";
-import { TextBlock } from "../inputs/TextBlock";
-import { Proficiencies } from "../blocks/Proficiencies";
+import { MobileHeader } from "../shared/navigation/MobileHeader";
+import { MobileTabBar, type MobileTab } from "../shared/navigation/MobileTabBar";
+import { ArmorClass } from "../shared/sections/ArmorClass";
+import { HitPoints } from "../shared/sections/HitPoints";
+import { HitDice } from "./sections/HitDice";
+import { DeathSaves } from "./sections/DeathSaves";
+import { CombatStats } from "../shared/sections/CombatStats";
+import { AttacksTable } from "../shared/sections/AttacksTable";
+import { SpellSlots } from "./sections/SpellSlots";
+import { AbilityScore } from "../shared/sections/AbilityScore";
+import { CharacterLore } from "./sections/CharacterLore";
+import { ClassFeatures } from "./sections/ClassFeatures";
+import { TextBlock } from "../shared/inputs/TextBlock";
+import { Proficiencies } from "./sections/Proficiencies";
 
 const ABILITY_NAMES: Record<AbilityName, string> = {
   str: "Strength",

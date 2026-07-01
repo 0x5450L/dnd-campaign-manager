@@ -1,5 +1,5 @@
-import { useCharacterSheet } from "../../../hooks/useCharacterSheet";
-import type { CharacterSheetState } from "../../../types/characters/characterSheet";
+import { useCharacterSheet } from "../../../../hooks/useCharacterSheet";
+import type { CharacterSheetState } from "../../../../types/characters/characterSheet";
 
 type MobileHeaderProps = {
   onClose: () => void;

@@ -1,4 +1,4 @@
-import { useCharacterSheet } from "../../../hooks/useCharacterSheet";
+import { useCharacterSheet } from "../../../../hooks/useCharacterSheet";
 
 type CheckVariant = "success" | "fail";
 

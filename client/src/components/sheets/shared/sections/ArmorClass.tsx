@@ -1,6 +1,6 @@
 import { NumericInput } from "../inputs/NumericInput";
-import { useCharacterSheet } from "../../../hooks/useCharacterSheet";
-import { SHIELD_AC_BONUS } from "../../../utils/dndMath";
+import { useCharacterSheet } from "../../../../hooks/useCharacterSheet";
+import { SHIELD_AC_BONUS } from "../../../../utils/dndMath";
 
 export const ArmorClass = () => {
   const { state, setField, toggleShield } = useCharacterSheet();

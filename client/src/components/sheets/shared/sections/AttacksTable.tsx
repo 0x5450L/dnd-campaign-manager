@@ -1,5 +1,5 @@
-import { MIN_ATTACKS } from "../../../constants/characterSheet";
-import type { Attack } from "../../../types/characters/characterSheet";
+import { MIN_ATTACKS } from "../../../../constants/characterSheet";
+import type { Attack } from "../../../../types/characters/characterSheet";
 
 type AttacksTableProps = {
   attacks: Attack[];

@@ -2,8 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { CharacterSheetProvider } from "../../context/characterSheetContext/CharacterSheetProvider";
 import { useCharacterSheet } from "../../hooks/useCharacterSheet";
 import { useIsMobile } from "../../hooks/useMediaQuery";
-import { MobileCharacterSheet } from "./layouts/MobileCharacterSheet";
-import { DesktopCharacterSheet } from "./layouts/DesktopCharacterSheet";
+import { MobileCharacterSheet } from "./character/MobileCharacterSheet";
+import { DesktopCharacterSheet } from "./character/DesktopCharacterSheet";
 import type { CharacterSheetState } from "../../types/characters/characterSheet";
 import type { CharacterType } from "../../types/characters/characters";
 import {

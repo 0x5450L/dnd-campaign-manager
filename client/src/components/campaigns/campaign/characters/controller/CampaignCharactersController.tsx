@@ -3,7 +3,7 @@ import type { Character, CharacterType } from "../../../../../types/characters/c
 import type { CharacterSheetState } from "../../../../../types/characters/characterSheet";
 import type { SrdCreature } from "../../../../../../../shared/dto/srd";
 import { srdCreatureToSheetState } from "../../../../../utils/srd/creatureMapper";
-import { CharacterSheet } from "../../../../characters/CharacterSheet";
+import { CharacterSheet } from "../../../../sheets/CharacterSheet";
 import {
   useCampaignCharactersQuery,
   useCharactersRealtimeSync,

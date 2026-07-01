@@ -1,6 +1,6 @@
-import { NumericInput } from "../inputs/NumericInput";
-import { GradientInput } from "../inputs/GradientInput";
-import { useCharacterSheet } from "../../../hooks/useCharacterSheet";
+import { NumericInput } from "../../shared/inputs/NumericInput";
+import { GradientInput } from "../../shared/inputs/GradientInput";
+import { useCharacterSheet } from "../../../../hooks/useCharacterSheet";
 
 export const CharacterLore = () => {
   const { state, setField, setLevelFromXp, setXpFromLevel } = useCharacterSheet();

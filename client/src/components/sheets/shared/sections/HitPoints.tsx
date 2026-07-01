@@ -1,5 +1,5 @@
 import { NumericInput } from "../inputs/NumericInput";
-import { useCharacterSheet } from "../../../hooks/useCharacterSheet";
+import { useCharacterSheet } from "../../../../hooks/useCharacterSheet";
 
 export const HitPoints = () => {
   const { state, setField } = useCharacterSheet();
