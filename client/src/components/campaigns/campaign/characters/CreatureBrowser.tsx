@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import type { SrdMonster } from "../../../../utils/srdMonsterMapping";
-import { useSrdMonsterSearchQuery } from "../../../../queries/srd";
-import { getSrdMonster } from "../../../../services/api/srd";
+import type { SrdCreature } from "../../../../../../shared/dto/srd";
+import { useSrdCreatureSearchQuery } from "../../../../queries/srd";
+import { getSrdCreature } from "../../../../services/api/srd";
 
-type MonsterBrowserProps = {
+type CreatureBrowserProps = {
   isOpen: boolean;
   onClose: () => void;
-  onSelectMonster: (monster: SrdMonster) => void;
+  onSelectCreature: (creature: SrdCreature) => void;
 };
 
 const formatCr = (cr: number): string => {
@@ -16,7 +16,7 @@ const formatCr = (cr: number): string => {
   return String(cr);
 };
 
-function MonsterBrowser({ isOpen, onClose, onSelectMonster }: MonsterBrowserProps) {
+function CreatureBrowser({ isOpen, onClose, onSelectCreature }: CreatureBrowserProps) {
   const [term, setTerm] = useState("");
   const [debounced, setDebounced] = useState("");
   const [loadingSlug, setLoadingSlug] = useState<string | null>(null);
@@ -35,16 +35,16 @@ function MonsterBrowser({ isOpen, onClose, onSelectMonster }: MonsterBrowserProp
     return () => window.removeEventListener("keydown", onKey);
   }, [isOpen, onClose]);
 
-  const { data, isFetching, isError } = useSrdMonsterSearchQuery(debounced);
+  const { data, isFetching, isError } = useSrdCreatureSearchQuery(debounced);
   const results = data?.results ?? [];
 
   const handleSelect = async (slug: string) => {
     setLoadingSlug(slug);
     try {
-      const monster = await getSrdMonster(slug);
-      onSelectMonster(monster);
+      const creature = await getSrdCreature(slug);
+      onSelectCreature(creature);
     } catch (error) {
-      console.error("Failed to load monster:", error);
+      console.error("Failed to load creature:", error);
     } finally {
       setLoadingSlug(null);
     }
@@ -109,19 +109,19 @@ function MonsterBrowser({ isOpen, onClose, onSelectMonster }: MonsterBrowserProp
               No monsters found for “{debounced}”.
             </p>
           ) : (
-            results.map((monster) => (
+            results.map((creature) => (
               <button
-                key={monster.slug}
+                key={creature.slug}
                 type="button"
                 disabled={loadingSlug !== null}
-                onClick={() => handleSelect(monster.slug)}
+                onClick={() => handleSelect(creature.slug)}
                 className="flex items-center justify-between gap-3 rounded-md border border-rule/60 bg-surface px-3 py-2 text-left transition-colors duration-150 hover:border-gold hover:bg-surface-light disabled:cursor-not-allowed disabled:opacity-60"
               >
-                <span className="font-medium text-ink">{monster.name}</span>
+                <span className="font-medium text-ink">{creature.name}</span>
                 <span className="flex shrink-0 items-center gap-2 text-xs text-dim">
-                  {monster.type && <span className="capitalize">{monster.type}</span>}
+                  {creature.type && <span className="capitalize">{creature.type}</span>}
                   <span className="rounded bg-bg px-1.5 py-0.5 text-gold">
-                    {loadingSlug === monster.slug ? "…" : `CR ${formatCr(monster.challengeRating)}`}
+                    {loadingSlug === creature.slug ? "…" : `CR ${formatCr(creature.challengeRating)}`}
                   </span>
                 </span>
               </button>
@@ -133,4 +133,4 @@ function MonsterBrowser({ isOpen, onClose, onSelectMonster }: MonsterBrowserProp
   );
 }
 
-export default MonsterBrowser;
+export default CreatureBrowser;

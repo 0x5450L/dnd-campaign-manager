@@ -1,10 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import type { Character, CharacterType } from "../../../../../types/characters/characters";
 import type { CharacterSheetState } from "../../../../../types/characters/characterSheet";
-import {
-  srdMonsterToSheetState,
-  type SrdMonster,
-} from "../../../../../utils/srdMonsterMapping";
+import type { SrdCreature } from "../../../../../../../shared/dto/srd";
+import { srdCreatureToSheetState } from "../../../../../utils/srd/creatureMapper";
 import { CharacterSheet } from "../../../../characters/CharacterSheet";
 import {
   useCampaignCharactersQuery,
@@ -15,7 +13,7 @@ import { useLiveSession } from "../../../../../hooks/useLiveSession";
 import { useNotificationStore } from "../../../../../state/notifications/notificationStore";
 import ConfirmDialog from "../../../../ui/ConfirmDialog";
 import CharactersSidebar from "../CharactersSidebar";
-import MonsterBrowser from "../MonsterBrowser";
+import CreatureBrowser from "../CreatureBrowser";
 import { CampaignCharactersContext } from "./CampaignCharactersContext";
 
 type SheetMode =
@@ -106,9 +104,9 @@ function CampaignCharactersController({
     setIsBestiaryOpen(true);
   };
 
-  const handleSelectMonster = (monster: SrdMonster) => {
+  const handleSelectCreature = (creature: SrdCreature) => {
     setIsBestiaryOpen(false);
-    setSheetMode({ kind: "preview", seed: srdMonsterToSheetState(monster) });
+    setSheetMode({ kind: "preview", seed: srdCreatureToSheetState(creature) });
   };
 
   const handleConfirmDeleteCharacter = () => {
@@ -149,10 +147,10 @@ function CampaignCharactersController({
             onDeleteCharacter={(c) => setCharacterToDelete(c)}
           />
 
-          <MonsterBrowser
+          <CreatureBrowser
             isOpen={isBestiaryOpen}
             onClose={() => setIsBestiaryOpen(false)}
-            onSelectMonster={handleSelectMonster}
+            onSelectCreature={handleSelectCreature}
           />
         </>
       )}
