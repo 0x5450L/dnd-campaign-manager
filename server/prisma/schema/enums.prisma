@@ -36,6 +36,11 @@ enum Alignment {
   chaotic_evil
 }
 
+enum CreatureTraitKind {
+  trait
+  legendary_action
+}
+
 enum HitDiceType {
   d6
   d8

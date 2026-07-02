@@ -1,0 +1,28 @@
+model CreatureProfile {
+  id                    String          @id @default(uuid())
+  challengeRating       Float?          @map("challenge_rating")
+  size                  String?
+  creatureType          String?         @map("creature_type")
+  senses                String?
+  languages             String?
+  damageVulnerabilities String?         @map("damage_vulnerabilities")
+  damageResistances     String?         @map("damage_resistances")
+  damageImmunities      String?         @map("damage_immunities")
+  conditionImmunities   String?         @map("condition_immunities")
+  characterId           String          @unique @map("character_id")
+  character             Character       @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  traits                CreatureTrait[]
+
+  @@map("creature_profiles")
+}
+
+model CreatureTrait {
+  id          String            @id @default(uuid())
+  kind        CreatureTraitKind
+  name        String
+  description String
+  profileId   String            @map("profile_id")
+  profile     CreatureProfile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@map("creature_traits")
+}

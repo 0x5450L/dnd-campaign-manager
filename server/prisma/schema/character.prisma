@@ -31,6 +31,7 @@ model Character {
   abilityScores           AbilityScore[]
   skills                  Skill[]
   attacks                 Attack[]
+  creatureProfile         CreatureProfile?
 
   @@map("characters")
 }
