@@ -10,6 +10,7 @@ import {
   requireCampaignId,
   requireCharacterId,
   requireCreateCharacterFields,
+  requireMonsterForCreatureProfile,
 } from "./charactersValidation";
 import {
   notifyCharacterCreated,
@@ -35,6 +36,7 @@ export const createCharacter = async (
   body: CreateCharacterPayload,
 ) => {
   requireCreateCharacterFields(body);
+  requireMonsterForCreatureProfile(body.type, body.creatureProfile);
 
   const campaign = await charactersRepo.findCampaignForMember(body.campaignId, userId);
   if (!campaign) {
@@ -72,6 +74,8 @@ export const updateCharacter = async (
     await charactersRepo.findCharacterWithCampaignAccess(characterId),
     userId,
   );
+
+  requireMonsterForCreatureProfile(body.type ?? current.type, body.creatureProfile);
 
   const isDM = current.campaign.dmId === userId;
   if (!isDM) {

@@ -37,6 +37,45 @@ export type CharacterAttackDTO = CharacterAttackInput & {
   id: string;
 };
 
+export type CreatureTraitKind = "trait" | "legendary_action";
+
+export type CreatureTraitInput = {
+  kind: CreatureTraitKind;
+  name: string;
+  description: string;
+};
+
+export type CreatureTraitDTO = CreatureTraitInput & {
+  id: string;
+};
+
+export type CreatureProfileInput = {
+  challengeRating?: number | null;
+  size?: string | null;
+  creatureType?: string | null;
+  senses?: string | null;
+  languages?: string | null;
+  damageVulnerabilities?: string | null;
+  damageResistances?: string | null;
+  damageImmunities?: string | null;
+  conditionImmunities?: string | null;
+  traits?: CreatureTraitInput[];
+};
+
+export type CreatureProfileDTO = {
+  id: string;
+  challengeRating: number | null;
+  size: string | null;
+  creatureType: string | null;
+  senses: string | null;
+  languages: string | null;
+  damageVulnerabilities: string | null;
+  damageResistances: string | null;
+  damageImmunities: string | null;
+  conditionImmunities: string | null;
+  traits: CreatureTraitDTO[];
+};
+
 export type CharacterDTO = {
   id: string;
   name: string;
@@ -63,6 +102,7 @@ export type CharacterDTO = {
   abilityScores: CharacterAbilityDTO[];
   skills: CharacterSkillDTO[];
   attacks: CharacterAttackDTO[];
+  creatureProfile: CreatureProfileDTO | null;
   spellSlots?: SpellSlotLevel[] | null;
   createdAt: string;
   updatedAt: string;
@@ -77,6 +117,7 @@ export type CreateCharacterPayload = {
   background?: string;
   alignment?: Alignment;
   notes?: string | null;
+  creatureProfile?: CreatureProfileInput;
 };
 
 export type UpdateCharacterPayload = Partial<{
@@ -102,5 +143,6 @@ export type UpdateCharacterPayload = Partial<{
   abilityScores: CharacterAbilityDTO[];
   skills: CharacterSkillDTO[];
   attacks: CharacterAttackInput[];
+  creatureProfile: CreatureProfileInput;
   spellSlots: SpellSlotLevel[] | null;
 }>;

@@ -8,6 +8,8 @@ import {
 } from "../../constants/dnd";
 import type {
   CreateCharacterPayload,
+  CreatureProfileInput,
+  CreatureTraitInput,
   UpdateCharacterPayload,
 } from "../../../../shared/dto/character";
 
@@ -15,7 +17,46 @@ const characterSheetInclude = {
   abilityScores: true,
   skills: true,
   attacks: true,
+  creatureProfile: { include: { traits: true } },
 } satisfies Prisma.CharacterInclude;
+
+const creatureProfileScalars = (input: CreatureProfileInput) =>
+  pickDefined({
+    challengeRating: input.challengeRating,
+    size: input.size,
+    creatureType: input.creatureType,
+    senses: input.senses,
+    languages: input.languages,
+    damageVulnerabilities: input.damageVulnerabilities,
+    damageResistances: input.damageResistances,
+    damageImmunities: input.damageImmunities,
+    conditionImmunities: input.conditionImmunities,
+  });
+
+const creatureTraitCreates = (traits: CreatureTraitInput[]) =>
+  traits.map((trait) => ({
+    kind: trait.kind,
+    name: trait.name,
+    description: trait.description,
+  }));
+
+const creatureProfileCreate = (input: CreatureProfileInput) => ({
+  ...creatureProfileScalars(input),
+  ...(input.traits !== undefined &&
+    input.traits.length > 0 && {
+      traits: { create: creatureTraitCreates(input.traits) },
+    }),
+});
+
+const creatureProfileUpdate = (input: CreatureProfileInput) => ({
+  ...creatureProfileScalars(input),
+  ...(input.traits !== undefined && {
+    traits:
+      input.traits.length === 0
+        ? { deleteMany: {} }
+        : { deleteMany: {}, create: creatureTraitCreates(input.traits) },
+  }),
+});
 
 const campaignAccessInclude = {
   campaign: {
@@ -56,6 +97,9 @@ export const createCharacter = (userId: string, input: CreateCharacterPayload) =
       skills: {
         create: SKILL_NAMES.map((skillName) => ({ name: skillName })),
       },
+      ...(input.creatureProfile !== undefined && {
+        creatureProfile: { create: creatureProfileCreate(input.creatureProfile) },
+      }),
     },
     include: characterSheetInclude,
   });
@@ -124,6 +168,14 @@ export const updateCharacter = (id: string, input: UpdateCharacterPayload) =>
             where: { name: s.name },
             data: { proficient: s.proficient },
           })),
+        },
+      }),
+      ...(input.creatureProfile !== undefined && {
+        creatureProfile: {
+          upsert: {
+            create: creatureProfileCreate(input.creatureProfile),
+            update: creatureProfileUpdate(input.creatureProfile),
+          },
         },
       }),
       ...(input.attacks !== undefined && {

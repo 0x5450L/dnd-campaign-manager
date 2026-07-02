@@ -1,5 +1,9 @@
 import { AppError } from "../../utils/errors";
-import type { CreateCharacterPayload } from "../../../../shared/dto/character";
+import type {
+  CharacterType,
+  CreateCharacterPayload,
+  CreatureProfileInput,
+} from "../../../../shared/dto/character";
 
 export const requireCreateCharacterFields = (body: CreateCharacterPayload) => {
   if (
@@ -10,6 +14,15 @@ export const requireCreateCharacterFields = (body: CreateCharacterPayload) => {
     !body.campaignId
   ) {
     throw new AppError(400, "Provide all necessary character details");
+  }
+};
+
+export const requireMonsterForCreatureProfile = (
+  type: CharacterType,
+  creatureProfile: CreatureProfileInput | undefined,
+) => {
+  if (creatureProfile !== undefined && type !== "monster") {
+    throw new AppError(400, "Creature profile is only allowed for monsters");
   }
 };
 
