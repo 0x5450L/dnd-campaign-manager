@@ -51,28 +51,14 @@ export type CreatureTraitDTO = CreatureTraitInput & {
 
 export type CreatureProfileInput = {
   challengeRating?: number | null;
-  size?: string | null;
   creatureType?: string | null;
-  senses?: string | null;
-  languages?: string | null;
-  damageVulnerabilities?: string | null;
-  damageResistances?: string | null;
-  damageImmunities?: string | null;
-  conditionImmunities?: string | null;
   traits?: CreatureTraitInput[];
 };
 
 export type CreatureProfileDTO = {
   id: string;
   challengeRating: number | null;
-  size: string | null;
   creatureType: string | null;
-  senses: string | null;
-  languages: string | null;
-  damageVulnerabilities: string | null;
-  damageResistances: string | null;
-  damageImmunities: string | null;
-  conditionImmunities: string | null;
   traits: CreatureTraitDTO[];
 };
 
@@ -97,6 +83,13 @@ export type CharacterDTO = {
   armorClass: number;
   usesShield: boolean;
   inspiration: boolean;
+  size: string | null;
+  senses: string | null;
+  languages: string | null;
+  damageVulnerabilities: string | null;
+  damageResistances: string | null;
+  damageImmunities: string | null;
+  conditionImmunities: string | null;
   campaignId: string;
   userId: string;
   abilityScores: CharacterAbilityDTO[];
@@ -140,6 +133,13 @@ export type UpdateCharacterPayload = Partial<{
   armorClass: number;
   usesShield: boolean;
   inspiration: boolean;
+  size: string | null;
+  senses: string | null;
+  languages: string | null;
+  damageVulnerabilities: string | null;
+  damageResistances: string | null;
+  damageImmunities: string | null;
+  conditionImmunities: string | null;
   abilityScores: CharacterAbilityDTO[];
   skills: CharacterSkillDTO[];
   attacks: CharacterAttackInput[];

@@ -23,14 +23,7 @@ const characterSheetInclude = {
 const creatureProfileScalars = (input: CreatureProfileInput) =>
   pickDefined({
     challengeRating: input.challengeRating,
-    size: input.size,
     creatureType: input.creatureType,
-    senses: input.senses,
-    languages: input.languages,
-    damageVulnerabilities: input.damageVulnerabilities,
-    damageResistances: input.damageResistances,
-    damageImmunities: input.damageImmunities,
-    conditionImmunities: input.conditionImmunities,
   });
 
 const creatureTraitCreates = (traits: CreatureTraitInput[]) =>
@@ -150,6 +143,13 @@ export const updateCharacter = (id: string, input: UpdateCharacterPayload) =>
         armorClass: input.armorClass,
         usesShield: input.usesShield,
         inspiration: input.inspiration,
+        size: input.size,
+        senses: input.senses,
+        languages: input.languages,
+        damageVulnerabilities: input.damageVulnerabilities,
+        damageResistances: input.damageResistances,
+        damageImmunities: input.damageImmunities,
+        conditionImmunities: input.conditionImmunities,
       }),
       ...(input.spellSlots !== undefined && {
         spellSlots: jsonInput(input.spellSlots),
