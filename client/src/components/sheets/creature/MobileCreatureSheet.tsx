@@ -13,6 +13,8 @@ import { AttacksTable } from "../shared/sections/AttacksTable";
 import { AbilityScore } from "../shared/sections/AbilityScore";
 import { TextBlock } from "../shared/inputs/TextBlock";
 import { CreatureHeader } from "./sections/CreatureHeader";
+import { CreatureDetails } from "./sections/CreatureDetails";
+import { CreatureTraits } from "./sections/CreatureTraits";
 
 const ABILITY_NAMES: Record<AbilityName, string> = {
   str: "Strength",
@@ -105,6 +107,8 @@ export const MobileCreatureSheet = ({ onClose, onForceSave }: MobileCreatureShee
         {activeTab === "lore" && (
           <>
             <CreatureHeader />
+            <CreatureDetails />
+            <CreatureTraits />
             <TextBlock
               title="Notes"
               value={state.notes}

@@ -7,6 +7,8 @@ import { CombatStats } from "../shared/sections/CombatStats";
 import { AttacksTable } from "../shared/sections/AttacksTable";
 import { TextBlock } from "../shared/inputs/TextBlock";
 import { CreatureHeader } from "./sections/CreatureHeader";
+import { CreatureDetails } from "./sections/CreatureDetails";
+import { CreatureTraits } from "./sections/CreatureTraits";
 
 const ABILITY_NAMES: Record<AbilityName, string> = {
   str: "Strength",
@@ -70,6 +72,10 @@ export const DesktopCreatureSheet = () => {
           <div className="order-6 lg:order-0">
             <TextBlock title="Notes" value={state.notes} onChange={(updatedNotes) => setField("notes", updatedNotes)} />
           </div>
+
+          <div className="order-7 lg:order-0">
+            <CreatureDetails />
+          </div>
         </div>
 
         <div className="contents lg:flex lg:flex-col lg:gap-3">
@@ -91,6 +97,10 @@ export const DesktopCreatureSheet = () => {
 
           <div className="order-4 lg:order-0">
             <AttacksTable attacks={state.attacks} onUpdate={updateAttack} onAdd={addAttack} onRemove={removeAttack} />
+          </div>
+
+          <div className="order-8 lg:order-0">
+            <CreatureTraits />
           </div>
         </div>
       </div>
