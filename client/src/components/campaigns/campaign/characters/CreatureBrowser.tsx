@@ -93,7 +93,7 @@ function CreatureBrowser({ isOpen, onClose, onSelectCreature }: CreatureBrowserP
           />
         </div>
 
-        <div className="flex max-h-[55vh] flex-col gap-1.5 overflow-y-auto px-4 py-3">
+        <div className="custom-scrollbar flex max-h-[55vh] flex-col gap-1.5 overflow-y-auto px-4 py-3">
           {debounced.trim() === "" ? (
             <p className="py-8 text-center text-sm text-faint">
               Type a name to search the bestiary.

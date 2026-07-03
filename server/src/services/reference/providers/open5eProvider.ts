@@ -11,6 +11,8 @@ import {
   type Open5eMonsterResult,
 } from "./mappers/open5e";
 
+const OFFICIAL_SRD_DOCUMENT = "wotc-srd";
+
 export class Open5eProvider extends AbstractContentProvider {
   readonly id: SrdSource = SRD_SOURCE.Open5e;
   readonly capabilities: ReadonlySet<SrdCategory> = new Set<SrdCategory>([
@@ -65,6 +67,7 @@ export class Open5eProvider extends AbstractContentProvider {
       search: query.search,
       limit: query.limit,
       offset: query.offset,
+      document__slug: OFFICIAL_SRD_DOCUMENT,
     })}`;
     const response =
       await this.getJson<Open5eListResponse<Open5eMonsterResult>>(path);
