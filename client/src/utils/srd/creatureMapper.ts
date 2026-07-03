@@ -3,13 +3,15 @@ import {
   SKILL_DEFINITIONS,
 } from "../../../../shared/constants/dnd";
 import type { AbilityName } from "../../../../shared/types/dnd";
-import type { SrdCreature } from "../../../../shared/dto/srd";
+import type { SrdCreature, SrdCreatureAction } from "../../../../shared/dto/srd";
 import type {
   AbilityState,
   CharacterSheetState,
+  CreatureTrait,
+  CreatureTraitKind,
   SkillDef,
 } from "../../types/characters/characterSheet";
-import { buildAttacks } from "./creatureActionParser";
+import { splitCreatureActions } from "./creatureActionParser";
 import { buildNotes } from "./creatureNotesFormatter";
 
 const buildAbilities = (
@@ -36,28 +38,54 @@ const buildSkills = (creature: SrdCreature): SkillDef[] => {
   }));
 };
 
+const toTraits = (
+  actions: SrdCreatureAction[],
+  kind: CreatureTraitKind,
+): CreatureTrait[] =>
+  actions.map((action) => ({
+    id: crypto.randomUUID(),
+    kind,
+    name: action.name,
+    description: action.description,
+  }));
+
 export const srdCreatureToSheetState = (
   creature: SrdCreature,
-): Partial<CharacterSheetState> => ({
-  name: creature.name,
-  race: creature.type ?? "",
-  characterClass: "",
-  background: "",
-  size: creature.size ?? "",
-  abilities: buildAbilities(creature),
-  skills: buildSkills(creature),
-  ac: creature.armorClass,
-  usesShield: false,
-  speed: creature.speed.walk ?? 30,
-  currentHp: creature.hitPoints,
-  maxHp: creature.hitPoints,
-  tempHp: 0,
-  hitDiceType: "d8",
-  hitDiceUsed: 0,
-  deathSaveSuccesses: 0,
-  deathSaveFailures: 0,
-  inspiration: false,
-  attacks: buildAttacks(creature.actions),
-  spellSlots: null,
-  notes: buildNotes(creature),
-});
+): Partial<CharacterSheetState> => {
+  const { attacks, nonAttackActions } = splitCreatureActions(creature.actions);
+  return {
+    name: creature.name,
+    race: creature.type ?? "",
+    characterClass: "",
+    background: "",
+    size: creature.size ?? "",
+    abilities: buildAbilities(creature),
+    skills: buildSkills(creature),
+    ac: creature.armorClass,
+    usesShield: false,
+    speed: creature.speed.walk ?? 30,
+    currentHp: creature.hitPoints,
+    maxHp: creature.hitPoints,
+    tempHp: 0,
+    hitDiceType: "d8",
+    hitDiceUsed: 0,
+    deathSaveSuccesses: 0,
+    deathSaveFailures: 0,
+    inspiration: false,
+    attacks,
+    spellSlots: null,
+    challengeRating: creature.challengeRating,
+    senses: creature.senses ?? "",
+    languages: creature.languages ?? "",
+    damageVulnerabilities: creature.damageVulnerabilities ?? "",
+    damageResistances: creature.damageResistances ?? "",
+    damageImmunities: creature.damageImmunities ?? "",
+    conditionImmunities: creature.conditionImmunities ?? "",
+    traits: [
+      ...toTraits(creature.specialAbilities, "trait"),
+      ...toTraits(nonAttackActions, "trait"),
+      ...toTraits(creature.legendaryActions, "legendary_action"),
+    ],
+    notes: buildNotes(creature),
+  };
+};

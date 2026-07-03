@@ -8,6 +8,8 @@ import type {
   CharacterSkillDTO,
   CharacterType,
   CreateCharacterPayload,
+  CreatureProfileInput,
+  CreatureTraitInput,
   UpdateCharacterPayload,
 } from "../types/characters/characters";
 import type {
@@ -15,6 +17,7 @@ import type {
   AbilityState,
   Attack,
   CharacterSheetState,
+  CreatureTrait,
   SkillDef,
 } from "../types/characters/characterSheet";
 
@@ -92,6 +95,21 @@ export const dtoToSheetState = (
   attacks: buildAttacksFromDto(dto.attacks),
   spellSlots: dto.spellSlots ?? null,
 
+  size: dto.size ?? "Medium",
+  senses: dto.senses ?? "",
+  languages: dto.languages ?? "",
+  damageVulnerabilities: dto.damageVulnerabilities ?? "",
+  damageResistances: dto.damageResistances ?? "",
+  damageImmunities: dto.damageImmunities ?? "",
+  conditionImmunities: dto.conditionImmunities ?? "",
+  challengeRating: dto.creatureProfile?.challengeRating ?? null,
+  traits: (dto.creatureProfile?.traits ?? []).map((t) => ({
+    id: t.id,
+    kind: t.kind,
+    name: t.name,
+    description: t.description,
+  })),
+
   notes: dto.notes ?? "",
 });
 
@@ -131,8 +149,21 @@ export const sheetStateToCreatePayload = (
   notes: state.notes || null,
 });
 
+const sheetTraitsToInputs = (traits: CreatureTrait[]): CreatureTraitInput[] =>
+  traits
+    .filter((t) => t.name.trim() !== "")
+    .map((t) => ({ kind: t.kind, name: t.name, description: t.description }));
+
+const sheetStateToCreatureProfile = (
+  state: CharacterSheetState,
+): CreatureProfileInput => ({
+  challengeRating: state.challengeRating,
+  traits: sheetTraitsToInputs(state.traits),
+});
+
 export const sheetStateToUpdatePayload = (
   state: CharacterSheetState,
+  type: CharacterType,
 ): UpdateCharacterPayload => ({
   name: state.name,
   race: state.race,
@@ -151,8 +182,18 @@ export const sheetStateToUpdatePayload = (
   armorClass: state.ac,
   usesShield: state.usesShield,
   inspiration: state.inspiration,
+  size: state.size || null,
+  senses: state.senses || null,
+  languages: state.languages || null,
+  damageVulnerabilities: state.damageVulnerabilities || null,
+  damageResistances: state.damageResistances || null,
+  damageImmunities: state.damageImmunities || null,
+  conditionImmunities: state.conditionImmunities || null,
   abilityScores: sheetAbilitiesToDtos(state.abilities),
   skills: sheetSkillsToDtos(state.skills),
   attacks: sheetAttacksToInputs(state.attacks),
   spellSlots: state.spellSlots,
+  ...(type === "monster" && {
+    creatureProfile: sheetStateToCreatureProfile(state),
+  }),
 });

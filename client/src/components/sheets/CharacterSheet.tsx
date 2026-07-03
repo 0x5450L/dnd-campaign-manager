@@ -162,7 +162,7 @@ export const CharacterSheet = ({
   const handleSave = (state: CharacterSheetState) => {
     if (loadedCharacter) {
       updateCharacterMutation.mutate(
-        { id: loadedCharacter.id, payload: sheetStateToUpdatePayload(state) },
+        { id: loadedCharacter.id, payload: sheetStateToUpdatePayload(state, sheetType) },
         {
           onSuccess: () => setSaveStatus({ status: "success" }),
           onError: handleSaveError,
@@ -172,7 +172,7 @@ export const CharacterSheet = ({
       createCharacterMutation.mutate(sheetStateToCreatePayload(state, campaignId, defaultType), {
         onSuccess: (character) => {
           updateCharacterMutation.mutate(
-            { id: character.id, payload: sheetStateToUpdatePayload(state) },
+            { id: character.id, payload: sheetStateToUpdatePayload(state, defaultType) },
             {
               onSuccess: () => {
                 setSaveStatus({ status: "success" });

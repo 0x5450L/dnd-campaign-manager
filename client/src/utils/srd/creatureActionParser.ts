@@ -59,14 +59,30 @@ const makeEmptyAttack = (): Attack => ({
   notes: "",
 });
 
-export const buildAttacks = (actions: SrdCreatureAction[]): Attack[] => {
-  const mapped: Attack[] = actions.map((action) => ({
-    id: crypto.randomUUID(),
-    name: action.name,
-    ...parseCreatureAction(action.description),
-  }));
-  while (mapped.length < MIN_ATTACKS) {
-    mapped.push(makeEmptyAttack());
+export type CreatureActionsSplit = {
+  attacks: Attack[];
+  nonAttackActions: SrdCreatureAction[];
+};
+
+export const splitCreatureActions = (
+  actions: SrdCreatureAction[],
+): CreatureActionsSplit => {
+  const attacks: Attack[] = [];
+  const nonAttackActions: SrdCreatureAction[] = [];
+  for (const action of actions) {
+    const parsed = parseCreatureAction(action.description);
+    if (parsed.attackBonus === "" && parsed.damage === "") {
+      nonAttackActions.push(action);
+    } else {
+      attacks.push({
+        id: crypto.randomUUID(),
+        name: action.name,
+        ...parsed,
+      });
+    }
   }
-  return mapped;
+  while (attacks.length < MIN_ATTACKS) {
+    attacks.push(makeEmptyAttack());
+  }
+  return { attacks, nonAttackActions };
 };

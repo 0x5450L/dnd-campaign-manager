@@ -38,7 +38,7 @@ type Props = {
 
 const serverFingerprint = (partial: Partial<CharacterSheetState>): string =>
   JSON.stringify(
-    sheetStateToUpdatePayload({ ...createInitialCharacterSheet(), ...partial }),
+    sheetStateToUpdatePayload({ ...createInitialCharacterSheet(), ...partial }, "monster"),
   );
 
 const buildInitialState = (

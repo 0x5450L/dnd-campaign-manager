@@ -1,5 +1,6 @@
 import type { AbilityName, SpellSlotLevel } from "../../../../shared/types/dnd";
-export type { AbilityName, SpellSlotLevel };
+import type { CreatureTraitKind } from "../../../../shared/dto/character";
+export type { AbilityName, SpellSlotLevel, CreatureTraitKind };
 
 export type AbilityState = {
   score: number;
@@ -21,6 +22,13 @@ export type Attack = {
 };
 
 export type HitDiceType = "d6" | "d8" | "d10" | "d12";
+
+export type CreatureTrait = {
+  id: string;
+  kind: CreatureTraitKind;
+  name: string;
+  description: string;
+};
 
 export type CharacterSheetState = {
   // Lore
@@ -55,6 +63,15 @@ export type CharacterSheetState = {
 
   // Spellcasting
   spellSlots: SpellSlotLevel[] | null;
+
+  challengeRating: number | null;
+  senses: string;
+  languages: string;
+  damageVulnerabilities: string;
+  damageResistances: string;
+  damageImmunities: string;
+  conditionImmunities: string;
+  traits: CreatureTrait[];
 
   // Text blocks
   classFeatures: string;
