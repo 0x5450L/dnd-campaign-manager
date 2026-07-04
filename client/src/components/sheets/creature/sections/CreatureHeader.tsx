@@ -1,15 +1,16 @@
 import { GradientInput } from "../../shared/inputs/GradientInput";
-import { useCharacterSheet } from "../../../../hooks/useCharacterSheet";
+import { useSheet, useSheetActions } from "../../../../state/sheet";
 
 export const CreatureHeader = () => {
-  const { state, setField } = useCharacterSheet();
+  const { name, race } = useSheet((s) => ({ name: s.name, race: s.race }));
+  const { setSharedField } = useSheetActions();
 
   return (
     <div className="cs-section-card p-3 flex flex-col justify-center gap-2">
       <div>
         <GradientInput
-          value={state.name}
-          onChange={(v) => setField("name", v)}
+          value={name}
+          onChange={(v) => setSharedField("name", v)}
           placeholder="Creature Name"
           large
           required
@@ -19,8 +20,8 @@ export const CreatureHeader = () => {
 
       <div>
         <GradientInput
-          value={state.race}
-          onChange={(v) => setField("race", v)}
+          value={race}
+          onChange={(v) => setSharedField("race", v)}
           placeholder="—"
         />
         <div className="cs-label">Type</div>

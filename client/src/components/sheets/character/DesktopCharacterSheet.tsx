@@ -1,4 +1,13 @@
-import { useCharacterSheet } from "../../../hooks/useCharacterSheet";
+import {
+  getAbilityModifier,
+  getInitiative,
+  getPassivePerception,
+  getSaveValue,
+  getSheetProficiencyBonus,
+  getSkillsForAbility,
+  useCharacterSheetState,
+  useSheetActions,
+} from "../../../state/sheet";
 import type { AbilityName } from "../../../types/characters/characterSheet";
 import { CharacterLore } from "./sections/CharacterLore";
 import { ArmorClass } from "../shared/sections/ArmorClass";
@@ -25,15 +34,10 @@ const ABILITY_NAMES: Record<AbilityName, string> = {
 const ALL_ABILITIES: AbilityName[] = ["str", "con", "dex", "int", "wis", "cha"];
 
 export const DesktopCharacterSheet = () => {
+  const state = useCharacterSheetState();
   const {
-    state,
-    proficiencyBonus,
-    getModifier,
-    getSaveValue,
-    getSkillsForAbility,
-    initiative,
-    passivePerception,
-    setField,
+    setSharedField,
+    setCharacterField,
     setAbilityScore,
     setSaveProficient,
     setSkillProficient,
@@ -41,18 +45,18 @@ export const DesktopCharacterSheet = () => {
     addAttack,
     updateAttack,
     removeAttack,
-  } = useCharacterSheet();
+  } = useSheetActions();
 
   const onProficienciesUpdate = (field: string, value: string) => {
     switch (field) {
       case "armorProficiencies":
-        setField("armorProficiencies", value);
+        setCharacterField("armorProficiencies", value);
         break;
       case "weaponProficiencies":
-        setField("weaponProficiencies", value);
+        setCharacterField("weaponProficiencies", value);
         break;
       case "toolProficiencies":
-        setField("toolProficiencies", value);
+        setCharacterField("toolProficiencies", value);
         break;
     }
   };
@@ -77,10 +81,10 @@ export const DesktopCharacterSheet = () => {
                   key={ability}
                   name={ABILITY_NAMES[ability]}
                   score={state.abilities[ability].score}
-                  modifier={getModifier(ability)}
+                  modifier={getAbilityModifier(state, ability)}
                   saveProficient={state.abilities[ability].saveProficient}
-                  saveValue={getSaveValue(ability)}
-                  skills={getSkillsForAbility(ability)}
+                  saveValue={getSaveValue(state, ability)}
+                  skills={getSkillsForAbility(state, ability)}
                   onScoreChange={(updatedAbilityScore) => setAbilityScore(ability, updatedAbilityScore)}
                   onSaveProfChange={(updatedAbilityProficient) => setSaveProficient(ability, updatedAbilityProficient)}
                   onSkillProfChange={setSkillProficient}
@@ -90,7 +94,7 @@ export const DesktopCharacterSheet = () => {
           </div>
 
           <div className="order-6 lg:order-0">
-            <TextBlock title="Notes" value={state.notes} onChange={(updatedNotes) => setField("notes", updatedNotes)} />
+            <TextBlock title="Notes" value={state.notes} onChange={(updatedNotes) => setSharedField("notes", updatedNotes)} />
           </div>
         </div>
 
@@ -98,15 +102,15 @@ export const DesktopCharacterSheet = () => {
           <div className="flex flex-col gap-3 order-3 sm:flex-row sm:items-stretch lg:order-0">
             <CombatStats
               ac={state.ac}
-              initiative={initiative}
+              initiative={getInitiative(state)}
               speed={state.speed}
               size={state.size}
-              proficiencyBonus={proficiencyBonus}
-              passivePerception={passivePerception}
+              proficiencyBonus={getSheetProficiencyBonus(state)}
+              passivePerception={getPassivePerception(state)}
               hasInspiration={state.inspiration}
               onUpdate={(field, value) => {
-                if (field === "speed") setField("speed", value as number);
-                else if (field === "size") setField("size", value as string);
+                if (field === "speed") setSharedField("speed", value as number);
+                else if (field === "size") setSharedField("size", value as string);
               }}
               onToggleInspiration={toggleInspiration}
             />
@@ -125,12 +129,12 @@ export const DesktopCharacterSheet = () => {
             <TextBlock
               title="Racial Traits"
               value={state.racialTraits}
-              onChange={(updatedRacialTraisValue) => setField("racialTraits", updatedRacialTraisValue)}
+              onChange={(updatedRacialTraisValue) => setCharacterField("racialTraits", updatedRacialTraisValue)}
             />
             <TextBlock
               title="Feats"
               value={state.feats}
-              onChange={(updatedFeatsValue) => setField("feats", updatedFeatsValue)}
+              onChange={(updatedFeatsValue) => setCharacterField("feats", updatedFeatsValue)}
             />
           </div>
 

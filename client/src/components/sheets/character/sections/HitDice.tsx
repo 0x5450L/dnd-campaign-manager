@@ -1,28 +1,33 @@
-import { useCharacterSheet } from "../../../../hooks/useCharacterSheet";
+import {
+  getHitDiceMax,
+  getHitDiceRemaining,
+  useCharacterSheet,
+  useSheetActions,
+} from "../../../../state/sheet";
 import type { HitDiceType } from "../../../../types/characters/characterSheet";
 
 const DICE_OPTIONS: HitDiceType[] = ["d6", "d8", "d10", "d12"];
 
 export const HitDice = () => {
-  const {
-    state,
-    setField,
-    hitDiceRemaining,
-    hitDiceMax,
-    spendHitDie,
-    longRest,
-  } = useCharacterSheet();
+  const { currentHp, maxHp, hitDiceType, hitDiceRemaining, hitDiceMax } =
+    useCharacterSheet((s) => ({
+      currentHp: s.currentHp,
+      maxHp: s.maxHp,
+      hitDiceType: s.hitDiceType,
+      hitDiceRemaining: getHitDiceRemaining(s),
+      hitDiceMax: getHitDiceMax(s),
+    }));
+  const { setCharacterField, spendHitDie, longRest } = useSheetActions();
 
-  const canSpend =
-    hitDiceRemaining > 0 && state.currentHp < state.maxHp && state.currentHp > 0;
+  const canSpend = hitDiceRemaining > 0 && currentHp < maxHp && currentHp > 0;
 
   const spendTitle = !canSpend
     ? hitDiceRemaining <= 0
       ? "No hit dice remaining"
-      : state.currentHp >= state.maxHp
+      : currentHp >= maxHp
         ? "Already at full HP"
         : "Unconscious — cannot spend hit dice"
-    : `Roll ${state.hitDiceType} + CON mod and heal`;
+    : `Roll ${hitDiceType} + CON mod and heal`;
 
   return (
     <div
@@ -30,7 +35,6 @@ export const HitDice = () => {
     >
       <div className="cs-section-title">Hit Dice</div>
 
-      {/* Remaining / Max  |  Dice type select */}
       <div className="flex items-center justify-evenly gap-2 px-1">
         <div className="flex flex-col items-center leading-none">
           <span className="cs-modifier text-lg">
@@ -44,9 +48,9 @@ export const HitDice = () => {
 
         <div className="flex flex-col items-center leading-none">
           <select
-            value={state.hitDiceType}
+            value={hitDiceType}
             onChange={(e) =>
-              setField("hitDiceType", e.target.value as HitDiceType)
+              setCharacterField("hitDiceType", e.target.value as HitDiceType)
             }
             className="cs-select"
           >
@@ -59,7 +63,6 @@ export const HitDice = () => {
         </div>
       </div>
 
-      {/* Actions */}
       <button
         type="button"
         onClick={() => canSpend && spendHitDie()}

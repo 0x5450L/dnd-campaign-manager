@@ -1,9 +1,15 @@
 import { useState } from "react";
-import { useCharacterSheet } from "../../../hooks/useCharacterSheet";
-import type {
-  AbilityName,
-  CharacterSheetState,
-} from "../../../types/characters/characterSheet";
+import {
+  getAbilityModifier,
+  getInitiative,
+  getPassivePerception,
+  getSaveValue,
+  getSheetProficiencyBonus,
+  getSkillsForAbility,
+  useCreatureSheetState,
+  useSheetActions,
+} from "../../../state/sheet";
+import type { AbilityName } from "../../../types/characters/characterSheet";
 import { MobileHeader } from "../shared/navigation/MobileHeader";
 import { MobileTabBar, type MobileTab } from "../shared/navigation/MobileTabBar";
 import { ArmorClass } from "../shared/sections/ArmorClass";
@@ -29,26 +35,20 @@ const ALL_ABILITIES: AbilityName[] = ["str", "con", "dex", "int", "wis", "cha"];
 
 type MobileCreatureSheetProps = {
   onClose: () => void;
-  onForceSave?: (state: CharacterSheetState) => void;
+  onForceSave?: () => void;
 };
 
 export const MobileCreatureSheet = ({ onClose, onForceSave }: MobileCreatureSheetProps) => {
+  const state = useCreatureSheetState();
   const {
-    state,
-    proficiencyBonus,
-    getModifier,
-    getSaveValue,
-    getSkillsForAbility,
-    initiative,
-    passivePerception,
-    setField,
+    setSharedField,
     setAbilityScore,
     setSaveProficient,
     setSkillProficient,
     addAttack,
     updateAttack,
     removeAttack,
-  } = useCharacterSheet();
+  } = useSheetActions();
 
   const [activeTab, setActiveTab] = useState<MobileTab>("combat");
 
@@ -65,15 +65,15 @@ export const MobileCreatureSheet = ({ onClose, onForceSave }: MobileCreatureShee
             </div>
             <CombatStats
               ac={state.ac}
-              initiative={initiative}
+              initiative={getInitiative(state)}
               speed={state.speed}
               size={state.size}
-              proficiencyBonus={proficiencyBonus}
-              passivePerception={passivePerception}
+              proficiencyBonus={getSheetProficiencyBonus(state)}
+              passivePerception={getPassivePerception(state)}
               showInspiration={false}
               onUpdate={(field, value) => {
-                if (field === "speed") setField("speed", value as number);
-                else if (field === "size") setField("size", value as string);
+                if (field === "speed") setSharedField("speed", value as number);
+                else if (field === "size") setSharedField("size", value as string);
               }}
             />
             <AttacksTable
@@ -92,10 +92,10 @@ export const MobileCreatureSheet = ({ onClose, onForceSave }: MobileCreatureShee
                 key={ability}
                 name={ABILITY_NAMES[ability]}
                 score={state.abilities[ability].score}
-                modifier={getModifier(ability)}
+                modifier={getAbilityModifier(state, ability)}
                 saveProficient={state.abilities[ability].saveProficient}
-                saveValue={getSaveValue(ability)}
-                skills={getSkillsForAbility(ability)}
+                saveValue={getSaveValue(state, ability)}
+                skills={getSkillsForAbility(state, ability)}
                 onScoreChange={(v) => setAbilityScore(ability, v)}
                 onSaveProfChange={(v) => setSaveProficient(ability, v)}
                 onSkillProfChange={setSkillProficient}
@@ -112,7 +112,7 @@ export const MobileCreatureSheet = ({ onClose, onForceSave }: MobileCreatureShee
             <TextBlock
               title="Notes"
               value={state.notes}
-              onChange={(v) => setField("notes", v)}
+              onChange={(v) => setSharedField("notes", v)}
             />
           </>
         )}

@@ -1,15 +1,18 @@
 import { NumericInput } from "../inputs/NumericInput";
-import { useCharacterSheet } from "../../../../hooks/useCharacterSheet";
+import { useSheet, useSheetActions } from "../../../../state/sheet";
 import { SHIELD_AC_BONUS } from "../../../../utils/dndMath";
 
 export const ArmorClass = () => {
-  const { state, setField, toggleShield } = useCharacterSheet();
-  const { ac, usesShield } = state;
+  const { ac, usesShield } = useSheet((s) => ({
+    ac: s.ac,
+    usesShield: s.usesShield,
+  }));
+  const { setSharedField, toggleShield } = useSheetActions();
+
   const displayAc = usesShield ? ac + SHIELD_AC_BONUS : ac;
 
   return (
     <div className={`cs-ac-shield ${usesShield ? "active" : ""}`}>
-      {/* SVG shield shape */}
       <svg viewBox="0 0 100 130" className="cs-ac-shield-svg" preserveAspectRatio="none">
         <defs>
           <linearGradient id="shieldGrad" x1="0" y1="0" x2="0" y2="1">
@@ -26,19 +29,17 @@ export const ArmorClass = () => {
         />
       </svg>
 
-      {/* Content */}
       <div className="cs-ac-shield-content">
         <span className="cs-ac-shield-label">Armor Class</span>
         <NumericInput
           value={displayAc}
-          onChange={(v) => setField("ac", usesShield ? v - SHIELD_AC_BONUS : v)}
+          onChange={(v) => setSharedField("ac", usesShield ? v - SHIELD_AC_BONUS : v)}
           min={0}
           max={30}
           defaultValue={10}
           className="cs-ac-shield-input"
         />
 
-        {/* Shield toggle checkbox */}
         <div
           className="cs-ac-toggle"
           onClick={(e) => {

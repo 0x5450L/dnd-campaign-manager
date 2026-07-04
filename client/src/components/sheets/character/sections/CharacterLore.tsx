@@ -1,19 +1,28 @@
 import { NumericInput } from "../../shared/inputs/NumericInput";
 import { GradientInput } from "../../shared/inputs/GradientInput";
-import { useCharacterSheet } from "../../../../hooks/useCharacterSheet";
+import { useCharacterSheet, useSheetActions } from "../../../../state/sheet";
 
 export const CharacterLore = () => {
-  const { state, setField, setLevelFromXp, setXpFromLevel } = useCharacterSheet();
+  const { name, race, characterClass, subclass, background, level, xp } =
+    useCharacterSheet((s) => ({
+      name: s.name,
+      race: s.race,
+      characterClass: s.characterClass,
+      subclass: s.subclass,
+      background: s.background,
+      level: s.level,
+      xp: s.xp,
+    }));
+  const { setSharedField, setCharacterField, setLevelFromXp, setXpFromLevel } =
+    useSheetActions();
 
   return (
     <div className="cs-section-card p-3 flex items-stretch gap-4">
-      {/* Character info fields */}
       <div className="flex-1 flex flex-col justify-center">
-        {/* Name */}
         <div className="mb-2">
           <GradientInput
-            value={state.name}
-            onChange={(v) => setField("name", v)}
+            value={name}
+            onChange={(v) => setSharedField("name", v)}
             placeholder="Character Name"
             large
             required
@@ -21,20 +30,19 @@ export const CharacterLore = () => {
           <div className="cs-label mt-1">Character Name</div>
         </div>
 
-        {/* Info grid: 2x2 */}
         <div className="grid grid-cols-2 gap-x-4 gap-y-1">
           <div>
             <GradientInput
-              value={state.background}
-              onChange={(v) => setField("background", v)}
+              value={background}
+              onChange={(v) => setCharacterField("background", v)}
               placeholder="—"
             />
             <div className="cs-label">Background</div>
           </div>
           <div>
             <GradientInput
-              value={state.characterClass}
-              onChange={(v) => setField("characterClass", v)}
+              value={characterClass}
+              onChange={(v) => setCharacterField("characterClass", v)}
               placeholder="—"
               required
             />
@@ -42,8 +50,8 @@ export const CharacterLore = () => {
           </div>
           <div>
             <GradientInput
-              value={state.race}
-              onChange={(v) => setField("race", v)}
+              value={race}
+              onChange={(v) => setSharedField("race", v)}
               placeholder="—"
               required
             />
@@ -51,8 +59,8 @@ export const CharacterLore = () => {
           </div>
           <div>
             <GradientInput
-              value={state.subclass}
-              onChange={(v) => setField("subclass", v)}
+              value={subclass}
+              onChange={(v) => setCharacterField("subclass", v)}
               placeholder="—"
             />
             <div className="cs-label">Subclass</div>
@@ -60,12 +68,11 @@ export const CharacterLore = () => {
         </div>
       </div>
 
-      {/* Level circle + XP (right side of lore box) */}
       <div className="flex flex-col items-center justify-center pl-4 border-l border-rule">
         <span className="cs-section-title mb-1">Level</span>
         <div className="cs-level-circle">
           <NumericInput
-            value={state.level}
+            value={level}
             onChange={setXpFromLevel}
             min={1}
             max={20}
@@ -75,7 +82,7 @@ export const CharacterLore = () => {
         </div>
         <div className="flex flex-col items-center mt-1">
           <NumericInput
-            value={state.xp}
+            value={xp}
             onChange={setLevelFromXp}
             min={0}
             defaultValue={0}

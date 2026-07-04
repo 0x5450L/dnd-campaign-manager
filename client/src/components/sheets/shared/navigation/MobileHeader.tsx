@@ -1,29 +1,38 @@
-import { useCharacterSheet } from "../../../../hooks/useCharacterSheet";
-import type { CharacterSheetState } from "../../../../types/characters/characterSheet";
+import { useSheet } from "../../../../state/sheet";
 
 type MobileHeaderProps = {
   onClose: () => void;
-  onForceSave?: (state: CharacterSheetState) => void;
+  onForceSave?: () => void;
 };
 
 export const MobileHeader = ({ onClose, onForceSave }: MobileHeaderProps) => {
-  const { state } = useCharacterSheet();
-
-  const classInfo = [state.characterClass, state.subclass].filter(Boolean).join(" / ");
+  const { name, subtitle } = useSheet((s) => ({
+    name: s.name,
+    subtitle:
+      s.kind === "character"
+        ? {
+            classInfo: [s.characterClass, s.subclass].filter(Boolean).join(" / "),
+            level: s.level,
+            background: s.background,
+          }
+        : null,
+  }));
 
   return (
     <div className="sticky top-0 z-20 px-4 py-2.5 bg-bg border-b border-rule">
-      <div className="truncate text-sm font-bold font-fantasy text-gold">{state.name || "New Character"}</div>
-      <div className="text-[11px] text-dim truncate">
-        {classInfo || "—"} <span className="text-faint">Lv.{state.level}</span>
-        {state.background && <span className="text-faint"> · {state.background}</span>}
-      </div>
+      <div className="truncate text-sm font-bold font-fantasy text-gold">{name || "New Character"}</div>
+      {subtitle && (
+        <div className="text-[11px] text-dim truncate">
+          {subtitle.classInfo || "—"} <span className="text-faint">Lv.{subtitle.level}</span>
+          {subtitle.background && <span className="text-faint"> · {subtitle.background}</span>}
+        </div>
+      )}
 
       <div className="absolute top-4 right-4 flex items-center gap-3">
         {onForceSave && (
           <button
             type="button"
-            onClick={() => onForceSave(state)}
+            onClick={onForceSave}
             aria-label="Save character sheet"
             className="text-gold hover:text-gold-bright cursor-pointer"
           >

@@ -1,4 +1,4 @@
-import { useCharacterSheet } from "../../../../hooks/useCharacterSheet";
+import { useCreatureSheet, useSheetActions } from "../../../../state/sheet";
 import type {
   CreatureTrait,
   CreatureTraitKind,
@@ -14,23 +14,24 @@ const GROUPS: { kind: CreatureTraitKind; title: string; addLabel: string }[] = [
 ];
 
 export const CreatureTraits = () => {
-  const { state, setField } = useCharacterSheet();
+  const allTraits = useCreatureSheet((s) => s.traits);
+  const { setCreatureField } = useSheetActions();
 
   const updateTrait = (id: string, patch: Partial<CreatureTrait>) =>
-    setField(
+    setCreatureField(
       "traits",
-      state.traits.map((t) => (t.id === id ? { ...t, ...patch } : t)),
+      allTraits.map((t) => (t.id === id ? { ...t, ...patch } : t)),
     );
 
   const removeTrait = (id: string) =>
-    setField(
+    setCreatureField(
       "traits",
-      state.traits.filter((t) => t.id !== id),
+      allTraits.filter((t) => t.id !== id),
     );
 
   const addTrait = (kind: CreatureTraitKind) =>
-    setField("traits", [
-      ...state.traits,
+    setCreatureField("traits", [
+      ...allTraits,
       { id: crypto.randomUUID(), kind, name: "", description: "" },
     ]);
 
@@ -41,7 +42,7 @@ export const CreatureTraits = () => {
       </div>
 
       {GROUPS.map((group) => {
-        const traits = state.traits.filter((t) => t.kind === group.kind);
+        const traits = allTraits.filter((t) => t.kind === group.kind);
         return (
           <div key={group.kind} className="flex flex-col gap-2">
             <div className="text-xs tracking-[0.12em] uppercase text-gold">

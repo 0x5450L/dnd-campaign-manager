@@ -1,4 +1,5 @@
-import { useCharacterSheet } from "../../../../hooks/useCharacterSheet";
+import { useCreatureSheet, useSheet, useSheetActions } from "../../../../state/sheet";
+import type { SharedSheetFields } from "../../../../types/characters/characterSheet";
 
 type CreatureDetailTextField =
   | "senses"
@@ -23,7 +24,18 @@ const fieldClassName =
 const labelClassName = "text-[10px] tracking-[0.12em] uppercase text-dim";
 
 export const CreatureDetails = () => {
-  const { state, setField } = useCharacterSheet();
+  const details = useSheet(
+    (s): Pick<SharedSheetFields, CreatureDetailTextField> => ({
+      senses: s.senses,
+      languages: s.languages,
+      damageVulnerabilities: s.damageVulnerabilities,
+      damageResistances: s.damageResistances,
+      damageImmunities: s.damageImmunities,
+      conditionImmunities: s.conditionImmunities,
+    }),
+  );
+  const challengeRating = useCreatureSheet((s) => s.challengeRating);
+  const { setSharedField, setCreatureField } = useSheetActions();
 
   return (
     <div className="rounded-md border-[1.5px] border-rule bg-surface/70 shadow-md p-3 flex flex-col gap-2">
@@ -37,9 +49,9 @@ export const CreatureDetails = () => {
           type="number"
           min={0}
           step={0.125}
-          value={state.challengeRating ?? ""}
+          value={challengeRating ?? ""}
           onChange={(e) =>
-            setField(
+            setCreatureField(
               "challengeRating",
               e.target.value === "" ? null : Number(e.target.value),
             )
@@ -54,8 +66,8 @@ export const CreatureDetails = () => {
           <span className={labelClassName}>{field.label}</span>
           <input
             type="text"
-            value={state[field.key]}
-            onChange={(e) => setField(field.key, e.target.value)}
+            value={details[field.key]}
+            onChange={(e) => setSharedField(field.key, e.target.value)}
             placeholder="—"
             className={fieldClassName}
           />

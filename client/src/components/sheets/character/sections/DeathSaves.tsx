@@ -1,17 +1,20 @@
-import { useCharacterSheet } from "../../../../hooks/useCharacterSheet";
+import { useCharacterSheet, useSheetActions } from "../../../../state/sheet";
 
 type CheckVariant = "success" | "fail";
 
 export const DeathSaves = () => {
-  const { state, setField } = useCharacterSheet();
-  const { deathSaveSuccesses: successes, deathSaveFailures: failures } = state;
+  const { successes, failures } = useCharacterSheet((s) => ({
+    successes: s.deathSaveSuccesses,
+    failures: s.deathSaveFailures,
+  }));
+  const { setCharacterField } = useSheetActions();
 
   const handleClick = (
     field: "deathSaveSuccesses" | "deathSaveFailures",
     count: number,
     i: number,
   ) => {
-    setField(field, i < count ? i : i + 1);
+    setCharacterField(field, i < count ? i : i + 1);
   };
 
   const renderChecks = (

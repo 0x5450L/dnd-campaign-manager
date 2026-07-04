@@ -1,35 +1,37 @@
 import { NumericInput } from "../inputs/NumericInput";
-import { useCharacterSheet } from "../../../../hooks/useCharacterSheet";
+import { useSheet, useSheetActions } from "../../../../state/sheet";
 
 export const HitPoints = () => {
-  const { state, setField } = useCharacterSheet();
+  const { currentHp, maxHp, tempHp } = useSheet((s) => ({
+    currentHp: s.currentHp,
+    maxHp: s.maxHp,
+    tempHp: s.tempHp,
+  }));
+  const { setSharedField } = useSheetActions();
 
   return (
     <div className="cs-section-card flex flex-col p-3 justify-between flex-1">
-      {/* Title */}
       <div className="cs-section-title">Hit Points</div>
 
-      {/* Row 1: Current HP */}
       <div className="flex flex-col items-center px-2 py-1">
         <div className="cs-input-wrap w-full">
           <NumericInput
-            value={state.currentHp}
-            onChange={(v) => setField("currentHp", v)}
+            value={currentHp}
+            onChange={(v) => setSharedField("currentHp", v)}
             min={0}
-            max={state.maxHp}
+            max={maxHp}
             className="cs-input text-center text-lg font-semibold font-fantasy"
           />
         </div>
         <span className="cs-label mt-1">Current</span>
       </div>
 
-      {/* Row 2: Temporary | Maximum */}
       <div className="flex items-stretch">
         <div className="flex-1 flex flex-col items-center px-2 py-1">
           <div className="cs-input-wrap w-full">
             <NumericInput
-              value={state.tempHp}
-              onChange={(v) => setField("tempHp", v)}
+              value={tempHp}
+              onChange={(v) => setSharedField("tempHp", v)}
               min={0}
               max={9999}
               className="cs-input text-center text-xs"
@@ -41,10 +43,10 @@ export const HitPoints = () => {
         <div className="flex-1 flex flex-col items-center px-2 py-1">
           <div className="cs-input-wrap w-full">
             <NumericInput
-              value={state.maxHp}
+              value={maxHp}
               onChange={(v) => {
-                setField("maxHp", v);
-                if (state.currentHp > v) setField("currentHp", v);
+                setSharedField("maxHp", v);
+                if (currentHp > v) setSharedField("currentHp", v);
               }}
               min={0}
               max={9999}

@@ -1,14 +1,15 @@
-import { useCharacterSheet } from "../../../../hooks/useCharacterSheet";
+import { useCharacterSheet, useSheetActions } from "../../../../state/sheet";
 
 export const ClassFeatures = () => {
-  const { state, setField } = useCharacterSheet();
+  const classFeatures = useCharacterSheet((s) => s.classFeatures);
+  const { setCharacterField } = useSheetActions();
 
   return (
     <div className="cs-section-card p-3 flex flex-col flex-1">
       <div className="cs-section-title">Class Features</div>
       <textarea
-        value={state.classFeatures}
-        onChange={(e) => setField("classFeatures", e.target.value)}
+        value={classFeatures}
+        onChange={(e) => setCharacterField("classFeatures", e.target.value)}
         className="cs-textarea flex-1 min-h-20"
         placeholder="Class Features..."
       />

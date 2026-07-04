@@ -1,4 +1,13 @@
-import { useCharacterSheet } from "../../../hooks/useCharacterSheet";
+import {
+  getAbilityModifier,
+  getInitiative,
+  getPassivePerception,
+  getSaveValue,
+  getSheetProficiencyBonus,
+  getSkillsForAbility,
+  useCreatureSheetState,
+  useSheetActions,
+} from "../../../state/sheet";
 import type { AbilityName } from "../../../types/characters/characterSheet";
 import { ArmorClass } from "../shared/sections/ArmorClass";
 import { HitPoints } from "../shared/sections/HitPoints";
@@ -22,22 +31,16 @@ const ABILITY_NAMES: Record<AbilityName, string> = {
 const ALL_ABILITIES: AbilityName[] = ["str", "con", "dex", "int", "wis", "cha"];
 
 export const DesktopCreatureSheet = () => {
+  const state = useCreatureSheetState();
   const {
-    state,
-    proficiencyBonus,
-    getModifier,
-    getSaveValue,
-    getSkillsForAbility,
-    initiative,
-    passivePerception,
-    setField,
+    setSharedField,
     setAbilityScore,
     setSaveProficient,
     setSkillProficient,
     addAttack,
     updateAttack,
     removeAttack,
-  } = useCharacterSheet();
+  } = useSheetActions();
 
   return (
     <div className="min-h-screen py-4">
@@ -57,10 +60,10 @@ export const DesktopCreatureSheet = () => {
                   key={ability}
                   name={ABILITY_NAMES[ability]}
                   score={state.abilities[ability].score}
-                  modifier={getModifier(ability)}
+                  modifier={getAbilityModifier(state, ability)}
                   saveProficient={state.abilities[ability].saveProficient}
-                  saveValue={getSaveValue(ability)}
-                  skills={getSkillsForAbility(ability)}
+                  saveValue={getSaveValue(state, ability)}
+                  skills={getSkillsForAbility(state, ability)}
                   onScoreChange={(updatedAbilityScore) => setAbilityScore(ability, updatedAbilityScore)}
                   onSaveProfChange={(updatedAbilityProficient) => setSaveProficient(ability, updatedAbilityProficient)}
                   onSkillProfChange={setSkillProficient}
@@ -70,7 +73,7 @@ export const DesktopCreatureSheet = () => {
           </div>
 
           <div className="order-6 lg:order-0">
-            <TextBlock title="Notes" value={state.notes} onChange={(updatedNotes) => setField("notes", updatedNotes)} />
+            <TextBlock title="Notes" value={state.notes} onChange={(updatedNotes) => setSharedField("notes", updatedNotes)} />
           </div>
 
           <div className="order-7 lg:order-0">
@@ -82,15 +85,15 @@ export const DesktopCreatureSheet = () => {
           <div className="order-3 lg:order-0">
             <CombatStats
               ac={state.ac}
-              initiative={initiative}
+              initiative={getInitiative(state)}
               speed={state.speed}
               size={state.size}
-              proficiencyBonus={proficiencyBonus}
-              passivePerception={passivePerception}
+              proficiencyBonus={getSheetProficiencyBonus(state)}
+              passivePerception={getPassivePerception(state)}
               showInspiration={false}
               onUpdate={(field, value) => {
-                if (field === "speed") setField("speed", value as number);
-                else if (field === "size") setField("size", value as string);
+                if (field === "speed") setSharedField("speed", value as number);
+                else if (field === "size") setSharedField("size", value as string);
               }}
             />
           </div>

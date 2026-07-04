@@ -1,14 +1,15 @@
-import { useCharacterSheet } from "../../../../hooks/useCharacterSheet";
+import { useCharacterSheet, useSheetActions } from "../../../../state/sheet";
 import { SpellSlotsTracker } from "../../../spells/SpellSlotsTracker";
 
 export const SpellSlots = () => {
-  const { state, setField } = useCharacterSheet();
+  const spellSlots = useCharacterSheet((s) => s.spellSlots);
+  const { setCharacterField } = useSheetActions();
 
   return (
     <SpellSlotsTracker
-      slots={state.spellSlots}
+      slots={spellSlots}
       editable
-      onChange={(spellSlots) => setField("spellSlots", spellSlots)}
+      onChange={(spellSlots) => setCharacterField("spellSlots", spellSlots)}
     />
   );
 };
