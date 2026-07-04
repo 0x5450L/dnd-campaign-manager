@@ -3,17 +3,17 @@ import {
   applySharedAction,
   isSharedSheetAction,
   type SharedSheetAction,
-} from "./sharedReducerFunction";
+} from "./sharedReducerFunctions";
 import {
   applyCharacterAction,
   isCharacterSheetAction,
   type CharacterSheetAction,
-} from "./characterReducerFunction";
+} from "./characterReducerFunctions";
 import {
   applyCreatureAction,
   isCreatureSheetAction,
   type CreatureSheetAction,
-} from "./creatureReducerFunction";
+} from "./creatureReducerFunctions";
 
 export type SheetAction =
   | SharedSheetAction

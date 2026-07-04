@@ -9,9 +9,9 @@ export {
   useSheetActions,
 } from "./sheetHooks";
 export { sheetReducer, type SheetAction } from "./sheetReducer";
-export { type SharedSheetAction } from "./sharedReducerFunction";
-export { type CharacterSheetAction } from "./characterReducerFunction";
-export { type CreatureSheetAction } from "./creatureReducerFunction";
+export { type SharedSheetAction } from "./sharedReducerFunctions";
+export { type CharacterSheetAction } from "./characterReducerFunctions";
+export { type CreatureSheetAction } from "./creatureReducerFunctions";
 export {
   getAbilityModifier,
   getHitDiceMax,
