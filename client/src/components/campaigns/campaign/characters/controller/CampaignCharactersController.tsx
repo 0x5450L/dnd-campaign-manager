@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import type { Character, CharacterType } from "../../../../../types/characters/characters";
-import type { CharacterSheetState } from "../../../../../types/characters/characterSheet";
+import type { CreatureSheetState } from "../../../../../types/characters/characterSheet";
 import type { SrdCreature } from "../../../../../../../shared/dto/srd";
 import { srdCreatureToSheetState } from "../../../../../utils/srd/creatureMapper";
 import { CharacterSheet } from "../../../../sheets/CharacterSheet";
@@ -20,7 +20,7 @@ type SheetMode =
   | { kind: "closed" }
   | { kind: "edit"; characterId: string }
   | { kind: "create"; type: CharacterType }
-  | { kind: "preview"; seed: Partial<CharacterSheetState> };
+  | { kind: "preview"; seed: CreatureSheetState };
 
 type CampaignCharactersControllerProps = {
   campaignId: string;

@@ -6,11 +6,12 @@ import type { AbilityName } from "../../../../shared/types/dnd";
 import type { SrdCreature, SrdCreatureAction } from "../../../../shared/dto/srd";
 import type {
   AbilityState,
-  CharacterSheetState,
+  CreatureSheetState,
   CreatureTrait,
   CreatureTraitKind,
   SkillDef,
 } from "../../types/characters/characterSheet";
+import { createInitialCreatureSheet } from "../../constants/characterSheet";
 import { splitCreatureActions } from "./creatureActionParser";
 import { buildNotes } from "./creatureNotesFormatter";
 
@@ -51,13 +52,12 @@ const toTraits = (
 
 export const srdCreatureToSheetState = (
   creature: SrdCreature,
-): Partial<CharacterSheetState> => {
+): CreatureSheetState => {
   const { attacks, nonAttackActions } = splitCreatureActions(creature.actions);
   return {
+    ...createInitialCreatureSheet(),
     name: creature.name,
     race: creature.type ?? "",
-    characterClass: "",
-    background: "",
     size: creature.size ?? "",
     abilities: buildAbilities(creature),
     skills: buildSkills(creature),
@@ -67,13 +67,7 @@ export const srdCreatureToSheetState = (
     currentHp: creature.hitPoints,
     maxHp: creature.hitPoints,
     tempHp: 0,
-    hitDiceType: "d8",
-    hitDiceUsed: 0,
-    deathSaveSuccesses: 0,
-    deathSaveFailures: 0,
-    inspiration: false,
     attacks,
-    spellSlots: null,
     challengeRating: creature.challengeRating,
     senses: creature.senses ?? "",
     languages: creature.languages ?? "",

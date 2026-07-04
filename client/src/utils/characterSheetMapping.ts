@@ -1,5 +1,5 @@
 import { ABILITY_NAMES, SKILL_DEFINITIONS } from "../../../shared/constants/dnd";
-import { MIN_ATTACKS } from "../constants/characterSheet";
+import { MIN_ATTACKS, createInitialCharacterSheet, createInitialCreatureSheet } from "../constants/characterSheet";
 import { getLevelFromXp } from "./dndMath";
 import type {
   CharacterAbilityDTO,
@@ -17,9 +17,15 @@ import type {
   AbilityState,
   Attack,
   CharacterSheetState,
+  CreatureSheetState,
   CreatureTrait,
+  SheetKind,
+  SheetState,
   SkillDef,
 } from "../types/characters/characterSheet";
+
+export const sheetKindFromCharacterType = (type: CharacterType): SheetKind =>
+  type === "monster" ? "creature" : "character";
 
 const makeEmptyAttack = (): Attack => ({
   id: crypto.randomUUID(),
@@ -67,15 +73,11 @@ const buildAttacksFromDto = (attacks: CharacterDTO["attacks"]): Attack[] => {
   return mapped;
 };
 
-export const dtoToSheetState = (
-  dto: CharacterDTO,
-): Partial<CharacterSheetState> => ({
+const dtoToSharedFields = (dto: CharacterDTO) => ({
   name: dto.name,
   race: dto.race,
-  characterClass: dto.characterClass,
-  background: dto.background,
+  size: dto.size ?? "Medium",
   level: getLevelFromXp(dto.experience),
-  xp: dto.experience,
 
   abilities: buildAbilitiesFromDto(dto.abilityScores),
   skills: buildSkillsFromDto(dto.skills),
@@ -86,22 +88,40 @@ export const dtoToSheetState = (
   currentHp: dto.currentHp,
   maxHp: dto.maxHp,
   tempHp: dto.tempHp,
-  hitDiceType: dto.hitDiceType,
-  hitDiceUsed: dto.hitDiceUsed,
-  deathSaveSuccesses: dto.deathSaveSuccesses,
-  deathSaveFailures: dto.deathSaveFailures,
-  inspiration: dto.inspiration,
 
   attacks: buildAttacksFromDto(dto.attacks),
-  spellSlots: dto.spellSlots ?? null,
 
-  size: dto.size ?? "Medium",
   senses: dto.senses ?? "",
   languages: dto.languages ?? "",
   damageVulnerabilities: dto.damageVulnerabilities ?? "",
   damageResistances: dto.damageResistances ?? "",
   damageImmunities: dto.damageImmunities ?? "",
   conditionImmunities: dto.conditionImmunities ?? "",
+
+  notes: dto.notes ?? "",
+});
+
+const dtoToCharacterSheetState = (dto: CharacterDTO): CharacterSheetState => ({
+  ...createInitialCharacterSheet(),
+  ...dtoToSharedFields(dto),
+
+  characterClass: dto.characterClass,
+  background: dto.background,
+  xp: dto.experience,
+
+  hitDiceType: dto.hitDiceType,
+  hitDiceUsed: dto.hitDiceUsed,
+  deathSaveSuccesses: dto.deathSaveSuccesses,
+  deathSaveFailures: dto.deathSaveFailures,
+  inspiration: dto.inspiration,
+
+  spellSlots: dto.spellSlots ?? null,
+});
+
+const dtoToCreatureSheetState = (dto: CharacterDTO): CreatureSheetState => ({
+  ...createInitialCreatureSheet(),
+  ...dtoToSharedFields(dto),
+
   challengeRating: dto.creatureProfile?.challengeRating ?? null,
   traits: (dto.creatureProfile?.traits ?? []).map((t) => ({
     id: t.id,
@@ -109,9 +129,12 @@ export const dtoToSheetState = (
     name: t.name,
     description: t.description,
   })),
-
-  notes: dto.notes ?? "",
 });
+
+export const dtoToSheetState = (dto: CharacterDTO): SheetState =>
+  sheetKindFromCharacterType(dto.type) === "creature"
+    ? dtoToCreatureSheetState(dto)
+    : dtoToCharacterSheetState(dto);
 
 const sheetAttacksToInputs = (attacks: Attack[]): CharacterAttackInput[] =>
   attacks
@@ -136,16 +159,16 @@ const sheetSkillsToDtos = (skills: SkillDef[]): CharacterSkillDTO[] =>
   skills.map((s) => ({ name: s.name, proficient: s.proficient }));
 
 export const sheetStateToCreatePayload = (
-  state: CharacterSheetState,
+  state: SheetState,
   campaignId: string,
   type: CharacterType = "player",
 ): CreateCharacterPayload => ({
   name: state.name,
   type,
   race: state.race,
-  characterClass: state.characterClass,
+  characterClass: state.kind === "character" ? state.characterClass : "",
   campaignId,
-  background: state.background,
+  background: state.kind === "character" ? state.background : "",
   notes: state.notes || null,
 });
 
@@ -155,33 +178,24 @@ const sheetTraitsToInputs = (traits: CreatureTrait[]): CreatureTraitInput[] =>
     .map((t) => ({ kind: t.kind, name: t.name, description: t.description }));
 
 const sheetStateToCreatureProfile = (
-  state: CharacterSheetState,
+  state: CreatureSheetState,
 ): CreatureProfileInput => ({
   challengeRating: state.challengeRating,
   traits: sheetTraitsToInputs(state.traits),
 });
 
 export const sheetStateToUpdatePayload = (
-  state: CharacterSheetState,
-  type: CharacterType,
+  state: SheetState,
 ): UpdateCharacterPayload => ({
   name: state.name,
   race: state.race,
-  characterClass: state.characterClass,
-  background: state.background,
   notes: state.notes || null,
-  experience: state.xp,
   speed: state.speed,
-  hitDiceType: state.hitDiceType,
-  hitDiceUsed: state.hitDiceUsed,
   maxHp: state.maxHp,
   currentHp: state.currentHp,
   tempHp: state.tempHp,
-  deathSaveSuccesses: state.deathSaveSuccesses,
-  deathSaveFailures: state.deathSaveFailures,
   armorClass: state.ac,
   usesShield: state.usesShield,
-  inspiration: state.inspiration,
   size: state.size || null,
   senses: state.senses || null,
   languages: state.languages || null,
@@ -192,8 +206,19 @@ export const sheetStateToUpdatePayload = (
   abilityScores: sheetAbilitiesToDtos(state.abilities),
   skills: sheetSkillsToDtos(state.skills),
   attacks: sheetAttacksToInputs(state.attacks),
-  spellSlots: state.spellSlots,
-  ...(type === "monster" && {
-    creatureProfile: sheetStateToCreatureProfile(state),
-  }),
+  ...(state.kind === "character"
+    ? {
+        characterClass: state.characterClass,
+        background: state.background,
+        experience: state.xp,
+        hitDiceType: state.hitDiceType,
+        hitDiceUsed: state.hitDiceUsed,
+        deathSaveSuccesses: state.deathSaveSuccesses,
+        deathSaveFailures: state.deathSaveFailures,
+        inspiration: state.inspiration,
+        spellSlots: state.spellSlots,
+      }
+    : {
+        creatureProfile: sheetStateToCreatureProfile(state),
+      }),
 });
