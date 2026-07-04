@@ -2,6 +2,10 @@ import type {
   AbilityName,
   AbilityState,
   CharacterSheetState,
+  CreatureSheetState,
+  SharedSheetFields,
+  SheetKind,
+  SheetState,
   SkillDef,
 } from "../types/characters/characterSheet";
 import { SKILL_DEFINITIONS } from "../../../shared/constants/dnd";
@@ -23,14 +27,11 @@ export const DEFAULT_ABILITIES: Record<AbilityName, AbilityState> = {
   cha: { score: 10, saveProficient: false },
 };
 
-export const createInitialCharacterSheet = (): CharacterSheetState => ({
+const createSharedFields = (): SharedSheetFields => ({
   name: "New Character",
   race: "",
-  characterClass: "",
+  size: "Medium",
   level: 1,
-  background: "",
-  subclass: "",
-  xp: 0,
 
   abilities: DEFAULT_ABILITIES,
   skills: DEFAULT_SKILLS,
@@ -38,15 +39,9 @@ export const createInitialCharacterSheet = (): CharacterSheetState => ({
   ac: 10,
   usesShield: false,
   speed: 30,
-  size: "Medium",
   currentHp: 10,
   maxHp: 10,
   tempHp: 0,
-  hitDiceType: "d8",
-  hitDiceUsed: 0,
-  deathSaveSuccesses: 0,
-  deathSaveFailures: 0,
-  inspiration: false,
 
   attacks: Array.from({ length: MIN_ATTACKS }, () => ({
     id: crypto.randomUUID(),
@@ -56,23 +51,51 @@ export const createInitialCharacterSheet = (): CharacterSheetState => ({
     notes: "",
   })),
 
-  spellSlots: null,
-
-  challengeRating: null,
   senses: "",
   languages: "",
   damageVulnerabilities: "",
   damageResistances: "",
   damageImmunities: "",
   conditionImmunities: "",
-  traits: [],
+
+  notes: "",
+});
+
+export const createInitialCharacterSheet = (): CharacterSheetState => ({
+  kind: "character",
+  ...createSharedFields(),
+
+  characterClass: "",
+  subclass: "",
+  background: "",
+  xp: 0,
+
+  hitDiceType: "d8",
+  hitDiceUsed: 0,
+  deathSaveSuccesses: 0,
+  deathSaveFailures: 0,
+  inspiration: false,
+
+  spellSlots: null,
 
   classFeatures: "",
   racialTraits: "",
   feats: "",
-  notes: "",
 
   armorProficiencies: "",
   weaponProficiencies: "",
   toolProficiencies: "",
 });
+
+export const createInitialCreatureSheet = (): CreatureSheetState => ({
+  kind: "creature",
+  ...createSharedFields(),
+
+  challengeRating: null,
+  traits: [],
+});
+
+export const createInitialSheetState = (kind: SheetKind): SheetState =>
+  kind === "character"
+    ? createInitialCharacterSheet()
+    : createInitialCreatureSheet();

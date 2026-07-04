@@ -30,60 +30,71 @@ export type CreatureTrait = {
   description: string;
 };
 
-export type CharacterSheetState = {
-  // Lore
+export type SheetKind = "character" | "creature";
+
+export type SharedSheetFields = {
   name: string;
   race: string;
-  characterClass: string;
+  size: string;
   level: number;
-  background: string;
-  subclass: string;
-  xp: number;
 
-  // Abilities & skills
   abilities: Record<AbilityName, AbilityState>;
   skills: SkillDef[];
 
-  // Combat
   ac: number;
   usesShield: boolean;
   speed: number;
-  size: string;
   currentHp: number;
   maxHp: number;
   tempHp: number;
-  hitDiceType: HitDiceType;
-  hitDiceUsed: number;
-  deathSaveSuccesses: number;
-  deathSaveFailures: number;
-  inspiration: boolean;
 
-  // Attacks
   attacks: Attack[];
 
-  // Spellcasting
-  spellSlots: SpellSlotLevel[] | null;
-
-  challengeRating: number | null;
   senses: string;
   languages: string;
   damageVulnerabilities: string;
   damageResistances: string;
   damageImmunities: string;
   conditionImmunities: string;
-  traits: CreatureTrait[];
 
-  // Text blocks
+  notes: string;
+};
+
+export type CharacterSheetFields = {
+  characterClass: string;
+  subclass: string;
+  background: string;
+  xp: number;
+
+  hitDiceType: HitDiceType;
+  hitDiceUsed: number;
+  deathSaveSuccesses: number;
+  deathSaveFailures: number;
+  inspiration: boolean;
+
+  spellSlots: SpellSlotLevel[] | null;
+
   classFeatures: string;
   racialTraits: string;
   feats: string;
-  notes: string;
 
-  // Proficiencies
   armorProficiencies: string;
   weaponProficiencies: string;
   toolProficiencies: string;
 };
+
+export type CreatureSheetFields = {
+  challengeRating: number | null;
+  traits: CreatureTrait[];
+};
+
+export type CharacterSheetState = { kind: "character" } & SharedSheetFields &
+  CharacterSheetFields;
+
+export type CreatureSheetState = { kind: "creature" } & SharedSheetFields &
+  CreatureSheetFields;
+
+export type SheetState = CharacterSheetState | CreatureSheetState;
 
 export type UseHitDieResult = {
   rolled: number;
