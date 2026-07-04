@@ -2,31 +2,47 @@ import { clamp } from "../../utils/dndMath";
 import type {
   AbilityName,
   Attack,
-  CharacterSheetState,
+  SharedSheetFields,
+  SheetState,
 } from "../../types/characters/characterSheet";
 
-export type CharacterSheetAction =
-  | { type: "SET_FIELD"; payload: Partial<CharacterSheetState> }
+export type SharedSheetAction =
+  | { type: "SET_SHARED_FIELD"; payload: Partial<SharedSheetFields> }
   | { type: "SET_ABILITY_SCORE"; ability: AbilityName; score: number }
   | { type: "SET_SAVE_PROFICIENT"; ability: AbilityName; proficient: boolean }
   | { type: "SET_SKILL_PROFICIENT"; skillName: string; proficient: boolean }
   | { type: "TOGGLE_SHIELD" }
-  | { type: "TOGGLE_INSPIRATION" }
   | { type: "ADD_ATTACK"; attack: Attack }
   | { type: "UPDATE_ATTACK"; id: string; field: keyof Attack; value: string }
   | { type: "REMOVE_ATTACK"; id: string }
   | { type: "HEAL"; amount: number }
-  | { type: "DAMAGE"; amount: number }
-  | { type: "APPLY_HIT_DIE"; newCurrentHp: number }
-  | { type: "RESET_HIT_DICE" }
-  | { type: "LONG_REST" };
+  | { type: "DAMAGE"; amount: number };
 
-export const characterSheetReducer = (
-  state: CharacterSheetState,
-  action: CharacterSheetAction,
-): CharacterSheetState => {
+const SHARED_ACTION_TYPES: ReadonlySet<string> = new Set<
+  SharedSheetAction["type"]
+>([
+  "SET_SHARED_FIELD",
+  "SET_ABILITY_SCORE",
+  "SET_SAVE_PROFICIENT",
+  "SET_SKILL_PROFICIENT",
+  "TOGGLE_SHIELD",
+  "ADD_ATTACK",
+  "UPDATE_ATTACK",
+  "REMOVE_ATTACK",
+  "HEAL",
+  "DAMAGE",
+]);
+
+export const isSharedSheetAction = (action: {
+  type: string;
+}): action is SharedSheetAction => SHARED_ACTION_TYPES.has(action.type);
+
+export const applySharedAction = (
+  state: SheetState,
+  action: SharedSheetAction,
+): SheetState => {
   switch (action.type) {
-    case "SET_FIELD":
+    case "SET_SHARED_FIELD":
       return { ...state, ...action.payload };
 
     case "SET_ABILITY_SCORE":
@@ -66,9 +82,6 @@ export const characterSheetReducer = (
     case "TOGGLE_SHIELD":
       return { ...state, usesShield: !state.usesShield };
 
-    case "TOGGLE_INSPIRATION":
-      return { ...state, inspiration: !state.inspiration };
-
     case "ADD_ATTACK":
       return { ...state, attacks: [...state.attacks, action.attack] };
 
@@ -106,24 +119,5 @@ export const characterSheetReducer = (
       const current = Math.max(0, state.currentHp - remaining);
       return { ...state, currentHp: current, tempHp: temp };
     }
-
-    case "APPLY_HIT_DIE":
-      return {
-        ...state,
-        currentHp: action.newCurrentHp,
-        hitDiceUsed: state.hitDiceUsed + 1,
-      };
-
-    case "RESET_HIT_DICE":
-      return { ...state, hitDiceUsed: 0 };
-
-    case "LONG_REST":
-      return {
-        ...state,
-        currentHp: state.maxHp,
-        hitDiceUsed: 0,
-        deathSaveSuccesses: 0,
-        deathSaveFailures: 0,
-      };
   }
 };
