@@ -1,9 +1,9 @@
 import type { CacheStore } from "./cacheStore";
 
-interface MemoryEntry {
+type MemoryEntry = {
   value: string;
   expiresAt: number;
-}
+};
 
 export class MemoryCacheStore implements CacheStore {
   private readonly entries = new Map<string, MemoryEntry>();

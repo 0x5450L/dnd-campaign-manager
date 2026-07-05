@@ -8,18 +8,18 @@ import type {
   SrdSource,
 } from "../../../../../../shared/dto/srd";
 
-export interface Open5eConditionResult {
+export type Open5eConditionResult = {
   slug: string;
   name: string;
   desc: string;
-}
+};
 
-export interface Open5eActionResult {
+export type Open5eActionResult = {
   name: string;
   desc: string;
-}
+};
 
-export interface Open5eMonsterResult {
+export type Open5eMonsterResult = {
   slug: string;
   name: string;
   size: string | null;
@@ -54,13 +54,13 @@ export interface Open5eMonsterResult {
   actions: Open5eActionResult[] | null;
   special_abilities: Open5eActionResult[] | null;
   legendary_actions: Open5eActionResult[] | null;
-}
+};
 
-export interface Open5eListResponse<TResult> {
+export type Open5eListResponse<TResult> = {
   count: number;
   next: string | null;
   results: TResult[];
-}
+};
 
 const SAVE_FIELDS: ReadonlyArray<[AbilityName, keyof Open5eMonsterResult]> = [
   ["str", "strength_save"],

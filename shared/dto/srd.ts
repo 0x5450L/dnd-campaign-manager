@@ -5,37 +5,37 @@ export type SrdSource = (typeof SRD_SOURCE)[keyof typeof SRD_SOURCE];
 
 export type SrdCategory = (typeof SRD_CATEGORY)[keyof typeof SRD_CATEGORY];
 
-export interface SrdRef {
+export type SrdRef = {
   slug: string;
   name: string;
-}
+};
 
-export interface SrdQuery {
+export type SrdQuery = {
   search?: string;
   limit?: number;
   offset?: number;
   filters?: Record<string, string | number>;
-}
+};
 
-export interface SrdListPage<TSummary> {
+export type SrdListPage<TSummary> = {
   results: TSummary[];
   total: number;
   next: string | null;
-}
+};
 
-export interface SrdSpellSummary extends SrdRef {
+export type SrdSpellSummary = SrdRef & {
   source: SrdSource;
   level: number;
   school: string | null;
-}
+};
 
-export interface SrdSpellDamageScaling {
+export type SrdSpellDamageScaling = {
   damageType: string | null;
   byCharacterLevel: Record<number, string> | null;
   bySlotLevel: Record<number, string> | null;
-}
+};
 
-export interface SrdSpell extends SrdSpellSummary {
+export type SrdSpell = SrdSpellSummary & {
   description: string;
   higherLevel: string | null;
   range: string;
@@ -49,20 +49,20 @@ export interface SrdSpell extends SrdSpellSummary {
   saveAbility: AbilityName | null;
   areaOfEffect: { type: string; size: number } | null;
   classes: string[];
-}
+};
 
-export interface SrdCreatureSummary extends SrdRef {
+export type SrdCreatureSummary = SrdRef & {
   source: SrdSource;
   challengeRating: number;
   type: string | null;
-}
+};
 
-export interface SrdCreatureAction {
+export type SrdCreatureAction = {
   name: string;
   description: string;
-}
+};
 
-export interface SrdCreature extends SrdCreatureSummary {
+export type SrdCreature = SrdCreatureSummary & {
   size: string | null;
   alignment: string | null;
   armorClass: number;
@@ -82,35 +82,35 @@ export interface SrdCreature extends SrdCreatureSummary {
   specialAbilities: SrdCreatureAction[];
   actions: SrdCreatureAction[];
   legendaryActions: SrdCreatureAction[];
-}
+};
 
-export interface SrdItemSummary extends SrdRef {
+export type SrdItemSummary = SrdRef & {
   source: SrdSource;
   itemType: string | null;
   rarity: string | null;
-}
+};
 
-export interface SrdItem extends SrdItemSummary {
+export type SrdItem = SrdItemSummary & {
   description: string;
   requiresAttunement: boolean;
   cost: string | null;
   weight: string | null;
-}
+};
 
-export interface SrdConditionSummary extends SrdRef {
+export type SrdConditionSummary = SrdRef & {
   source: SrdSource;
-}
+};
 
-export interface SrdCondition extends SrdConditionSummary {
+export type SrdCondition = SrdConditionSummary & {
   description: string;
-}
+};
 
-export interface SrdCategoryShape {
+export type SrdCategoryShape = {
   spell: { summary: SrdSpellSummary; detail: SrdSpell };
   monster: { summary: SrdCreatureSummary; detail: SrdCreature };
   item: { summary: SrdItemSummary; detail: SrdItem };
   condition: { summary: SrdConditionSummary; detail: SrdCondition };
-}
+};
 
 export type SrdDetail<TCategory extends SrdCategory> =
   SrdCategoryShape[TCategory]["detail"];

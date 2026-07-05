@@ -4,21 +4,21 @@ import type {
   SrdSource,
 } from "../../../../../../shared/dto/srd";
 
-export interface Dnd5eListItem {
+export type Dnd5eListItem = {
   index: string;
   name: string;
-}
+};
 
-export interface Dnd5eListResponse {
+export type Dnd5eListResponse = {
   count: number;
   results: Dnd5eListItem[];
-}
+};
 
-export interface Dnd5eConditionResponse {
+export type Dnd5eConditionResponse = {
   index: string;
   name: string;
   desc: string[];
-}
+};
 
 export const mapDnd5eCondition = (
   raw: Dnd5eConditionResponse,
