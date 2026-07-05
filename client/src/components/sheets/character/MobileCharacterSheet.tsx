@@ -23,6 +23,7 @@ import { AbilityScore } from "../shared/sections/AbilityScore";
 import { CharacterLore } from "./sections/CharacterLore";
 import { ClassFeatures } from "./sections/ClassFeatures";
 import { TextBlock } from "../shared/inputs/TextBlock";
+import { SheetDetails } from "../shared/sections/SheetDetails";
 import { Proficiencies } from "./sections/Proficiencies";
 
 const ABILITY_NAMES: Record<AbilityName, string> = {
@@ -140,6 +141,7 @@ export const MobileCharacterSheet = ({ onClose, onForceSave }: MobileCharacterSh
               value={state.notes}
               onChange={(v) => setSharedField("notes", v)}
             />
+            <SheetDetails title="Details" />
             <Proficiencies
               armorProficiencies={state.armorProficiencies}
               weaponProficiencies={state.weaponProficiencies}

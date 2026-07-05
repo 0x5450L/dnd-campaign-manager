@@ -20,6 +20,7 @@ import { ClassFeatures } from "./sections/ClassFeatures";
 import { AttacksTable } from "../shared/sections/AttacksTable";
 import { SpellSlots } from "./sections/SpellSlots";
 import { TextBlock } from "../shared/inputs/TextBlock";
+import { SheetDetails } from "../shared/sections/SheetDetails";
 import { Proficiencies } from "./sections/Proficiencies";
 
 const ABILITY_NAMES: Record<AbilityName, string> = {
@@ -139,6 +140,10 @@ export const DesktopCharacterSheet = () => {
           </div>
 
           <div className="order-8 lg:order-0">
+            <SheetDetails title="Details" />
+          </div>
+
+          <div className="order-9 lg:order-0">
             <Proficiencies
               armorProficiencies={state.armorProficiencies}
               weaponProficiencies={state.weaponProficiencies}
