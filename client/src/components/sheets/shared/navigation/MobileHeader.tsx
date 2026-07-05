@@ -6,25 +6,24 @@ type MobileHeaderProps = {
 };
 
 export const MobileHeader = ({ onClose, onForceSave }: MobileHeaderProps) => {
-  const { name, subtitle } = useSheet((s) => ({
+  const { name, isCharacter, classInfo, level, background } = useSheet((s) => ({
     name: s.name,
-    subtitle:
+    isCharacter: s.kind === "character",
+    classInfo:
       s.kind === "character"
-        ? {
-            classInfo: [s.characterClass, s.subclass].filter(Boolean).join(" / "),
-            level: s.level,
-            background: s.background,
-          }
-        : null,
+        ? [s.characterClass, s.subclass].filter(Boolean).join(" / ")
+        : "",
+    level: s.kind === "character" ? s.level : 0,
+    background: s.kind === "character" ? s.background : "",
   }));
 
   return (
     <div className="sticky top-0 z-20 px-4 py-2.5 bg-bg border-b border-rule">
       <div className="truncate text-sm font-bold font-fantasy text-gold">{name || "New Character"}</div>
-      {subtitle && (
+      {isCharacter && (
         <div className="text-[11px] text-dim truncate">
-          {subtitle.classInfo || "—"} <span className="text-faint">Lv.{subtitle.level}</span>
-          {subtitle.background && <span className="text-faint"> · {subtitle.background}</span>}
+          {classInfo || "—"} <span className="text-faint">Lv.{level}</span>
+          {background && <span className="text-faint"> · {background}</span>}
         </div>
       )}
 
