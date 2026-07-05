@@ -1,19 +1,22 @@
-export type MobileTab = "combat" | "stats" | "lore";
-
-const TAB_META: { id: MobileTab; label: string; icon: string }[] = [
-  { id: "combat", label: "Combat", icon: "⚔" },
-  { id: "stats", label: "Stats", icon: "◆" },
-  { id: "lore", label: "Lore", icon: "📜" },
-];
-
-type Props = {
-  activeTab: MobileTab;
-  onTabChange: (tab: MobileTab) => void;
+export type MobileTabConfig<Id extends string> = {
+  id: Id;
+  label: string;
+  icon: string;
 };
 
-export const MobileTabBar = ({ activeTab, onTabChange }: Props) => (
+type Props<Id extends string> = {
+  tabs: MobileTabConfig<Id>[];
+  activeTab: Id;
+  onTabChange: (tab: Id) => void;
+};
+
+export const MobileTabBar = <Id extends string>({
+  tabs,
+  activeTab,
+  onTabChange,
+}: Props<Id>) => (
   <div className="sticky bottom-0 inset-x-0 z-20 flex border-t border-rule bg-surface">
-    {TAB_META.map((tab) => (
+    {tabs.map((tab) => (
       <button
         key={tab.id}
         onClick={() => onTabChange(tab.id)}

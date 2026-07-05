@@ -11,7 +11,7 @@ import {
 } from "../../../state/sheet";
 import type { AbilityName } from "../../../types/characters/characterSheet";
 import { MobileHeader } from "../shared/navigation/MobileHeader";
-import { MobileTabBar, type MobileTab } from "../shared/navigation/MobileTabBar";
+import { MobileTabBar, type MobileTabConfig } from "../shared/navigation/MobileTabBar";
 import { ArmorClass } from "../shared/sections/ArmorClass";
 import { HitPoints } from "../shared/sections/HitPoints";
 import { HitDice } from "./sections/HitDice";
@@ -36,6 +36,14 @@ const ABILITY_NAMES: Record<AbilityName, string> = {
 
 const ALL_ABILITIES: AbilityName[] = ["str", "con", "dex", "int", "wis", "cha"];
 
+type CharacterTab = "combat" | "stats" | "lore";
+
+const CHARACTER_TABS: MobileTabConfig<CharacterTab>[] = [
+  { id: "combat", label: "Combat", icon: "⚔" },
+  { id: "stats", label: "Stats", icon: "◆" },
+  { id: "lore", label: "Lore", icon: "📜" },
+];
+
 type MobileCharacterSheetProps = {
   onClose: () => void;
   onForceSave?: () => void;
@@ -55,7 +63,7 @@ export const MobileCharacterSheet = ({ onClose, onForceSave }: MobileCharacterSh
     removeAttack,
   } = useSheetActions();
 
-  const [activeTab, setActiveTab] = useState<MobileTab>("combat");
+  const [activeTab, setActiveTab] = useState<CharacterTab>("combat");
 
   return (
     <div className="flex flex-col min-h-screen bg-bg">
@@ -154,7 +162,7 @@ export const MobileCharacterSheet = ({ onClose, onForceSave }: MobileCharacterSh
         )}
       </div>
 
-      <MobileTabBar activeTab={activeTab} onTabChange={setActiveTab} />
+      <MobileTabBar tabs={CHARACTER_TABS} activeTab={activeTab} onTabChange={setActiveTab} />
     </div>
   );
 };
