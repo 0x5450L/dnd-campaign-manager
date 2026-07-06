@@ -26,15 +26,6 @@ function CreatureBrowser({ isOpen, onClose, onSelectCreature }: CreatureBrowserP
     return () => clearTimeout(handle);
   }, [term]);
 
-  useEffect(() => {
-    if (!isOpen) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [isOpen, onClose]);
-
   const { data, isFetching, isError } = useSrdCreatureSearchQuery(debounced);
   const results = data?.results ?? [];
 
@@ -58,12 +49,8 @@ function CreatureBrowser({ isOpen, onClose, onSelectCreature }: CreatureBrowserP
       role="dialog"
       aria-modal="true"
       aria-label="Bestiary"
-      onClick={onClose}
     >
-      <div
-        className="relative w-full max-w-xl rounded-lg border border-rule bg-bg shadow-2xl"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className="relative w-full max-w-xl rounded-lg border border-rule bg-bg shadow-2xl">
         <header className="flex items-center justify-between gap-2 border-b border-rule px-4 py-3">
           <h2 className="text-lg font-semibold text-gold-bright">Bestiary</h2>
           <button

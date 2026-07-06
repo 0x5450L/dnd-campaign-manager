@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import type { Character } from "../../../../types/characters/characters";
 import CommonButton from "../../../ui/buttons/CommonButton";
 import CharacterCard from "./CharacterCard";
@@ -29,15 +29,6 @@ function CharactersSidebar({
 }: CharactersSidebarProps) {
   const [activeTab, setActiveTab] = useState<CharactersSidebarTab>("players");
 
-  useEffect(() => {
-    if (!isOpen) return;
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, onClose]);
-
   const { players, npcs } = useMemo(() => {
     const players: Character[] = [];
     const npcs: Character[] = [];
@@ -54,7 +45,6 @@ function CharactersSidebar({
     <>
       <div
         aria-hidden={!isOpen}
-        onClick={onClose}
         className={`fixed inset-0 bg-black/50 z-30 transition-opacity duration-200 ${
           isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         }`}

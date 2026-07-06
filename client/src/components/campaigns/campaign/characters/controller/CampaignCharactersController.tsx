@@ -100,12 +100,10 @@ function CampaignCharactersController({
   };
 
   const handleOpenBestiary = () => {
-    setIsSidebarOpen(false);
     setIsBestiaryOpen(true);
   };
 
   const handleSelectCreature = (creature: SrdCreature) => {
-    setIsBestiaryOpen(false);
     setSheetMode({ kind: "preview", seed: srdCreatureToSheetState(creature) });
   };
 
