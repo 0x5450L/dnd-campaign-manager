@@ -1,5 +1,6 @@
 import { MIN_ATTACKS } from "../../../../constants/characterSheet";
 import { useSheet, useSheetActions } from "../../../../state/sheet";
+import { AddButton } from "../buttons/AddButton";
 
 export const AttacksTable = () => {
   const attacks = useSheet((s) => s.attacks);
@@ -72,9 +73,7 @@ export const AttacksTable = () => {
         </div>
       </div>
 
-      <button onClick={addAttack} className="cs-table-add-btn">
-        + Add attack
-      </button>
+      <AddButton label="+ Add attack" onClick={addAttack} className="mt-2" />
     </div>
   );
 };

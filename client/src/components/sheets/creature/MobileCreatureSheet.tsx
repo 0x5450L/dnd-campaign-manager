@@ -10,7 +10,7 @@ import { AbilityScore } from "../shared/sections/AbilityScore";
 import { NotesBlock } from "../shared/sections/NotesBlock";
 import { CreatureHeader } from "./sections/CreatureHeader";
 import { CreatureDetails } from "./sections/CreatureDetails";
-import { CreatureTraits } from "./sections/CreatureTraits";
+import { CreatureTraits } from "./sections/traits/CreatureTraits";
 
 const ALL_ABILITIES: AbilityName[] = ["str", "con", "dex", "int", "wis", "cha"];
 
