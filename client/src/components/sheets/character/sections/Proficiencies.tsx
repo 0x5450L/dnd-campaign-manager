@@ -1,13 +1,13 @@
-type ProficienciesProps = {
-  armorProficiencies: string;
-  weaponProficiencies: string;
-  toolProficiencies: string;
-  onUpdate: (field: string, value: string) => void;
-};
+import { useCharacterSheet, useSheetActions } from "../../../../state/sheet";
 
-export const Proficiencies = ({
-  armorProficiencies, weaponProficiencies, toolProficiencies, onUpdate,
-}: ProficienciesProps) => {
+export const Proficiencies = () => {
+  const { armorProficiencies, weaponProficiencies, toolProficiencies } = useCharacterSheet((s) => ({
+    armorProficiencies: s.armorProficiencies,
+    weaponProficiencies: s.weaponProficiencies,
+    toolProficiencies: s.toolProficiencies,
+  }));
+  const { setCharacterField } = useSheetActions();
+
   return (
     <div className="cs-section-card p-3">
       <div className="cs-section-title">Proficiencies & Equipment</div>
@@ -19,7 +19,7 @@ export const Proficiencies = ({
             <input
               type="text"
               value={armorProficiencies}
-              onChange={(e) => onUpdate("armorProficiencies", e.target.value)}
+              onChange={(e) => setCharacterField("armorProficiencies", e.target.value)}
               className="cs-input text-xs"
               placeholder="Light, Medium, Shields..."
             />
@@ -32,7 +32,7 @@ export const Proficiencies = ({
             <input
               type="text"
               value={weaponProficiencies}
-              onChange={(e) => onUpdate("weaponProficiencies", e.target.value)}
+              onChange={(e) => setCharacterField("weaponProficiencies", e.target.value)}
               className="cs-input text-xs"
               placeholder="Simple, Martial..."
             />
@@ -45,7 +45,7 @@ export const Proficiencies = ({
             <input
               type="text"
               value={toolProficiencies}
-              onChange={(e) => onUpdate("toolProficiencies", e.target.value)}
+              onChange={(e) => setCharacterField("toolProficiencies", e.target.value)}
               className="cs-input text-xs"
               placeholder="Thieves' tools..."
             />

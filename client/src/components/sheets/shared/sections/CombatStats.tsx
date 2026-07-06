@@ -1,29 +1,32 @@
 import { NumericInput } from "../inputs/NumericInput";
+import {
+  getInitiative,
+  getPassivePerception,
+  getSheetProficiencyBonus,
+  useSheet,
+  useSheetActions,
+} from "../../../../state/sheet";
 
-type CombatStatsProps = {
-  ac: number;
-  initiative: number;
-  speed: number;
-  size: string;
-  proficiencyBonus: number;
-  passivePerception: number;
-  hasInspiration?: boolean;
-  showInspiration?: boolean;
-  onUpdate: (field: string, value: number | string) => void;
-  onToggleInspiration?: () => void;
-};
+export const CombatStats = () => {
+  const {
+    initiative,
+    speed,
+    size,
+    proficiencyBonus,
+    passivePerception,
+    hasInspiration,
+    showInspiration,
+  } = useSheet((s) => ({
+    initiative: getInitiative(s),
+    speed: s.speed,
+    size: s.size,
+    proficiencyBonus: getSheetProficiencyBonus(s),
+    passivePerception: getPassivePerception(s),
+    hasInspiration: s.kind === "character" ? s.inspiration : false,
+    showInspiration: s.kind === "character",
+  }));
+  const { setSharedField, toggleInspiration } = useSheetActions();
 
-export const CombatStats = ({
-  initiative,
-  speed,
-  size,
-  proficiencyBonus,
-  passivePerception,
-  hasInspiration = false,
-  showInspiration = true,
-  onUpdate,
-  onToggleInspiration,
-}: CombatStatsProps) => {
   const initStr = initiative >= 0 ? `+${initiative}` : `${initiative}`;
   const profStr = proficiencyBonus >= 0 ? `+${proficiencyBonus}` : `${proficiencyBonus}`;
 
@@ -40,7 +43,7 @@ export const CombatStats = ({
       <div className="flex flex-col items-center">
         <NumericInput
           value={speed}
-          onChange={(v) => onUpdate("speed", v)}
+          onChange={(v) => setSharedField("speed", v)}
           min={0}
           defaultValue={30}
           className="cs-score-input w-10 h-6 text-xs"
@@ -57,20 +60,20 @@ export const CombatStats = ({
   const sizeSelect = (
     <select
       value={size}
-      onChange={(e) => onUpdate("size", e.target.value)}
+      onChange={(e) => setSharedField("size", e.target.value)}
       className="cs-select cs-select-lg text-sm max-w-45 w-full text-center"
     >
       <option value="Tiny">Tiny</option>
       <option value="Small">Small</option>
       <option value="Medium">Medium</option>
-      <option value="Large">Large</option>  
+      <option value="Large">Large</option>
       <option value="Huge">Huge</option>
       <option value="Gargantuan">Gargantuan</option>
     </select>
   );
 
   const inspirationToggle = (
-    <div onClick={onToggleInspiration} className={`flex items-center gap-2 cs-inspiration max-w-45 w-full ${hasInspiration ? "active" : ""}`}>
+    <div onClick={toggleInspiration} className={`flex items-center gap-2 cs-inspiration max-w-45 w-full ${hasInspiration ? "active" : ""}`}>
       <div
         className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all shrink-0 ${
           hasInspiration ? "border-gold bg-gold/20" : "border-rule bg-transparent"

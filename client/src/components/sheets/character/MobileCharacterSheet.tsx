@@ -1,14 +1,4 @@
 import { useState } from "react";
-import {
-  getAbilityModifier,
-  getInitiative,
-  getPassivePerception,
-  getSaveValue,
-  getSheetProficiencyBonus,
-  getSkillsForAbility,
-  useCharacterSheetState,
-  useSheetActions,
-} from "../../../state/sheet";
 import type { AbilityName } from "../../../types/characters/characterSheet";
 import { MobileHeader } from "../shared/navigation/MobileHeader";
 import { MobileTabBar, type MobileTabConfig } from "../shared/navigation/MobileTabBar";
@@ -22,18 +12,11 @@ import { SpellSlots } from "./sections/SpellSlots";
 import { AbilityScore } from "../shared/sections/AbilityScore";
 import { CharacterLore } from "./sections/CharacterLore";
 import { ClassFeatures } from "./sections/ClassFeatures";
-import { TextBlock } from "../shared/inputs/TextBlock";
+import { NotesBlock } from "../shared/sections/NotesBlock";
+import { RacialTraits } from "./sections/RacialTraits";
+import { Feats } from "./sections/Feats";
 import { SheetDetails } from "../shared/sections/SheetDetails";
 import { Proficiencies } from "./sections/Proficiencies";
-
-const ABILITY_NAMES: Record<AbilityName, string> = {
-  str: "Strength",
-  dex: "Dexterity",
-  con: "Constitution",
-  int: "Intelligence",
-  wis: "Wisdom",
-  cha: "Charisma",
-};
 
 const ALL_ABILITIES: AbilityName[] = ["str", "con", "dex", "int", "wis", "cha"];
 
@@ -51,19 +34,6 @@ type MobileCharacterSheetProps = {
 };
 
 export const MobileCharacterSheet = ({ onClose, onForceSave }: MobileCharacterSheetProps) => {
-  const state = useCharacterSheetState();
-  const {
-    setSharedField,
-    setCharacterField,
-    setAbilityScore,
-    setSaveProficient,
-    setSkillProficient,
-    toggleInspiration,
-    addAttack,
-    updateAttack,
-    removeAttack,
-  } = useSheetActions();
-
   const [activeTab, setActiveTab] = useState<CharacterTab>("combat");
 
   return (
@@ -79,26 +49,8 @@ export const MobileCharacterSheet = ({ onClose, onForceSave }: MobileCharacterSh
               <HitDice />
               <DeathSaves />
             </div>
-            <CombatStats
-              ac={state.ac}
-              initiative={getInitiative(state)}
-              speed={state.speed}
-              size={state.size}
-              proficiencyBonus={getSheetProficiencyBonus(state)}
-              passivePerception={getPassivePerception(state)}
-              hasInspiration={state.inspiration}
-              onUpdate={(field, value) => {
-                if (field === "speed") setSharedField("speed", value as number);
-                else if (field === "size") setSharedField("size", value as string);
-              }}
-              onToggleInspiration={toggleInspiration}
-            />
-            <AttacksTable
-              attacks={state.attacks}
-              onUpdate={updateAttack}
-              onAdd={addAttack}
-              onRemove={removeAttack}
-            />
+            <CombatStats />
+            <AttacksTable />
             <SpellSlots />
           </>
         )}
@@ -106,18 +58,7 @@ export const MobileCharacterSheet = ({ onClose, onForceSave }: MobileCharacterSh
         {activeTab === "stats" && (
           <div className="grid grid-cols-2 gap-3">
             {ALL_ABILITIES.map((ability) => (
-              <AbilityScore
-                key={ability}
-                name={ABILITY_NAMES[ability]}
-                score={state.abilities[ability].score}
-                modifier={getAbilityModifier(state, ability)}
-                saveProficient={state.abilities[ability].saveProficient}
-                saveValue={getSaveValue(state, ability)}
-                skills={getSkillsForAbility(state, ability)}
-                onScoreChange={(v) => setAbilityScore(ability, v)}
-                onSaveProfChange={(v) => setSaveProficient(ability, v)}
-                onSkillProfChange={setSkillProficient}
-              />
+              <AbilityScore key={ability} ability={ability} />
             ))}
           </div>
         )}
@@ -126,40 +67,11 @@ export const MobileCharacterSheet = ({ onClose, onForceSave }: MobileCharacterSh
           <>
             <CharacterLore />
             <ClassFeatures />
-            <TextBlock
-              title="Racial Traits"
-              value={state.racialTraits}
-              onChange={(v) => setCharacterField("racialTraits", v)}
-            />
-            <TextBlock
-              title="Feats"
-              value={state.feats}
-              onChange={(v) => setCharacterField("feats", v)}
-            />
-            <TextBlock
-              title="Notes"
-              value={state.notes}
-              onChange={(v) => setSharedField("notes", v)}
-            />
+            <RacialTraits />
+            <Feats />
+            <NotesBlock />
             <SheetDetails title="Details" />
-            <Proficiencies
-              armorProficiencies={state.armorProficiencies}
-              weaponProficiencies={state.weaponProficiencies}
-              toolProficiencies={state.toolProficiencies}
-              onUpdate={(field, value) => {
-                switch (field) {
-                  case "armorProficiencies":
-                    setCharacterField("armorProficiencies", value);
-                    break;
-                  case "weaponProficiencies":
-                    setCharacterField("weaponProficiencies", value);
-                    break;
-                  case "toolProficiencies":
-                    setCharacterField("toolProficiencies", value);
-                    break;
-                }
-              }}
-            />
+            <Proficiencies />
           </>
         )}
       </div>
