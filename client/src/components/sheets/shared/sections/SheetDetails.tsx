@@ -41,10 +41,8 @@ export const SheetDetails = ({ title }: SheetDetailsProps) => {
   const { setSharedField } = useSheetActions();
 
   return (
-    <div className="rounded-md border-[1.5px] border-rule bg-surface/70 shadow-md p-3 flex flex-col gap-2">
-      <div className="font-fantasy font-bold text-sm tracking-[0.16em] uppercase text-gold-bright">
-        {title}
-      </div>
+    <div className="cs-section-card p-3 flex flex-col gap-2">
+      <div className="cs-section-title">{title}</div>
 
       {TEXT_FIELDS.map((field) => (
         <label key={field.key} className="flex flex-col gap-0.5">

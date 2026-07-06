@@ -26,7 +26,13 @@ export class NoProviderAvailableError extends Error {
     readonly category: SrdCategory,
     readonly causes: unknown[],
   ) {
-    super(`no provider resolved category ${category} (${causes.length} attempt(s) failed)`);
+    const detail = causes
+      .map((cause) => (cause instanceof Error ? cause.message : String(cause)))
+      .join("; ");
+    super(
+      `no provider resolved category ${category} (${causes.length} attempt(s) failed)` +
+        (detail ? `: ${detail}` : ""),
+    );
     this.name = "NoProviderAvailableError";
   }
 }
