@@ -5,7 +5,10 @@ import type {
   EncounterParticipantDTO,
   ParticipantType,
 } from "../../../../types/encounter";
+import type { SrdCreature } from "../../../../../../shared/dto/srd";
+import { srdCreatureToParticipant } from "../../../../utils/srd/creatureParticipantMapper";
 import CommonButton from "../../../ui/buttons/CommonButton";
+import CreatureBrowser from "../characters/CreatureBrowser";
 import { CloseIcon } from "./participantCard/blocks/icons";
 import ParticipantEditorBody from "./participantCard/modal/ParticipantEditorBody";
 
@@ -48,17 +51,25 @@ const blankParticipant = (type: ParticipantType): EncounterParticipantDTO => ({
 export const AddParticipantModal = ({ onClose }: AddParticipantModalProps) => {
   const { addParticipant } = useLiveSession();
   const [draft, setDraft] = useState<EncounterParticipantDTO>(() => blankParticipant("monster"));
+  const [isBestiaryOpen, setIsBestiaryOpen] = useState(false);
 
   const updateDraft = (fields: Partial<EncounterParticipantDTO>) =>
     setDraft((current) => ({ ...current, ...fields }));
 
+  const handlePickCreature = (creature: SrdCreature) => {
+    setDraft((current) => ({ ...current, ...srdCreatureToParticipant(creature) }));
+    setIsBestiaryOpen(false);
+  };
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key !== "Escape") return;
+      if (isBestiaryOpen) setIsBestiaryOpen(false);
+      else onClose();
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
-  }, [onClose]);
+  }, [onClose, isBestiaryOpen]);
 
   const canSubmit = draft.name.trim().length > 0 && draft.maxHp >= 1;
 
@@ -87,6 +98,7 @@ export const AddParticipantModal = ({ onClose }: AddParticipantModalProps) => {
   };
 
   return (
+    <>
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
       onClick={onClose}
@@ -131,6 +143,16 @@ export const AddParticipantModal = ({ onClose }: AddParticipantModalProps) => {
           ))}
         </div>
 
+        {draft.type === "monster" && (
+          <button
+            type="button"
+            onClick={() => setIsBestiaryOpen(true)}
+            className="rounded-md border border-dashed border-rule px-3 py-2 font-fantasy text-sm uppercase tracking-widest text-dim transition-colors hover:border-gold hover:text-gold-bright"
+          >
+            Prefill from bestiary
+          </button>
+        )}
+
         <ParticipantEditorBody
           draft={draft}
           updateDraft={updateDraft}
@@ -148,6 +170,13 @@ export const AddParticipantModal = ({ onClose }: AddParticipantModalProps) => {
         </div>
       </div>
     </div>
+
+    <CreatureBrowser
+      isOpen={isBestiaryOpen}
+      onClose={() => setIsBestiaryOpen(false)}
+      onSelectCreature={handlePickCreature}
+    />
+    </>
   );
 };
 
