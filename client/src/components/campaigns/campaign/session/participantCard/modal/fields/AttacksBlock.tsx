@@ -1,8 +1,8 @@
-import type { CharacterAttackDTO } from "../../../../../../types/characters/characters";
-import { formatSigned } from "../../../../../../utils/dndMath";
-import EditableNumber from "../blocks/EditableNumber";
-import EditableText from "./EditableText";
-import { PlusIcon, CloseIcon } from "../blocks/icons";
+import type { CharacterAttackDTO } from "../../../../../../../types/characters/characters";
+import { formatSigned } from "../../../../../../../utils/dndMath";
+import EditableNumber from "../../blocks/EditableNumber";
+import EditableText from "../EditableText";
+import { PlusIcon, CloseIcon } from "../../blocks/icons";
 
 type AttacksBlockProps = {
   attacks: CharacterAttackDTO[];

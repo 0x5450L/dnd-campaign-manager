@@ -1,4 +1,4 @@
-import EditableNumber from "../blocks/EditableNumber";
+import EditableNumber from "../../blocks/EditableNumber";
 import StatTile from "./StatTile";
 
 type StatInputProps = {
