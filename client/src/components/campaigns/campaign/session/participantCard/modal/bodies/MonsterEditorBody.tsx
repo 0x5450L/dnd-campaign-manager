@@ -15,4 +15,12 @@ export const MonsterEditorBody = (props: EditorBodyProps) => (
     <AttacksBlock
       attacks={props.draft.attacks}
       editable={props.canEditOwn}
-      onChange={(at
+      onChange={(attacks) => props.updateDraft({ attacks })}
+    />
+    <AbilitiesSection {...props} />
+    <ResourcePoolsSection {...props} />
+    <ConditionsSection {...props} />
+  </>
+);
+
+export default MonsterEditorBody;

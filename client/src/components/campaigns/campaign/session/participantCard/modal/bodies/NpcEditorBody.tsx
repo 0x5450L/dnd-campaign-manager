@@ -13,4 +13,16 @@ export const NpcEditorBody = (props: EditorBodyProps) => (
     <VitalsSection {...props} />
     <MonsterStatsSection {...props} />
     <AbilityScoresSection {...props} />
-    <SpellcastingSection {...props} 
+    <SpellcastingSection {...props} />
+    <AttacksBlock
+      attacks={props.draft.attacks}
+      editable={props.canEditOwn}
+      onChange={(attacks) => props.updateDraft({ attacks })}
+    />
+    <AbilitiesSection {...props} />
+    <ResourcePoolsSection {...props} />
+    <ConditionsSection {...props} />
+  </>
+);
+
+export default NpcEditorBody;
