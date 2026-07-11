@@ -1,5 +1,6 @@
 import type { CharacterAttackDTO, CharacterAttackInput } from "./character";
 import type { AbilityName, SpellSlotLevel } from "../types/dnd";
+import type { Ability, ResourcePool } from "../types/abilities";
 import type { DiceRollDTO } from "./dnd";
 
 export type { SpellSlotLevel };
@@ -50,6 +51,8 @@ export type ParticipantAbilityScore = {
   score: number;
 };
 
+export type { Ability, AbilityActivation, AbilityCost, ResourcePool, ResourceReset } from "../types/abilities";
+
 export type EncounterParticipantDTO = {
   id: string;
   encounterId: string;
@@ -73,6 +76,15 @@ export type EncounterParticipantDTO = {
   spellSlots?: SpellSlotLevel[] | null;
   deathSaveSuccesses: number;
   deathSaveFailures: number;
+  speed: string | null;
+  senses: string | null;
+  challengeRating: number | null;
+  damageVulnerabilities: string | null;
+  damageResistances: string | null;
+  damageImmunities: string | null;
+  conditionImmunities: string | null;
+  abilities: Ability[] | null;
+  resources: ResourcePool[] | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -126,6 +138,15 @@ export type CreateParticipantPayload = {
   proficiencyBonus?: number | null;
   spellSlots?: SpellSlotLevel[] | null;
   attacks?: CharacterAttackInput[];
+  speed?: string | null;
+  senses?: string | null;
+  challengeRating?: number | null;
+  damageVulnerabilities?: string | null;
+  damageResistances?: string | null;
+  damageImmunities?: string | null;
+  conditionImmunities?: string | null;
+  abilities?: Ability[] | null;
+  resources?: ResourcePool[] | null;
 };
 
 export type UpdateParticipantPayload = Partial<{
@@ -147,6 +168,15 @@ export type UpdateParticipantPayload = Partial<{
   spellSlots: SpellSlotLevel[] | null;
   deathSaveSuccesses: number;
   deathSaveFailures: number;
+  speed: string | null;
+  senses: string | null;
+  challengeRating: number | null;
+  damageVulnerabilities: string | null;
+  damageResistances: string | null;
+  damageImmunities: string | null;
+  conditionImmunities: string | null;
+  abilities: Ability[] | null;
+  resources: ResourcePool[] | null;
 }>;
 
 export type BulkInitiativeEntry = {
