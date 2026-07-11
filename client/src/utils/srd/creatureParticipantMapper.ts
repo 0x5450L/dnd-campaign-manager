@@ -6,12 +6,31 @@ import type {
 } from "../../types/encounter";
 import type { CharacterAttackDTO } from "../../types/characters/characters";
 import { parseCreatureAction } from "./creatureActionParser";
+import {
+  creatureAbilities,
+  creatureResourcePools,
+} from "./abilities";
 
 const TO_HIT_BONUS = /^[+-]\d+$/;
 
 type ParticipantSeed = Pick<
   EncounterParticipantDTO,
-  "type" | "name" | "maxHp" | "currentHp" | "armorClass" | "abilityScores" | "attacks"
+  | "type"
+  | "name"
+  | "maxHp"
+  | "currentHp"
+  | "armorClass"
+  | "abilityScores"
+  | "attacks"
+  | "speed"
+  | "senses"
+  | "challengeRating"
+  | "damageVulnerabilities"
+  | "damageResistances"
+  | "damageImmunities"
+  | "conditionImmunities"
+  | "abilities"
+  | "resources"
 >;
 
 const buildAbilityScores = (creature: SrdCreature): ParticipantAbilityScore[] =>
@@ -33,12 +52,36 @@ const buildAttacks = (creature: SrdCreature): CharacterAttackDTO[] => {
   return attacks;
 };
 
-export const srdCreatureToParticipant = (creature: SrdCreature): ParticipantSeed => ({
-  type: "monster",
-  name: creature.name,
-  maxHp: creature.hitPoints,
-  currentHp: creature.hitPoints,
-  armorClass: creature.armorClass,
-  abilityScores: buildAbilityScores(creature),
-  attacks: buildAttacks(creature),
-});
+const formatSpeed = (speed: SrdCreature["speed"]): string | null => {
+  const entries = Object.entries(speed).filter(([, value]) => typeof value === "number");
+  if (entries.length === 0) return null;
+  const walk = entries.find(([mode]) => mode === "walk");
+  const rest = entries.filter(([mode]) => mode !== "walk");
+  const parts = walk ? [`${walk[1]} ft.`] : [];
+  for (const [mode, value] of rest) parts.push(`${mode} ${value} ft.`);
+  return parts.join(", ");
+};
+
+export const srdCreatureToParticipant = (creature: SrdCreature): ParticipantSeed => {
+  const abilities = creatureAbilities(creature);
+  const resources = creatureResourcePools(creature);
+
+  return {
+    type: "monster",
+    name: creature.name,
+    maxHp: creature.hitPoints,
+    currentHp: creature.hitPoints,
+    armorClass: creature.armorClass,
+    abilityScores: buildAbilityScores(creature),
+    attacks: buildAttacks(creature),
+    speed: formatSpeed(creature.speed),
+    senses: creature.senses,
+    challengeRating: creature.challengeRating,
+    damageVulnerabilities: creature.damageVulnerabilities,
+    damageResistances: creature.damageResistances,
+    damageImmunities: creature.damageImmunities,
+    conditionImmunities: creature.conditionImmunities,
+    abilities: abilities.length > 0 ? abilities : null,
+    resources: resources.length > 0 ? resources : null,
+  };
+};

@@ -73,9 +73,23 @@ const SCALAR_FIELDS = [
   "proficiencyBonus",
   "deathSaveSuccesses",
   "deathSaveFailures",
+  "speed",
+  "senses",
+  "challengeRating",
+  "damageVulnerabilities",
+  "damageResistances",
+  "damageImmunities",
+  "conditionImmunities",
 ] as const;
 
-const JSON_FIELDS = ["conditions", "abilityScores", "spellSlots", "attacks"] as const;
+const JSON_FIELDS = [
+  "conditions",
+  "abilityScores",
+  "spellSlots",
+  "attacks",
+  "abilities",
+  "resources",
+] as const;
 
 export const diffParticipant = (
   base: EncounterParticipantDTO,
