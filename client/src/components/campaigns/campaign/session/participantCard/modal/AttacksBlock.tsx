@@ -101,7 +101,7 @@ export const AttacksBlock = ({
                   editable={editable}
                   onCommit={(damage) => patchAttack(attack.id, { damage })}
                   ariaLabel="Attack damage"
-                  className={`w-20 text-center font-fantasy text-sm sm:text-base text-ink ${
+                  className={`w-24 px-2 text-center font-fantasy text-sm sm:text-base text-ink ${
                     editable
                       ? "rounded border border-rule/60 focus:border-hover"
                       : ""
