@@ -27,6 +27,8 @@ model Character {
   damageResistances       String?                @map("damage_resistances")
   damageImmunities        String?                @map("damage_immunities")
   conditionImmunities     String?                @map("condition_immunities")
+  abilities               Json?
+  resources               Json?
   campaignId              String
   userId                  String
   createdAt               DateTime               @default(now()) @map("created_at")
