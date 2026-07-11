@@ -115,6 +115,15 @@ const buildParticipantCreateData = (
     proficiencyBonus: input.proficiencyBonus,
     abilityScores: jsonInput(input.abilityScores),
     spellSlots: jsonInput(input.spellSlots),
+    speed: trimOrNull(input.speed),
+    senses: trimOrNull(input.senses),
+    challengeRating: input.challengeRating,
+    damageVulnerabilities: trimOrNull(input.damageVulnerabilities),
+    damageResistances: trimOrNull(input.damageResistances),
+    damageImmunities: trimOrNull(input.damageImmunities),
+    conditionImmunities: trimOrNull(input.conditionImmunities),
+    abilities: jsonInput(input.abilities),
+    resources: jsonInput(input.resources),
   }),
 });
 

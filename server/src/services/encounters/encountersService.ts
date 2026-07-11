@@ -241,6 +241,15 @@ export const updateParticipant = async (
         proficiencyBonus: body.proficiencyBonus,
         abilityScores: jsonInput(body.abilityScores),
         spellSlots: jsonInput(body.spellSlots),
+        speed: body.speed,
+        senses: body.senses,
+        challengeRating: body.challengeRating,
+        damageVulnerabilities: body.damageVulnerabilities,
+        damageResistances: body.damageResistances,
+        damageImmunities: body.damageImmunities,
+        conditionImmunities: body.conditionImmunities,
+        abilities: jsonInput(body.abilities),
+        resources: jsonInput(body.resources),
       }
     : {};
 

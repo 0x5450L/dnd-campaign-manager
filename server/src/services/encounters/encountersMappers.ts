@@ -5,6 +5,7 @@ import type {
   ParticipantAbilityScore,
   SpellSlotLevel,
 } from "../../../../shared/dto/session";
+import type { Ability, ResourcePool } from "../../../../shared/types/abilities";
 import type { AbilityName } from "../../../../shared/types/dnd";
 import type { CharacterAttackDTO } from "../../../../shared/dto/character";
 import { jsonInput } from "../../utils/payload";
@@ -36,6 +37,15 @@ export const mapParticipantToDTO = (
   spellSlots: participant.spellSlots as unknown as SpellSlotLevel[] | null,
   deathSaveSuccesses: participant.deathSaveSuccesses,
   deathSaveFailures: participant.deathSaveFailures,
+  speed: participant.speed,
+  senses: participant.senses,
+  challengeRating: participant.challengeRating,
+  damageVulnerabilities: participant.damageVulnerabilities,
+  damageResistances: participant.damageResistances,
+  damageImmunities: participant.damageImmunities,
+  conditionImmunities: participant.conditionImmunities,
+  abilities: participant.abilities as unknown as Ability[] | null,
+  resources: participant.resources as unknown as ResourcePool[] | null,
   createdAt: participant.createdAt.toISOString(),
   updatedAt: participant.updatedAt.toISOString(),
 });
