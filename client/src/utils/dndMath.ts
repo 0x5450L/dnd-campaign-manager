@@ -61,3 +61,6 @@ export const CHALLENGE_RATINGS: ChallengeRating[] = [
 
 export const xpForChallengeRating = (cr: number | null): number | null =>
   CHALLENGE_RATINGS.find((entry) => entry.value === cr)?.xp ?? null;
+
+export const challengeRatingLabel = (cr: number | null): string | null =>
+  CHALLENGE_RATINGS.find((entry) => entry.value === cr)?.label ?? null;
