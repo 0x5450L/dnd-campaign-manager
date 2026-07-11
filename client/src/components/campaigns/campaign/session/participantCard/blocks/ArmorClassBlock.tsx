@@ -1,7 +1,8 @@
 import { SHIELD_AC_BONUS } from "../../../../../../utils/dndMath";
 import EditableNumber from "./EditableNumber";
 import { ShieldIcon, ShieldPlusIcon } from "./icons";
-import { STAT_BLOCK_SIZES, type StatBlockSize } from "./statBlockSizes";
+import { STAT_BLOCK_SIZES } from "../../../../../../constants/statBlockSizes";
+import type { StatBlockSize } from "../../../../../../types/components/participantCard";
 
 type ArmorClassBlockProps = {
   value: number;

@@ -1,11 +1,4 @@
-export type StatBlockSize = "md" | "lg";
-
-export type StatBlockSizeStyles = {
-  box: string;
-  label: string;
-  value: string;
-  input: string;
-};
+import type { StatBlockSize, StatBlockSizeStyles } from "../types/components/participantCard";
 
 export const STAT_BLOCK_SIZES: Record<StatBlockSize, StatBlockSizeStyles> = {
   md: {

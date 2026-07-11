@@ -1,10 +1,7 @@
 import { useMemo, useState } from "react";
-import {
-  CONDITIONS,
-  CONDITION_THEME,
-  isKnownCondition,
-  type ConditionName,
-} from "../conditions";
+import { CONDITIONS, CONDITION_THEME } from "../../../../../../constants/conditions";
+import { isKnownCondition } from "../../../../../../utils/conditions";
+import type { ConditionName } from "../../../../../../types/conditions";
 import ConditionIcon from "../conditionIcons";
 import { PlusIcon, CloseIcon } from "./icons";
 

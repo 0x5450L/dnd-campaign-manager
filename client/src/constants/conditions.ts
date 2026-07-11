@@ -1,3 +1,5 @@
+import type { ConditionName, ConditionTheme } from "../types/conditions";
+
 export const CONDITIONS = [
   "Blinded",
   "Charmed",
@@ -15,16 +17,6 @@ export const CONDITIONS = [
   "Stunned",
   "Unconscious",
 ] as const;
-
-export type ConditionName = (typeof CONDITIONS)[number];
-
-export type ConditionTheme = {
-  chipBorder: string;
-  chipBg: string;
-  chipText: string;
-  fillRgba: string;
-  dotRgba: string;
-};
 
 export const CONDITION_THEME: Record<ConditionName, ConditionTheme> = {
   Blinded: {
@@ -132,22 +124,4 @@ export const CONDITION_THEME: Record<ConditionName, ConditionTheme> = {
     fillRgba: "rgba(122, 90, 165, 0.32)",
     dotRgba: "rgba(122, 90, 165, 0.9)",
   },
-};
-
-export const isKnownCondition = (value: string): value is ConditionName =>
-  (CONDITIONS as readonly string[]).includes(value);
-
-export const buildConditionBackground = (active: string[]): string | undefined => {
-  const known = active.filter(isKnownCondition);
-  if (known.length === 0) return undefined;
-  if (known.length === 1) {
-    return `linear-gradient(135deg, ${CONDITION_THEME[known[0]].fillRgba}, transparent 75%)`;
-  }
-  const stops = known
-    .map((c, idx) => {
-      const pct = Math.round((idx / (known.length - 1)) * 100);
-      return `${CONDITION_THEME[c].fillRgba} ${pct}%`;
-    })
-    .join(", ");
-  return `linear-gradient(135deg, ${stops})`;
 };

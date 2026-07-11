@@ -1,5 +1,6 @@
 import EditableNumber from "./EditableNumber";
-import { STAT_BLOCK_SIZES, type StatBlockSize } from "./statBlockSizes";
+import { STAT_BLOCK_SIZES } from "../../../../../../constants/statBlockSizes";
+import type { StatBlockSize } from "../../../../../../types/components/participantCard";
 
 type InitiativeBlockProps = {
   value: number;
