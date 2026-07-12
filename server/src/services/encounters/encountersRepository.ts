@@ -224,6 +224,8 @@ export const seedPartyForEncounter = async (
       deathSaveFailures: character.deathSaveFailures,
       proficiencyBonus: getProficiencyBonus(getLevelFromXp(character.experience)),
       abilityScores: character.abilityScores.map((a) => ({ name: a.name, score: a.score })),
+      abilities: character.abilities ?? Prisma.DbNull,
+      resources: character.resources ?? Prisma.DbNull,
       attacks: character.attacks.map((a) => ({
         id: a.id,
         name: a.name,

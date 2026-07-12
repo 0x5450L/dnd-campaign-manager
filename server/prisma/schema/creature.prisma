@@ -4,18 +4,6 @@ model CreatureProfile {
   creatureType          String?         @map("creature_type")
   characterId           String          @unique @map("character_id")
   character             Character       @relation(fields: [characterId], references: [id], onDelete: Cascade)
-  traits                CreatureTrait[]
 
   @@map("creature_profiles")
-}
-
-model CreatureTrait {
-  id          String            @id @default(uuid())
-  kind        CreatureTraitKind
-  name        String
-  description String
-  profileId   String            @map("profile_id")
-  profile     CreatureProfile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
-
-  @@map("creature_traits")
 }

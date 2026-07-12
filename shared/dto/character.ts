@@ -1,3 +1,4 @@
+import type { Ability, ResourcePool } from "../types/abilities";
 import type { AbilityName, SpellSlotLevel } from "../types/dnd";
 
 export type CharacterType = "player" | "npc" | "monster";
@@ -37,29 +38,15 @@ export type CharacterAttackDTO = CharacterAttackInput & {
   id: string;
 };
 
-export type CreatureTraitKind = "trait" | "legendary_action";
-
-export type CreatureTraitInput = {
-  kind: CreatureTraitKind;
-  name: string;
-  description: string;
-};
-
-export type CreatureTraitDTO = CreatureTraitInput & {
-  id: string;
-};
-
 export type CreatureProfileInput = {
   challengeRating?: number | null;
   creatureType?: string | null;
-  traits?: CreatureTraitInput[];
 };
 
 export type CreatureProfileDTO = {
   id: string;
   challengeRating: number | null;
   creatureType: string | null;
-  traits: CreatureTraitDTO[];
 };
 
 export type CharacterDTO = {
@@ -97,6 +84,8 @@ export type CharacterDTO = {
   attacks: CharacterAttackDTO[];
   creatureProfile: CreatureProfileDTO | null;
   spellSlots?: SpellSlotLevel[] | null;
+  abilities: Ability[] | null;
+  resources: ResourcePool[] | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -145,4 +134,6 @@ export type UpdateCharacterPayload = Partial<{
   attacks: CharacterAttackInput[];
   creatureProfile: CreatureProfileInput;
   spellSlots: SpellSlotLevel[] | null;
+  abilities: Ability[] | null;
+  resources: ResourcePool[] | null;
 }>;
