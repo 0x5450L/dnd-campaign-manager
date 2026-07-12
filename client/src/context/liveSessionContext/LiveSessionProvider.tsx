@@ -28,6 +28,7 @@ import {
   encounterKeys,
   useAbilityUsageMutation,
   useActiveEncounterQuery,
+  useRollInitiativeMutation,
   useAdvanceTurnMutation,
   useCreateParticipantMutation,
   useEncounterRealtimeSync,
@@ -43,6 +44,7 @@ import {
   toggleConditionInList,
 } from "../../utils/encounterParticipant";
 import type {
+  InitiativeUpdatedPayload,
   PresenceChangedPayload,
   RollLoggedPayload,
   TurnAdvancedPayload,
@@ -95,6 +97,7 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
   useEncounterRealtimeSync(campaign.id, sessionId);
   const { mutate: mutateParticipant } = useUpdateParticipantMutation(sessionId);
   const { mutate: mutateAbilityUsage } = useAbilityUsageMutation(sessionId);
+  const { mutate: mutateRollInitiative } = useRollInitiativeMutation(sessionId);
   const { mutate: mutateAdvanceTurn } = useAdvanceTurnMutation(sessionId);
   const { mutate: mutateCreateParticipant } = useCreateParticipantMutation(sessionId);
   const { mutate: mutateRemoveParticipant } = useRemoveParticipantMutation(sessionId);
@@ -145,6 +148,11 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
       });
     };
 
+    const handleInitiativeRolls = (payload: InitiativeUpdatedPayload) => {
+      if (payload.campaignId !== campaign.id || !payload.rolls?.length) return;
+      dispatch({ type: "INITIATIVE_ROLLED", rolls: payload.rolls });
+    };
+
     const handleTurnAdvanced = (payload: TurnAdvancedPayload) => {
       if (payload.campaignId !== campaign.id) return;
       dispatch({
@@ -154,6 +162,7 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
       });
     };
 
+    socket.on("initiative_updated", handleInitiativeRolls);
     socket.on("turn_advanced", handleTurnAdvanced);
     socket.on("roll_logged", handleRollLogged);
     socket.on("session_started", handleSessionStarted);
@@ -162,6 +171,7 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
 
     return () => {
       socket.off("connect", join);
+      socket.off("initiative_updated", handleInitiativeRolls);
       socket.off("turn_advanced", handleTurnAdvanced);
       socket.off("roll_logged", handleRollLogged);
       socket.off("session_started", handleSessionStarted);
@@ -311,6 +321,14 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
     [encounter, mutateParticipant],
   );
 
+  const rollInitiative = useCallback(
+    (participantIds?: string[]) => {
+      if (!encounter) return;
+      mutateRollInitiative({ encounterId: encounter.id, participantIds });
+    },
+    [encounter, mutateRollInitiative],
+  );
+
   const applyAbilityUsage = useCallback(
     (participantId: string, abilityId: string, action: AbilityUsageAction) => {
       if (!encounter) return;
@@ -387,6 +405,7 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
       resetDeathSaves,
       updateParticipant,
       applyAbilityUsage,
+      rollInitiative,
       addParticipant,
       removeParticipant,
       logRoll,
@@ -417,6 +436,7 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
       resetDeathSaves,
       updateParticipant,
       applyAbilityUsage,
+      rollInitiative,
       addParticipant,
       removeParticipant,
       logRoll,

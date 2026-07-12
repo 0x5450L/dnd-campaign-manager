@@ -19,6 +19,8 @@ import type {
   UpdateParticipantPayload,
   BulkInitiativePayload,
   BulkCreateParticipantsPayload,
+  InitiativeRollDTO,
+  RollInitiativePayload,
 } from "../../../shared/dto/session";
 
 export type {
@@ -42,6 +44,8 @@ export type {
   UpdateParticipantPayload,
   BulkInitiativePayload,
   BulkCreateParticipantsPayload,
+  InitiativeRollDTO,
+  RollInitiativePayload,
 };
 
 export type ListEncountersResponse = {
@@ -73,6 +77,12 @@ export type DeleteEncounterResponse = {
 export type NextTurnResponse = {
   status: string;
   encounter: EncounterDTO;
+};
+
+export type RollInitiativeResponse = {
+  status: string;
+  participants: EncounterParticipantDTO[];
+  rolls: InitiativeRollDTO[];
 };
 
 export type SetInitiativeResponse = {

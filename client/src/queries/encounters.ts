@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   advanceTurn as advanceTurnRequest,
   applyAbilityUsage as applyAbilityUsageRequest,
+  rollInitiative as rollInitiativeRequest,
   createParticipant as createParticipantRequest,
   deleteParticipant as deleteParticipantRequest,
   listEncounters,
@@ -80,6 +81,26 @@ export const useUpdateParticipantMutation = (campaignSessionId: string | undefin
     onSuccess: (participant, { encounterId }) => {
       queryClient.setQueryData<EncounterList>(key, (list) =>
         replaceParticipant(list, encounterId, participant),
+      );
+    },
+  });
+};
+
+export const useRollInitiativeMutation = (campaignSessionId: string | undefined) => {
+  const queryClient = useQueryClient();
+  const key = encounterKeys.list(campaignSessionId ?? "");
+
+  return useMutation({
+    mutationFn: async ({
+      encounterId,
+      participantIds,
+    }: {
+      encounterId: string;
+      participantIds?: string[];
+    }) => (await rollInitiativeRequest(encounterId, { participantIds })).participants,
+    onSuccess: (participants, { encounterId }) => {
+      queryClient.setQueryData<EncounterList>(key, (list) =>
+        setParticipants(list, encounterId, participants),
       );
     },
   });

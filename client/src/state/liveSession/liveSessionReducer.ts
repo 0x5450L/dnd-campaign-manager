@@ -6,6 +6,7 @@ import type {
   SessionEventKind,
 } from "../../types/session";
 import type { RechargeRollDTO } from "../../../../shared/dto/socketEvents";
+import type { InitiativeRollDTO } from "../../../../shared/dto/session";
 
 export type LiveSessionState = {
   session: CampaignSessionDTO | null;
@@ -26,7 +27,8 @@ export type LiveSessionAction =
       type: "TURN_ADVANCED";
       participantName: string | null;
       rechargeRolls: RechargeRollDTO[];
-    };
+    }
+  | { type: "INITIATIVE_ROLLED"; rolls: InitiativeRollDTO[] };
 
 export const EVENT_LIMIT = 40;
 export const ROLL_LIMIT = 30;
@@ -106,6 +108,22 @@ export const liveSessionReducer = (
               recharge.charged ? "recharged" : "still spent"
             }`,
             action.participantName ?? undefined,
+          ),
+        );
+      }
+      return { ...state, events };
+    }
+
+    case "INITIATIVE_ROLLED": {
+      let events = state.events;
+      for (const roll of action.rolls) {
+        const sign = roll.modifier >= 0 ? "+" : "";
+        events = pushEvent(
+          events,
+          makeEvent(
+            "dice_rolled",
+            `Initiative ${roll.total} (${roll.roll}${sign}${roll.modifier})`,
+            roll.participantName,
           ),
         );
       }

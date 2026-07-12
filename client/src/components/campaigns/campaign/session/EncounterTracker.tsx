@@ -16,6 +16,7 @@ export const EncounterTracker = ({ isDM }: EncounterTrackerProps) => {
     startEncounter,
     endEncounter,
     advanceTurn,
+    rollInitiative,
     isOwnParticipant,
   } = useLiveSession();
   const [isAddOpen, setIsAddOpen] = useState(false);
@@ -54,6 +55,9 @@ export const EncounterTracker = ({ isDM }: EncounterTrackerProps) => {
           <div className="flex items-center gap-2">
             <CommonButton onClick={() => setIsAddOpen(true)} variant="secondary" size="sm">
               + Add
+            </CommonButton>
+            <CommonButton onClick={() => rollInitiative()} variant="secondary" size="sm">
+              Roll initiative
             </CommonButton>
             <CommonButton onClick={advanceTurn} size="sm">
               Next turn

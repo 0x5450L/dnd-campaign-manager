@@ -47,6 +47,7 @@ export type LiveSessionContextType = {
   resetDeathSaves: (participantId: string) => void;
   updateParticipant: (participantId: string, payload: UpdateParticipantPayload) => void;
   applyAbilityUsage: (participantId: string, abilityId: string, action: AbilityUsageAction) => void;
+  rollInitiative: (participantIds?: string[]) => void;
   addParticipant: (input: CreateParticipantPayload) => void;
   removeParticipant: (participantId: string) => void;
   isOwnParticipant: (participant: EncounterParticipantDTO) => boolean;

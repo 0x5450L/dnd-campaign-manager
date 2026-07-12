@@ -19,6 +19,8 @@ import type {
   UpdateParticipantResponse,
   BulkInitiativePayload,
   AbilityUsagePayload,
+  RollInitiativePayload,
+  RollInitiativeResponse,
 } from "../../types/encounter";
 
 export const listEncounters = async (campaignSessionId: string) => {
@@ -94,6 +96,13 @@ export const updateParticipant = async (
 ) => {
   return apiClient<UpdateParticipantResponse>(`/api/encounters/${id}/participants/${pid}`, {
     method: "PATCH",
+    body: JSON.stringify(payload),
+  });
+};
+
+export const rollInitiative = async (id: string, payload: RollInitiativePayload) => {
+  return apiClient<RollInitiativeResponse>(`/api/encounters/${id}/initiative/roll`, {
+    method: "POST",
     body: JSON.stringify(payload),
   });
 };

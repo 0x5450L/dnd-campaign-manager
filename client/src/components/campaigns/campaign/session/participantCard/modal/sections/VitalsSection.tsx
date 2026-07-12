@@ -9,16 +9,33 @@ import HpControls from "../../blocks/HpControls";
 import InitiativeBlock from "../../blocks/InitiativeBlock";
 import StatInput from "../fields/StatInput";
 import type { EditorBodyProps } from "../../../../../../../types/components/participantCard";
+import { useLiveSession } from "../../../../../../../hooks/useLiveSession";
 
-export const VitalsSection = ({ draft, updateDraft, canEditOwn, canManage }: EditorBodyProps) => (
+export const VitalsSection = ({ draft, updateDraft, canEditOwn, canManage }: EditorBodyProps) => {
+  const { participants, rollInitiative } = useLiveSession();
+  const canRollInitiative = canEditOwn && participants.some((p) => p.id === draft.id);
+
+  return (
   <>
     <div className="flex flex-wrap items-stretch gap-2.5">
-      <InitiativeBlock
-        value={draft.sortOrder}
-        isActive={false}
-        size="lg"
-        onChange={canEditOwn ? (sortOrder) => updateDraft({ sortOrder }) : undefined}
-      />
+      <div className="relative flex min-w-16 grow basis-0 sm:min-w-20">
+        <InitiativeBlock
+          value={draft.sortOrder}
+          isActive={false}
+          size="lg"
+          onChange={canEditOwn ? (sortOrder) => updateDraft({ sortOrder }) : undefined}
+        />
+        {canRollInitiative && (
+          <button
+            type="button"
+            onClick={() => rollInitiative([draft.id])}
+            aria-label="Roll initiative"
+            className="absolute -right-1 -top-1 rounded border border-rule bg-bg px-1 text-[11px] uppercase tracking-wider text-faint transition-colors hover:border-hover hover:text-ink"
+          >
+            d20
+          </button>
+        )}
+      </div>
       <ArmorClassBlock
         value={draft.armorClass}
         hidden={draft.acHidden}
@@ -66,6 +83,7 @@ export const VitalsSection = ({ draft, updateDraft, canEditOwn, canManage }: Edi
       />
     )}
   </>
-);
+  );
+};
 
 export default VitalsSection;

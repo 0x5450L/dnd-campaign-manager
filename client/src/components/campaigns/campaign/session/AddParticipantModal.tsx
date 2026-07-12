@@ -27,7 +27,7 @@ const blankParticipant = (type: ParticipantType): EncounterParticipantDTO => ({
   characterId: null,
   type,
   name: "",
-  sortOrder: 10,
+  sortOrder: 0,
   maxHp: 10,
   currentHp: 10,
   tempHp: 0,
