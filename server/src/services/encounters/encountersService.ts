@@ -201,10 +201,13 @@ export const setInitiative = async (
   return participants;
 };
 
-const withRolledInitiative = (body: CreateParticipantPayload): CreateParticipantPayload =>
-  body.sortOrder
-    ? body
-    : { ...body, sortOrder: rollInitiative(body.abilityScores ?? null).total };
+const withRolledInitiative = (
+  body: CreateParticipantPayload,
+): { body: CreateParticipantPayload; roll: ReturnType<typeof rollInitiative> | null } => {
+  if (body.sortOrder) return { body, roll: null };
+  const roll = rollInitiative(body.abilityScores ?? null);
+  return { body: { ...body, sortOrder: roll.total }, roll };
+};
 
 export const addParticipant = async (
   userId: string,
@@ -216,7 +219,8 @@ export const addParticipant = async (
     "type, name, sortOrder, maxHp, currentHp, armorClass are required",
   );
   const access = await requireEncounterDM(userId, id);
-  const participant = await encountersRepo.createParticipant(id, withRolledInitiative(body));
+  const rolled = withRolledInitiative(body);
+  const participant = await encountersRepo.createParticipant(id, rolled.body);
 
   try {
     await broadcastParticipantUpdate(
@@ -226,6 +230,22 @@ export const addParticipant = async (
       mapParticipantToDTO(participant),
       false,
     );
+    if (rolled.roll) {
+      const participants = await encountersRepo.listParticipants(id);
+      await broadcastInitiative(
+        access.campaignSession.campaign.id,
+        access.campaignSession.campaign.dmId,
+        id,
+        participants.map(mapParticipantToDTO),
+        [
+          {
+            participantId: participant.id,
+            participantName: participant.name,
+            ...rolled.roll,
+          },
+        ],
+      );
+    }
   } catch (error) {
     console.error("participant add broadcast failed", error);
   }
@@ -240,7 +260,10 @@ export const addParticipants = async (
 ) => {
   const participants = requireParticipantsPayload(body.participants);
   await requireEncounterDM(userId, id);
-  return encountersRepo.createParticipants(id, participants.map(withRolledInitiative));
+  return encountersRepo.createParticipants(
+    id,
+    participants.map((participant) => withRolledInitiative(participant).body),
+  );
 };
 
 export const updateParticipant = async (

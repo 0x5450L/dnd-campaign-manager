@@ -122,7 +122,7 @@ export const liveSessionReducer = (
           events,
           makeEvent(
             "dice_rolled",
-            `Initiative ${roll.total} (${roll.roll}${sign}${roll.modifier})`,
+            `${roll.participantName}: initiative ${roll.total} (${roll.roll}${sign}${roll.modifier})`,
             roll.participantName,
           ),
         );

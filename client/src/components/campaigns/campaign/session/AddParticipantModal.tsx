@@ -101,9 +101,18 @@ export const AddParticipantModal = ({ onClose }: AddParticipantModalProps) => {
       proficiencyBonus: draft.proficiencyBonus,
       spellSlots: draft.spellSlots,
       attacks: draft.attacks as CreateParticipantPayload["attacks"],
+      speed: draft.speed,
+      senses: draft.senses,
+      challengeRating: draft.challengeRating,
+      damageVulnerabilities: draft.damageVulnerabilities,
+      damageResistances: draft.damageResistances,
+      damageImmunities: draft.damageImmunities,
+      conditionImmunities: draft.conditionImmunities,
+      abilities: draft.abilities,
+      resources: draft.resources,
     };
     addParticipant(payload);
-    onClose();
+    setDraft(blankParticipant("monster"));
   };
 
   return (
