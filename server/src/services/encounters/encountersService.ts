@@ -9,6 +9,8 @@ import type {
   UpdateParticipantPayload,
 } from "../../../../shared/dto/session";
 import type { Ability, AbilityUsageAction, ResourcePool } from "../../../../shared/types/abilities";
+import type { InitiativeRollDTO, RollInitiativePayload } from "../../../../shared/dto/session";
+import { rollInitiative } from "../../../../shared/utils/initiative";
 import { applyAbilityUsage, applyTurnStart } from "../../../../shared/utils/abilityUsage";
 import { rollDie } from "../../../../shared/utils/dice";
 import * as encountersRepo from "./encountersRepository";
@@ -199,6 +201,11 @@ export const setInitiative = async (
   return participants;
 };
 
+const withRolledInitiative = (body: CreateParticipantPayload): CreateParticipantPayload =>
+  body.sortOrder
+    ? body
+    : { ...body, sortOrder: rollInitiative(body.abilityScores ?? null).total };
+
 export const addParticipant = async (
   userId: string,
   id: string,
@@ -209,7 +216,7 @@ export const addParticipant = async (
     "type, name, sortOrder, maxHp, currentHp, armorClass are required",
   );
   const access = await requireEncounterDM(userId, id);
-  const participant = await encountersRepo.createParticipant(id, body);
+  const participant = await encountersRepo.createParticipant(id, withRolledInitiative(body));
 
   try {
     await broadcastParticipantUpdate(
@@ -233,7 +240,7 @@ export const addParticipants = async (
 ) => {
   const participants = requireParticipantsPayload(body.participants);
   await requireEncounterDM(userId, id);
-  return encountersRepo.createParticipants(id, participants);
+  return encountersRepo.createParticipants(id, participants.map(withRolledInitiative));
 };
 
 export const updateParticipant = async (
@@ -312,6 +319,64 @@ export const updateParticipant = async (
   }
 
   return updated;
+};
+
+export const rollEncounterInitiative = async (
+  userId: string,
+  id: string,
+  body: RollInitiativePayload,
+) => {
+  const encounter = await encountersRepo.findEncounterForMember(id, userId);
+  if (!encounter) {
+    throw new AppError(404, "Encounter not found");
+  }
+
+  const isDM = encounter.campaignSession.campaign.dmId === userId;
+  const participants = await encountersRepo.listParticipantsWithOwners(id);
+  const requestedIds = body.participantIds?.filter(Boolean);
+  const targets = requestedIds?.length
+    ? participants.filter((participant) => requestedIds.includes(participant.id))
+    : participants;
+
+  if (requestedIds?.length && targets.length !== requestedIds.length) {
+    throw new AppError(400, "Some participants do not belong to this encounter");
+  }
+  if (targets.length === 0) {
+    throw new AppError(400, "No participants to roll initiative for");
+  }
+  if (!isDM && !targets.every((participant) => participant.character?.userId === userId)) {
+    throw new AppError(403, "You can only roll initiative for your own character or as DM");
+  }
+
+  const rolls: InitiativeRollDTO[] = targets.map((participant) => {
+    const scores = participant.abilityScores as unknown as
+      | { name: string; score: number }[]
+      | null;
+    return {
+      participantId: participant.id,
+      participantName: participant.name,
+      ...rollInitiative(scores),
+    };
+  });
+
+  await encountersRepo.reorderParticipants(
+    rolls.map((roll) => ({ participantId: roll.participantId, sortOrder: roll.total })),
+  );
+  const updated = await encountersRepo.listParticipants(id);
+
+  try {
+    await broadcastInitiative(
+      encounter.campaignSession.campaign.id,
+      encounter.campaignSession.campaign.dmId,
+      id,
+      updated.map(mapParticipantToDTO),
+      rolls,
+    );
+  } catch (error) {
+    console.error("initiative_updated broadcast failed", error);
+  }
+
+  return { participants: updated, rolls };
 };
 
 export const applyParticipantAbilityUsage = async (

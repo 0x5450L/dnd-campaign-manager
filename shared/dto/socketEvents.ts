@@ -2,6 +2,7 @@ import type {
   CampaignSessionDTO,
   EncounterDTO,
   EncounterParticipantDTO,
+  InitiativeRollDTO,
   SessionDiceRollDTO,
 } from "./session";
 
@@ -54,6 +55,7 @@ export type InitiativeUpdatedPayload = {
   campaignId: string;
   encounterId: string;
   participants: EncounterParticipantDTO[];
+  rolls?: InitiativeRollDTO[];
 };
 
 export type RechargeRollDTO = {

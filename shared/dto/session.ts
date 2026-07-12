@@ -184,6 +184,18 @@ export type BulkInitiativeEntry = {
   sortOrder: number;
 };
 
+export type InitiativeRollDTO = {
+  participantId: string;
+  participantName: string;
+  roll: number;
+  modifier: number;
+  total: number;
+};
+
+export type RollInitiativePayload = {
+  participantIds?: string[];
+};
+
 export type AbilityUsagePayload = {
   action: AbilityUsageAction;
 };

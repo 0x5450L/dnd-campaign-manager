@@ -3,6 +3,7 @@ import { authMiddleware } from "../middleware/auth";
 import { asyncHandler } from "../utils/asyncHandler";
 import type {
   AbilityUsagePayload,
+  RollInitiativePayload,
   BulkCreateParticipantsPayload,
   BulkInitiativePayload,
   CreateParticipantPayload,
@@ -56,6 +57,15 @@ router.patch<{ id: string }>("/:id/initiative", authMiddleware, asyncHandler(asy
     req.body as BulkInitiativePayload,
   );
   res.json({ status: "ok", participants });
+}));
+
+router.post<{ id: string }>("/:id/initiative/roll", authMiddleware, asyncHandler(async (req, res) => {
+  const result = await encountersService.rollEncounterInitiative(
+    req.userId!,
+    req.params.id,
+    (req.body ?? {}) as RollInitiativePayload,
+  );
+  res.json({ status: "ok", participants: result.participants, rolls: result.rolls });
 }));
 
 router.post<{ id: string }>("/:id/participants", authMiddleware, asyncHandler(async (req, res) => {

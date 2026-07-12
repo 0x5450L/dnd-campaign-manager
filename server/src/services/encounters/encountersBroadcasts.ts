@@ -4,6 +4,7 @@ import type {
   EncounterParticipantDTO,
 } from "../../../../shared/dto/session";
 import type { RechargeRollDTO } from "../../../../shared/dto/socketEvents";
+import type { InitiativeRollDTO } from "../../../../shared/dto/session";
 
 export const broadcastEncounterUpdated = (
   campaignId: string,
@@ -71,11 +72,19 @@ export const broadcastInitiative = async (
   dmId: string,
   encounterId: string,
   participants: EncounterParticipantDTO[],
+  rolls?: InitiativeRollDTO[],
 ) => {
   const sockets = await getIo().in(`campaign:${campaignId}`).fetchSockets();
   const visibleOnly = participants.filter((p) => p.isVisible);
+  const visibleIds = new Set(visibleOnly.map((p) => p.id));
+  const visibleRolls = rolls?.filter((roll) => visibleIds.has(roll.participantId));
   for (const socket of sockets) {
-    const list = socket.data.userId === dmId ? participants : visibleOnly;
-    socket.emit("initiative_updated", { campaignId, encounterId, participants: list });
+    const isDM = socket.data.userId === dmId;
+    socket.emit("initiative_updated", {
+      campaignId,
+      encounterId,
+      participants: isDM ? participants : visibleOnly,
+      rolls: isDM ? rolls : visibleRolls,
+    });
   }
 };

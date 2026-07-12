@@ -2,6 +2,7 @@ import { Prisma } from "@prisma/client";
 import prisma from "../prisma";
 import { jsonInput, pickDefined, trimOrNull } from "../../utils/payload";
 import { getLevelFromXp, getProficiencyBonus } from "../../../../shared/utils/dndMath";
+import { rollInitiative } from "../../../../shared/utils/initiative";
 import type {
   BulkInitiativeEntry,
   CreateParticipantPayload,
@@ -46,7 +47,7 @@ export const listEncountersBySession = (campaignSessionId: string) =>
   });
 
 const encounterForMemberInclude = {
-  campaignSession: { select: { campaign: { select: { dmId: true } } } },
+  campaignSession: { select: { campaign: { select: { id: true, dmId: true } } } },
   participants: { orderBy: bySortOrder },
 } satisfies Prisma.EncounterInclude;
 
@@ -87,6 +88,13 @@ export const reorderParticipants = (entries: BulkInitiativeEntry[]) =>
       }),
     ),
   );
+
+export const listParticipantsWithOwners = (encounterId: string) =>
+  prisma.encounterParticipant.findMany({
+    where: { encounterId },
+    orderBy: bySortOrder,
+    include: { character: { select: { userId: true } } },
+  });
 
 export const listParticipants = (encounterId: string) =>
   prisma.encounterParticipant.findMany({
@@ -204,7 +212,9 @@ export const seedPartyForEncounter = async (
       characterId: character.id,
       type: "pc" as const,
       name: character.name,
-      sortOrder: 0,
+      sortOrder: rollInitiative(
+        character.abilityScores.map((a) => ({ name: a.name, score: a.score })),
+      ).total,
       maxHp: character.maxHp,
       currentHp: character.currentHp,
       tempHp: character.tempHp,
