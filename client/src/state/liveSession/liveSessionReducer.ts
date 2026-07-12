@@ -5,6 +5,7 @@ import type {
   SessionEvent,
   SessionEventKind,
 } from "../../types/session";
+import type { RechargeRollDTO } from "../../../../shared/dto/socketEvents";
 
 export type LiveSessionState = {
   session: CampaignSessionDTO | null;
@@ -20,7 +21,12 @@ export type LiveSessionAction =
   | { type: "HYDRATE_SESSION"; session: CampaignSessionDTO }
   | { type: "END_SESSION" }
   | { type: "REPLACE_PRESENCE"; presence: MemberPresence[] }
-  | { type: "ROLL_LOGGED"; roll: SessionDiceRoll };
+  | { type: "ROLL_LOGGED"; roll: SessionDiceRoll }
+  | {
+      type: "TURN_ADVANCED";
+      participantName: string | null;
+      rechargeRolls: RechargeRollDTO[];
+    };
 
 export const EVENT_LIMIT = 40;
 export const ROLL_LIMIT = 30;
@@ -82,5 +88,28 @@ export const liveSessionReducer = (
         ...state,
         rolls: [action.roll, ...state.rolls].slice(0, ROLL_LIMIT),
       };
+
+    case "TURN_ADVANCED": {
+      let events = pushEvent(
+        state.events,
+        makeEvent(
+          "turn_advanced",
+          action.participantName ? `Turn: ${action.participantName}` : "Turn advanced",
+        ),
+      );
+      for (const recharge of action.rechargeRolls) {
+        events = pushEvent(
+          events,
+          makeEvent(
+            "dice_rolled",
+            `${recharge.abilityName}: recharge ${recharge.roll} (${recharge.threshold}+) — ${
+              recharge.charged ? "recharged" : "still spent"
+            }`,
+            action.participantName ?? undefined,
+          ),
+        );
+      }
+      return { ...state, events };
+    }
   }
 };

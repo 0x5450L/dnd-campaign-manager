@@ -23,6 +23,7 @@ import type {
   InitiativeUpdatedPayload,
   ParticipantRemovedPayload,
   ParticipantUpdatedPayload,
+  TurnAdvancedPayload,
 } from "../../../shared/dto/socketEvents";
 import {
   mapEncounter,
@@ -239,6 +240,21 @@ export const useEncounterRealtimeSync = (
       );
     };
 
+    const handleTurnAdvanced = (payload: TurnAdvancedPayload) => {
+      if (payload.campaignId !== campaignId) return;
+      const list = queryClient.getQueryData<EncounterList>(key);
+      if (!list?.some((e) => e.id === payload.encounter.id)) {
+        queryClient.invalidateQueries({ queryKey: key });
+        return;
+      }
+      queryClient.setQueryData<EncounterList>(key, (current) => {
+        const patched = patchEncounterScalar(current, payload.encounter);
+        return payload.participant
+          ? replaceParticipant(patched, payload.encounter.id, payload.participant)
+          : patched;
+      });
+    };
+
     const handleInitiativeUpdated = (payload: InitiativeUpdatedPayload) => {
       if (payload.campaignId !== campaignId) return;
       queryClient.setQueryData<EncounterList>(key, (current) =>
@@ -250,12 +266,14 @@ export const useEncounterRealtimeSync = (
     socket.on("participant_removed", handleParticipantRemoved);
     socket.on("encounter_updated", handleEncounterUpdated);
     socket.on("initiative_updated", handleInitiativeUpdated);
+    socket.on("turn_advanced", handleTurnAdvanced);
 
     return () => {
       socket.off("participant_updated", handleParticipantUpdated);
       socket.off("participant_removed", handleParticipantRemoved);
       socket.off("encounter_updated", handleEncounterUpdated);
       socket.off("initiative_updated", handleInitiativeUpdated);
+      socket.off("turn_advanced", handleTurnAdvanced);
     };
   }, [campaignId, campaignSessionId, queryClient]);
 };

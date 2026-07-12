@@ -6,6 +6,7 @@ import type {
   RollResult,
   RolledTerm,
 } from "../types/dice";
+import { rollDie } from "../../../shared/utils/dice";
 
 const SUPPORTED_SIDES = new Set([4, 6, 8, 10, 12, 20, 100]);
 const DICE_TOKEN = /^(\d*)d(\d+)(?:(kh|kl)(\d+))?$/i;
@@ -98,9 +99,6 @@ export const applyAdvDis = (terms: DiceTerm[], mode: AdvDis): DiceTerm[] => {
   });
 };
 
-const rollSingleDie = (sides: number): number =>
-  Math.floor(Math.random() * sides) + 1;
-
 export const rollTerms = (
   terms: DiceTerm[],
   expression: string,
@@ -120,7 +118,7 @@ export const rollTerms = (
 
     const raw: DieRoll[] = [];
     for (let i = 0; i < term.count; i++) {
-      raw.push({ sides: term.sides, value: rollSingleDie(term.sides), dropped: false });
+      raw.push({ sides: term.sides, value: rollDie(term.sides), dropped: false });
     }
 
     let kept = raw;

@@ -45,6 +45,7 @@ import {
 import type {
   PresenceChangedPayload,
   RollLoggedPayload,
+  TurnAdvancedPayload,
   SessionEndedPayload,
   SessionStartedPayload,
 } from "../../../../shared/dto/socketEvents";
@@ -144,6 +145,16 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
       });
     };
 
+    const handleTurnAdvanced = (payload: TurnAdvancedPayload) => {
+      if (payload.campaignId !== campaign.id) return;
+      dispatch({
+        type: "TURN_ADVANCED",
+        participantName: payload.participant?.name ?? null,
+        rechargeRolls: payload.rechargeRolls,
+      });
+    };
+
+    socket.on("turn_advanced", handleTurnAdvanced);
     socket.on("roll_logged", handleRollLogged);
     socket.on("session_started", handleSessionStarted);
     socket.on("session_ended", handleSessionEnded);
@@ -151,6 +162,7 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
 
     return () => {
       socket.off("connect", join);
+      socket.off("turn_advanced", handleTurnAdvanced);
       socket.off("roll_logged", handleRollLogged);
       socket.off("session_started", handleSessionStarted);
       socket.off("session_ended", handleSessionEnded);
