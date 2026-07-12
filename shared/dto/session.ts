@@ -1,6 +1,6 @@
 import type { CharacterAttackDTO, CharacterAttackInput } from "./character";
 import type { AbilityName, SpellSlotLevel } from "../types/dnd";
-import type { Ability, ResourcePool } from "../types/abilities";
+import type { Ability, AbilityUsageAction, ResourcePool } from "../types/abilities";
 import type { DiceRollDTO } from "./dnd";
 
 export type { SpellSlotLevel };
@@ -51,7 +51,7 @@ export type ParticipantAbilityScore = {
   score: number;
 };
 
-export type { Ability, AbilityActivation, AbilityCost, ResourcePool, ResourceReset } from "../types/abilities";
+export type { Ability, AbilityActivation, AbilityCost, AbilityUsageAction, ResourcePool, ResourceReset } from "../types/abilities";
 
 export type EncounterParticipantDTO = {
   id: string;
@@ -182,6 +182,10 @@ export type UpdateParticipantPayload = Partial<{
 export type BulkInitiativeEntry = {
   participantId: string;
   sortOrder: number;
+};
+
+export type AbilityUsagePayload = {
+  action: AbilityUsageAction;
 };
 
 export type BulkInitiativePayload = {

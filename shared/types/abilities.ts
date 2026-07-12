@@ -1,5 +1,7 @@
 import type { SpellSlotLevel } from "./dnd";
 
+export type AbilityUsageAction = "spend" | "restore";
+
 export type AbilityActivation =
   | "passive"
   | "action"

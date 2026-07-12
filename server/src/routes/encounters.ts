@@ -2,6 +2,7 @@ import { Router } from "express";
 import { authMiddleware } from "../middleware/auth";
 import { asyncHandler } from "../utils/asyncHandler";
 import type {
+  AbilityUsagePayload,
   BulkCreateParticipantsPayload,
   BulkInitiativePayload,
   CreateParticipantPayload,
@@ -81,6 +82,17 @@ router.patch<{ id: string; pid: string }>("/:id/participants/:pid", authMiddlewa
     req.params.id,
     req.params.pid,
     req.body as UpdateParticipantPayload,
+  );
+  res.json({ status: "ok", participant });
+}));
+
+router.post<{ id: string; pid: string; abilityId: string }>("/:id/participants/:pid/abilities/:abilityId/usage", authMiddleware, asyncHandler(async (req, res) => {
+  const participant = await encountersService.applyParticipantAbilityUsage(
+    req.userId!,
+    req.params.id,
+    req.params.pid,
+    req.params.abilityId,
+    (req.body as AbilityUsagePayload).action,
   );
   res.json({ status: "ok", participant });
 }));

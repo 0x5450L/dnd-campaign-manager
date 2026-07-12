@@ -8,6 +8,8 @@ import type {
   UpdateEncounterPayload,
   UpdateParticipantPayload,
 } from "../../../../shared/dto/session";
+import type { Ability, AbilityUsageAction, ResourcePool } from "../../../../shared/types/abilities";
+import { applyAbilityUsage } from "../../../../shared/utils/abilityUsage";
 import * as encountersRepo from "./encountersRepository";
 import { mapEncounterToDTO, mapParticipantToDTO } from "./encountersMappers";
 import {
@@ -281,6 +283,55 @@ export const updateParticipant = async (
       id,
       mapParticipantToDTO(updated),
       wasVisible,
+    );
+  } catch (error) {
+    console.error("participant broadcast failed", error);
+  }
+
+  return updated;
+};
+
+export const applyParticipantAbilityUsage = async (
+  userId: string,
+  id: string,
+  pid: string,
+  abilityId: string,
+  action: AbilityUsageAction,
+) => {
+  if (action !== "spend" && action !== "restore") {
+    throw new AppError(400, "Unknown ability usage action");
+  }
+
+  const participant = await encountersRepo.findParticipantForEdit(pid);
+  if (!participant || participant.encounterId !== id) {
+    throw new AppError(404, "Participant not found");
+  }
+
+  const isDM = participant.encounter.campaignSession.campaign.dmId === userId;
+  const isOwner = participant.character?.userId === userId;
+  if (!isDM && !isOwner) {
+    throw new AppError(403, "You can only modify your own character or as DM");
+  }
+
+  const abilities = (participant.abilities as unknown as Ability[] | null) ?? [];
+  const resources = (participant.resources as unknown as ResourcePool[] | null) ?? [];
+  const result = applyAbilityUsage(abilities, resources, abilityId, action);
+  if (!result) {
+    throw new AppError(409, "Ability usage is not available");
+  }
+
+  const updated = await encountersRepo.updateParticipant(pid, {
+    abilities: jsonInput(result.abilities),
+    resources: jsonInput(result.resources),
+  });
+
+  try {
+    await broadcastParticipantUpdate(
+      participant.encounter.campaignSession.campaign.id,
+      participant.encounter.campaignSession.campaign.dmId,
+      id,
+      mapParticipantToDTO(updated),
+      participant.isVisible,
     );
   } catch (error) {
     console.error("participant broadcast failed", error);
