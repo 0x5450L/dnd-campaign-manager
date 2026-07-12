@@ -14,9 +14,6 @@ export type {
   UpdateCharacterPayload,
   CreatureProfileDTO,
   CreatureProfileInput,
-  CreatureTraitDTO,
-  CreatureTraitInput,
-  CreatureTraitKind,
 } from "../../../../shared/dto/character";
 
 /** Character payload as returned by the API — DTO + optional `user` join used by the list view. */

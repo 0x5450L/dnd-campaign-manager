@@ -9,7 +9,6 @@ import type {
   CharacterType,
   CreateCharacterPayload,
   CreatureProfileInput,
-  CreatureTraitInput,
   UpdateCharacterPayload,
 } from "../types/characters/characters";
 import type {
@@ -18,7 +17,6 @@ import type {
   Attack,
   CharacterSheetState,
   CreatureSheetState,
-  CreatureTrait,
   SheetKind,
   SheetState,
   SkillDef,
@@ -99,6 +97,9 @@ const dtoToSharedFields = (dto: CharacterDTO) => ({
   conditionImmunities: dto.conditionImmunities ?? "",
 
   notes: dto.notes ?? "",
+
+  specialAbilities: dto.abilities ?? [],
+  resources: dto.resources ?? [],
 });
 
 const dtoToCharacterSheetState = (dto: CharacterDTO): CharacterSheetState => ({
@@ -123,12 +124,6 @@ const dtoToCreatureSheetState = (dto: CharacterDTO): CreatureSheetState => ({
   ...dtoToSharedFields(dto),
 
   challengeRating: dto.creatureProfile?.challengeRating ?? null,
-  traits: (dto.creatureProfile?.traits ?? []).map((t) => ({
-    id: t.id,
-    kind: t.kind,
-    name: t.name,
-    description: t.description,
-  })),
 });
 
 export const dtoToSheetState = (dto: CharacterDTO): SheetState =>
@@ -172,16 +167,10 @@ export const sheetStateToCreatePayload = (
   notes: state.notes || null,
 });
 
-const sheetTraitsToInputs = (traits: CreatureTrait[]): CreatureTraitInput[] =>
-  traits
-    .filter((t) => t.name.trim() !== "")
-    .map((t) => ({ kind: t.kind, name: t.name, description: t.description }));
-
 const sheetStateToCreatureProfile = (
   state: CreatureSheetState,
 ): CreatureProfileInput => ({
   challengeRating: state.challengeRating,
-  traits: sheetTraitsToInputs(state.traits),
 });
 
 export const sheetStateToUpdatePayload = (
@@ -206,6 +195,8 @@ export const sheetStateToUpdatePayload = (
   abilityScores: sheetAbilitiesToDtos(state.abilities),
   skills: sheetSkillsToDtos(state.skills),
   attacks: sheetAttacksToInputs(state.attacks),
+  abilities: state.specialAbilities.filter((ability) => ability.name.trim() !== ""),
+  resources: state.resources,
   ...(state.kind === "character"
     ? {
         characterClass: state.characterClass,

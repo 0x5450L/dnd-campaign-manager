@@ -34,6 +34,8 @@ const createSharedFields = (): SharedSheetFields => ({
   level: 1,
 
   abilities: DEFAULT_ABILITIES,
+  specialAbilities: [],
+  resources: [],
   skills: DEFAULT_SKILLS,
 
   ac: 10,
@@ -92,7 +94,6 @@ export const createInitialCreatureSheet = (): CreatureSheetState => ({
   ...createSharedFields(),
 
   challengeRating: null,
-  traits: [],
 });
 
 export const createInitialSheetState = (kind: SheetKind): SheetState =>

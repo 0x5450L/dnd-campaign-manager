@@ -17,3 +17,12 @@ export const ABILITY_ACTIVATION_LABELS: Record<AbilityActivation, string> = {
   free: "Free Actions",
   legendary: "Legendary Actions",
 };
+
+export const ABILITY_ACTIVATION_NAMES: Record<AbilityActivation, string> = {
+  passive: "Passive",
+  action: "Action",
+  bonus: "Bonus action",
+  reaction: "Reaction",
+  free: "Free",
+  legendary: "Legendary",
+};

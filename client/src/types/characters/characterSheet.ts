@@ -1,6 +1,6 @@
 import type { AbilityName, SpellSlotLevel } from "../../../../shared/types/dnd";
-import type { CreatureTraitKind } from "../../../../shared/dto/character";
-export type { AbilityName, SpellSlotLevel, CreatureTraitKind };
+import type { Ability, ResourcePool } from "../../../../shared/types/abilities";
+export type { AbilityName, SpellSlotLevel };
 
 export type AbilityState = {
   score: number;
@@ -23,13 +23,6 @@ export type Attack = {
 
 export type HitDiceType = "d6" | "d8" | "d10" | "d12";
 
-export type CreatureTrait = {
-  id: string;
-  kind: CreatureTraitKind;
-  name: string;
-  description: string;
-};
-
 export type SheetKind = "character" | "creature";
 
 export type SharedSheetFields = {
@@ -39,6 +32,8 @@ export type SharedSheetFields = {
   level: number;
 
   abilities: Record<AbilityName, AbilityState>;
+  specialAbilities: Ability[];
+  resources: ResourcePool[];
   skills: SkillDef[];
 
   ac: number;
@@ -85,7 +80,6 @@ export type CharacterSheetFields = {
 
 export type CreatureSheetFields = {
   challengeRating: number | null;
-  traits: CreatureTrait[];
 };
 
 export type CharacterSheetState = { kind: "character" } & SharedSheetFields &

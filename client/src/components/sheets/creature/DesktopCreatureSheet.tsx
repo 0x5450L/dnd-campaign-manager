@@ -7,7 +7,7 @@ import { AttacksTable } from "../shared/sections/AttacksTable";
 import { NotesBlock } from "../shared/sections/NotesBlock";
 import { CreatureHeader } from "./sections/CreatureHeader";
 import { CreatureDetails } from "./sections/CreatureDetails";
-import { CreatureTraits } from "./sections/traits/CreatureTraits";
+import { SpecialAbilities } from "../shared/sections/specialAbilities/SpecialAbilities";
 
 const ALL_ABILITIES: AbilityName[] = ["str", "con", "dex", "int", "wis", "cha"];
 
@@ -36,7 +36,7 @@ export const DesktopCreatureSheet = () => (
       <div className="flex flex-col gap-3">
         <AttacksTable />
         <CreatureDetails />
-        <CreatureTraits />
+        <SpecialAbilities />
       </div>
     </div>
   </div>

@@ -10,7 +10,7 @@ import { AbilityScore } from "../shared/sections/AbilityScore";
 import { NotesBlock } from "../shared/sections/NotesBlock";
 import { CreatureHeader } from "./sections/CreatureHeader";
 import { CreatureDetails } from "./sections/CreatureDetails";
-import { CreatureTraits } from "./sections/traits/CreatureTraits";
+import { SpecialAbilities } from "../shared/sections/specialAbilities/SpecialAbilities";
 
 const ALL_ABILITIES: AbilityName[] = ["str", "con", "dex", "int", "wis", "cha"];
 
@@ -58,7 +58,7 @@ export const MobileCreatureSheet = ({ onClose, onForceSave }: MobileCreatureShee
           <>
             <CreatureHeader />
             <CreatureDetails />
-            <CreatureTraits />
+            <SpecialAbilities />
             <NotesBlock />
           </>
         )}

@@ -1,3 +1,4 @@
+import { SpecialAbilities } from "../shared/sections/specialAbilities/SpecialAbilities";
 import { useState } from "react";
 import type { AbilityName } from "../../../types/characters/characterSheet";
 import { MobileHeader } from "../shared/navigation/MobileHeader";
@@ -66,6 +67,7 @@ export const MobileCharacterSheet = ({ onClose, onForceSave }: MobileCharacterSh
         {activeTab === "lore" && (
           <>
             <CharacterLore />
+            <SpecialAbilities />
             <ClassFeatures />
             <RacialTraits />
             <Feats />

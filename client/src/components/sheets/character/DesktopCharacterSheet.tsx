@@ -1,3 +1,4 @@
+import { SpecialAbilities } from "../shared/sections/specialAbilities/SpecialAbilities";
 import type { AbilityName } from "../../../types/characters/characterSheet";
 import { CharacterLore } from "./sections/CharacterLore";
 import { ArmorClass } from "../shared/sections/ArmorClass";
@@ -55,6 +56,10 @@ export const DesktopCharacterSheet = () => (
 
         <div className="order-4 lg:order-0">
           <SpellSlots />
+        </div>
+
+        <div className="order-5 lg:order-0">
+          <SpecialAbilities />
         </div>
 
         <div className="grid grid-cols-1 gap-3 order-7 sm:grid-cols-2 lg:order-0">

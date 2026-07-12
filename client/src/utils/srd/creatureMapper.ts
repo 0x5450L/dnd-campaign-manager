@@ -1,3 +1,4 @@
+import { creatureAbilities, creatureResourcePools } from "./abilities";
 import {
   ABILITY_NAMES,
   SKILL_DEFINITIONS,
@@ -7,8 +8,6 @@ import type { SrdCreature, SrdCreatureAction } from "../../../../shared/dto/srd"
 import type {
   AbilityState,
   CreatureSheetState,
-  CreatureTrait,
-  CreatureTraitKind,
   SkillDef,
 } from "../../types/characters/characterSheet";
 import { createInitialCreatureSheet } from "../../constants/characterSheet";
@@ -39,21 +38,10 @@ const buildSkills = (creature: SrdCreature): SkillDef[] => {
   }));
 };
 
-const toTraits = (
-  actions: SrdCreatureAction[],
-  kind: CreatureTraitKind,
-): CreatureTrait[] =>
-  actions.map((action) => ({
-    id: crypto.randomUUID(),
-    kind,
-    name: action.name,
-    description: action.description,
-  }));
-
 export const srdCreatureToSheetState = (
   creature: SrdCreature,
 ): CreatureSheetState => {
-  const { attacks, nonAttackActions } = splitCreatureActions(creature.actions);
+  const { attacks } = splitCreatureActions(creature.actions);
   return {
     ...createInitialCreatureSheet(),
     name: creature.name,
@@ -75,11 +63,8 @@ export const srdCreatureToSheetState = (
     damageResistances: creature.damageResistances ?? "",
     damageImmunities: creature.damageImmunities ?? "",
     conditionImmunities: creature.conditionImmunities ?? "",
-    traits: [
-      ...toTraits(creature.specialAbilities, "trait"),
-      ...toTraits(nonAttackActions, "trait"),
-      ...toTraits(creature.legendaryActions, "legendary_action"),
-    ],
+    specialAbilities: creatureAbilities(creature),
+    resources: creatureResourcePools(creature),
     notes: buildNotes(creature),
   };
 };
