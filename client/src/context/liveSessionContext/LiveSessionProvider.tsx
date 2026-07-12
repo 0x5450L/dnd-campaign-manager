@@ -16,6 +16,7 @@ import {
 } from "../../state/liveSession/liveSessionReducer";
 import type { MemberPresence, PresenceStatus } from "../../types/session";
 import type {
+  AbilityUsageAction,
   CreateParticipantPayload,
   EncounterParticipantDTO,
   UpdateParticipantPayload,
@@ -25,6 +26,7 @@ import { useCampaignCharactersQuery } from "../../queries/characters";
 import type { Campaign } from "../../types/campaigns";
 import {
   encounterKeys,
+  useAbilityUsageMutation,
   useActiveEncounterQuery,
   useAdvanceTurnMutation,
   useCreateParticipantMutation,
@@ -91,6 +93,7 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
 
   useEncounterRealtimeSync(campaign.id, sessionId);
   const { mutate: mutateParticipant } = useUpdateParticipantMutation(sessionId);
+  const { mutate: mutateAbilityUsage } = useAbilityUsageMutation(sessionId);
   const { mutate: mutateAdvanceTurn } = useAdvanceTurnMutation(sessionId);
   const { mutate: mutateCreateParticipant } = useCreateParticipantMutation(sessionId);
   const { mutate: mutateRemoveParticipant } = useRemoveParticipantMutation(sessionId);
@@ -296,6 +299,14 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
     [encounter, mutateParticipant],
   );
 
+  const applyAbilityUsage = useCallback(
+    (participantId: string, abilityId: string, action: AbilityUsageAction) => {
+      if (!encounter) return;
+      mutateAbilityUsage({ encounterId: encounter.id, participantId, abilityId, action });
+    },
+    [encounter, mutateAbilityUsage],
+  );
+
   const addParticipant = useCallback(
     (input: CreateParticipantPayload) => {
       if (!encounter) return;
@@ -363,6 +374,7 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
       recordDeathSave,
       resetDeathSaves,
       updateParticipant,
+      applyAbilityUsage,
       addParticipant,
       removeParticipant,
       logRoll,
@@ -392,6 +404,7 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
       recordDeathSave,
       resetDeathSaves,
       updateParticipant,
+      applyAbilityUsage,
       addParticipant,
       removeParticipant,
       logRoll,

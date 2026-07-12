@@ -18,6 +18,7 @@ import type {
   UpdateParticipantPayload,
   UpdateParticipantResponse,
   BulkInitiativePayload,
+  AbilityUsagePayload,
 } from "../../types/encounter";
 
 export const listEncounters = async (campaignSessionId: string) => {
@@ -95,6 +96,21 @@ export const updateParticipant = async (
     method: "PATCH",
     body: JSON.stringify(payload),
   });
+};
+
+export const applyAbilityUsage = async (
+  id: string,
+  pid: string,
+  abilityId: string,
+  payload: AbilityUsagePayload,
+) => {
+  return apiClient<UpdateParticipantResponse>(
+    `/api/encounters/${id}/participants/${pid}/abilities/${abilityId}/usage`,
+    {
+      method: "POST",
+      body: JSON.stringify(payload),
+    },
+  );
 };
 
 export const deleteParticipants = async (id: string, ids: string[]) => {

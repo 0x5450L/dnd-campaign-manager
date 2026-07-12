@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   advanceTurn as advanceTurnRequest,
+  applyAbilityUsage as applyAbilityUsageRequest,
   createParticipant as createParticipantRequest,
   deleteParticipant as deleteParticipantRequest,
   listEncounters,
@@ -11,6 +12,7 @@ import {
 import { useAuthStore } from "../state/auth/authStore";
 import { getSocket } from "../services/socket";
 import type {
+  AbilityUsageAction,
   BulkInitiativePayload,
   CreateParticipantPayload,
   EncounterParticipantDTO,
@@ -74,6 +76,29 @@ export const useUpdateParticipantMutation = (campaignSessionId: string | undefin
     onError: (_error, _vars, context) => {
       if (context?.previous) queryClient.setQueryData(key, context.previous);
     },
+    onSuccess: (participant, { encounterId }) => {
+      queryClient.setQueryData<EncounterList>(key, (list) =>
+        replaceParticipant(list, encounterId, participant),
+      );
+    },
+  });
+};
+
+type AbilityUsageVars = {
+  encounterId: string;
+  participantId: string;
+  abilityId: string;
+  action: AbilityUsageAction;
+};
+
+export const useAbilityUsageMutation = (campaignSessionId: string | undefined) => {
+  const queryClient = useQueryClient();
+  const key = encounterKeys.list(campaignSessionId ?? "");
+
+  return useMutation({
+    mutationFn: async ({ encounterId, participantId, abilityId, action }: AbilityUsageVars) =>
+      (await applyAbilityUsageRequest(encounterId, participantId, abilityId, { action }))
+        .participant,
     onSuccess: (participant, { encounterId }) => {
       queryClient.setQueryData<EncounterList>(key, (list) =>
         replaceParticipant(list, encounterId, participant),
