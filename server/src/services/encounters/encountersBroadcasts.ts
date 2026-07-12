@@ -3,6 +3,7 @@ import type {
   EncounterDTO,
   EncounterParticipantDTO,
 } from "../../../../shared/dto/session";
+import type { RechargeRollDTO } from "../../../../shared/dto/socketEvents";
 
 export const broadcastEncounterUpdated = (
   campaignId: string,
@@ -42,6 +43,26 @@ export const broadcastParticipantUpdate = async (
         participantId: participant.id,
       });
     }
+  }
+};
+
+export const broadcastTurnAdvanced = async (
+  campaignId: string,
+  dmId: string,
+  encounter: EncounterDTO,
+  participant: EncounterParticipantDTO | null,
+  rechargeRolls: RechargeRollDTO[],
+) => {
+  const sockets = await getIo().in(`campaign:${campaignId}`).fetchSockets();
+  for (const socket of sockets) {
+    const isDM = socket.data.userId === dmId;
+    const showParticipant = participant !== null && (isDM || participant.isVisible);
+    socket.emit("turn_advanced", {
+      campaignId,
+      encounter,
+      participant: showParticipant ? participant : null,
+      rechargeRolls: showParticipant ? rechargeRolls : [],
+    });
   }
 };
 

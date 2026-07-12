@@ -60,3 +60,51 @@ export const canApplyAbilityUsage = (
   abilityId: string,
   action: AbilityUsageAction,
 ): boolean => applyAbilityUsage(abilities, resources, abilityId, action) !== null;
+
+export type RechargeRollResult = {
+  abilityId: string;
+  abilityName: string;
+  roll: number;
+  threshold: number;
+  charged: boolean;
+};
+
+export type TurnStartResult = {
+  abilities: Ability[];
+  resources: ResourcePool[];
+  rechargeRolls: RechargeRollResult[];
+  changed: boolean;
+};
+
+export const applyTurnStart = (
+  abilities: Ability[],
+  resources: ResourcePool[],
+  rollD6: () => number,
+): TurnStartResult => {
+  let changed = false;
+
+  const nextResources = resources.map((pool) => {
+    if (pool.resetOn !== "turn" || pool.remaining === pool.max) return pool;
+    changed = true;
+    return { ...pool, remaining: pool.max };
+  });
+
+  const rechargeRolls: RechargeRollResult[] = [];
+  const nextAbilities = abilities.map((ability) => {
+    if (ability.cost?.type !== "recharge" || ability.cost.charged) return ability;
+    const roll = rollD6();
+    const charged = roll >= ability.cost.threshold;
+    rechargeRolls.push({
+      abilityId: ability.id,
+      abilityName: ability.name,
+      roll,
+      threshold: ability.cost.threshold,
+      charged,
+    });
+    if (!charged) return ability;
+    changed = true;
+    return { ...ability, cost: { ...ability.cost, charged: true } };
+  });
+
+  return { abilities: nextAbilities, resources: nextResources, rechargeRolls, changed };
+};

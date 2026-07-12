@@ -9,6 +9,9 @@ import type {
 
 const bySortOrder = { sortOrder: "asc" } as const;
 
+export const runInTransaction = <T extends Prisma.PrismaPromise<unknown>[]>(ops: [...T]) =>
+  prisma.$transaction(ops);
+
 export const findOwnedSession = (campaignSessionId: string, userId: string) =>
   prisma.campaignSession.findUnique({
     where: { id: campaignSessionId, campaign: { dmId: userId } },

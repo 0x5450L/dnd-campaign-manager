@@ -56,6 +56,21 @@ export type InitiativeUpdatedPayload = {
   participants: EncounterParticipantDTO[];
 };
 
+export type RechargeRollDTO = {
+  abilityId: string;
+  abilityName: string;
+  roll: number;
+  threshold: number;
+  charged: boolean;
+};
+
+export type TurnAdvancedPayload = {
+  campaignId: string;
+  encounter: EncounterDTO;
+  participant: EncounterParticipantDTO | null;
+  rechargeRolls: RechargeRollDTO[];
+};
+
 export type RollLogPayload = {
   campaignId: string;
   expression: string;
@@ -83,6 +98,7 @@ export type SocketServerToClientEvents = {
   'participant_updated': (payload: ParticipantUpdatedPayload) => void;
   'participant_removed': (payload: ParticipantRemovedPayload) => void;
   'encounter_updated': (payload: EncounterUpdatedPayload) => void;
+  'turn_advanced': (payload: TurnAdvancedPayload) => void;
   'initiative_updated': (payload: InitiativeUpdatedPayload) => void;
   'roll_logged': (payload: RollLoggedPayload) => void;
   'session_started': (payload: SessionStartedPayload) => void;

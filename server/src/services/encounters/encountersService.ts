@@ -9,7 +9,8 @@ import type {
   UpdateParticipantPayload,
 } from "../../../../shared/dto/session";
 import type { Ability, AbilityUsageAction, ResourcePool } from "../../../../shared/types/abilities";
-import { applyAbilityUsage } from "../../../../shared/utils/abilityUsage";
+import { applyAbilityUsage, applyTurnStart } from "../../../../shared/utils/abilityUsage";
+import { rollDie } from "../../../../shared/utils/dice";
 import * as encountersRepo from "./encountersRepository";
 import { mapEncounterToDTO, mapParticipantToDTO } from "./encountersMappers";
 import {
@@ -17,6 +18,7 @@ import {
   broadcastInitiative,
   broadcastParticipantRemoved,
   broadcastParticipantUpdate,
+  broadcastTurnAdvanced,
 } from "./encountersBroadcasts";
 import {
   parseParticipantIds,
@@ -118,7 +120,8 @@ export const deleteEncounter = async (userId: string, id: string) => {
 
 export const advanceTurn = async (userId: string, id: string) => {
   const encounter = await requireEncounterDM(userId, id);
-  const total = await encountersRepo.countParticipants(id);
+  const participants = await encountersRepo.listParticipants(id);
+  const total = participants.length;
 
   if (total === 0) {
     throw new AppError(400, "No participants in encounter");
@@ -126,18 +129,38 @@ export const advanceTurn = async (userId: string, id: string) => {
 
   const next = encounter.currentTurnIndex + 1;
   const wraps = next >= total;
-  const updated = await encountersRepo.updateEncounter(id, {
-    currentTurnIndex: wraps ? 0 : next,
+  const newIndex = wraps ? 0 : next;
+  const active = participants[newIndex];
+
+  const abilities = (active.abilities as unknown as Ability[] | null) ?? [];
+  const resources = (active.resources as unknown as ResourcePool[] | null) ?? [];
+  const turnStart = applyTurnStart(abilities, resources, () => rollDie(6));
+
+  const encounterUpdate = encountersRepo.updateEncounter(id, {
+    currentTurnIndex: newIndex,
     round: wraps ? encounter.round + 1 : encounter.round,
   });
 
+  const [updated, updatedActive] = turnStart.changed
+    ? await encountersRepo.runInTransaction([
+        encounterUpdate,
+        encountersRepo.updateParticipant(active.id, {
+          abilities: jsonInput(turnStart.abilities),
+          resources: jsonInput(turnStart.resources),
+        }),
+      ])
+    : [await encounterUpdate, active];
+
   try {
-    broadcastEncounterUpdated(
+    await broadcastTurnAdvanced(
       encounter.campaignSession.campaign.id,
+      encounter.campaignSession.campaign.dmId,
       mapEncounterToDTO(updated),
+      mapParticipantToDTO(updatedActive),
+      turnStart.rechargeRolls,
     );
   } catch (error) {
-    console.error("encounter_updated broadcast failed", error);
+    console.error("turn_advanced broadcast failed", error);
   }
 
   return updated;
