@@ -47,7 +47,7 @@ export const createEncounter = async (
   const created = await encountersRepo.findEncounterWithParticipants(encounter.id);
 
   try {
-    broadcastEncounterUpdated(session.campaignId, mapEncounterToDTO(created));
+    await broadcastEncounterUpdated(session.campaignId, userId, mapEncounterToDTO(created));
   } catch (error) {
     console.error("encounter_updated broadcast failed", error);
   }
@@ -73,10 +73,12 @@ export const listEncounters = async (
     return encounters;
   }
 
-  return encounters.map((encounter) => ({
-    ...encounter,
-    participants: encounter.participants.filter((participant) => participant.isVisible),
-  }));
+  return encounters
+    .filter((encounter) => encounter.status !== "setup")
+    .map((encounter) => ({
+      ...encounter,
+      participants: encounter.participants.filter((participant) => participant.isVisible),
+    }));
 };
 
 export const getEncounter = async (userId: string, id: string) => {
@@ -87,6 +89,9 @@ export const getEncounter = async (userId: string, id: string) => {
 
   const { campaignSession, participants, ...fields } = encounter;
   const isDM = campaignSession.campaign.dmId === userId;
+  if (!isDM && encounter.status === "setup") {
+    throw new AppError(404, "Encounter not found");
+  }
   const participantsForUser = isDM
     ? participants
     : participants.filter((participant) => participant.isVisible);
@@ -107,7 +112,11 @@ export const updateEncounter = async (
   });
 
   try {
-    broadcastEncounterUpdated(access.campaignSession.campaign.id, mapEncounterToDTO(encounter));
+    await broadcastEncounterUpdated(
+      access.campaignSession.campaign.id,
+      access.campaignSession.campaign.dmId,
+      mapEncounterToDTO(encounter),
+    );
   } catch (error) {
     console.error("encounter_updated broadcast failed", error);
   }
@@ -122,6 +131,9 @@ export const deleteEncounter = async (userId: string, id: string) => {
 
 export const advanceTurn = async (userId: string, id: string) => {
   const encounter = await requireEncounterDM(userId, id);
+  if (encounter.status !== "active") {
+    throw new AppError(400, "Encounter is not active");
+  }
   const participants = await encountersRepo.listParticipants(id);
   const total = participants.length;
 
@@ -193,6 +205,8 @@ export const setInitiative = async (
       access.campaignSession.campaign.dmId,
       id,
       participants.map(mapParticipantToDTO),
+      undefined,
+      access.status === "setup",
     );
   } catch (error) {
     console.error("initiative_updated broadcast failed", error);
@@ -229,6 +243,7 @@ export const addParticipant = async (
       id,
       mapParticipantToDTO(participant),
       false,
+      access.status === "setup",
     );
     if (rolled.roll) {
       const participants = await encountersRepo.listParticipants(id);
@@ -244,6 +259,7 @@ export const addParticipant = async (
             ...rolled.roll,
           },
         ],
+        access.status === "setup",
       );
     }
   } catch (error) {
@@ -336,6 +352,7 @@ export const updateParticipant = async (
       id,
       mapParticipantToDTO(updated),
       wasVisible,
+      participant.encounter.status === "setup",
     );
   } catch (error) {
     console.error("participant broadcast failed", error);
@@ -394,6 +411,7 @@ export const rollEncounterInitiative = async (
       id,
       updated.map(mapParticipantToDTO),
       rolls,
+      encounter.status === "setup",
     );
   } catch (error) {
     console.error("initiative_updated broadcast failed", error);
@@ -443,6 +461,7 @@ export const applyParticipantAbilityUsage = async (
       id,
       mapParticipantToDTO(updated),
       participant.isVisible,
+      participant.encounter.status === "setup",
     );
   } catch (error) {
     console.error("participant broadcast failed", error);

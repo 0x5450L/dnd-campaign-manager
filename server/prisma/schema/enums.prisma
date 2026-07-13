@@ -50,6 +50,7 @@ enum SessionStatus {
 }
 
 enum EncounterStatus {
+  setup
   active
   ended
 }

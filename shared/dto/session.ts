@@ -7,7 +7,7 @@ export type { SpellSlotLevel };
 
 export type SessionStatus = "active" | "paused" | "ended";
 
-export type EncounterStatus = "active" | "ended";
+export type EncounterStatus = "setup" | "active" | "ended";
 
 export type ParticipantType = "pc" | "npc" | "monster";
 

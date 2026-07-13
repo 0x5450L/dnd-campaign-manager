@@ -6,13 +6,23 @@ import type {
 import type { RechargeRollDTO } from "../../../../shared/dto/socketEvents";
 import type { InitiativeRollDTO } from "../../../../shared/dto/session";
 
-export const broadcastEncounterUpdated = (
+export const broadcastEncounterUpdated = async (
   campaignId: string,
+  dmId: string,
   encounter: EncounterDTO,
 ) => {
-  getIo()
-    .to(`campaign:${campaignId}`)
-    .emit("encounter_updated", { campaignId, encounter });
+  if (encounter.status !== "setup") {
+    getIo()
+      .to(`campaign:${campaignId}`)
+      .emit("encounter_updated", { campaignId, encounter });
+    return;
+  }
+  const sockets = await getIo().in(`campaign:${campaignId}`).fetchSockets();
+  for (const socket of sockets) {
+    if (socket.data.userId === dmId) {
+      socket.emit("encounter_updated", { campaignId, encounter });
+    }
+  }
 };
 
 export const broadcastParticipantRemoved = (
@@ -31,10 +41,12 @@ export const broadcastParticipantUpdate = async (
   encounterId: string,
   participant: EncounterParticipantDTO,
   wasVisible: boolean,
+  dmOnly = false,
 ) => {
   const sockets = await getIo().in(`campaign:${campaignId}`).fetchSockets();
   for (const socket of sockets) {
     const isDM = socket.data.userId === dmId;
+    if (dmOnly && !isDM) continue;
     if (isDM || participant.isVisible) {
       socket.emit("participant_updated", { campaignId, encounterId, participant });
     } else if (wasVisible) {
@@ -73,6 +85,7 @@ export const broadcastInitiative = async (
   encounterId: string,
   participants: EncounterParticipantDTO[],
   rolls?: InitiativeRollDTO[],
+  dmOnly = false,
 ) => {
   const sockets = await getIo().in(`campaign:${campaignId}`).fetchSockets();
   const visibleOnly = participants.filter((p) => p.isVisible);
@@ -80,6 +93,7 @@ export const broadcastInitiative = async (
   const visibleRolls = rolls?.filter((roll) => visibleIds.has(roll.participantId));
   for (const socket of sockets) {
     const isDM = socket.data.userId === dmId;
+    if (dmOnly && !isDM) continue;
     socket.emit("initiative_updated", {
       campaignId,
       encounterId,

@@ -30,7 +30,7 @@ export const createEncounter = (
   name: string | null | undefined,
 ) =>
   prisma.encounter.create({
-    data: { campaignSessionId, ...pickDefined({ name: trimOrNull(name) }) },
+    data: { campaignSessionId, status: "setup", ...pickDefined({ name: trimOrNull(name) }) },
   });
 
 export const findEncounterWithParticipants = (id: string) =>
@@ -159,6 +159,7 @@ const participantForEditInclude = {
   encounter: {
     select: {
       id: true,
+      status: true,
       campaignSession: { select: { campaign: { select: { id: true, dmId: true } } } },
     },
   },
