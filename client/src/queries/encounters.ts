@@ -47,7 +47,10 @@ export const useActiveEncounterQuery = (campaignSessionId: string | undefined) =
     queryKey: encounterKeys.list(campaignSessionId ?? ""),
     queryFn: async () => (await listEncounters(campaignSessionId as string)).encounters,
     enabled: !!token && !!campaignSessionId,
-    select: (encounters) => encounters.find((e) => e.status === "active") ?? null,
+    select: (encounters) =>
+      encounters.find((e) => e.status === "active") ??
+      encounters.find((e) => e.status === "setup") ??
+      null,
   });
 };
 

@@ -31,6 +31,7 @@ export type LiveSessionContextType = {
   endSession: () => void;
 
   startEncounter: () => void;
+  beginCombat: () => void;
   endEncounter: () => void;
   advanceTurn: () => void;
 

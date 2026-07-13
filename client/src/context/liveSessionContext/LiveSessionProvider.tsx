@@ -214,6 +214,12 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
     queryClient.invalidateQueries({ queryKey: encounterKeys.list(sessionId) });
   }, [encounter, sessionId, queryClient]);
 
+  const beginCombat = useCallback(async () => {
+    if (!encounter || !sessionId) return;
+    await updateEncounter(encounter.id, { status: "active" });
+    queryClient.invalidateQueries({ queryKey: encounterKeys.list(sessionId) });
+  }, [encounter, sessionId, queryClient]);
+
   const advanceTurn = useCallback(() => {
     if (!encounter) return;
     mutateAdvanceTurn(encounter.id);
@@ -393,6 +399,7 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
       startSession,
       endSession,
       startEncounter,
+      beginCombat,
       endEncounter,
       advanceTurn,
       adjustHp,
@@ -424,6 +431,7 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
       startSession,
       endSession,
       startEncounter,
+      beginCombat,
       endEncounter,
       advanceTurn,
       adjustHp,

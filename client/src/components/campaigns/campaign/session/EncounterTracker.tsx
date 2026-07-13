@@ -14,6 +14,7 @@ export const EncounterTracker = ({ isDM }: EncounterTrackerProps) => {
     participants,
     activeParticipant,
     startEncounter,
+    beginCombat,
     endEncounter,
     advanceTurn,
     rollInitiative,
@@ -39,6 +40,8 @@ export const EncounterTracker = ({ isDM }: EncounterTrackerProps) => {
     );
   }
 
+  const isSetup = encounter.status === "setup";
+
   return (
     <div className="cs-section-card flex flex-col gap-3 p-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -47,8 +50,11 @@ export const EncounterTracker = ({ isDM }: EncounterTrackerProps) => {
             {encounter.name ?? "Encounter"}
           </span>
           <span className="text-xs uppercase tracking-[0.12em] text-faint">
-            Round {encounter.round} &middot; {participants.length} combatants
-            {activeParticipant ? ` · ${activeParticipant.name}'s turn` : ""}
+            {isSetup
+              ? `Setup · ${participants.length} combatants · hidden from players`
+              : `Round ${encounter.round} · ${participants.length} combatants${
+                  activeParticipant ? ` · ${activeParticipant.name}'s turn` : ""
+                }`}
           </span>
         </div>
         {isDM && (
@@ -59,9 +65,15 @@ export const EncounterTracker = ({ isDM }: EncounterTrackerProps) => {
             <CommonButton onClick={() => rollInitiative()} variant="secondary" size="sm">
               Roll initiative
             </CommonButton>
-            <CommonButton onClick={advanceTurn} size="sm">
-              Next turn
-            </CommonButton>
+            {isSetup ? (
+              <CommonButton onClick={beginCombat} size="sm">
+                Start combat
+              </CommonButton>
+            ) : (
+              <CommonButton onClick={advanceTurn} size="sm">
+                Next turn
+              </CommonButton>
+            )}
             <CommonButton onClick={endEncounter} variant="decline" size="sm">
               End
             </CommonButton>
@@ -74,7 +86,7 @@ export const EncounterTracker = ({ isDM }: EncounterTrackerProps) => {
           <EncounterParticipantCard
             key={p.id}
             participant={p}
-            isActive={idx === encounter.currentTurnIndex}
+            isActive={!isSetup && idx === encounter.currentTurnIndex}
             isDM={isDM}
             isOwner={isOwnParticipant(p)}
           />
