@@ -26,7 +26,6 @@ import type {
   TurnAdvancedPayload,
 } from "../../../shared/dto/socketEvents";
 import {
-  mapEncounter,
   patchEncounterScalar,
   removeParticipant,
   replaceParticipant,
@@ -122,23 +121,6 @@ export const useAdvanceTurnMutation = (campaignSessionId: string | undefined) =>
 
   return useMutation({
     mutationFn: async (encounterId: string) => (await advanceTurnRequest(encounterId)).encounter,
-    onMutate: async (encounterId) => {
-      await queryClient.cancelQueries({ queryKey: key });
-      const previous = queryClient.getQueryData<EncounterList>(key);
-      queryClient.setQueryData<EncounterList>(key, (list) =>
-        mapEncounter(list, encounterId, (encounter) => {
-          const total = encounter.participants.length;
-          if (total === 0) return encounter;
-          const nextIndex = (encounter.currentTurnIndex + 1) % total;
-          const nextRound = nextIndex === 0 ? encounter.round + 1 : encounter.round;
-          return { ...encounter, currentTurnIndex: nextIndex, round: nextRound };
-        }),
-      );
-      return { previous };
-    },
-    onError: (_error, _vars, context) => {
-      if (context?.previous) queryClient.setQueryData(key, context.previous);
-    },
     onSuccess: (encounter) => {
       queryClient.setQueryData<EncounterList>(key, (list) => patchEncounterScalar(list, encounter));
     },
