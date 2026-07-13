@@ -1,5 +1,3 @@
-import type { SpellSlotLevel } from "./dnd";
-
 export type AbilityUsageAction = "spend" | "restore";
 
 export type AbilityActivation =
@@ -13,7 +11,7 @@ export type AbilityActivation =
 export type AbilityCost =
   | { type: "recharge"; threshold: number; charged: boolean }
   | { type: "perDay"; max: number; remaining: number }
-  | { type: "spellSlot"; level: SpellSlotLevel }
+  | { type: "spellSlot"; level: number }
   | { type: "pool"; pool: string; amount: number };
 
 export type Ability = {
