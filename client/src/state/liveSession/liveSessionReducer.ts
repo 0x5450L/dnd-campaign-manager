@@ -79,7 +79,7 @@ export const liveSessionReducer = (
         ...state,
         session: null,
         rolls: [],
-        events: pushEvent(state.events, makeEvent("session_ended", "Session ended")),
+        events: [],
       };
 
     case "REPLACE_PRESENCE":
