@@ -16,7 +16,6 @@ import type {
   AbilityUsageAction,
   BulkInitiativePayload,
   CreateParticipantPayload,
-  EncounterParticipantDTO,
   UpdateParticipantPayload,
 } from "../types/encounter";
 import type {
@@ -29,7 +28,6 @@ import type {
 import {
   mapEncounter,
   patchEncounterScalar,
-  patchParticipant,
   removeParticipant,
   replaceParticipant,
   setParticipants,
@@ -67,17 +65,6 @@ export const useUpdateParticipantMutation = (campaignSessionId: string | undefin
   return useMutation({
     mutationFn: async ({ encounterId, participantId, payload }: UpdateParticipantVars) =>
       (await updateParticipantRequest(encounterId, participantId, payload)).participant,
-    onMutate: async ({ encounterId, participantId, payload }) => {
-      await queryClient.cancelQueries({ queryKey: key });
-      const previous = queryClient.getQueryData<EncounterList>(key);
-      queryClient.setQueryData<EncounterList>(key, (list) =>
-        patchParticipant(list, encounterId, participantId, payload as Partial<EncounterParticipantDTO>),
-      );
-      return { previous };
-    },
-    onError: (_error, _vars, context) => {
-      if (context?.previous) queryClient.setQueryData(key, context.previous);
-    },
     onSuccess: (participant, { encounterId }) => {
       queryClient.setQueryData<EncounterList>(key, (list) =>
         replaceParticipant(list, encounterId, participant),
