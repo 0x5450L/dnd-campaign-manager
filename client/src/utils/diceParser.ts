@@ -171,16 +171,6 @@ export const rollTerms = (
   };
 };
 
-export const rollFormula = (
-  formula: string,
-  options: { mode?: AdvDis; label?: string } = {},
-): RollResult => {
-  const parsed = parseDiceFormula(formula);
-  const adjusted = applyAdvDis(parsed, options.mode ?? "normal");
-  const normalized = formatTerms(adjusted);
-  return rollTerms(adjusted, normalized, options.label);
-};
-
 export const formatTerms = (terms: DiceTerm[]): string => {
   if (terms.length === 0) return "";
   const parts: string[] = [];

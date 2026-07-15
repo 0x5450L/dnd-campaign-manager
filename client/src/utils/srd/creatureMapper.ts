@@ -4,7 +4,7 @@ import {
   SKILL_DEFINITIONS,
 } from "../../../../shared/constants/dnd";
 import type { AbilityName } from "../../../../shared/types/dnd";
-import type { SrdCreature, SrdCreatureAction } from "../../../../shared/dto/srd";
+import type { SrdCreature } from "../../../../shared/dto/srd";
 import type {
   AbilityState,
   CreatureSheetState,

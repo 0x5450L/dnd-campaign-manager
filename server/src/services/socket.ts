@@ -116,8 +116,6 @@ export const initSocket = (httpServer: HttpServer): AppIo => {
   });
 
   io.on('connection', (socket) => {
-    console.log(`${socket.id} connected`);
-
     socket.on('ping', (ack) => {
       ack({ at: Date.now(), userId: socket.data.userId });
     });
@@ -272,9 +270,6 @@ export const initSocket = (httpServer: HttpServer): AppIo => {
       }
     });
 
-    socket.on('disconnect', () => {
-      console.log(`${socket.id} disconnected`);
-    });
   });
 
   return io;

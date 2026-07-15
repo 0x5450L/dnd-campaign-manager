@@ -13,7 +13,7 @@ export const removeClient = (email: string, res: Response) => {
   clients.set(email, existing.filter((c) => c !== res));
 };
 
-export const notifyClient = (email: string, data: any) => {
+export const notifyClient = (email: string, data: { type: string } & Record<string, unknown>) => {
   const clientList = clients.get(email) || [];
   clientList.forEach((client) => {
     client.write(`data: ${JSON.stringify(data)}\n\n`);

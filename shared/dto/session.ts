@@ -1,7 +1,6 @@
 import type { CharacterAttackDTO, CharacterAttackInput } from "./character";
 import type { AbilityName, SpellSlotLevel } from "../types/dnd";
 import type { Ability, AbilityUsageAction, ResourcePool } from "../types/abilities";
-import type { DiceRollDTO } from "./dnd";
 
 export type { SpellSlotLevel };
 
@@ -91,11 +90,6 @@ export type EncounterParticipantDTO = {
 
 export type EncounterWithParticipantsDTO = EncounterDTO & {
   participants: EncounterParticipantDTO[];
-};
-
-export type SessionWithEncountersDTO = CampaignSessionDTO & {
-  encounters: EncounterWithParticipantsDTO[];
-  diceRolls: DiceRollDTO[];
 };
 
 export type CreateSessionPayload = {

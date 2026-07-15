@@ -6,25 +6,12 @@ import type {
 
 export type EncounterList = EncounterWithParticipantsDTO[];
 
-export const mapEncounter = (
+const mapEncounter = (
   list: EncounterList | undefined,
   encounterId: string,
   fn: (encounter: EncounterWithParticipantsDTO) => EncounterWithParticipantsDTO,
 ): EncounterList | undefined =>
   list?.map((encounter) => (encounter.id === encounterId ? fn(encounter) : encounter));
-
-export const patchParticipant = (
-  list: EncounterList | undefined,
-  encounterId: string,
-  participantId: string,
-  patch: Partial<EncounterParticipantDTO>,
-) =>
-  mapEncounter(list, encounterId, (encounter) => ({
-    ...encounter,
-    participants: encounter.participants.map((p) =>
-      p.id === participantId ? { ...p, ...patch } : p,
-    ),
-  }));
 
 export const replaceParticipant = (
   list: EncounterList | undefined,
