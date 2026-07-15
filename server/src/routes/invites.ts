@@ -1,12 +1,20 @@
 import { Router } from "express";
+import type { ParamsDictionary } from "express-serve-static-core";
 import { authMiddleware } from "../middleware/auth";
 import { asyncHandler } from "../utils/asyncHandler";
+import { validateBody } from "../middleware/validateBody";
+import {
+  createInviteSchema,
+  respondToInviteSchema,
+  type CreateInviteBody,
+  type RespondToInviteBody,
+} from "../validation/invites";
 import { openSseStream } from "../services/sseClients";
 import * as invitesService from "../services/invites/invitesService";
 
 const router = Router();
 
-router.post("/create", authMiddleware, asyncHandler(async (req, res) => {
+router.post("/create", authMiddleware, validateBody(createInviteSchema), asyncHandler<ParamsDictionary, unknown, CreateInviteBody>(async (req, res) => {
   const { email, campaignId } = req.body;
   const result = await invitesService.createInvite(req.userId!, email, campaignId);
   res.json({
@@ -38,8 +46,8 @@ router.get<{ token: string }>("/:token", asyncHandler(async (req, res) => {
   res.json({ status: "ok", message: "Invite retrieved successfully", invite });
 }));
 
-router.post<{ token: string }>("/:token/respond", authMiddleware, asyncHandler(async (req, res) => {
-  const { action } = req.body as { action: "accept" | "reject" };
+router.post<{ token: string }>("/:token/respond", authMiddleware, validateBody(respondToInviteSchema), asyncHandler<{ token: string }, unknown, RespondToInviteBody>(async (req, res) => {
+  const { action } = req.body;
   await invitesService.respondToInvite(req.userId!, req.params.token, action);
   res.json({ status: "ok", message: `Invite ${action}ed successfully` });
 }));

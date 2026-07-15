@@ -2,14 +2,13 @@ import bcrypt from "bcrypt";
 import { generateToken } from "../../utils/jwt";
 import { AppError } from "../../utils/errors";
 import * as authRepo from "./authRepository";
-import { requireRegisterFields } from "./authValidation";
 
 export const register = async (body: {
-  email?: string;
-  password?: string;
-  displayName?: string;
+  email: string;
+  password: string;
+  displayName: string;
 }) => {
-  const { email, password, displayName } = requireRegisterFields(body);
+  const { email, password, displayName } = body;
   const passwordHash = await bcrypt.hash(password, 10);
   const user = await authRepo.createUser(email, passwordHash, displayName);
   const token = generateToken(user.id);

@@ -1,12 +1,21 @@
 import { Router } from "express";
+import type { ParamsDictionary } from "express-serve-static-core";
 import { authMiddleware } from "../middleware/auth";
 import { asyncHandler } from "../utils/asyncHandler";
-import type { UpdateCharacterPayload } from "../../../shared/dto/character";
+import { validateBody } from "../middleware/validateBody";
+import type {
+  CreateCharacterPayload,
+  UpdateCharacterPayload,
+} from "../../../shared/dto/character";
+import {
+  createCharacterSchema,
+  updateCharacterSchema,
+} from "../validation/characters";
 import * as charactersService from "../services/characters/charactersService";
 
 const router = Router();
 
-router.post("/create", authMiddleware, asyncHandler(async (req, res) => {
+router.post("/create", authMiddleware, validateBody(createCharacterSchema), asyncHandler<ParamsDictionary, unknown, CreateCharacterPayload>(async (req, res) => {
   const character = await charactersService.createCharacter(req.userId!, req.body);
   res.json({ status: "ok", message: "Character created successfully", character });
 }));
@@ -23,11 +32,11 @@ router.get<{ campaignId: string }>(
   }),
 );
 
-router.patch<{ id: string }>("/:id", authMiddleware, asyncHandler(async (req, res) => {
+router.patch<{ id: string }>("/:id", authMiddleware, validateBody(updateCharacterSchema), asyncHandler<{ id: string }, unknown, UpdateCharacterPayload>(async (req, res) => {
   const character = await charactersService.updateCharacter(
     req.userId!,
     req.params.id,
-    req.body as UpdateCharacterPayload,
+    req.body,
   );
   res.json({ status: "ok", message: "Character updated successfully", character });
 }));

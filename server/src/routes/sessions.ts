@@ -1,12 +1,18 @@
 import { Router } from "express";
+import type { ParamsDictionary } from "express-serve-static-core";
 import { authMiddleware } from "../middleware/auth";
 import { asyncHandler } from "../utils/asyncHandler";
-import type { UpdateSessionPayload } from "../../../shared/dto/session";
+import { validateBody } from "../middleware/validateBody";
+import type {
+  CreateSessionPayload,
+  UpdateSessionPayload,
+} from "../../../shared/dto/session";
+import { createSessionSchema, updateSessionSchema } from "../validation/sessions";
 import * as sessionsService from "../services/sessions/sessionsService";
 
 const router = Router();
 
-router.post("/", authMiddleware, asyncHandler(async (req, res) => {
+router.post("/", authMiddleware, validateBody(createSessionSchema), asyncHandler<ParamsDictionary, unknown, CreateSessionPayload>(async (req, res) => {
   const session = await sessionsService.createSession(req.userId!, req.body.campaignId, req.body.title);
   res.json({ status: "ok", message: "Session created successfully", session });
 }));
@@ -22,12 +28,8 @@ router.get<{ id: string }>("/:id", authMiddleware, asyncHandler(async (req, res)
   res.json({ status: "ok", message: "Session retrieved successfully", session });
 }));
 
-router.patch<{ id: string }>("/:id", authMiddleware, asyncHandler(async (req, res) => {
-  const session = await sessionsService.updateSession(
-    req.userId!,
-    req.params.id,
-    req.body as UpdateSessionPayload,
-  );
+router.patch<{ id: string }>("/:id", authMiddleware, validateBody(updateSessionSchema), asyncHandler<{ id: string }, unknown, UpdateSessionPayload>(async (req, res) => {
+  const session = await sessionsService.updateSession(req.userId!, req.params.id, req.body);
   res.json({ status: "ok", message: "Session updated successfully", session });
 }));
 

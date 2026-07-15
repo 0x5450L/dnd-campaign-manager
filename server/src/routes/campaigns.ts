@@ -1,11 +1,21 @@
 import { Router } from "express";
+import type { ParamsDictionary } from "express-serve-static-core";
 import { authMiddleware } from "../middleware/auth";
 import { asyncHandler } from "../utils/asyncHandler";
+import { validateBody } from "../middleware/validateBody";
+import {
+  createCampaignSchema,
+  updateCampaignSchema,
+} from "../validation/campaigns";
+import type {
+  CreateCampaignInput,
+  UpdateCampaignInput,
+} from "../services/campaigns/campaignsRepository";
 import * as campaignsService from "../services/campaigns/campaignsService";
 
 const router = Router();
 
-router.post("/create", authMiddleware, asyncHandler(async (req, res) => {
+router.post("/create", authMiddleware, validateBody(createCampaignSchema), asyncHandler<ParamsDictionary, unknown, CreateCampaignInput>(async (req, res) => {
   const campaign = await campaignsService.createCampaign(req.userId!, req.body);
   res.json({ status: "ok", message: "Campaign created successfully", campaign });
 }));
@@ -32,7 +42,7 @@ router.delete<{ id: string }>("/delete/:id", authMiddleware, asyncHandler(async 
   res.json({ status: "ok", message: "Campaign deleted successfully" });
 }));
 
-router.patch<{ id: string }>("/:id", authMiddleware, asyncHandler(async (req, res) => {
+router.patch<{ id: string }>("/:id", authMiddleware, validateBody(updateCampaignSchema), asyncHandler<{ id: string }, unknown, UpdateCampaignInput>(async (req, res) => {
   const campaign = await campaignsService.updateCampaign(req.userId!, req.params.id, req.body);
   res.json({ status: "ok", message: "Campaign updated successfully", campaign });
 }));

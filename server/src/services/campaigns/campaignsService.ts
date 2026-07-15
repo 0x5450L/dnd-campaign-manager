@@ -8,7 +8,7 @@ import type {
   CreateCampaignInput,
   UpdateCampaignInput,
 } from "./campaignsRepository";
-import { requireCampaignName } from "./campaignsValidation";
+
 import {
   notifyCampaignDeleted,
   notifyCampaignUpdated,
@@ -36,12 +36,11 @@ export const createCampaign = async (
   userId: string,
   body: CreateCampaignInput,
 ) => {
-  const name = requireCampaignName(body.name);
   const { id, dm } = await campaignsRepo.createCampaignWithDm(userId, body);
   return {
     id,
     dm,
-    name,
+    name: body.name,
     description: body.description,
     setting: body.setting,
     imageUrl: body.imageUrl,

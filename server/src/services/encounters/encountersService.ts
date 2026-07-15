@@ -22,22 +22,13 @@ import {
   broadcastParticipantUpdate,
   broadcastTurnAdvanced,
 } from "./encountersBroadcasts";
-import {
-  parseParticipantIds,
-  requireCampaignSessionId,
-  requireInitiativeEntries,
-  requireParticipantFields,
-  requireParticipantsPayload,
-} from "./encountersValidation";
 
 export const createEncounter = async (
   userId: string,
-  campaignSessionId: string | undefined,
+  campaignSessionId: string,
   name: string | undefined,
 ) => {
-  requireCampaignSessionId(campaignSessionId, "campaignSessionId is required");
-
-  const session = await encountersRepo.findOwnedSession(campaignSessionId!, userId);
+  const session = await encountersRepo.findOwnedSession(campaignSessionId, userId);
   if (!session) {
     throw new AppError(404, "Session not found");
   }
@@ -57,17 +48,15 @@ export const createEncounter = async (
 
 export const listEncounters = async (
   userId: string,
-  campaignSessionId: string | undefined,
+  campaignSessionId: string,
 ) => {
-  requireCampaignSessionId(campaignSessionId, "campaignSessionId query param is required");
-
-  const session = await encountersRepo.findMemberSession(campaignSessionId!, userId);
+  const session = await encountersRepo.findMemberSession(campaignSessionId, userId);
   if (!session) {
     throw new AppError(404, "Session not found");
   }
 
   const isDM = session.campaign.dmId === userId;
-  const encounters = await encountersRepo.listEncountersBySession(campaignSessionId!);
+  const encounters = await encountersRepo.listEncountersBySession(campaignSessionId);
 
   if (isDM) {
     return encounters;
@@ -185,7 +174,7 @@ export const setInitiative = async (
   id: string,
   body: BulkInitiativePayload,
 ) => {
-  const entries = requireInitiativeEntries(body.entries);
+  const entries = body.entries;
   const access = await requireEncounterDM(userId, id);
 
   const owned = await encountersRepo.findParticipantIds(
@@ -228,10 +217,6 @@ export const addParticipant = async (
   id: string,
   body: CreateParticipantPayload,
 ) => {
-  requireParticipantFields(
-    body,
-    "type, name, sortOrder, maxHp, currentHp, armorClass are required",
-  );
   const access = await requireEncounterDM(userId, id);
   const rolled = withRolledInitiative(body);
   const participant = await encountersRepo.createParticipant(id, rolled.body);
@@ -274,7 +259,7 @@ export const addParticipants = async (
   id: string,
   body: BulkCreateParticipantsPayload,
 ) => {
-  const participants = requireParticipantsPayload(body.participants);
+  const participants = body.participants;
   await requireEncounterDM(userId, id);
   return encountersRepo.createParticipants(
     id,
@@ -473,9 +458,8 @@ export const applyParticipantAbilityUsage = async (
 export const removeParticipants = async (
   userId: string,
   id: string,
-  idsParam: string | undefined,
+  ids: string[],
 ) => {
-  const ids = parseParticipantIds(idsParam);
   await requireEncounterDM(userId, id);
 
   const owned = await encountersRepo.findParticipantIds(ids, id);
