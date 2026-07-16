@@ -32,6 +32,11 @@ const removeMemberAndNotify = async (campaignId: string, targetUserId: string) =
   }
 };
 
+const toCampaignDTO = <T extends { sessions: { id: string }[] }>(campaign: T) => {
+  const { sessions, ...rest } = campaign;
+  return { ...rest, activeSessionId: sessions[0]?.id ?? null };
+};
+
 export const createCampaign = async (
   userId: string,
   body: CreateCampaignInput,
@@ -44,18 +49,21 @@ export const createCampaign = async (
     description: body.description,
     setting: body.setting,
     imageUrl: body.imageUrl,
+    activeSessionId: null,
   };
 };
 
-export const listCampaigns = (userId: string) =>
-  campaignsRepo.listUserCampaigns(userId);
+export const listCampaigns = async (userId: string) => {
+  const campaigns = await campaignsRepo.listUserCampaigns(userId);
+  return campaigns.map(toCampaignDTO);
+};
 
 export const getCampaign = async (userId: string, id: string) => {
   const campaign = await campaignsRepo.findUserCampaign(id, userId);
   if (!campaign) {
     throw new AppError(404, "Campaign not found");
   }
-  return campaign;
+  return toCampaignDTO(campaign);
 };
 
 export const deleteCampaign = async (userId: string, id: string) => {
@@ -83,10 +91,11 @@ export const updateCampaign = async (
   body: UpdateCampaignInput,
 ) => {
   await requireCampaignDM(userId, id);
-  const campaign = await campaignsRepo.updateCampaign(id, body);
+  const updated = await campaignsRepo.updateCampaign(id, body);
+  const campaign = toCampaignDTO(updated);
 
   try {
-    notifyCampaignUpdated(campaign.members, campaign);
+    notifyCampaignUpdated(updated.members, campaign);
   } catch (error) {
     console.error("campaign_updated notify failed", error);
   }

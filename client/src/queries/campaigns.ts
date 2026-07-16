@@ -22,6 +22,7 @@ export const useCampaignsQuery = () => {
     queryKey: campaignKeys.lists(),
     queryFn: async () => (await getCampaigns()).campaigns,
     enabled: !!token,
+    refetchOnWindowFocus: true,
   });
 };
 

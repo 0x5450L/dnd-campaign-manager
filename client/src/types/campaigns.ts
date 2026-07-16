@@ -46,6 +46,7 @@ export type Campaign = {
   createdAt: Date;
   updatedAt: Date;
   members: CampaignMember[];
+  activeSessionId: string | null;
 }
 
 type CampaignMember = {

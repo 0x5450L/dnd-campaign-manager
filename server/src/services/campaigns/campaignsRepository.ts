@@ -21,6 +21,11 @@ const campaignWithMembersInclude = {
   members: {
     include: { user: { select: { id: true, displayName: true, email: true } } },
   },
+  sessions: {
+    where: { status: "active" },
+    select: { id: true },
+    take: 1,
+  },
 } satisfies Prisma.CampaignInclude;
 
 export const createCampaignWithDm = (userId: string, input: CreateCampaignInput) =>

@@ -6,6 +6,7 @@ import {
 import type { UpdateSessionPayload } from "@shared/dto/session";
 import * as sessionsRepo from "./sessionsRepository";
 import { requireCampaignId } from "./sessionsValidation";
+import { notifySessionStatusChanged } from "./sessionsNotifications";
 
 export const createSession = async (
   userId: string,
@@ -14,7 +15,11 @@ export const createSession = async (
 ) => {
   const id = requireCampaignId(campaignId, "campaignId is required");
   await requireCampaignDM(userId, id);
-  return sessionsRepo.createSession(id, title);
+  const session = await sessionsRepo.createSession(id, title);
+  notifySessionStatusChanged(id).catch((error) => {
+    console.error("session_status_changed notify failed", error);
+  });
+  return session;
 };
 
 export const listSessions = async (
@@ -43,7 +48,13 @@ export const updateSession = async (
   if (!existing) {
     throw new AppError(404, "Session not found");
   }
-  return sessionsRepo.updateSession(id, body);
+  const session = await sessionsRepo.updateSession(id, body);
+  if (body.status) {
+    notifySessionStatusChanged(session.campaignId).catch((error) => {
+      console.error("session_status_changed notify failed", error);
+    });
+  }
+  return session;
 };
 
 export const deleteSession = async (userId: string, id: string) => {

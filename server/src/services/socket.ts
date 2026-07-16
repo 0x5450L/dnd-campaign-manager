@@ -19,6 +19,7 @@ import {
 } from '../utils/accessControl';
 import { AppError } from '../utils/errors';
 import prisma from './prisma';
+import { notifySessionStatusChanged } from './sessions/sessionsNotifications';
 
 const campaignRoom = (campaignId: string) => `campaign:${campaignId}`;
 
@@ -179,6 +180,9 @@ export const initSocket = (httpServer: HttpServer): AppIo => {
           getIo()
             .to(campaignRoom(campaignId))
             .emit('session_ended', { campaignId, sessionId: active.id });
+          notifySessionStatusChanged(campaignId).catch((error) => {
+            console.error('session_status_changed notify failed', error);
+          });
           active = null;
         }
 
@@ -224,6 +228,9 @@ export const initSocket = (httpServer: HttpServer): AppIo => {
             campaignId: payload.campaignId,
             session: toSessionDTO(session),
           });
+        notifySessionStatusChanged(payload.campaignId).catch((error) => {
+          console.error('session_status_changed notify failed', error);
+        });
         ack({ ok: true });
       } catch (error) {
         if (error instanceof AppError && error.statusCode === 404) {
@@ -257,6 +264,9 @@ export const initSocket = (httpServer: HttpServer): AppIo => {
             campaignId: payload.campaignId,
             sessionId: payload.sessionId,
           });
+        notifySessionStatusChanged(payload.campaignId).catch((error) => {
+          console.error('session_status_changed notify failed', error);
+        });
         ack({ ok: true });
       } catch (error) {
         if (error instanceof AppError && error.statusCode === 404) {

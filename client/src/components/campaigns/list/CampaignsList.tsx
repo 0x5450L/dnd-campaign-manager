@@ -13,12 +13,12 @@ function CampaignsList() {
   const sortedCampaigns = useMemo(() => {
     if (!campaigns) return [];
     return [...campaigns].sort((a, b) => {
-      const aLive = hasLiveSession && a.id === activeCampaignId;
-      const bLive = hasLiveSession && b.id === activeCampaignId;
+      const aLive = a.activeSessionId !== null;
+      const bLive = b.activeSessionId !== null;
       if (aLive !== bLive) return aLive ? -1 : 1;
       return (visitedAt[b.id] ?? 0) - (visitedAt[a.id] ?? 0);
     });
-  }, [campaigns, hasLiveSession, activeCampaignId, visitedAt]);
+  }, [campaigns, visitedAt]);
 
   if (isLoading) {
     return <p className="text-gold">Loading campaigns...</p>;
@@ -34,7 +34,7 @@ function CampaignsList() {
         <CampaignsListItem
           key={campaign.id}
           campaign={campaign}
-          isLive={hasLiveSession && campaign.id === activeCampaignId}
+          isLive={campaign.activeSessionId !== null}
           isLocked={hasLiveSession && campaign.id !== activeCampaignId}
         />
       ))}

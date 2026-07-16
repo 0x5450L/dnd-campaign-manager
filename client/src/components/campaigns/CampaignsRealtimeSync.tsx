@@ -48,12 +48,14 @@ export const CampaignsRealtimeSync = () => {
     };
 
     const unsubJoined = subscribe("member_joined", handleMembershipChange);
+    const unsubSession = subscribe("session_status_changed", handleMembershipChange);
     const unsubLeft = subscribe("member_left", handleMembershipChange);
     const unsubUpdated = subscribe("campaign_updated", handleCampaignUpdated);
     const unsubDeleted = subscribe("campaign_deleted", handleCampaignDeleted);
 
     return () => {
       unsubJoined();
+      unsubSession();
       unsubLeft();
       unsubUpdated();
       unsubDeleted();
