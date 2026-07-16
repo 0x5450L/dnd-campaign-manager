@@ -1,5 +1,5 @@
-import { SRD_CATEGORY } from "../../../../../shared/constants/srd";
-import type { SrdCategory, SrdCondition, SrdConditionSummary, SrdItem, SrdItemSummary, SrdListPage, SrdCreature, SrdCreatureSummary, SrdQuery, SrdSource, SrdSpell, SrdSpellSummary } from "../../../../../shared/dto/srd";
+import { SRD_CATEGORY } from "@shared/constants/srd";
+import type { SrdCategory, SrdCondition, SrdConditionSummary, SrdItem, SrdItemSummary, SrdListPage, SrdCreature, SrdCreatureSummary, SrdQuery, SrdSource, SrdSpell, SrdSpellSummary } from "@shared/dto/srd";
 import type { ContentProvider } from "./contentProvider";
 import { NoProviderAvailableError } from "./providerErrors";
 import { DEFAULT_ROUTING, type ProviderRouting } from "./routing";

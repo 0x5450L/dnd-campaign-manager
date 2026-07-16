@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import type { Character } from "../../../../../types/characters/characters";
+import type { Character } from "@/types/characters/characters";
 
 export type CampaignCharactersContextValue = {
   characters: Character[];

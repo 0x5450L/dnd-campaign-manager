@@ -5,7 +5,7 @@ import ConditionsSection from "../sections/ConditionsSection";
 import MonsterStatsSection from "../sections/MonsterStatsSection";
 import ResourcePoolsSection from "../sections/ResourcePoolsSection";
 import VitalsSection from "../sections/VitalsSection";
-import type { EditorBodyProps } from "../../../../../../../types/components/participantCard";
+import type { EditorBodyProps } from "@/types/components/participantCard";
 
 export const MonsterEditorBody = (props: EditorBodyProps) => (
   <>

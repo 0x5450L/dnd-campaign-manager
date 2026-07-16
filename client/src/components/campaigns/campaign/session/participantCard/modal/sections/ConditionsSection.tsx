@@ -1,6 +1,6 @@
-import { toggleConditionInList } from "../../../../../../../utils/encounterParticipant";
-import ConditionsPicker from "../../blocks/ConditionsPicker";
-import type { EditorBodyProps } from "../../../../../../../types/components/participantCard";
+import { toggleConditionInList } from "@/utils/encounterParticipant";
+import ConditionsPicker from "@/components/campaigns/campaign/session/participantCard/blocks/ConditionsPicker";
+import type { EditorBodyProps } from "@/types/components/participantCard";
 
 export const ConditionsSection = ({ draft, updateDraft, canEditOwn }: EditorBodyProps) => (
   <div className="flex flex-col gap-1.5">

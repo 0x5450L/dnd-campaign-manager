@@ -21,7 +21,7 @@ import type {
   BulkCreateParticipantsPayload,
   InitiativeRollDTO,
   RollInitiativePayload,
-} from "../../../shared/dto/session";
+} from "@shared/dto/session";
 
 export type {
   EncounterDTO,

@@ -1,4 +1,4 @@
-import type { SheetState } from "../../types/characters/characterSheet";
+import type { SheetState } from "@/types/characters/characterSheet";
 import {
   applySharedAction,
   isSharedSheetAction,

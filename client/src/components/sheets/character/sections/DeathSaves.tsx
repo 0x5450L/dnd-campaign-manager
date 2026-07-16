@@ -1,4 +1,4 @@
-import { useCharacterSheet, useSheetActions } from "../../../../state/sheet";
+import { useCharacterSheet, useSheetActions } from "@/state/sheet";
 
 type CheckVariant = "success" | "fail";
 

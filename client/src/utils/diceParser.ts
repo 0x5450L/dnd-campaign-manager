@@ -6,7 +6,7 @@ import type {
   RollResult,
   RolledTerm,
 } from "../types/dice";
-import { rollDie } from "../../../shared/utils/dice";
+import { rollDie } from "@shared/utils/dice";
 
 const SUPPORTED_SIDES = new Set([4, 6, 8, 10, 12, 20, 100]);
 const DICE_TOKEN = /^(\d*)d(\d+)(?:(kh|kl)(\d+))?$/i;

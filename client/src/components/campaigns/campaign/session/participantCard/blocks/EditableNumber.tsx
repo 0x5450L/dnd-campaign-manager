@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { clamp } from "../../../../../../utils/dndMath";
+import { clamp } from "@/utils/dndMath";
 
 type EditableNumberProps = {
   value: number;

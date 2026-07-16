@@ -1,7 +1,7 @@
 import type {
   CreatureSheetFields,
   CreatureSheetState,
-} from "../../types/characters/characterSheet";
+} from "@/types/characters/characterSheet";
 
 export type CreatureSheetAction = {
   type: "SET_CREATURE_FIELD";

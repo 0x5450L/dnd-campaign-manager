@@ -4,7 +4,7 @@ import {
   useInvitesRealtimeSync,
   useMyInvitesQuery,
   useRespondToInviteMutation,
-} from "../../queries/invites";
+} from "@/queries/invites";
 
 function InvitesDropdown() {
   useInvitesRealtimeSync();

@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useMeQuery, useAuthActions } from "../../queries/auth";
+import { useMeQuery, useAuthActions } from "@/queries/auth";
 import CommonButton from "../ui/buttons/CommonButton";
 import InvitesDropdown from "./InvitesDropdown";
 

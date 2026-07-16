@@ -4,19 +4,19 @@ import {
   useCampaignQuery,
   useDeleteCampaignMutation,
   useUpdateCampaignMutation,
-} from "../../queries/campaigns";
-import { useLeaveCampaignMutation } from "../../queries/members";
-import { useMeQuery } from "../../queries/auth";
-import { useNotificationStore } from "../../state/notifications/notificationStore";
-import type { Campaign } from "../../types/campaigns";
-import CommonButton from "../../components/ui/buttons/CommonButton";
-import CampaignDetails from "../../components/campaigns/campaign/CampaignDetails";
-import CampaignActionsPanel from "../../components/campaigns/campaign/CampaignActionsPanel";
-import CampaignHeaderBar from "../../components/campaigns/campaign/CampaignHeaderBar";
-import PartyRow from "../../components/campaigns/campaign/PartyRow";
-import CampaignCharactersController from "../../components/campaigns/campaign/characters/controller/CampaignCharactersController";
-import { LiveSessionProvider } from "../../context/liveSessionContext/LiveSessionProvider";
-import SessionPanel from "../../components/campaigns/campaign/session/SessionPanel";
+} from "@/queries/campaigns";
+import { useLeaveCampaignMutation } from "@/queries/members";
+import { useMeQuery } from "@/queries/auth";
+import { useNotificationStore } from "@/state/notifications/notificationStore";
+import type { Campaign } from "@/types/campaigns";
+import CommonButton from "@/components/ui/buttons/CommonButton";
+import CampaignDetails from "@/components/campaigns/campaign/CampaignDetails";
+import CampaignActionsPanel from "@/components/campaigns/campaign/CampaignActionsPanel";
+import CampaignHeaderBar from "@/components/campaigns/campaign/CampaignHeaderBar";
+import PartyRow from "@/components/campaigns/campaign/PartyRow";
+import CampaignCharactersController from "@/components/campaigns/campaign/characters/controller/CampaignCharactersController";
+import { LiveSessionProvider } from "@/context/liveSessionContext/LiveSessionProvider";
+import SessionPanel from "@/components/campaigns/campaign/session/SessionPanel";
 
 function CampaignPage() {
   const { id } = useParams();

@@ -1,4 +1,4 @@
-import EditableNumber from "../../blocks/EditableNumber";
+import EditableNumber from "@/components/campaigns/campaign/session/participantCard/blocks/EditableNumber";
 import StatTile from "./StatTile";
 
 type StatInputProps = {

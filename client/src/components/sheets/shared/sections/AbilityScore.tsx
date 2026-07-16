@@ -5,8 +5,8 @@ import {
   getSheetProficiencyBonus,
   useSheet,
   useSheetActions,
-} from "../../../../state/sheet";
-import type { AbilityName } from "../../../../types/characters/characterSheet";
+} from "@/state/sheet";
+import type { AbilityName } from "@/types/characters/characterSheet";
 
 const ABILITY_NAMES: Record<AbilityName, string> = {
   str: "Strength",

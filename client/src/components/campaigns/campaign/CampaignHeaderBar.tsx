@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import type { Campaign } from "../../../types/campaigns";
-import CommonButton from "../../ui/buttons/CommonButton";
+import type { Campaign } from "@/types/campaigns";
+import CommonButton from "@/components/ui/buttons/CommonButton";
 
 type CampaignHeaderBarProps = {
   campaign: Campaign;

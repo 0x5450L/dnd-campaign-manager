@@ -1,5 +1,5 @@
-import { useLiveSession } from "../../../../hooks/useLiveSession";
-import type { SessionEventKind } from "../../../../types/session";
+import { useLiveSession } from "@/hooks/useLiveSession";
+import type { SessionEventKind } from "@/types/session";
 
 const formatTime = (iso: string) => {
   const d = new Date(iso);

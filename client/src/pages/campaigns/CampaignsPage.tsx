@@ -1,5 +1,5 @@
-import CreateNewCampaign from "../../components/campaigns/CreateNewCampaign";
-import CampaignsList from "../../components/campaigns/list/CampaignsList";
+import CreateNewCampaign from "@/components/campaigns/CreateNewCampaign";
+import CampaignsList from "@/components/campaigns/list/CampaignsList";
 
 function CampaignsPage() {
   return (

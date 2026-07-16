@@ -2,7 +2,7 @@ import type {
   CampaignSessionDTO,
   SessionStatus,
   SessionDiceRollDTO,
-} from "../../../shared/dto/session";
+} from "@shared/dto/session";
 
 export type {
   CampaignSessionDTO,

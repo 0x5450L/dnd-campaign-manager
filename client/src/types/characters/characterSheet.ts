@@ -1,5 +1,5 @@
-import type { AbilityName, SpellSlotLevel } from "../../../../shared/types/dnd";
-import type { Ability, ResourcePool } from "../../../../shared/types/abilities";
+import type { AbilityName, SpellSlotLevel } from "@shared/types/dnd";
+import type { Ability, ResourcePool } from "@shared/types/abilities";
 export type { AbilityName, SpellSlotLevel };
 
 export type AbilityState = {

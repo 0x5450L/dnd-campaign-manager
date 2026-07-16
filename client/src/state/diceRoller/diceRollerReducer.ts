@@ -1,4 +1,4 @@
-import type { AdvDis, DiceHistoryEntry, RollResult } from "../../types/dice";
+import type { AdvDis, DiceHistoryEntry, RollResult } from "@/types/dice";
 
 export type DiceRollerState = {
   isOpen: boolean;

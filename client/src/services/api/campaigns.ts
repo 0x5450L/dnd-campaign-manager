@@ -1,5 +1,5 @@
 import { apiClient } from ".";
-import type { CreateCampaignResponse, DeleteCampaignResponse, GetCampaignResponse, GetCampaignsResponse, UpdateCampaignResponse } from "../../types/campaigns";
+import type { CreateCampaignResponse, DeleteCampaignResponse, GetCampaignResponse, GetCampaignsResponse, UpdateCampaignResponse } from "@/types/campaigns";
 
 export const createCampaign = async (name: string, description?: string, setting?: string, imageUrl?: string) => {
   return apiClient<CreateCampaignResponse>('/api/campaigns/create', {

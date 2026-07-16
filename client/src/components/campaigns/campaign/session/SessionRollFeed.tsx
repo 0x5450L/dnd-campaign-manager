@@ -1,8 +1,8 @@
-import { useLiveSession } from "../../../../hooks/useLiveSession";
-import type { SessionDiceRoll } from "../../../../types/session";
-import { DICE_TYPES, type DiceType } from "../../../../types/dice";
-import DiceShape from "../../../dice/DiceShape";
-import { formatRollExpression } from "../../../../utils/diceFormat";
+import { useLiveSession } from "@/hooks/useLiveSession";
+import type { SessionDiceRoll } from "@/types/session";
+import { DICE_TYPES, type DiceType } from "@/types/dice";
+import DiceShape from "@/components/dice/DiceShape";
+import { formatRollExpression } from "@/utils/diceFormat";
 
 const formatTime = (iso: string) => {
   const d = new Date(iso);

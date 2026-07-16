@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { SSEContext } from "./SSEContext";
-import { useMeQuery } from "../../queries/auth";
+import { useMeQuery } from "@/queries/auth";
 
 export const SSEProvider = ({ children }: { children: React.ReactNode }) => {
   const { data: user } = useMeQuery();

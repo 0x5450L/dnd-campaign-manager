@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { AbilityName } from "../../../types/characters/characterSheet";
+import type { AbilityName } from "@/types/characters/characterSheet";
 import { MobileHeader } from "../shared/navigation/MobileHeader";
 import { MobileTabBar, type MobileTabConfig } from "../shared/navigation/MobileTabBar";
 import { ArmorClass } from "../shared/sections/ArmorClass";

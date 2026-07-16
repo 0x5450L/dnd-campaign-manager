@@ -2,14 +2,14 @@ import {
   applyDamage,
   applyHealing,
   applyTempHp,
-} from "../../../../../../../utils/encounterParticipant";
-import ArmorClassBlock from "../../blocks/ArmorClassBlock";
-import HpBar from "../../blocks/HpBar";
-import HpControls from "../../blocks/HpControls";
-import InitiativeBlock from "../../blocks/InitiativeBlock";
+} from "@/utils/encounterParticipant";
+import ArmorClassBlock from "@/components/campaigns/campaign/session/participantCard/blocks/ArmorClassBlock";
+import HpBar from "@/components/campaigns/campaign/session/participantCard/blocks/HpBar";
+import HpControls from "@/components/campaigns/campaign/session/participantCard/blocks/HpControls";
+import InitiativeBlock from "@/components/campaigns/campaign/session/participantCard/blocks/InitiativeBlock";
 import StatInput from "../fields/StatInput";
-import type { EditorBodyProps } from "../../../../../../../types/components/participantCard";
-import { useLiveSession } from "../../../../../../../hooks/useLiveSession";
+import type { EditorBodyProps } from "@/types/components/participantCard";
+import { useLiveSession } from "@/hooks/useLiveSession";
 
 export const VitalsSection = ({ draft, updateDraft, canEditOwn, canManage }: EditorBodyProps) => {
   const { participants, rollInitiative } = useLiveSession();

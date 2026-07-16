@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
-import { useLiveSession } from "../../../../hooks/useLiveSession";
+import { useLiveSession } from "@/hooks/useLiveSession";
 import type {
   CreateParticipantPayload,
   EncounterParticipantDTO,
   ParticipantType,
-} from "../../../../types/encounter";
-import type { SrdCreature } from "../../../../../../shared/dto/srd";
-import { srdCreatureToParticipant } from "../../../../utils/srd/creatureParticipantMapper";
-import CommonButton from "../../../ui/buttons/CommonButton";
+} from "@/types/encounter";
+import type { SrdCreature } from "@shared/dto/srd";
+import { srdCreatureToParticipant } from "@/utils/srd/creatureParticipantMapper";
+import CommonButton from "@/components/ui/buttons/CommonButton";
 import CreatureBrowser from "../characters/CreatureBrowser";
 import { CloseIcon } from "./participantCard/blocks/icons";
 import ParticipantEditorBody from "./participantCard/modal/ParticipantEditorBody";

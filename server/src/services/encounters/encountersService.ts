@@ -7,12 +7,12 @@ import type {
   CreateParticipantPayload,
   UpdateEncounterPayload,
   UpdateParticipantPayload,
-} from "../../../../shared/dto/session";
-import type { Ability, AbilityUsageAction, ResourcePool } from "../../../../shared/types/abilities";
-import type { InitiativeRollDTO, RollInitiativePayload } from "../../../../shared/dto/session";
-import { rollInitiative } from "../../../../shared/utils/initiative";
-import { applyAbilityUsage, applyTurnStart } from "../../../../shared/utils/abilityUsage";
-import { rollDie } from "../../../../shared/utils/dice";
+} from "@shared/dto/session";
+import type { Ability, AbilityUsageAction, ResourcePool } from "@shared/types/abilities";
+import type { InitiativeRollDTO, RollInitiativePayload } from "@shared/dto/session";
+import { rollInitiative } from "@shared/utils/initiative";
+import { applyAbilityUsage, applyTurnStart } from "@shared/utils/abilityUsage";
+import { rollDie } from "@shared/utils/dice";
 import * as encountersRepo from "./encountersRepository";
 import { mapEncounterToDTO, mapParticipantToDTO } from "./encountersMappers";
 import {

@@ -1,6 +1,6 @@
-import { incrementDeathSave } from "../../../../../../../utils/encounterParticipant";
-import DeathSavesBlock from "../../blocks/DeathSavesBlock";
-import type { EditorBodyProps } from "../../../../../../../types/components/participantCard";
+import { incrementDeathSave } from "@/utils/encounterParticipant";
+import DeathSavesBlock from "@/components/campaigns/campaign/session/participantCard/blocks/DeathSavesBlock";
+import type { EditorBodyProps } from "@/types/components/participantCard";
 
 export const DeathSavesSection = ({ draft, updateDraft, canEditOwn }: EditorBodyProps) => {
   const hasDeathSaves = draft.deathSaveSuccesses > 0 || draft.deathSaveFailures > 0;

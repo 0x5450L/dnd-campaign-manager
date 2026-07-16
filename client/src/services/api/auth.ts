@@ -1,5 +1,5 @@
 import { apiClient } from ".";
-import type { LoginResponse, MeResponse, RegisterResponse, LogoutResponse } from "../../types/auth";
+import type { LoginResponse, MeResponse, RegisterResponse, LogoutResponse } from "@/types/auth";
 
 export const register = async (email: string, password: string, name: string) => {
   return apiClient<RegisterResponse>('/api/auth/register', {

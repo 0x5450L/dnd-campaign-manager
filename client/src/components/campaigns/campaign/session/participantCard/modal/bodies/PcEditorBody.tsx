@@ -4,7 +4,7 @@ import ConditionsSection from "../sections/ConditionsSection";
 import DeathSavesSection from "../sections/DeathSavesSection";
 import SpellcastingSection from "../sections/SpellcastingSection";
 import VitalsSection from "../sections/VitalsSection";
-import type { EditorBodyProps } from "../../../../../../../types/components/participantCard";
+import type { EditorBodyProps } from "@/types/components/participantCard";
 
 export const PcEditorBody = (props: EditorBodyProps) => (
   <>

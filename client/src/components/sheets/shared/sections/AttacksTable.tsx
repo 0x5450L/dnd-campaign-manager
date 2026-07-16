@@ -1,5 +1,5 @@
-import { MIN_ATTACKS } from "../../../../constants/characterSheet";
-import { useSheet, useSheetActions } from "../../../../state/sheet";
+import { MIN_ATTACKS } from "@/constants/characterSheet";
+import { useSheet, useSheetActions } from "@/state/sheet";
 import { AddButton } from "../buttons/AddButton";
 
 export const AttacksTable = () => {

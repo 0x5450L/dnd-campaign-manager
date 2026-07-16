@@ -1,5 +1,5 @@
-import { TextBlock } from "../../shared/inputs/TextBlock";
-import { useCharacterSheet, useSheetActions } from "../../../../state/sheet";
+import { TextBlock } from "@/components/sheets/shared/inputs/TextBlock";
+import { useCharacterSheet, useSheetActions } from "@/state/sheet";
 
 export const Feats = () => {
   const feats = useCharacterSheet((s) => s.feats);

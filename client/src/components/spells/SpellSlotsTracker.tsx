@@ -2,8 +2,8 @@ import { useState } from "react";
 import {
   SPELL_SLOT_LEVELS,
   SPELL_SLOT_MAX_BY_LEVEL,
-} from "../../../../shared/constants/dnd";
-import type { SpellSlotLevel } from "../../../../shared/types/dnd";
+} from "@shared/constants/dnd";
+import type { SpellSlotLevel } from "@shared/types/dnd";
 
 type SpellSlotsTrackerProps = {
   slots: SpellSlotLevel[] | null;

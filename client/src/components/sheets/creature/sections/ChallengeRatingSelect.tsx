@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { CHALLENGE_RATINGS } from "../../../../utils/dndMath";
+import { CHALLENGE_RATINGS } from "@/utils/dndMath";
 
 type ChallengeRatingSelectProps = {
   value: number | null;

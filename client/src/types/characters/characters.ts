@@ -1,4 +1,4 @@
-import type { CharacterDTO } from "../../../../shared/dto/character";
+import type { CharacterDTO } from "@shared/dto/character";
 import type { User } from "../auth";
 
 export type {
@@ -14,7 +14,7 @@ export type {
   UpdateCharacterPayload,
   CreatureProfileDTO,
   CreatureProfileInput,
-} from "../../../../shared/dto/character";
+} from "@shared/dto/character";
 
 /** Character payload as returned by the API — DTO + optional `user` join used by the list view. */
 export type Character = CharacterDTO & {

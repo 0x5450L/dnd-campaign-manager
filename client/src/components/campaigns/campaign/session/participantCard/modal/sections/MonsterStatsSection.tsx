@@ -1,8 +1,8 @@
-import type { EditorBodyProps } from "../../../../../../../types/components/participantCard";
+import type { EditorBodyProps } from "@/types/components/participantCard";
 import {
   challengeRatingLabel,
   xpForChallengeRating,
-} from "../../../../../../../utils/dndMath";
+} from "@/utils/dndMath";
 
 const formatChallenge = (cr: number | null): string | null => {
   const label = challengeRatingLabel(cr);

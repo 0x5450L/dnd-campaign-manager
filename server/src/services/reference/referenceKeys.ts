@@ -1,4 +1,4 @@
-import type { SrdCategory, SrdQuery } from "../../../../shared/dto/srd";
+import type { SrdCategory, SrdQuery } from "@shared/dto/srd";
 
 function serializeQuery(query: SrdQuery): string {
   const filters = query.filters

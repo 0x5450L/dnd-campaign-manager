@@ -1,4 +1,4 @@
-import type { Character, CharacterType } from "../../../../types/characters/characters";
+import type { Character, CharacterType } from "@/types/characters/characters";
 
 type CharacterCardProps = {
   character: Character;

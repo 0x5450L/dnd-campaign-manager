@@ -1,10 +1,10 @@
-import { ABILITY_NAMES } from "../../../../shared/constants/dnd";
-import type { SrdCreature } from "../../../../shared/dto/srd";
+import { ABILITY_NAMES } from "@shared/constants/dnd";
+import type { SrdCreature } from "@shared/dto/srd";
 import type {
   EncounterParticipantDTO,
   ParticipantAbilityScore,
-} from "../../types/encounter";
-import type { CharacterAttackDTO } from "../../types/characters/characters";
+} from "@/types/encounter";
+import type { CharacterAttackDTO } from "@/types/characters/characters";
 import { parseCreatureAction } from "./creatureActionParser";
 import {
   creatureAbilities,

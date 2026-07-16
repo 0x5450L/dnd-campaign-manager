@@ -4,7 +4,7 @@ import type {
   CharacterSheetState,
   CreatureSheetState,
   SheetState,
-} from "../../types/characters/characterSheet";
+} from "@/types/characters/characterSheet";
 
 export const useSheetActions = (): SheetActions =>
   useSheetStore((store) => store.actions);

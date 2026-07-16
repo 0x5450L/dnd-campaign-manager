@@ -2,7 +2,7 @@ import { z } from "zod";
 import type {
   CreateSessionPayload,
   UpdateSessionPayload,
-} from "../../../shared/dto/session";
+} from "@shared/dto/session";
 
 export const createSessionSchema = z.object({
   campaignId: z.string().min(1),

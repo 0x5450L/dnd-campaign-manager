@@ -1,6 +1,6 @@
 import prisma from "../prisma";
 import { pickDefined, trimOrNull } from "../../utils/payload";
-import type { UpdateSessionPayload } from "../../../../shared/dto/session";
+import type { UpdateSessionPayload } from "@shared/dto/session";
 
 export const createSession = async (campaignId: string, title: string | undefined) => {
   const { _max } = await prisma.campaignSession.aggregate({

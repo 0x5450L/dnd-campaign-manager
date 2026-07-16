@@ -1,6 +1,6 @@
 import { NumericInput } from "../inputs/NumericInput";
-import { useSheet, useSheetActions } from "../../../../state/sheet";
-import { SHIELD_AC_BONUS } from "../../../../utils/dndMath";
+import { useSheet, useSheetActions } from "@/state/sheet";
+import { SHIELD_AC_BONUS } from "@/utils/dndMath";
 
 export const ArmorClass = () => {
   const { ac, usesShield } = useSheet((s) => ({

@@ -6,7 +6,7 @@ import { validateBody } from "../middleware/validateBody";
 import type {
   CreateSessionPayload,
   UpdateSessionPayload,
-} from "../../../shared/dto/session";
+} from "@shared/dto/session";
 import { createSessionSchema, updateSessionSchema } from "../validation/sessions";
 import * as sessionsService from "../services/sessions/sessionsService";
 

@@ -1,5 +1,5 @@
 import { apiClient } from ".";
-import type { MemberMutationResponse } from "../../types/members";
+import type { MemberMutationResponse } from "@/types/members";
 
 export const leaveCampaign = async (campaignId: string) => {
   return apiClient<MemberMutationResponse>(`/api/campaigns/${campaignId}/leave`, {

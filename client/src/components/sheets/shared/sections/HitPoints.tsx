@@ -1,5 +1,5 @@
 import { NumericInput } from "../inputs/NumericInput";
-import { useSheet, useSheetActions } from "../../../../state/sheet";
+import { useSheet, useSheetActions } from "@/state/sheet";
 
 export const HitPoints = () => {
   const { currentHp, maxHp, tempHp } = useSheet((s) => ({

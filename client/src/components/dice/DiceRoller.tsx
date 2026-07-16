@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { useDiceRollerStore } from "../../state/diceRoller/diceRollerStore";
-import { DICE_TYPES, type AdvDis, type DiceType } from "../../types/dice";
+import { useDiceRollerStore } from "@/state/diceRoller/diceRollerStore";
+import { DICE_TYPES, type AdvDis, type DiceType } from "@/types/dice";
 import DiceShape from "./DiceShape";
 import DiceResult from "./DiceResult";
 import DiceHistory from "./DiceHistory";

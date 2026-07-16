@@ -11,7 +11,7 @@ import type {
   CreateParticipantPayload,
   UpdateEncounterPayload,
   UpdateParticipantPayload,
-} from "../../../shared/dto/session";
+} from "@shared/dto/session";
 import {
   abilityUsageSchema,
   bulkCreateParticipantsSchema,

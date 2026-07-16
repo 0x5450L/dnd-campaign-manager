@@ -24,7 +24,7 @@ import type {
   ParticipantRemovedPayload,
   ParticipantUpdatedPayload,
   TurnAdvancedPayload,
-} from "../../../shared/dto/socketEvents";
+} from "@shared/dto/socketEvents";
 import {
   patchEncounterScalar,
   removeParticipant,

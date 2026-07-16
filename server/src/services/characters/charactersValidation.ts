@@ -3,7 +3,7 @@ import type {
   CharacterType,
   CreateCharacterPayload,
   CreatureProfileInput,
-} from "../../../../shared/dto/character";
+} from "@shared/dto/character";
 
 export const requireCreateCharacterFields = (body: CreateCharacterPayload) => {
   if (

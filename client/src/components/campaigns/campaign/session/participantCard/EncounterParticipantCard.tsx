@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useLiveSession } from "../../../../../hooks/useLiveSession";
-import type { EncounterParticipantDTO } from "../../../../../types/encounter";
+import { useLiveSession } from "@/hooks/useLiveSession";
+import type { EncounterParticipantDTO } from "@/types/encounter";
 import InitiativeBlock from "./blocks/InitiativeBlock";
 import ArmorClassBlock from "./blocks/ArmorClassBlock";
 import TypeBadge from "./blocks/TypeBadge";

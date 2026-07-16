@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { DiceType, RollResult, RolledTerm } from "../../types/dice";
+import type { DiceType, RollResult, RolledTerm } from "@/types/dice";
 import DiceShape from "./DiceShape";
 
 type Props = {

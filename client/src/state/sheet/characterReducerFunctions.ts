@@ -1,7 +1,7 @@
 import type {
   CharacterSheetFields,
   CharacterSheetState,
-} from "../../types/characters/characterSheet";
+} from "@/types/characters/characterSheet";
 
 export type CharacterSheetAction =
   | { type: "SET_CHARACTER_FIELD"; payload: Partial<CharacterSheetFields> }

@@ -1,6 +1,6 @@
-import { GradientInput } from "../../shared/inputs/GradientInput";
-import { useCreatureSheet, useSheetActions } from "../../../../state/sheet";
-import { xpForChallengeRating } from "../../../../utils/dndMath";
+import { GradientInput } from "@/components/sheets/shared/inputs/GradientInput";
+import { useCreatureSheet, useSheetActions } from "@/state/sheet";
+import { xpForChallengeRating } from "@/utils/dndMath";
 import { ChallengeRatingSelect } from "./ChallengeRatingSelect";
 
 export const CreatureHeader = () => {

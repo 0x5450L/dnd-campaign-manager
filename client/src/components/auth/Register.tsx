@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useRegisterMutation } from "../../queries/auth";
-import type { ApiError } from "../../services/api/errors";
+import { useRegisterMutation } from "@/queries/auth";
+import type { ApiError } from "@/services/api/errors";
 import CommonButton from "../ui/buttons/CommonButton";
 import CommonInput from "../ui/inputs/CommonInput";
 

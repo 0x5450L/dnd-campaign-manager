@@ -1,4 +1,4 @@
-import type { AbilityName } from "../../../types/characters/characterSheet";
+import type { AbilityName } from "@/types/characters/characterSheet";
 import { ArmorClass } from "../shared/sections/ArmorClass";
 import { HitPoints } from "../shared/sections/HitPoints";
 import { AbilityScore } from "../shared/sections/AbilityScore";

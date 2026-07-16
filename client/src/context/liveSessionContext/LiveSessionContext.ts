@@ -5,15 +5,15 @@ import type {
   PresenceStatus,
   SessionDiceRoll,
   SessionEvent,
-} from "../../types/session";
+} from "@/types/session";
 import type {
   AbilityUsageAction,
   CreateParticipantPayload,
   EncounterDTO,
   EncounterParticipantDTO,
   UpdateParticipantPayload,
-} from "../../types/encounter";
-import type { SessionRollInput } from "../../state/liveSession/liveSessionReducer";
+} from "@/types/encounter";
+import type { SessionRollInput } from "@/state/liveSession/liveSessionReducer";
 
 export type LiveSessionContextType = {
   session: CampaignSessionDTO | null;

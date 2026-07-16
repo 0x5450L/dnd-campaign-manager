@@ -6,7 +6,7 @@ import MonsterStatsSection from "../sections/MonsterStatsSection";
 import ResourcePoolsSection from "../sections/ResourcePoolsSection";
 import SpellcastingSection from "../sections/SpellcastingSection";
 import VitalsSection from "../sections/VitalsSection";
-import type { EditorBodyProps } from "../../../../../../../types/components/participantCard";
+import type { EditorBodyProps } from "@/types/components/participantCard";
 
 export const NpcEditorBody = (props: EditorBodyProps) => (
   <>

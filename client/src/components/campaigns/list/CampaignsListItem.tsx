@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import { useMeQuery } from "../../../queries/auth";
-import type { Campaign } from "../../../types/campaigns";
+import { useMeQuery } from "@/queries/auth";
+import type { Campaign } from "@/types/campaigns";
 
 function CampaignsListItem({ campaign }: { campaign: Campaign }) {
   const navigate = useNavigate();

@@ -1,8 +1,8 @@
-import type { CharacterAttackDTO } from "../../../../../../../types/characters/characters";
-import { formatSigned } from "../../../../../../../utils/dndMath";
-import EditableNumber from "../../blocks/EditableNumber";
+import type { CharacterAttackDTO } from "@/types/characters/characters";
+import { formatSigned } from "@/utils/dndMath";
+import EditableNumber from "@/components/campaigns/campaign/session/participantCard/blocks/EditableNumber";
 import EditableText from "../EditableText";
-import { PlusIcon, CloseIcon } from "../../blocks/icons";
+import { PlusIcon, CloseIcon } from "@/components/campaigns/campaign/session/participantCard/blocks/icons";
 
 type AttacksBlockProps = {
   attacks: CharacterAttackDTO[];

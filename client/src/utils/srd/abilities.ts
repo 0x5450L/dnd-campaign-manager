@@ -1,10 +1,10 @@
-import type { SrdCreature, SrdCreatureAction } from "../../../../shared/dto/srd";
+import type { SrdCreature, SrdCreatureAction } from "@shared/dto/srd";
 import type {
   Ability,
   AbilityActivation,
   AbilityCost,
   ResourcePool,
-} from "../../../../shared/types/abilities";
+} from "@shared/types/abilities";
 import { parseCreatureAction } from "./creatureActionParser";
 
 const TO_HIT_BONUS = /^[+-]\d+$/;

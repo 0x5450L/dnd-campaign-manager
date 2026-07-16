@@ -1,8 +1,8 @@
 import { useState } from "react";
-import CommonButton from "../../ui/buttons/CommonButton";
-import CommonInput from "../../ui/inputs/CommonInput";
-import { useCreateInviteMutation } from "../../../queries/invites";
-import type { ApiError } from "../../../services/api/errors";
+import CommonButton from "@/components/ui/buttons/CommonButton";
+import CommonInput from "@/components/ui/inputs/CommonInput";
+import { useCreateInviteMutation } from "@/queries/invites";
+import type { ApiError } from "@/services/api/errors";
 
 const PANEL_LABEL =
   "font-fantasy text-xs font-bold uppercase tracking-[0.16em] text-gold-bright";

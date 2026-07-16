@@ -3,8 +3,8 @@ import {
   getHitDiceRemaining,
   useCharacterSheet,
   useSheetActions,
-} from "../../../../state/sheet";
-import type { HitDiceType } from "../../../../types/characters/characterSheet";
+} from "@/state/sheet";
+import type { HitDiceType } from "@/types/characters/characterSheet";
 
 const DICE_OPTIONS: HitDiceType[] = ["d6", "d8", "d10", "d12"];
 

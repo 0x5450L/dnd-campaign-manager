@@ -1,7 +1,7 @@
 import MonsterEditorBody from "./bodies/MonsterEditorBody";
 import NpcEditorBody from "./bodies/NpcEditorBody";
 import PcEditorBody from "./bodies/PcEditorBody";
-import type { EditorBodyProps } from "../../../../../../types/components/participantCard";
+import type { EditorBodyProps } from "@/types/components/participantCard";
 
 export const ParticipantEditorBody = (props: EditorBodyProps) => {
   switch (props.draft.type) {

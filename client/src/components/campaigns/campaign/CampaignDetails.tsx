@@ -1,4 +1,4 @@
-import type { Campaign } from "../../../types/campaigns";
+import type { Campaign } from "@/types/campaigns";
 
 type CampaignDetailsProps = {
   campaign: Campaign;

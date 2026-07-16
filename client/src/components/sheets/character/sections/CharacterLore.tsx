@@ -1,6 +1,6 @@
-import { NumericInput } from "../../shared/inputs/NumericInput";
-import { GradientInput } from "../../shared/inputs/GradientInput";
-import { useCharacterSheet, useSheetActions } from "../../../../state/sheet";
+import { NumericInput } from "@/components/sheets/shared/inputs/NumericInput";
+import { GradientInput } from "@/components/sheets/shared/inputs/GradientInput";
+import { useCharacterSheet, useSheetActions } from "@/state/sheet";
 
 export const CharacterLore = () => {
   const { name, race, characterClass, subclass, background, level, xp } =

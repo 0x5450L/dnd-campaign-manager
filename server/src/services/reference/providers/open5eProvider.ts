@@ -1,5 +1,5 @@
-import { SRD_CATEGORY, SRD_SOURCE } from "../../../../../shared/constants/srd";
-import type { SrdCategory, SrdCondition, SrdConditionSummary, SrdListPage, SrdCreature, SrdCreatureSummary, SrdQuery, SrdSource } from "../../../../../shared/dto/srd";
+import { SRD_CATEGORY, SRD_SOURCE } from "@shared/constants/srd";
+import type { SrdCategory, SrdCondition, SrdConditionSummary, SrdListPage, SrdCreature, SrdCreatureSummary, SrdQuery, SrdSource } from "@shared/dto/srd";
 import { AbstractContentProvider } from "./abstractContentProvider";
 import {
   mapOpen5eCondition,

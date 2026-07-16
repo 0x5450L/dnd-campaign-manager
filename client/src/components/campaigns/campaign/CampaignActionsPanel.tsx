@@ -1,6 +1,6 @@
 import { useState } from "react";
-import CommonButton from "../../ui/buttons/CommonButton";
-import ConfirmDialog from "../../ui/ConfirmDialog";
+import CommonButton from "@/components/ui/buttons/CommonButton";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import CreateInvite from "./CreateInvite";
 import { useCampaignCharacters } from "./characters/controller/useCampaignCharacters";
 

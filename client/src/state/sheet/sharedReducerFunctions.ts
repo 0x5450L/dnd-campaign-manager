@@ -1,10 +1,10 @@
-import { clamp } from "../../utils/dndMath";
+import { clamp } from "@/utils/dndMath";
 import type {
   AbilityName,
   Attack,
   SharedSheetFields,
   SheetState,
-} from "../../types/characters/characterSheet";
+} from "@/types/characters/characterSheet";
 
 export type SharedSheetAction =
   | { type: "SET_SHARED_FIELD"; payload: Partial<SharedSheetFields> }

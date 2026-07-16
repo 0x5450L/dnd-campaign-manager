@@ -1,5 +1,5 @@
 import { TextBlock } from "../inputs/TextBlock";
-import { useSheet, useSheetActions } from "../../../../state/sheet";
+import { useSheet, useSheetActions } from "@/state/sheet";
 
 export const NotesBlock = () => {
   const notes = useSheet((s) => s.notes);

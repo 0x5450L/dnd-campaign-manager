@@ -1,5 +1,5 @@
-import { useSheet, useSheetActions } from "../../../../state/sheet";
-import type { SharedSheetFields } from "../../../../types/characters/characterSheet";
+import { useSheet, useSheetActions } from "@/state/sheet";
+import type { SharedSheetFields } from "@/types/characters/characterSheet";
 
 type SheetDetailField =
   | "senses"

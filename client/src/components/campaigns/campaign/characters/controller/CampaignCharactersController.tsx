@@ -1,17 +1,17 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import type { Character, CharacterType } from "../../../../../types/characters/characters";
-import type { CreatureSheetState } from "../../../../../types/characters/characterSheet";
-import type { SrdCreature } from "../../../../../../../shared/dto/srd";
-import { srdCreatureToSheetState } from "../../../../../utils/srd/creatureMapper";
-import { CharacterSheet } from "../../../../sheets/CharacterSheet";
+import type { Character, CharacterType } from "@/types/characters/characters";
+import type { CreatureSheetState } from "@/types/characters/characterSheet";
+import type { SrdCreature } from "@shared/dto/srd";
+import { srdCreatureToSheetState } from "@/utils/srd/creatureMapper";
+import { CharacterSheet } from "@/components/sheets/CharacterSheet";
 import {
   useCampaignCharactersQuery,
   useCharactersRealtimeSync,
   useDeleteCharacterMutation,
-} from "../../../../../queries/characters";
-import { useLiveSession } from "../../../../../hooks/useLiveSession";
-import { useNotificationStore } from "../../../../../state/notifications/notificationStore";
-import ConfirmDialog from "../../../../ui/ConfirmDialog";
+} from "@/queries/characters";
+import { useLiveSession } from "@/hooks/useLiveSession";
+import { useNotificationStore } from "@/state/notifications/notificationStore";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import CharactersSidebar from "../CharactersSidebar";
 import CreatureBrowser from "../CreatureBrowser";
 import { CampaignCharactersContext } from "./CampaignCharactersContext";

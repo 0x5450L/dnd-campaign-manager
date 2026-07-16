@@ -5,7 +5,7 @@ import {
   getSheetProficiencyBonus,
   useSheet,
   useSheetActions,
-} from "../../../../state/sheet";
+} from "@/state/sheet";
 
 export const CombatStats = () => {
   const {

@@ -4,9 +4,9 @@ import type {
   SessionDiceRoll,
   SessionEvent,
   SessionEventKind,
-} from "../../types/session";
-import type { RechargeRollDTO } from "../../../../shared/dto/socketEvents";
-import type { InitiativeRollDTO } from "../../../../shared/dto/session";
+} from "@/types/session";
+import type { RechargeRollDTO } from "@shared/dto/socketEvents";
+import type { InitiativeRollDTO } from "@shared/dto/session";
 
 export type LiveSessionState = {
   session: CampaignSessionDTO | null;

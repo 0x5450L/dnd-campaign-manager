@@ -1,8 +1,8 @@
 import { create } from "zustand";
 import { sheetReducer, type SheetAction } from "./sheetReducer";
 import { getHitDiceRemaining } from "./sheetDerived";
-import { createInitialCharacterSheet } from "../../constants/characterSheet";
-import { sheetStateToUpdatePayload } from "../../utils/characterSheetMapping";
+import { createInitialCharacterSheet } from "@/constants/characterSheet";
+import { sheetStateToUpdatePayload } from "@/utils/characterSheetMapping";
 import {
   calcModifier,
   clamp,
@@ -11,7 +11,7 @@ import {
   MAX_LEVEL,
   MIN_LEVEL,
   parseDiceToSidesNumber,
-} from "../../utils/dndMath";
+} from "@/utils/dndMath";
 import type {
   AbilityName,
   Attack,
@@ -20,7 +20,7 @@ import type {
   SharedSheetFields,
   SheetState,
   UseHitDieResult,
-} from "../../types/characters/characterSheet";
+} from "@/types/characters/characterSheet";
 
 export type SheetActions = {
   openSheet: (

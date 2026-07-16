@@ -13,8 +13,8 @@ import {
   formatTerms,
   parseDiceFormula,
   rollTerms,
-} from "../../utils/diceParser";
-import type { AdvDis, DiceHistoryEntry, DiceType, RollResult } from "../../types/dice";
+} from "@/utils/diceParser";
+import type { AdvDis, DiceHistoryEntry, DiceType, RollResult } from "@/types/dice";
 
 type DiceSessionSink = (result: RollResult) => void;
 

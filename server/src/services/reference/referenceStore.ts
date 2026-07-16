@@ -1,4 +1,4 @@
-import type { SrdCategory } from "../../../../shared/dto/srd";
+import type { SrdCategory } from "@shared/dto/srd";
 
 export interface ReferenceStore {
   readDetail<TDetail>(

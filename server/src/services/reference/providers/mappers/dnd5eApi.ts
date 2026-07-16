@@ -2,7 +2,7 @@ import type {
   SrdCondition,
   SrdConditionSummary,
   SrdSource,
-} from "../../../../../../shared/dto/srd";
+} from "@shared/dto/srd";
 
 export type Dnd5eListItem = {
   index: string;

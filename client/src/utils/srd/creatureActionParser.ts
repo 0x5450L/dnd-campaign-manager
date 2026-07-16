@@ -1,6 +1,6 @@
-import type { SrdCreatureAction } from "../../../../shared/dto/srd";
-import { MIN_ATTACKS } from "../../constants/characterSheet";
-import type { Attack } from "../../types/characters/characterSheet";
+import type { SrdCreatureAction } from "@shared/dto/srd";
+import { MIN_ATTACKS } from "@/constants/characterSheet";
+import type { Attack } from "@/types/characters/characterSheet";
 
 type ParsedAction = Pick<Attack, "attackBonus" | "damage" | "notes">;
 

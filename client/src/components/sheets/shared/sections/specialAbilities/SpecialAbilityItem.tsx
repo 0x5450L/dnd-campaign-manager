@@ -1,8 +1,8 @@
-import type { Ability, AbilityCost, ResourcePool } from "../../../../../types/encounter";
+import type { Ability, AbilityCost, ResourcePool } from "@/types/encounter";
 import {
   ABILITY_ACTIVATION_NAMES,
   ABILITY_ACTIVATION_ORDER,
-} from "../../../../../constants/abilities";
+} from "@/constants/abilities";
 
 type CostKind = "none" | "recharge" | "perDay" | "pool";
 

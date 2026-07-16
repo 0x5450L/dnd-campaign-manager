@@ -1,6 +1,6 @@
 import CampaignsListItem from "./CampaignsListItem";
-import { useCampaignsQuery } from "../../../queries/campaigns";
-import type { Campaign } from "../../../types/campaigns";
+import { useCampaignsQuery } from "@/queries/campaigns";
+import type { Campaign } from "@/types/campaigns";
 
 function CampaignsList() {
   const { data: campaigns, isLoading, isError, error } = useCampaignsQuery();

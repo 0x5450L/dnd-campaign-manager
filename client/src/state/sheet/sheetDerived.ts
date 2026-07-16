@@ -1,13 +1,13 @@
 import {
   calcModifier,
   getProficiencyBonus,
-} from "../../utils/dndMath";
+} from "@/utils/dndMath";
 import type {
   AbilityName,
   CharacterSheetState,
   SheetState,
   SkillDef,
-} from "../../types/characters/characterSheet";
+} from "@/types/characters/characterSheet";
 
 export const getSheetProficiencyBonus = (state: SheetState): number =>
   getProficiencyBonus(state.level);

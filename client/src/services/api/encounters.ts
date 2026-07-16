@@ -21,7 +21,7 @@ import type {
   AbilityUsagePayload,
   RollInitiativePayload,
   RollInitiativeResponse,
-} from "../../types/encounter";
+} from "@/types/encounter";
 
 export const listEncounters = async (campaignSessionId: string) => {
   return apiClient<ListEncountersResponse>(

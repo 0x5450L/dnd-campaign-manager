@@ -1,10 +1,10 @@
-import { useSheet, useSheetActions } from "../../../../../state/sheet";
-import type { Ability, ResourcePool, ResourceReset } from "../../../../../types/encounter";
+import { useSheet, useSheetActions } from "@/state/sheet";
+import type { Ability, ResourcePool, ResourceReset } from "@/types/encounter";
 import {
   RESOURCE_RESET_LABELS,
   RESOURCE_RESET_ORDER,
-} from "../../../../../constants/resources";
-import { AddButton } from "../../buttons/AddButton";
+} from "@/constants/resources";
+import { AddButton } from "@/components/sheets/shared/buttons/AddButton";
 import { SpecialAbilityItem } from "./SpecialAbilityItem";
 
 export const SpecialAbilities = () => {

@@ -2,7 +2,7 @@ import { io, type Socket } from "socket.io-client";
 import type {
   SocketClientToServerEvents,
   SocketServerToClientEvents,
-} from "../../../shared/dto/socketEvents";
+} from "@shared/dto/socketEvents";
 
 export type AppSocket = Socket<
   SocketServerToClientEvents,

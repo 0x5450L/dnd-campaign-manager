@@ -1,4 +1,4 @@
-import type { DiceType } from "../../types/dice";
+import type { DiceType } from "@/types/dice";
 
 type Props = {
   type: DiceType;

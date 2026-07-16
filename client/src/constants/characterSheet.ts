@@ -8,7 +8,7 @@ import type {
   SheetState,
   SkillDef,
 } from "../types/characters/characterSheet";
-import { SKILL_DEFINITIONS } from "../../../shared/constants/dnd";
+import { SKILL_DEFINITIONS } from "@shared/constants/dnd";
 
 export const MIN_ATTACKS = 3;
 

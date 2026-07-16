@@ -1,8 +1,8 @@
-import type { ParticipantAbilityScore } from "../../../../../../types/encounter";
+import type { ParticipantAbilityScore } from "@/types/encounter";
 import {
   formatAbilityModifier,
   formatSigned,
-} from "../../../../../../utils/dndMath";
+} from "@/utils/dndMath";
 
 type AbilityName = ParticipantAbilityScore["name"];
 

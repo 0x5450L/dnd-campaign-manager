@@ -8,22 +8,22 @@ import {
 } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { LiveSessionContext, type LiveSessionContextType } from "./LiveSessionContext";
-import { getSocket } from "../../services/socket";
+import { getSocket } from "@/services/socket";
 import {
   initialLiveSessionState,
   liveSessionReducer,
   type SessionRollInput,
-} from "../../state/liveSession/liveSessionReducer";
-import type { MemberPresence, PresenceStatus } from "../../types/session";
+} from "@/state/liveSession/liveSessionReducer";
+import type { MemberPresence, PresenceStatus } from "@/types/session";
 import type {
   AbilityUsageAction,
   CreateParticipantPayload,
   EncounterParticipantDTO,
   UpdateParticipantPayload,
-} from "../../types/encounter";
-import { useMeQuery } from "../../queries/auth";
-import { useCampaignCharactersQuery } from "../../queries/characters";
-import type { Campaign } from "../../types/campaigns";
+} from "@/types/encounter";
+import { useMeQuery } from "@/queries/auth";
+import { useCampaignCharactersQuery } from "@/queries/characters";
+import type { Campaign } from "@/types/campaigns";
 import {
   encounterKeys,
   useAbilityUsageMutation,
@@ -34,15 +34,15 @@ import {
   useEncounterRealtimeSync,
   useRemoveParticipantMutation,
   useUpdateParticipantMutation,
-} from "../../queries/encounters";
-import { createEncounter, updateEncounter } from "../../services/api/encounters";
+} from "@/queries/encounters";
+import { createEncounter, updateEncounter } from "@/services/api/encounters";
 import {
   applyDamage,
   applyHealing,
   applyTempHp,
   incrementDeathSave,
   toggleConditionInList,
-} from "../../utils/encounterParticipant";
+} from "@/utils/encounterParticipant";
 import type {
   InitiativeUpdatedPayload,
   PresenceChangedPayload,
@@ -50,7 +50,7 @@ import type {
   TurnAdvancedPayload,
   SessionEndedPayload,
   SessionStartedPayload,
-} from "../../../../shared/dto/socketEvents";
+} from "@shared/dto/socketEvents";
 
 type Props = {
   campaign: Campaign;

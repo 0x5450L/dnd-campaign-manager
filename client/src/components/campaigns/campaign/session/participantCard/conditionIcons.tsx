@@ -1,5 +1,5 @@
 import type { ComponentType } from "react";
-import type { ConditionName } from "../../../../../types/conditions";
+import type { ConditionName } from "@/types/conditions";
 
 type IconProps = {
   className?: string;

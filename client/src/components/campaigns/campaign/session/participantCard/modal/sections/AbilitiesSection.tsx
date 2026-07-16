@@ -1,11 +1,11 @@
-import type { Ability, AbilityCost, ResourcePool } from "../../../../../../../types/encounter";
+import type { Ability, AbilityCost, ResourcePool } from "@/types/encounter";
 import {
   ABILITY_ACTIVATION_LABELS,
   ABILITY_ACTIVATION_ORDER,
-} from "../../../../../../../constants/abilities";
-import type { EditorBodyProps } from "../../../../../../../types/components/participantCard";
-import { useLiveSession } from "../../../../../../../hooks/useLiveSession";
-import { canApplyAbilityUsage } from "../../../../../../../../../shared/utils/abilityUsage";
+} from "@/constants/abilities";
+import type { EditorBodyProps } from "@/types/components/participantCard";
+import { useLiveSession } from "@/hooks/useLiveSession";
+import { canApplyAbilityUsage } from "@shared/utils/abilityUsage";
 
 const costBadge = (cost: AbilityCost | null, pools: ResourcePool[] | null): string | null => {
   if (!cost) return null;

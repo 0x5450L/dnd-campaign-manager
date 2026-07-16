@@ -1,5 +1,5 @@
 import { SpecialAbilities } from "../shared/sections/specialAbilities/SpecialAbilities";
-import type { AbilityName } from "../../../types/characters/characterSheet";
+import type { AbilityName } from "@/types/characters/characterSheet";
 import { CharacterLore } from "./sections/CharacterLore";
 import { ArmorClass } from "../shared/sections/ArmorClass";
 import { HitPoints } from "../shared/sections/HitPoints";

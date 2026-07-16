@@ -1,5 +1,5 @@
 import { apiClient } from ".";
-import type { CreateInviteResponse, GetInviteByTokenResponse, GetInvitesResponse, RespondToInviteResponse } from "../../types/invites";
+import type { CreateInviteResponse, GetInviteByTokenResponse, GetInvitesResponse, RespondToInviteResponse } from "@/types/invites";
 
 export const createInvite = async (campaignId: string, email?: string,) => {
   return apiClient<CreateInviteResponse>('/api/invites/create', {

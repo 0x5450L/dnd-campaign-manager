@@ -1,5 +1,5 @@
-import { useCharacterSheet, useSheetActions } from "../../../../state/sheet";
-import { SpellSlotsTracker } from "../../../spells/SpellSlotsTracker";
+import { useCharacterSheet, useSheetActions } from "@/state/sheet";
+import { SpellSlotsTracker } from "@/components/spells/SpellSlotsTracker";
 
 export const SpellSlots = () => {
   const spellSlots = useCharacterSheet((s) => s.spellSlots);

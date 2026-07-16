@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { useIsMobile } from "../../hooks/useMediaQuery";
+import { useIsMobile } from "@/hooks/useMediaQuery";
 import { MobileCharacterSheet } from "./character/MobileCharacterSheet";
 import { DesktopCharacterSheet } from "./character/DesktopCharacterSheet";
 import { MobileCreatureSheet } from "./creature/MobileCreatureSheet";
@@ -8,21 +8,21 @@ import {
   useActiveSheetId,
   useSheetActions,
   useSheetStore,
-} from "../../state/sheet";
-import { createInitialSheetState } from "../../constants/characterSheet";
-import type { SheetState } from "../../types/characters/characterSheet";
-import type { CharacterType } from "../../types/characters/characters";
+} from "@/state/sheet";
+import { createInitialSheetState } from "@/constants/characterSheet";
+import type { SheetState } from "@/types/characters/characterSheet";
+import type { CharacterType } from "@/types/characters/characters";
 import {
   useCharacterQuery,
   useCreateCharacterMutation,
   useUpdateCharacterMutation,
-} from "../../queries/characters";
+} from "@/queries/characters";
 import {
   dtoToSheetState,
   sheetKindFromCharacterType,
   sheetStateToCreatePayload,
   sheetStateToUpdatePayload,
-} from "../../utils/characterSheetMapping";
+} from "@/utils/characterSheetMapping";
 import { StatusChip, type StatusChipState } from "../ui/StatusChip";
 
 const DRAFT_SHEET_ID = "draft";

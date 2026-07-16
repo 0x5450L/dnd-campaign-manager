@@ -3,7 +3,7 @@ import {
   requireCampaignAccess,
   requireCampaignDM,
 } from "../../utils/accessControl";
-import type { UpdateSessionPayload } from "../../../../shared/dto/session";
+import type { UpdateSessionPayload } from "@shared/dto/session";
 import * as sessionsRepo from "./sessionsRepository";
 import { requireCampaignId } from "./sessionsValidation";
 

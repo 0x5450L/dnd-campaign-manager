@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import { Outlet, useNavigate, useParams } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
-import { useSSE } from "../../hooks/useSSE";
-import { campaignKeys } from "../../queries/campaigns";
-import type { Campaign } from "../../types/campaigns";
+import { useSSE } from "@/hooks/useSSE";
+import { campaignKeys } from "@/queries/campaigns";
+import type { Campaign } from "@/types/campaigns";
 
 export const CampaignsRealtimeSync = () => {
   const { subscribe } = useSSE();

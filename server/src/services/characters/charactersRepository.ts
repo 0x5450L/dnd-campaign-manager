@@ -10,7 +10,7 @@ import type {
   CreateCharacterPayload,
   CreatureProfileInput,
   UpdateCharacterPayload,
-} from "../../../../shared/dto/character";
+} from "@shared/dto/character";
 
 const characterSheetInclude = {
   abilityScores: true,

@@ -1,4 +1,4 @@
-import { useSheet } from "../../../../state/sheet";
+import { useSheet } from "@/state/sheet";
 
 type MobileHeaderProps = {
   onClose: () => void;

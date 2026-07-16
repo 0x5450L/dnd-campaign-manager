@@ -2,9 +2,9 @@ import { getIo } from "../socket";
 import type {
   EncounterDTO,
   EncounterParticipantDTO,
-} from "../../../../shared/dto/session";
-import type { RechargeRollDTO } from "../../../../shared/dto/socketEvents";
-import type { InitiativeRollDTO } from "../../../../shared/dto/session";
+} from "@shared/dto/session";
+import type { RechargeRollDTO } from "@shared/dto/socketEvents";
+import type { InitiativeRollDTO } from "@shared/dto/session";
 
 export const broadcastEncounterUpdated = async (
   campaignId: string,

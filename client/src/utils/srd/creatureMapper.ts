@@ -2,15 +2,15 @@ import { creatureAbilities, creatureResourcePools } from "./abilities";
 import {
   ABILITY_NAMES,
   SKILL_DEFINITIONS,
-} from "../../../../shared/constants/dnd";
-import type { AbilityName } from "../../../../shared/types/dnd";
-import type { SrdCreature } from "../../../../shared/dto/srd";
+} from "@shared/constants/dnd";
+import type { AbilityName } from "@shared/types/dnd";
+import type { SrdCreature } from "@shared/dto/srd";
 import type {
   AbilityState,
   CreatureSheetState,
   SkillDef,
-} from "../../types/characters/characterSheet";
-import { createInitialCreatureSheet } from "../../constants/characterSheet";
+} from "@/types/characters/characterSheet";
+import { createInitialCreatureSheet } from "@/constants/characterSheet";
 import { splitCreatureActions } from "./creatureActionParser";
 import { buildNotes } from "./creatureNotesFormatter";
 

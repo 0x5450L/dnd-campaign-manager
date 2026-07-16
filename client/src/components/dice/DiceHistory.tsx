@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { useDiceRollerStore } from "../../state/diceRoller/diceRollerStore";
-import type { DiceHistoryEntry } from "../../types/dice";
-import { formatRollExpression } from "../../utils/diceFormat";
+import { useDiceRollerStore } from "@/state/diceRoller/diceRollerStore";
+import type { DiceHistoryEntry } from "@/types/dice";
+import { formatRollExpression } from "@/utils/diceFormat";
 
 export const DiceHistory = () => {
   const history = useDiceRollerStore((s) => s.history);

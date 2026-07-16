@@ -1,8 +1,8 @@
-import { calcModifier, formatSigned, SPELL_SAVE_DC_BASE } from "../../../../../../../utils/dndMath";
-import { SpellSlotsTracker } from "../../../../../../spells/SpellSlotsTracker";
+import { calcModifier, formatSigned, SPELL_SAVE_DC_BASE } from "@/utils/dndMath";
+import { SpellSlotsTracker } from "@/components/spells/SpellSlotsTracker";
 import SpellAbilitySelect from "../fields/SpellAbilitySelect";
 import StatInput from "../fields/StatInput";
-import type { EditorBodyProps } from "../../../../../../../types/components/participantCard";
+import type { EditorBodyProps } from "@/types/components/participantCard";
 
 export const SpellcastingSection = ({ draft, updateDraft, canEditOwn }: EditorBodyProps) => {
   const spellScore = draft.spellAbility

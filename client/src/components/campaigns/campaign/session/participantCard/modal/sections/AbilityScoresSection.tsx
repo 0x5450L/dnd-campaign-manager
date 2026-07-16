@@ -1,6 +1,6 @@
-import type { ParticipantAbilityScore } from "../../../../../../../types/encounter";
+import type { ParticipantAbilityScore } from "@/types/encounter";
 import AbilityScoresStrip from "../fields/AbilityScoresStrip";
-import type { EditorBodyProps } from "../../../../../../../types/components/participantCard";
+import type { EditorBodyProps } from "@/types/components/participantCard";
 
 type AbilityName = ParticipantAbilityScore["name"];
 

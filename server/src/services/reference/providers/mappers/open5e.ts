@@ -1,4 +1,4 @@
-import type { AbilityName } from "../../../../../../shared/types/dnd";
+import type { AbilityName } from "@shared/types/dnd";
 import type {
   SrdCondition,
   SrdConditionSummary,
@@ -6,7 +6,7 @@ import type {
   SrdCreatureAction,
   SrdCreatureSummary,
   SrdSource,
-} from "../../../../../../shared/dto/srd";
+} from "@shared/dto/srd";
 
 export type Open5eConditionResult = {
   slug: string;

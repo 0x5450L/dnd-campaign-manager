@@ -1,4 +1,4 @@
-import type { EditorBodyProps } from "../../../../../../../types/components/participantCard";
+import type { EditorBodyProps } from "@/types/components/participantCard";
 
 export const ResourcePoolsSection = ({ draft }: EditorBodyProps) => {
   const pools = draft.resources ?? [];

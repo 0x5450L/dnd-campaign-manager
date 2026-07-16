@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import type { SrdCreature } from "../../../../../../shared/dto/srd";
-import { useSrdCreatureFetcher, useSrdCreatureSearchQuery } from "../../../../queries/srd";
+import type { SrdCreature } from "@shared/dto/srd";
+import { useSrdCreatureFetcher, useSrdCreatureSearchQuery } from "@/queries/srd";
 
 type CreatureBrowserProps = {
   isOpen: boolean;

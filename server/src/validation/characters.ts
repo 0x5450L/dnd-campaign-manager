@@ -2,7 +2,7 @@ import { z } from "zod";
 import type {
   CreateCharacterPayload,
   UpdateCharacterPayload,
-} from "../../../shared/dto/character";
+} from "@shared/dto/character";
 import {
   abilityNameSchema,
   abilitySchema,

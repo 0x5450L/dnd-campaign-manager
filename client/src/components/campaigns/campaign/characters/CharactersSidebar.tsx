@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
-import type { Character } from "../../../../types/characters/characters";
-import CommonButton from "../../../ui/buttons/CommonButton";
+import type { Character } from "@/types/characters/characters";
+import CommonButton from "@/components/ui/buttons/CommonButton";
 import CharacterCard from "./CharacterCard";
 import CharactersEmptyState from "./CharactersEmptyState";
 

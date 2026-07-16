@@ -1,7 +1,7 @@
-import type { ParticipantAbilityScore } from "../../../../../../../types/encounter";
-import { ABILITY_NAMES } from "../../../../../../../constants/dnd";
-import { formatAbilityModifier } from "../../../../../../../utils/dndMath";
-import EditableNumber from "../../blocks/EditableNumber";
+import type { ParticipantAbilityScore } from "@/types/encounter";
+import { ABILITY_NAMES } from "@/constants/dnd";
+import { formatAbilityModifier } from "@/utils/dndMath";
+import EditableNumber from "@/components/campaigns/campaign/session/participantCard/blocks/EditableNumber";
 
 type AbilityScoresStripProps = {
   scores: ParticipantAbilityScore[] | null;

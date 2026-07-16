@@ -1,7 +1,7 @@
 import { useState } from "react";
-import type { ApiError } from "../../services/api/errors";
-import { useCreateCampaignMutation } from "../../queries/campaigns";
-import { useMeQuery } from "../../queries/auth";
+import type { ApiError } from "@/services/api/errors";
+import { useCreateCampaignMutation } from "@/queries/campaigns";
+import { useMeQuery } from "@/queries/auth";
 import CommonButton from "../ui/buttons/CommonButton";
 import CommonInput from "../ui/inputs/CommonInput";
 
