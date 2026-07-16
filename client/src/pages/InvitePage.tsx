@@ -1,16 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useMeQuery } from "../queries/auth";
-import { respondToInvite } from "../services/api/invites";
+import { useRespondToInviteMutation } from "../queries/invites";
 import type { ApiError } from "../services/api/errors";
 
 function InvitePage() {
   const { token } = useParams();
-  const { data: user } = useMeQuery();
+  const { data: user, isLoading: isUserLoading } = useMeQuery();
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const respondToInvite = useRespondToInviteMutation();
+  const hasResponded = useRef(false);
+
+  const { mutate: respond } = respondToInvite;
 
   useEffect(() => {
     if (!token) {
@@ -18,26 +19,32 @@ function InvitePage() {
       return;
     }
 
+    if (isUserLoading) return;
+
     if (!user) {
       navigate("/auth?redirect=/invite/" + token);
       return;
     }
 
-    respondToInvite(token as string, "accept")
-      .then(() => {
-        setSuccess("Invite accepted successfully");
-      })
-      .catch((error: ApiError) => {
-        setError(error.data.error.message);
-        console.error(error.data.error.message);
-      })
-      .finally(async () => {
-        setIsLoading(false);
-        setTimeout(() => {
-          navigate("/campaigns", { replace: true });
-        }, 1000);
-      });
-  }, [token]);
+    if (hasResponded.current) return;
+    hasResponded.current = true;
+
+    respond(
+      { token, action: "accept" },
+      {
+        onSettled: () => {
+          setTimeout(() => {
+            navigate("/campaigns", { replace: true });
+          }, 1000);
+        },
+      },
+    );
+  }, [token, user, isUserLoading, navigate, respond]);
+
+  const isLoading = respondToInvite.isPending || respondToInvite.isIdle;
+  const error = respondToInvite.isError
+    ? (respondToInvite.error as ApiError).data.error.message
+    : null;
 
   return (
     <div className="flex items-center justify-center h-[calc(100vh-53px)]">
@@ -45,8 +52,12 @@ function InvitePage() {
         <h1 className="text-3xl font-bold text-gold">Invite</h1>
 
         {isLoading && <p className="text-sm text-dim">Loading...</p>}
-        {success && <p className="text-sm text-leaf">{success}</p>}
-        {!success && error && <p className="text-sm text-rust">{error}</p>}
+        {respondToInvite.isSuccess && (
+          <p className="text-sm text-leaf">Invite accepted successfully</p>
+        )}
+        {!respondToInvite.isSuccess && error && (
+          <p className="text-sm text-rust">{error}</p>
+        )}
       </div>
     </div>
   );

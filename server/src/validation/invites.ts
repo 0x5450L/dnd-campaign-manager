@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const createInviteSchema = z.object({
-  email: z.string().email(),
+  email: z.string().email().optional(),
   campaignId: z.string().min(1),
 });
 

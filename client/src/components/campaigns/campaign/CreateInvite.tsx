@@ -1,37 +1,38 @@
 import { useState } from "react";
 import CommonButton from "../../ui/buttons/CommonButton";
 import CommonInput from "../../ui/inputs/CommonInput";
-import { createInvite } from "../../../services/api/invites";
+import { useCreateInviteMutation } from "../../../queries/invites";
 import type { ApiError } from "../../../services/api/errors";
 
 const PANEL_LABEL =
   "font-fantasy text-xs font-bold uppercase tracking-[0.16em] text-gold-bright";
 
 export default function CreateInvite({ campaignId }: { campaignId: string }) {
+  const linkInvite = useCreateInviteMutation();
+  const emailInvite = useCreateInviteMutation();
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState<string | null>(null);
   const [emailSuccess, setEmailSuccess] = useState<string | null>(null);
   const [linkButtonText, setLinkButtonText] = useState("Get invite link");
-  const [linkLoading, setLinkLoading] = useState(false);
-  const [emailLoading, setEmailLoading] = useState(false);
 
   const handleGetLink = () => {
-    setLinkLoading(true);
     setLinkButtonText("Generating...");
-
-    createInvite(campaignId)
-      .then((data) => {
-        const link = `${window.location.origin}/invite/${data.response.token}`;
-        navigator.clipboard.writeText(link);
-        setLinkButtonText("Copied!");
-        setTimeout(() => setLinkButtonText("Get invite link"), 2000);
-      })
-      .catch((error: ApiError) => {
-        console.error(error.data.error.message);
-        setLinkButtonText("Error!");
-        setTimeout(() => setLinkButtonText("Get invite link"), 2000);
-      })
-      .finally(() => setLinkLoading(false));
+    linkInvite.mutate(
+      { campaignId },
+      {
+        onSuccess: (data) => {
+          const link = `${window.location.origin}/invite/${data.response.token}`;
+          navigator.clipboard.writeText(link);
+          setLinkButtonText("Copied!");
+          setTimeout(() => setLinkButtonText("Get invite link"), 2000);
+        },
+        onError: (error) => {
+          console.error((error as ApiError).data.error.message);
+          setLinkButtonText("Error!");
+          setTimeout(() => setLinkButtonText("Get invite link"), 2000);
+        },
+      },
+    );
   };
 
   const handleSendInvite = () => {
@@ -45,19 +46,20 @@ export default function CreateInvite({ campaignId }: { campaignId: string }) {
     }
     setEmailError(null);
     setEmailSuccess(null);
-    setEmailLoading(true);
 
-    createInvite(campaignId, email)
-      .then(() => {
-        setEmailSuccess("Invite sent!");
-        setEmail("");
-        setTimeout(() => setEmailSuccess(null), 3000);
-      })
-      .catch((error: ApiError) => {
-        setEmailError(error.data.error.message);
-        console.error(error.data.error.message);
-      })
-      .finally(() => setEmailLoading(false));
+    emailInvite.mutate(
+      { campaignId, email },
+      {
+        onSuccess: () => {
+          setEmailSuccess("Invite sent!");
+          setEmail("");
+          setTimeout(() => setEmailSuccess(null), 3000);
+        },
+        onError: (error) => {
+          setEmailError((error as ApiError).data.error.message);
+        },
+      },
+    );
   };
 
   return (
@@ -65,16 +67,16 @@ export default function CreateInvite({ campaignId }: { campaignId: string }) {
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span className={PANEL_LABEL}>Invite players</span>
         <div className="flex flex-wrap items-center gap-2">
-          <CommonButton onClick={handleGetLink} size="sm" disabled={linkLoading}>
+          <CommonButton onClick={handleGetLink} size="sm" disabled={linkInvite.isPending}>
             {linkButtonText}
           </CommonButton>
           <CommonButton
             onClick={handleSendInvite}
             variant="accept"
             size="sm"
-            disabled={emailLoading}
+            disabled={emailInvite.isPending}
           >
-            {emailLoading ? "Sending..." : "Send invite"}
+            {emailInvite.isPending ? "Sending..." : "Send invite"}
           </CommonButton>
         </div>
       </div>

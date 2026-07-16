@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getMyInvites, respondToInvite } from "../services/api/invites";
+import { createInvite, getMyInvites, respondToInvite } from "../services/api/invites";
 import type { Invite } from "../types/invites";
 import { useMeQuery } from "./auth";
 import { useSSE } from "../hooks/useSSE";
@@ -18,6 +18,12 @@ export const useMyInvitesQuery = () => {
     enabled: !!user,
   });
 };
+
+export const useCreateInviteMutation = () =>
+  useMutation({
+    mutationFn: (vars: { campaignId: string; email?: string }) =>
+      createInvite(vars.campaignId, vars.email),
+  });
 
 export const useRespondToInviteMutation = () => {
   const queryClient = useQueryClient();

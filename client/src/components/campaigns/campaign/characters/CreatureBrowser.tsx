@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import type { SrdCreature } from "../../../../../../shared/dto/srd";
-import { useSrdCreatureSearchQuery } from "../../../../queries/srd";
-import { getSrdCreature } from "../../../../services/api/srd";
+import { useSrdCreatureFetcher, useSrdCreatureSearchQuery } from "../../../../queries/srd";
 
 type CreatureBrowserProps = {
   isOpen: boolean;
@@ -27,12 +26,13 @@ function CreatureBrowser({ isOpen, onClose, onSelectCreature }: CreatureBrowserP
   }, [term]);
 
   const { data, isFetching, isError } = useSrdCreatureSearchQuery(debounced);
+  const fetchCreature = useSrdCreatureFetcher();
   const results = data?.results ?? [];
 
   const handleSelect = async (slug: string) => {
     setLoadingSlug(slug);
     try {
-      const creature = await getSrdCreature(slug);
+      const creature = await fetchCreature(slug);
       onSelectCreature(creature);
     } catch (error) {
       console.error("Failed to load creature:", error);

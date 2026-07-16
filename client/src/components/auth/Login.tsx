@@ -1,12 +1,11 @@
-import { useAuthActions } from "../../queries/auth";
-import { login } from "../../services/api/auth";
 import { useState } from "react";
+import { useLoginMutation } from "../../queries/auth";
 import type { ApiError } from "../../services/api/errors";
 import CommonButton from "../ui/buttons/CommonButton";
 import CommonInput from "../ui/inputs/CommonInput";
 
 function Login({ handleRedirect }: { handleRedirect: () => void }) {
-  const { setAuth } = useAuthActions();
+  const loginMutation = useLoginMutation();
   const [loginError, setLoginError] = useState<string | null>(null);
 
   const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
@@ -18,15 +17,17 @@ function Login({ handleRedirect }: { handleRedirect: () => void }) {
       setLoginError("Email and password are required");
       return;
     }
-    login(email, password)
-      .then((data) => {
-        setAuth(data.user, data.token);
-        handleRedirect();
-      })
-      .catch((error: ApiError) => {
-        setLoginError(error.data.error.message);
-        console.error(error.data.error.message);
-      });
+    loginMutation.mutate(
+      { email, password },
+      {
+        onSuccess: () => {
+          handleRedirect();
+        },
+        onError: (error) => {
+          setLoginError((error as ApiError).data.error.message);
+        },
+      },
+    );
   };
   return (
     <div className="flex flex-col items-center gap-4 bg-surface/50 p-8 rounded-xl border border-rule w-80">
@@ -34,7 +35,9 @@ function Login({ handleRedirect }: { handleRedirect: () => void }) {
       <form onSubmit={handleSubmit} className="flex flex-col gap-3 w-full">
         <CommonInput type="email" name="email" placeholder="Email" variant="boxed" />
         <CommonInput type="password" name="password" placeholder="Password" variant="boxed" />
-        <CommonButton type="submit">Login</CommonButton>
+        <CommonButton type="submit" disabled={loginMutation.isPending}>
+          {loginMutation.isPending ? "Logging in..." : "Login"}
+        </CommonButton>
         {loginError && <p className="text-rust text-sm">{loginError}</p>}
       </form>
     </div>

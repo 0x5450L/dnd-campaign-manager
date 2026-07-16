@@ -1,12 +1,11 @@
 import { useState } from "react";
-import { useAuthActions } from "../../queries/auth";
-import { register } from "../../services/api/auth";
+import { useRegisterMutation } from "../../queries/auth";
 import type { ApiError } from "../../services/api/errors";
 import CommonButton from "../ui/buttons/CommonButton";
 import CommonInput from "../ui/inputs/CommonInput";
 
 function Register({ handleRedirect }: { handleRedirect: () => void }) {
-  const { setAuth } = useAuthActions();
+  const registerMutation = useRegisterMutation();
   const [registerError, setRegisterError] = useState<string | null>(null);
 
   const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
@@ -19,16 +18,18 @@ function Register({ handleRedirect }: { handleRedirect: () => void }) {
       setRegisterError("Email, password and name are required");
       return;
     }
-    
-    register(email, password, name)
-      .then((data) => {
-        setAuth(data.user, data.token);
-        handleRedirect();
-      })
-      .catch((error: ApiError) => {
-        setRegisterError(error.data.error.message);
-        console.error(error.data.error.message);
-      });
+
+    registerMutation.mutate(
+      { email, password, name },
+      {
+        onSuccess: () => {
+          handleRedirect();
+        },
+        onError: (error) => {
+          setRegisterError((error as ApiError).data.error.message);
+        },
+      },
+    );
   };
   return (
     <div className="flex flex-col items-center gap-4 bg-surface/50 p-8 rounded-xl border border-rule w-80">
@@ -37,7 +38,9 @@ function Register({ handleRedirect }: { handleRedirect: () => void }) {
         <CommonInput type="email" name="email" placeholder="Email" variant="boxed" />
         <CommonInput type="password" name="password" placeholder="Password" variant="boxed" />
         <CommonInput type="text" name="name" placeholder="Name" variant="boxed" />
-        <CommonButton type="submit">Register</CommonButton>
+        <CommonButton type="submit" disabled={registerMutation.isPending}>
+          {registerMutation.isPending ? "Registering..." : "Register"}
+        </CommonButton>
         {registerError && <p className="text-rust text-sm">{registerError}</p>}
       </form>
     </div>
