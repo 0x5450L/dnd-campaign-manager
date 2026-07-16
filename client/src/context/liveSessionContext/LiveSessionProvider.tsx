@@ -2,17 +2,12 @@ import {
   useCallback,
   useEffect,
   useMemo,
-  useReducer,
-  useRef,
   type ReactNode,
 } from "react";
 import { LiveSessionContext, type LiveSessionContextType } from "./LiveSessionContext";
 import { getSocket } from "@/services/socket";
-import {
-  initialLiveSessionState,
-  liveSessionReducer,
-  type SessionRollInput,
-} from "@/state/liveSession/liveSessionReducer";
+import type { SessionRollInput } from "@/state/liveSession/liveSessionReducer";
+import { useLiveSessionStore } from "@/state/liveSession/liveSessionStore";
 import type { MemberPresence, PresenceStatus } from "@/types/session";
 import type {
   AbilityUsageAction,
@@ -42,15 +37,6 @@ import {
   incrementDeathSave,
   toggleConditionInList,
 } from "@/utils/encounterParticipant";
-import type {
-  InitiativeUpdatedPayload,
-  PresenceChangedPayload,
-  RollLoggedPayload,
-  TurnAdvancedPayload,
-  SessionEndedPayload,
-  SessionStartedPayload,
-} from "@shared/dto/socketEvents";
-
 type Props = {
   campaign: Campaign;
   children: ReactNode;
@@ -68,9 +54,13 @@ const presenceFromUserIds = (
 };
 
 export const LiveSessionProvider = ({ campaign, children }: Props) => {
-  const [state, dispatch] = useReducer(liveSessionReducer, initialLiveSessionState);
+  const session = useLiveSessionStore((s) => s.session);
+  const connectedUserIds = useLiveSessionStore((s) => s.connectedUserIds);
+  const events = useLiveSessionStore((s) => s.events);
+  const rolls = useLiveSessionStore((s) => s.rolls);
+  const setActiveCampaign = useLiveSessionStore((s) => s.setActiveCampaign);
 
-  const sessionId = state.session?.id;
+  const sessionId = session?.id;
   const encounterQuery = useActiveEncounterQuery(sessionId);
   const encounter = encounterQuery.data ?? null;
   const participants = useMemo(() => encounter?.participants ?? [], [encounter]);
@@ -102,84 +92,14 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
   const { mutate: mutateCreateEncounter } = useCreateEncounterMutation(sessionId);
   const { mutate: mutateUpdateEncounter } = useUpdateEncounterMutation(sessionId);
 
-  const campaignRef = useRef(campaign);
   useEffect(() => {
-    campaignRef.current = campaign;
-  }, [campaign]);
+    setActiveCampaign(campaign.id);
+  }, [campaign.id, setActiveCampaign]);
 
-  useEffect(() => {
-    const socket = getSocket();
-
-    const join = () => {
-      socket.emit("campaign:join", campaign.id, (response) => {
-        if (!response.ok) {
-          console.error(`campaign:join failed: ${response.errorCode}`);
-          return;
-        }
-        if (response.activeSession) {
-          dispatch({ type: "HYDRATE_SESSION", session: response.activeSession });
-        }
-      });
-    };
-
-    join();
-    socket.on("connect", join);
-
-    const handleRollLogged = (payload: RollLoggedPayload) => {
-      if (payload.campaignId !== campaign.id) return;
-      dispatch({ type: "ROLL_LOGGED", roll: payload.roll });
-    };
-
-    const handleSessionStarted = (payload: SessionStartedPayload) => {
-      if (payload.campaignId !== campaign.id) return;
-      dispatch({ type: "START_SESSION", session: payload.session });
-    };
-
-    const handleSessionEnded = (payload: SessionEndedPayload) => {
-      if (payload.campaignId !== campaign.id) return;
-      dispatch({ type: "END_SESSION" });
-    };
-
-    const handlePresenceChanged = (payload: PresenceChangedPayload) => {
-      if (payload.campaignId !== campaign.id) return;
-      dispatch({
-        type: "REPLACE_PRESENCE",
-        presence: presenceFromUserIds(campaignRef.current, payload.userIds),
-      });
-    };
-
-    const handleInitiativeRolls = (payload: InitiativeUpdatedPayload) => {
-      if (payload.campaignId !== campaign.id || !payload.rolls?.length) return;
-      dispatch({ type: "INITIATIVE_ROLLED", rolls: payload.rolls });
-    };
-
-    const handleTurnAdvanced = (payload: TurnAdvancedPayload) => {
-      if (payload.campaignId !== campaign.id) return;
-      dispatch({
-        type: "TURN_ADVANCED",
-        participantName: payload.participant?.name ?? null,
-        rechargeRolls: payload.rechargeRolls,
-      });
-    };
-
-    socket.on("initiative_updated", handleInitiativeRolls);
-    socket.on("turn_advanced", handleTurnAdvanced);
-    socket.on("roll_logged", handleRollLogged);
-    socket.on("session_started", handleSessionStarted);
-    socket.on("session_ended", handleSessionEnded);
-    socket.on("presence_changed", handlePresenceChanged);
-
-    return () => {
-      socket.off("connect", join);
-      socket.off("initiative_updated", handleInitiativeRolls);
-      socket.off("turn_advanced", handleTurnAdvanced);
-      socket.off("roll_logged", handleRollLogged);
-      socket.off("session_started", handleSessionStarted);
-      socket.off("session_ended", handleSessionEnded);
-      socket.off("presence_changed", handlePresenceChanged);
-      socket.emit("campaign:leave", campaign.id);
-    };
-  }, [campaign.id]);
+  const presence = useMemo(
+    () => presenceFromUserIds(campaign, connectedUserIds),
+    [campaign, connectedUserIds],
+  );
 
   const startSession = useCallback(() => {
     getSocket().emit("session:start", { campaignId: campaign.id }, (response) => {
@@ -365,8 +285,8 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
 
   const presenceFor = useCallback(
     (userId: string): PresenceStatus =>
-      state.presence.find((p) => p.userId === userId)?.status ?? "offline",
-    [state.presence],
+      presence.find((p) => p.userId === userId)?.status ?? "offline",
+    [presence],
   );
 
   const activeParticipant = useMemo(() => {
@@ -375,18 +295,18 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
   }, [encounter, participants]);
 
   const connectedCount = useMemo(
-    () => state.presence.filter((p) => p.status === "connected").length,
-    [state.presence],
+    () => presence.filter((p) => p.status === "connected").length,
+    [presence],
   );
 
   const value = useMemo<LiveSessionContextType>(
     () => ({
-      session: state.session,
+      session,
       encounter,
       participants,
-      presence: state.presence,
-      events: state.events,
-      rolls: state.rolls,
+      presence,
+      events,
+      rolls,
 
       presenceFor,
       isOwnParticipant,
@@ -415,10 +335,10 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
       logRoll,
     }),
     [
-      state.session,
-      state.presence,
-      state.events,
-      state.rolls,
+      session,
+      presence,
+      events,
+      rolls,
       encounter,
       participants,
       presenceFor,

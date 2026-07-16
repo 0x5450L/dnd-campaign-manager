@@ -1,6 +1,5 @@
 import type {
   CampaignSessionDTO,
-  MemberPresence,
   SessionDiceRoll,
   SessionEvent,
   SessionEventKind,
@@ -10,7 +9,7 @@ import type { InitiativeRollDTO } from "@shared/dto/session";
 
 export type LiveSessionState = {
   session: CampaignSessionDTO | null;
-  presence: MemberPresence[];
+  connectedUserIds: string[];
   events: SessionEvent[];
   rolls: SessionDiceRoll[];
 };
@@ -21,7 +20,8 @@ export type LiveSessionAction =
   | { type: "START_SESSION"; session: CampaignSessionDTO }
   | { type: "HYDRATE_SESSION"; session: CampaignSessionDTO }
   | { type: "END_SESSION" }
-  | { type: "REPLACE_PRESENCE"; presence: MemberPresence[] }
+  | { type: "RESET" }
+  | { type: "REPLACE_PRESENCE"; userIds: string[] }
   | { type: "ROLL_LOGGED"; roll: SessionDiceRoll }
   | {
       type: "TURN_ADVANCED";
@@ -35,7 +35,7 @@ export const ROLL_LIMIT = 30;
 
 export const initialLiveSessionState: LiveSessionState = {
   session: null,
-  presence: [],
+  connectedUserIds: [],
   events: [],
   rolls: [],
 };
@@ -71,7 +71,7 @@ export const liveSessionReducer = (
       return {
         ...initialLiveSessionState,
         session: action.session,
-        presence: state.presence,
+        connectedUserIds: state.connectedUserIds,
       };
 
     case "END_SESSION":
@@ -82,8 +82,11 @@ export const liveSessionReducer = (
         events: [],
       };
 
+    case "RESET":
+      return initialLiveSessionState;
+
     case "REPLACE_PRESENCE":
-      return { ...state, presence: action.presence };
+      return { ...state, connectedUserIds: action.userIds };
 
     case "ROLL_LOGGED":
       return {

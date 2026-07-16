@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   useCampaignQuery,
@@ -8,6 +8,8 @@ import {
 import { useLeaveCampaignMutation } from "@/queries/members";
 import { useMeQuery } from "@/queries/auth";
 import { useNotificationStore } from "@/state/notifications/notificationStore";
+import { useLiveSessionStore } from "@/state/liveSession/liveSessionStore";
+import { useCampaignVisitsStore } from "@/state/campaigns/campaignVisitsStore";
 import type { Campaign } from "@/types/campaigns";
 import CommonButton from "@/components/ui/buttons/CommonButton";
 import CampaignDetails from "@/components/campaigns/campaign/CampaignDetails";
@@ -23,6 +25,22 @@ function CampaignPage() {
   const { data: user } = useMeQuery();
   const navigate = useNavigate();
   const notify = useNotificationStore((s) => s.notify);
+  const activeCampaignId = useLiveSessionStore((s) => s.activeCampaignId);
+  const hasLiveSession = useLiveSessionStore((s) => s.session !== null);
+  const markVisited = useCampaignVisitsStore((s) => s.markVisited);
+
+  const isBlocked =
+    !!id && hasLiveSession && activeCampaignId !== null && id !== activeCampaignId;
+
+  useEffect(() => {
+    if (!isBlocked) return;
+    notify("A live session is running in another campaign", "info");
+    navigate(`/campaigns/${activeCampaignId}`, { replace: true });
+  }, [isBlocked, activeCampaignId, navigate, notify]);
+
+  useEffect(() => {
+    if (id && !isBlocked) markVisited(id);
+  }, [id, isBlocked, markVisited]);
 
   const { data: serverCampaign, isLoading, isError, error } = useCampaignQuery(id);
   const updateCampaign = useUpdateCampaignMutation();
@@ -82,6 +100,10 @@ function CampaignPage() {
       onError: (err) => notify((err as Error).message, "error"),
     });
   };
+
+  if (isBlocked) {
+    return null;
+  }
 
   if (isLoading && !campaign) {
     return <p className="m-auto text-gold-bright">Loading campaign...</p>;
