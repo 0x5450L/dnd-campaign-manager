@@ -9,7 +9,7 @@ import {
   useCharactersRealtimeSync,
   useDeleteCharacterMutation,
 } from "@/queries/characters";
-import { useLiveSession } from "@/hooks/useLiveSession";
+import { useActiveEncounter } from "@/hooks/liveSession/useActiveEncounter";
 import { useNotificationStore } from "@/state/notifications/notificationStore";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import CharactersSidebar from "../CharactersSidebar";
@@ -40,7 +40,7 @@ function CampaignCharactersController({
   const { data: characters = EMPTY_CHARACTERS } = useCampaignCharactersQuery(campaignId);
   useCharactersRealtimeSync(campaignId);
   const deleteCharacterMutation = useDeleteCharacterMutation();
-  const { encounter } = useLiveSession();
+  const { encounter } = useActiveEncounter();
   const notify = useNotificationStore((s) => s.notify);
 
   const [sheetMode, setSheetMode] = useState<SheetMode>({ kind: "closed" });

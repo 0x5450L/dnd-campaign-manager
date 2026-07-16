@@ -1,7 +1,8 @@
 import { useState } from "react";
 import type { Campaign } from "@/types/campaigns";
 import type { PresenceStatus } from "@/types/session";
-import { useLiveSession } from "@/hooks/useLiveSession";
+import { useLiveSessionStore } from "@/state/liveSession/liveSessionStore";
+import { usePresence } from "@/hooks/liveSession/usePresence";
 import { useRemoveMemberMutation } from "@/queries/members";
 import { useNotificationStore } from "@/state/notifications/notificationStore";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
@@ -30,7 +31,8 @@ const initialsOf = (name: string) =>
     .join("") || "?";
 
 export const PartyRow = ({ members, dmId, isDM, campaignId }: PartyRowProps) => {
-  const { session, presenceFor } = useLiveSession();
+  const session = useLiveSessionStore((s) => s.session);
+  const { presenceFor } = usePresence();
   const sessionActive = !!session;
   const removeMember = useRemoveMemberMutation();
   const notify = useNotificationStore((s) => s.notify);

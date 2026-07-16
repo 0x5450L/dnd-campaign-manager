@@ -1,10 +1,12 @@
 import { useEffect } from "react";
 import { useDiceRollerStore } from "@/state/diceRoller/diceRollerStore";
-import { useLiveSession } from "@/hooks/useLiveSession";
+import { useLiveSessionStore } from "@/state/liveSession/liveSessionStore";
+import { useSessionCommands } from "@/hooks/liveSession/useSessionCommands";
 
 export const SessionDiceBridge = () => {
   const registerSessionSink = useDiceRollerStore((s) => s.registerSessionSink);
-  const { session, logRoll } = useLiveSession();
+  const session = useLiveSessionStore((s) => s.session);
+  const { logRoll } = useSessionCommands();
 
   const sessionIsActive = session?.status === "active";
 

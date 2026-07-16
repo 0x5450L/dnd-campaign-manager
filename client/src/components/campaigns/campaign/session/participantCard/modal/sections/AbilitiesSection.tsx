@@ -4,7 +4,8 @@ import {
   ABILITY_ACTIVATION_ORDER,
 } from "@/constants/abilities";
 import type { EditorBodyProps } from "@/types/components/participantCard";
-import { useLiveSession } from "@/hooks/useLiveSession";
+import { useActiveEncounter } from "@/hooks/liveSession/useActiveEncounter";
+import { useParticipantActions } from "@/hooks/liveSession/useParticipantActions";
 import { canApplyAbilityUsage } from "@shared/utils/abilityUsage";
 
 const costBadge = (cost: AbilityCost | null, pools: ResourcePool[] | null): string | null => {
@@ -81,7 +82,8 @@ const AbilityCard = ({ ability, abilities, resources, interactive, onUsage }: Ab
 };
 
 export const AbilitiesSection = ({ draft, canEditOwn }: EditorBodyProps) => {
-  const { participants, applyAbilityUsage } = useLiveSession();
+  const { participants } = useActiveEncounter();
+  const { applyAbilityUsage } = useParticipantActions();
   const abilities = draft.abilities ?? [];
   const resources = draft.resources ?? [];
   if (abilities.length === 0) return null;

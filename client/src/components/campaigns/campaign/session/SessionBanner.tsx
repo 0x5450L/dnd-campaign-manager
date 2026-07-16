@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
-import { useLiveSession } from "@/hooks/useLiveSession";
+import { useLiveSessionStore } from "@/state/liveSession/liveSessionStore";
+import { useActiveEncounter } from "@/hooks/liveSession/useActiveEncounter";
+import { usePresence } from "@/hooks/liveSession/usePresence";
+import { useSessionCommands } from "@/hooks/liveSession/useSessionCommands";
 
 type SessionBannerProps = {
   isDM: boolean;
@@ -16,7 +19,10 @@ const formatElapsed = (ms: number) => {
 };
 
 export const SessionBanner = ({ isDM }: SessionBannerProps) => {
-  const { session, encounter, connectedCount, endSession } = useLiveSession();
+  const session = useLiveSessionStore((s) => s.session);
+  const { encounter } = useActiveEncounter();
+  const { connectedCount } = usePresence();
+  const { endSession } = useSessionCommands();
   const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLiveSession } from "@/hooks/useLiveSession";
+import { useParticipantActions } from "@/hooks/liveSession/useParticipantActions";
 import type {
   CreateParticipantPayload,
   EncounterParticipantDTO,
@@ -58,7 +58,7 @@ const blankParticipant = (type: ParticipantType): EncounterParticipantDTO => ({
 });
 
 export const AddParticipantModal = ({ onClose }: AddParticipantModalProps) => {
-  const { addParticipant } = useLiveSession();
+  const { addParticipant } = useParticipantActions();
   const [draft, setDraft] = useState<EncounterParticipantDTO>(() => blankParticipant("monster"));
   const [isBestiaryOpen, setIsBestiaryOpen] = useState(false);
 

@@ -1,4 +1,4 @@
-import { useLiveSession } from "@/hooks/useLiveSession";
+import { useLiveSessionStore } from "@/state/liveSession/liveSessionStore";
 import type { SessionDiceRoll } from "@/types/session";
 import { DICE_TYPES, type DiceType } from "@/types/dice";
 import DiceShape from "@/components/dice/DiceShape";
@@ -58,7 +58,7 @@ const DiceCluster = ({
 };
 
 export const SessionRollFeed = () => {
-  const { rolls } = useLiveSession();
+  const rolls = useLiveSessionStore((s) => s.rolls);
 
   return (
     <div className="cs-section-card flex h-[220px] flex-col gap-1.5 p-3">

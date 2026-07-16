@@ -9,10 +9,12 @@ import HpControls from "@/components/campaigns/campaign/session/participantCard/
 import InitiativeBlock from "@/components/campaigns/campaign/session/participantCard/blocks/InitiativeBlock";
 import StatInput from "../fields/StatInput";
 import type { EditorBodyProps } from "@/types/components/participantCard";
-import { useLiveSession } from "@/hooks/useLiveSession";
+import { useActiveEncounter } from "@/hooks/liveSession/useActiveEncounter";
+import { useParticipantActions } from "@/hooks/liveSession/useParticipantActions";
 
 export const VitalsSection = ({ draft, updateDraft, canEditOwn, canManage }: EditorBodyProps) => {
-  const { participants, rollInitiative } = useLiveSession();
+  const { participants } = useActiveEncounter();
+  const { rollInitiative } = useParticipantActions();
   const canRollInitiative = canEditOwn && participants.some((p) => p.id === draft.id);
 
   return (

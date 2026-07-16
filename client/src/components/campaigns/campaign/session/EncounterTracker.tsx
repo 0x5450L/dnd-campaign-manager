@@ -1,5 +1,8 @@
 import { useState } from "react";
-import { useLiveSession } from "@/hooks/useLiveSession";
+import { useActiveEncounter } from "@/hooks/liveSession/useActiveEncounter";
+import { useEncounterCommands } from "@/hooks/liveSession/useEncounterCommands";
+import { useParticipantActions } from "@/hooks/liveSession/useParticipantActions";
+import { useIsOwnParticipant } from "@/hooks/liveSession/useIsOwnParticipant";
 import CommonButton from "@/components/ui/buttons/CommonButton";
 import EncounterParticipantCard from "./participantCard/EncounterParticipantCard";
 import AddParticipantModal from "./AddParticipantModal";
@@ -9,17 +12,10 @@ type EncounterTrackerProps = {
 };
 
 export const EncounterTracker = ({ isDM }: EncounterTrackerProps) => {
-  const {
-    encounter,
-    participants,
-    activeParticipant,
-    startEncounter,
-    beginCombat,
-    endEncounter,
-    advanceTurn,
-    rollInitiative,
-    isOwnParticipant,
-  } = useLiveSession();
+  const { encounter, participants, activeParticipant } = useActiveEncounter();
+  const { startEncounter, beginCombat, endEncounter, advanceTurn } = useEncounterCommands();
+  const { rollInitiative } = useParticipantActions();
+  const isOwnParticipant = useIsOwnParticipant();
   const [isAddOpen, setIsAddOpen] = useState(false);
 
   if (!encounter || encounter.status === "ended") {

@@ -1,4 +1,4 @@
-import { useLiveSession } from "@/hooks/useLiveSession";
+import { useSessionCommands } from "@/hooks/liveSession/useSessionCommands";
 import CommonButton from "@/components/ui/buttons/CommonButton";
 
 type StartSessionCTAProps = {
@@ -6,7 +6,7 @@ type StartSessionCTAProps = {
 };
 
 export const StartSessionCTA = ({ isDM }: StartSessionCTAProps) => {
-  const { startSession } = useLiveSession();
+  const { startSession } = useSessionCommands();
 
   return (
     <div className="cs-section-card flex flex-col items-center gap-3 p-8 text-center">

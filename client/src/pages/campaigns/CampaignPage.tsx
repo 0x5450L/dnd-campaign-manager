@@ -17,7 +17,7 @@ import CampaignActionsPanel from "@/components/campaigns/campaign/CampaignAction
 import CampaignHeaderBar from "@/components/campaigns/campaign/CampaignHeaderBar";
 import PartyRow from "@/components/campaigns/campaign/PartyRow";
 import CampaignCharactersController from "@/components/campaigns/campaign/characters/controller/CampaignCharactersController";
-import { LiveSessionProvider } from "@/context/liveSessionContext/LiveSessionProvider";
+import { useCampaignSessionBinding } from "@/hooks/liveSession/useCampaignSessionBinding";
 import SessionPanel from "@/components/campaigns/campaign/session/SessionPanel";
 
 function CampaignPage() {
@@ -43,6 +43,8 @@ function CampaignPage() {
   }, [id, isBlocked, markVisited]);
 
   const { data: serverCampaign, isLoading, isError, error } = useCampaignQuery(id);
+
+  useCampaignSessionBinding(serverCampaign?.id);
   const updateCampaign = useUpdateCampaignMutation();
   const deleteCampaign = useDeleteCampaignMutation();
   const leaveCampaign = useLeaveCampaignMutation();
@@ -125,8 +127,7 @@ function CampaignPage() {
   }
 
   return (
-    <LiveSessionProvider campaign={campaign}>
-      <CampaignCharactersController campaignId={campaign.id} dmId={campaign.dmId} currentUserId={user?.id ?? null}>
+    <CampaignCharactersController campaignId={campaign.id} dmId={campaign.dmId} currentUserId={user?.id ?? null}>
         <div className="mx-auto flex min-h-[calc(100vh-53px)] w-full max-w-7xl flex-col gap-3 p-3 sm:p-4">
           <CampaignHeaderBar campaign={campaign} isDM={isDM} onChange={setCampaign} />
 
@@ -146,8 +147,7 @@ function CampaignPage() {
             />
           </div>
         </div>
-      </CampaignCharactersController>
-    </LiveSessionProvider>
+    </CampaignCharactersController>
   );
 }
 

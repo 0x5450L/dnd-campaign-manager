@@ -1,4 +1,4 @@
-import { useLiveSession } from "@/hooks/useLiveSession";
+import { useLiveSessionStore } from "@/state/liveSession/liveSessionStore";
 import type { SessionEventKind } from "@/types/session";
 
 const formatTime = (iso: string) => {
@@ -25,7 +25,7 @@ const kindAccent: Record<SessionEventKind, string> = {
 };
 
 export const SessionEventFeed = () => {
-  const { events } = useLiveSession();
+  const events = useLiveSessionStore((s) => s.events);
 
   return (
     <div className="cs-section-card flex h-[220px] flex-col gap-2 p-3">

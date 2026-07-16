@@ -1,4 +1,4 @@
-import { useLiveSession } from "@/hooks/useLiveSession";
+import { useLiveSessionStore } from "@/state/liveSession/liveSessionStore";
 import SessionBanner from "./SessionBanner";
 import StartSessionCTA from "./StartSessionCTA";
 import EncounterTracker from "./EncounterTracker";
@@ -11,7 +11,7 @@ type SessionPanelProps = {
 };
 
 export const SessionPanel = ({ isDM }: SessionPanelProps) => {
-  const { session } = useLiveSession();
+  const session = useLiveSessionStore((s) => s.session);
 
   return (
     <>

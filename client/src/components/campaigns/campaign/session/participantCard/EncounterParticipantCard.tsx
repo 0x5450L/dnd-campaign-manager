@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useLiveSession } from "@/hooks/useLiveSession";
+import { useParticipantActions } from "@/hooks/liveSession/useParticipantActions";
 import type { EncounterParticipantDTO } from "@/types/encounter";
 import InitiativeBlock from "./blocks/InitiativeBlock";
 import ArmorClassBlock from "./blocks/ArmorClassBlock";
@@ -35,7 +35,7 @@ export const EncounterParticipantCard = ({
     setShield,
     recordDeathSave,
     removeParticipant,
-  } = useLiveSession();
+  } = useParticipantActions();
   const [detailsOpen, setDetailsOpen] = useState(false);
 
   const fullyHidden = !participant.isVisible && !isDM;
