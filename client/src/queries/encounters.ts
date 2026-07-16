@@ -4,10 +4,12 @@ import {
   advanceTurn as advanceTurnRequest,
   applyAbilityUsage as applyAbilityUsageRequest,
   rollInitiative as rollInitiativeRequest,
+  createEncounter as createEncounterRequest,
   createParticipant as createParticipantRequest,
   deleteParticipant as deleteParticipantRequest,
   listEncounters,
   setInitiative as setInitiativeRequest,
+  updateEncounter as updateEncounterRequest,
   updateParticipant as updateParticipantRequest,
 } from "../services/api/encounters";
 import { useAuthStore } from "../state/auth/authStore";
@@ -15,7 +17,9 @@ import { getSocket } from "../services/socket";
 import type {
   AbilityUsageAction,
   BulkInitiativePayload,
+  CreateEncounterPayload,
   CreateParticipantPayload,
+  UpdateEncounterPayload,
   UpdateParticipantPayload,
 } from "../types/encounter";
 import type {
@@ -51,6 +55,32 @@ export const useActiveEncounterQuery = (campaignSessionId: string | undefined) =
       encounters.find((e) => e.status === "active") ??
       encounters.find((e) => e.status === "setup") ??
       null,
+  });
+};
+
+export const useCreateEncounterMutation = (campaignSessionId: string | undefined) => {
+  const queryClient = useQueryClient();
+  const key = encounterKeys.list(campaignSessionId ?? "");
+
+  return useMutation({
+    mutationFn: async (payload: CreateEncounterPayload) =>
+      (await createEncounterRequest(campaignSessionId as string, payload)).encounter,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: key });
+    },
+  });
+};
+
+export const useUpdateEncounterMutation = (campaignSessionId: string | undefined) => {
+  const queryClient = useQueryClient();
+  const key = encounterKeys.list(campaignSessionId ?? "");
+
+  return useMutation({
+    mutationFn: async (vars: { encounterId: string; payload: UpdateEncounterPayload }) =>
+      (await updateEncounterRequest(vars.encounterId, vars.payload)).encounter,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: key });
+    },
   });
 };
 

@@ -6,7 +6,6 @@ import {
   useRef,
   type ReactNode,
 } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 import { LiveSessionContext, type LiveSessionContextType } from "./LiveSessionContext";
 import { getSocket } from "@/services/socket";
 import {
@@ -25,17 +24,17 @@ import { useMeQuery } from "@/queries/auth";
 import { useCampaignCharactersQuery } from "@/queries/characters";
 import type { Campaign } from "@/types/campaigns";
 import {
-  encounterKeys,
   useAbilityUsageMutation,
   useActiveEncounterQuery,
   useRollInitiativeMutation,
   useAdvanceTurnMutation,
+  useCreateEncounterMutation,
   useCreateParticipantMutation,
   useEncounterRealtimeSync,
   useRemoveParticipantMutation,
+  useUpdateEncounterMutation,
   useUpdateParticipantMutation,
 } from "@/queries/encounters";
-import { createEncounter, updateEncounter } from "@/services/api/encounters";
 import {
   applyDamage,
   applyHealing,
@@ -70,7 +69,6 @@ const presenceFromUserIds = (
 
 export const LiveSessionProvider = ({ campaign, children }: Props) => {
   const [state, dispatch] = useReducer(liveSessionReducer, initialLiveSessionState);
-  const queryClient = useQueryClient();
 
   const sessionId = state.session?.id;
   const encounterQuery = useActiveEncounterQuery(sessionId);
@@ -101,6 +99,8 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
   const { mutate: mutateAdvanceTurn } = useAdvanceTurnMutation(sessionId);
   const { mutate: mutateCreateParticipant } = useCreateParticipantMutation(sessionId);
   const { mutate: mutateRemoveParticipant } = useRemoveParticipantMutation(sessionId);
+  const { mutate: mutateCreateEncounter } = useCreateEncounterMutation(sessionId);
+  const { mutate: mutateUpdateEncounter } = useUpdateEncounterMutation(sessionId);
 
   const campaignRef = useRef(campaign);
   useEffect(() => {
@@ -202,23 +202,20 @@ export const LiveSessionProvider = ({ campaign, children }: Props) => {
     );
   }, [campaign.id, sessionId]);
 
-  const startEncounter = useCallback(async () => {
+  const startEncounter = useCallback(() => {
     if (!sessionId) return;
-    await createEncounter(sessionId, {});
-    queryClient.invalidateQueries({ queryKey: encounterKeys.list(sessionId) });
-  }, [sessionId, queryClient]);
+    mutateCreateEncounter({});
+  }, [sessionId, mutateCreateEncounter]);
 
-  const endEncounter = useCallback(async () => {
-    if (!encounter || !sessionId) return;
-    await updateEncounter(encounter.id, { status: "ended" });
-    queryClient.invalidateQueries({ queryKey: encounterKeys.list(sessionId) });
-  }, [encounter, sessionId, queryClient]);
+  const endEncounter = useCallback(() => {
+    if (!encounter) return;
+    mutateUpdateEncounter({ encounterId: encounter.id, payload: { status: "ended" } });
+  }, [encounter, mutateUpdateEncounter]);
 
-  const beginCombat = useCallback(async () => {
-    if (!encounter || !sessionId) return;
-    await updateEncounter(encounter.id, { status: "active" });
-    queryClient.invalidateQueries({ queryKey: encounterKeys.list(sessionId) });
-  }, [encounter, sessionId, queryClient]);
+  const beginCombat = useCallback(() => {
+    if (!encounter) return;
+    mutateUpdateEncounter({ encounterId: encounter.id, payload: { status: "active" } });
+  }, [encounter, mutateUpdateEncounter]);
 
   const advanceTurn = useCallback(() => {
     if (!encounter) return;
