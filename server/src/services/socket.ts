@@ -70,6 +70,29 @@ const broadcastPresence = async (campaignId: string, excludeSocketId?: string) =
   }
 };
 
+const SESSION_KEEPALIVE_INTERVAL_MS = 5 * 60 * 1000;
+
+const touchOccupiedCampaignSessions = async () => {
+  const campaignIds = [...getIo().sockets.adapter.rooms.keys()]
+    .filter((room) => room.startsWith('campaign:'))
+    .map((room) => room.slice('campaign:'.length));
+  if (campaignIds.length === 0) return;
+
+  await prisma.campaignSession.updateMany({
+    where: { campaignId: { in: campaignIds }, status: 'active' },
+    data: { lastActiveAt: new Date() },
+  });
+};
+
+const startSessionKeepAlive = () => {
+  const timer = setInterval(() => {
+    touchOccupiedCampaignSessions().catch((error) => {
+      console.error('session keep-alive failed', error);
+    });
+  }, SESSION_KEEPALIVE_INTERVAL_MS);
+  timer.unref();
+};
+
 export type AppIo = Server<
   SocketClientToServerEvents,
   SocketServerToClientEvents,
@@ -271,6 +294,8 @@ export const initSocket = (httpServer: HttpServer): AppIo => {
     });
 
   });
+
+  startSessionKeepAlive();
 
   return io;
 };
