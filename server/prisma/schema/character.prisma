@@ -36,7 +36,6 @@ model Character {
   user                    User                   @relation("UserCharacters", fields: [userId], references: [id])
   campaign                Campaign               @relation("CampaignCharacters", fields: [campaignId], references: [id])
   characterParticipations EncounterParticipant[] @relation("CharacterParticipations")
-  diceRolls               DiceRoll[]             @relation("CharacterDiceRolls")
   abilityScores           AbilityScore[]
   skills                  Skill[]
   attacks                 Attack[]

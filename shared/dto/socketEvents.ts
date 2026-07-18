@@ -12,7 +12,7 @@ export type JoinAckErrorCode = 'internal' | 'forbidden';
 export type JoinAckResponse = { ok: true } | { ok: false, errorCode: JoinAckErrorCode };
 
 export type CampaignJoinAckResponse =
-  | { ok: true; activeSession: CampaignSessionDTO | null; isAttendee: boolean }
+  | { ok: true; activeSession: CampaignSessionDTO | null; isAttendee: boolean; rolls: SessionDiceRollDTO[] }
   | { ok: false; errorCode: JoinAckErrorCode };
 
 export type SessionAckErrorCode = 'internal' | 'forbidden' | 'session_conflict';

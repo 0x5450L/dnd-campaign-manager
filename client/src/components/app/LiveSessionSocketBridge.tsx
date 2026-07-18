@@ -33,6 +33,7 @@ export const LiveSessionSocketBridge = () => {
             type: "HYDRATE_SESSION",
             session: response.activeSession,
             isAttendee: response.isAttendee,
+            rolls: response.rolls,
           });
         }
       });

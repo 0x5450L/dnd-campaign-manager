@@ -19,7 +19,12 @@ export type SessionRollInput = Omit<SessionDiceRoll, "id" | "at" | "actorName">;
 
 export type LiveSessionAction =
   | { type: "START_SESSION"; session: CampaignSessionDTO }
-  | { type: "HYDRATE_SESSION"; session: CampaignSessionDTO; isAttendee: boolean }
+  | {
+      type: "HYDRATE_SESSION";
+      session: CampaignSessionDTO;
+      isAttendee: boolean;
+      rolls: SessionDiceRoll[];
+    }
   | { type: "SESSION_JOINED" }
   | { type: "SESSION_LEFT" }
   | {
@@ -81,6 +86,7 @@ export const liveSessionReducer = (
         ...initialLiveSessionState,
         session: action.session,
         isAttendee: action.isAttendee,
+        rolls: action.rolls.slice(0, ROLL_LIMIT),
         connectedUserIds: state.connectedUserIds,
       };
 

@@ -8,13 +8,11 @@ model DiceRoll {
   userId String @map("user_id")
   user   User   @relation("UserDiceRolls", fields: [userId], references: [id], onDelete: Cascade)
 
-  characterId String?    @map("character_id")
-  character   Character? @relation("CharacterDiceRolls", fields: [characterId], references: [id], onDelete: Cascade)
-
-  formula     String
-  mode        DiceRollMode @default(normal)
-  resultByDie Json
+  actorName   String  @map("actor_name")
+  expression  String
   total       Int
+  critSuccess Boolean @default(false) @map("crit_success")
+  critFail    Boolean @default(false) @map("crit_fail")
 
   @@index([campaignSessionId, createdAt])
   @@map("dice_rolls")

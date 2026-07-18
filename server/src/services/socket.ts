@@ -2,14 +2,14 @@ import type { Server as HttpServer } from 'node:http';
 import { randomUUID } from 'node:crypto';
 import { DefaultEventsMap, Server } from 'socket.io';
 
-import type { CampaignSession } from '@prisma/client';
+import type { CampaignSession, DiceRoll } from '@prisma/client';
 
 import type {
   SocketClientToServerEvents,
   SocketServerToClientEvents,
   SocketData,
 } from '@shared/dto/socketEvents';
-import type { CampaignSessionDTO } from '@shared/dto/session';
+import type { CampaignSessionDTO, SessionDiceRollDTO } from '@shared/dto/session';
 import { getTokenFromCookie } from '../utils/cookies';
 import { verifyToken } from '../utils/jwt';
 import {
@@ -49,6 +49,27 @@ const toSessionDTO = (session: CampaignSession): CampaignSessionDTO => ({
   updatedAt: session.updatedAt.toISOString(),
   endedAt: session.endedAt ? session.endedAt.toISOString() : null,
 });
+
+const ROLL_HISTORY_LIMIT = 30;
+
+const toRollDTO = (roll: DiceRoll): SessionDiceRollDTO => ({
+  id: roll.id,
+  actorName: roll.actorName,
+  expression: roll.expression,
+  total: roll.total,
+  critSuccess: roll.critSuccess,
+  critFail: roll.critFail,
+  at: roll.createdAt.toISOString(),
+});
+
+const listSessionRolls = async (campaignSessionId: string): Promise<SessionDiceRollDTO[]> => {
+  const rolls = await prisma.diceRoll.findMany({
+    where: { campaignSessionId },
+    orderBy: { createdAt: 'desc' },
+    take: ROLL_HISTORY_LIMIT,
+  });
+  return rolls.map(toRollDTO);
+};
 
 const findActiveSession = (campaignId: string) =>
   prisma.campaignSession.findFirst({
@@ -197,10 +218,12 @@ export const initSocket = (httpServer: HttpServer): AppIo => {
         const attending = active
           ? await isSessionAttendee(active.id, socket.data.userId)
           : false;
+        const rolls = active ? await listSessionRolls(active.id) : [];
         ack({
           ok: true,
           activeSession: active ? toSessionDTO(active) : null,
           isAttendee: attending,
+          rolls,
         });
         await broadcastPresence(campaignId);
       } catch (error) {
@@ -381,21 +404,43 @@ export const initSocket = (httpServer: HttpServer): AppIo => {
       }
     });
 
-    socket.on('roll:log', (payload) => {
+    socket.on('roll:log', async (payload) => {
       const room = campaignRoom(payload.campaignId);
       if (!socket.rooms.has(room)) return;
 
+      let roll: SessionDiceRollDTO = {
+        id: randomUUID(),
+        actorName: socket.data.displayName,
+        expression: payload.expression,
+        total: payload.total,
+        critSuccess: payload.critSuccess,
+        critFail: payload.critFail,
+        at: new Date().toISOString(),
+      };
+
+      try {
+        const active = await findActiveSession(payload.campaignId);
+        if (active) {
+          const saved = await prisma.diceRoll.create({
+            data: {
+              campaignSessionId: active.id,
+              userId: socket.data.userId,
+              actorName: socket.data.displayName,
+              expression: payload.expression,
+              total: payload.total,
+              critSuccess: payload.critSuccess,
+              critFail: payload.critFail,
+            },
+          });
+          roll = toRollDTO(saved);
+        }
+      } catch (error) {
+        console.error('roll:log persist failed', error);
+      }
+
       getIo().to(room).emit('roll_logged', {
         campaignId: payload.campaignId,
-        roll: {
-          id: randomUUID(),
-          actorName: socket.data.displayName,
-          expression: payload.expression,
-          total: payload.total,
-          critSuccess: payload.critSuccess,
-          critFail: payload.critFail,
-          at: new Date().toISOString(),
-        },
+        roll,
       });
     });
 
