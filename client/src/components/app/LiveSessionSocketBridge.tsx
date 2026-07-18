@@ -1,10 +1,12 @@
 import { useEffect } from "react";
 import { getSocket } from "@/services/socket";
 import { useLiveSessionStore } from "@/state/liveSession/liveSessionStore";
+import { useMeQuery } from "@/queries/auth";
 import type {
   InitiativeUpdatedPayload,
   PresenceChangedPayload,
   RollLoggedPayload,
+  SessionAttendanceChangedPayload,
   SessionEndedPayload,
   SessionStartedPayload,
   TurnAdvancedPayload,
@@ -13,6 +15,8 @@ import type {
 export const LiveSessionSocketBridge = () => {
   const campaignId = useLiveSessionStore((s) => s.activeCampaignId);
   const dispatch = useLiveSessionStore((s) => s.dispatch);
+  const { data: user } = useMeQuery();
+  const userId = user?.id;
 
   useEffect(() => {
     if (!campaignId) return;
@@ -25,7 +29,11 @@ export const LiveSessionSocketBridge = () => {
           return;
         }
         if (response.activeSession) {
-          dispatch({ type: "HYDRATE_SESSION", session: response.activeSession });
+          dispatch({
+            type: "HYDRATE_SESSION",
+            session: response.activeSession,
+            isAttendee: response.isAttendee,
+          });
         }
       });
     };
@@ -58,6 +66,20 @@ export const LiveSessionSocketBridge = () => {
       dispatch({ type: "INITIATIVE_ROLLED", rolls: payload.rolls });
     };
 
+    const handleAttendanceChanged = (payload: SessionAttendanceChangedPayload) => {
+      if (payload.campaignId !== campaignId) return;
+      dispatch({
+        type: "ATTENDANCE_CHANGED",
+        displayName: payload.displayName,
+        action: payload.action,
+      });
+      if (payload.userId === userId) {
+        dispatch({
+          type: payload.action === "joined" ? "SESSION_JOINED" : "SESSION_LEFT",
+        });
+      }
+    };
+
     const handleTurnAdvanced = (payload: TurnAdvancedPayload) => {
       if (payload.campaignId !== campaignId) return;
       dispatch({
@@ -73,6 +95,7 @@ export const LiveSessionSocketBridge = () => {
     socket.on("session_started", handleSessionStarted);
     socket.on("session_ended", handleSessionEnded);
     socket.on("presence_changed", handlePresenceChanged);
+    socket.on("session_attendance_changed", handleAttendanceChanged);
 
     return () => {
       socket.off("connect", join);
@@ -82,9 +105,10 @@ export const LiveSessionSocketBridge = () => {
       socket.off("session_started", handleSessionStarted);
       socket.off("session_ended", handleSessionEnded);
       socket.off("presence_changed", handlePresenceChanged);
+      socket.off("session_attendance_changed", handleAttendanceChanged);
       socket.emit("campaign:leave", campaignId);
     };
-  }, [campaignId, dispatch]);
+  }, [campaignId, dispatch, userId]);
 
   return null;
 };

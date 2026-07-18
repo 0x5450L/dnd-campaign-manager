@@ -9,6 +9,7 @@ import type { InitiativeRollDTO } from "@shared/dto/session";
 
 export type LiveSessionState = {
   session: CampaignSessionDTO | null;
+  isAttendee: boolean;
   connectedUserIds: string[];
   events: SessionEvent[];
   rolls: SessionDiceRoll[];
@@ -18,7 +19,14 @@ export type SessionRollInput = Omit<SessionDiceRoll, "id" | "at" | "actorName">;
 
 export type LiveSessionAction =
   | { type: "START_SESSION"; session: CampaignSessionDTO }
-  | { type: "HYDRATE_SESSION"; session: CampaignSessionDTO }
+  | { type: "HYDRATE_SESSION"; session: CampaignSessionDTO; isAttendee: boolean }
+  | { type: "SESSION_JOINED" }
+  | { type: "SESSION_LEFT" }
+  | {
+      type: "ATTENDANCE_CHANGED";
+      displayName: string;
+      action: "joined" | "left";
+    }
   | { type: "END_SESSION" }
   | { type: "RESET" }
   | { type: "REPLACE_PRESENCE"; userIds: string[] }
@@ -35,6 +43,7 @@ export const ROLL_LIMIT = 30;
 
 export const initialLiveSessionState: LiveSessionState = {
   session: null,
+  isAttendee: false,
   connectedUserIds: [],
   events: [],
   rolls: [],
@@ -71,13 +80,36 @@ export const liveSessionReducer = (
       return {
         ...initialLiveSessionState,
         session: action.session,
+        isAttendee: action.isAttendee,
         connectedUserIds: state.connectedUserIds,
+      };
+
+    case "SESSION_JOINED":
+      return { ...state, isAttendee: true };
+
+    case "SESSION_LEFT":
+      return { ...state, isAttendee: false };
+
+    case "ATTENDANCE_CHANGED":
+      return {
+        ...state,
+        events: pushEvent(
+          state.events,
+          makeEvent(
+            action.action === "joined" ? "member_joined" : "member_left",
+            action.action === "joined"
+              ? `${action.displayName} joined the session`
+              : `${action.displayName} left the session`,
+            action.displayName,
+          ),
+        ),
       };
 
     case "END_SESSION":
       return {
         ...state,
         session: null,
+        isAttendee: false,
         rolls: [],
         events: [],
       };
