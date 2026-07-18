@@ -7,6 +7,11 @@ import type { UpdateSessionPayload } from "@shared/dto/session";
 import * as sessionsRepo from "./sessionsRepository";
 import { requireCampaignId } from "./sessionsValidation";
 import { notifySessionStatusChanged } from "./sessionsNotifications";
+import {
+  closeAllAttendances,
+  findOpenAttendance,
+  openAttendance,
+} from "./sessionsAttendance";
 
 export const createSession = async (
   userId: string,
@@ -15,7 +20,15 @@ export const createSession = async (
 ) => {
   const id = requireCampaignId(campaignId, "campaignId is required");
   await requireCampaignDM(userId, id);
+  const open = await findOpenAttendance(userId);
+  if (open) {
+    throw new AppError(
+      409,
+      `You are already in a live session in campaign "${open.campaignSession.campaign.name}"`,
+    );
+  }
   const session = await sessionsRepo.createSession(id, title);
+  await openAttendance(session.id, userId);
   notifySessionStatusChanged(id).catch((error) => {
     console.error("session_status_changed notify failed", error);
   });
@@ -49,6 +62,9 @@ export const updateSession = async (
     throw new AppError(404, "Session not found");
   }
   const session = await sessionsRepo.updateSession(id, body);
+  if (body.status === "ended") {
+    await closeAllAttendances(id);
+  }
   if (body.status) {
     notifySessionStatusChanged(session.campaignId).catch((error) => {
       console.error("session_status_changed notify failed", error);

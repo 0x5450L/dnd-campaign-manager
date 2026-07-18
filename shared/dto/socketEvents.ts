@@ -12,16 +12,30 @@ export type JoinAckErrorCode = 'internal' | 'forbidden';
 export type JoinAckResponse = { ok: true } | { ok: false, errorCode: JoinAckErrorCode };
 
 export type CampaignJoinAckResponse =
-  | { ok: true; activeSession: CampaignSessionDTO | null }
+  | { ok: true; activeSession: CampaignSessionDTO | null; isAttendee: boolean }
   | { ok: false; errorCode: JoinAckErrorCode };
 
-export type SessionAckErrorCode = 'internal' | 'forbidden';
+export type SessionAckErrorCode = 'internal' | 'forbidden' | 'session_conflict';
+export type SessionConflictInfo = {
+  campaignId: string;
+  campaignName: string;
+};
 export type SessionAckResponse =
   | { ok: true }
-  | { ok: false; errorCode: SessionAckErrorCode };
+  | { ok: false; errorCode: SessionAckErrorCode; conflict?: SessionConflictInfo };
 
 export type SessionStartPayload = { campaignId: string; title?: string };
 export type SessionEndPayload = { campaignId: string; sessionId: string };
+export type SessionJoinPayload = { campaignId: string; sessionId: string };
+export type SessionLeavePayload = { campaignId: string; sessionId: string };
+
+export type SessionAttendanceChangedPayload = {
+  campaignId: string;
+  sessionId: string;
+  userId: string;
+  displayName: string;
+  action: 'joined' | 'left';
+};
 
 export type SessionStartedPayload = {
   campaignId: string;
@@ -95,6 +109,8 @@ export type SocketClientToServerEvents = {
   'roll:log': (payload: RollLogPayload) => void;
   'session:start': (payload: SessionStartPayload, ack: SocketAck<SessionAckResponse>) => void;
   'session:end': (payload: SessionEndPayload, ack: SocketAck<SessionAckResponse>) => void;
+  'session:join': (payload: SessionJoinPayload, ack: SocketAck<SessionAckResponse>) => void;
+  'session:leave': (payload: SessionLeavePayload, ack: SocketAck<SessionAckResponse>) => void;
 }
 export type SocketServerToClientEvents = {
   'participant_updated': (payload: ParticipantUpdatedPayload) => void;
@@ -103,6 +119,7 @@ export type SocketServerToClientEvents = {
   'turn_advanced': (payload: TurnAdvancedPayload) => void;
   'initiative_updated': (payload: InitiativeUpdatedPayload) => void;
   'roll_logged': (payload: RollLoggedPayload) => void;
+  'session_attendance_changed': (payload: SessionAttendanceChangedPayload) => void;
   'session_started': (payload: SessionStartedPayload) => void;
   'session_ended': (payload: SessionEndedPayload) => void;
   'presence_changed': (payload: PresenceChangedPayload) => void;

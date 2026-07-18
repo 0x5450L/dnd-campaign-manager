@@ -1,20 +1,36 @@
 model CampaignSession {
-  id           String        @id @default(uuid())
-  number       Int           @default(1)
-  status       SessionStatus @default(active)
-  startedAt    DateTime      @default(now()) @map("started_at")
-  updatedAt    DateTime      @updatedAt @map("updated_at")
-  endedAt      DateTime?     @map("ended_at")
-  lastActiveAt DateTime?     @map("last_active_at")
+  id           String            @id @default(uuid())
+  number       Int               @default(1)
+  status       SessionStatus     @default(active)
+  startedAt    DateTime          @default(now()) @map("started_at")
+  updatedAt    DateTime          @updatedAt @map("updated_at")
+  endedAt      DateTime?         @map("ended_at")
+  lastActiveAt DateTime?         @map("last_active_at")
   title        String?
   summary      String?
   notes        String?
-  campaignId   String        @map("campaign_id")
-  campaign     Campaign      @relation("CampaignSessions", fields: [campaignId], references: [id], onDelete: Cascade)
-  encounters   Encounter[]   @relation("SessionEncounters")
-  diceRolls    DiceRoll[]    @relation("CampaignSessionDiceRolls")
+  campaignId   String            @map("campaign_id")
+  campaign     Campaign          @relation("CampaignSessions", fields: [campaignId], references: [id], onDelete: Cascade)
+  encounters   Encounter[]       @relation("SessionEncounters")
+  diceRolls    DiceRoll[]        @relation("CampaignSessionDiceRolls")
+  attendees    SessionAttendee[] @relation("SessionAttendees")
 
   @@map("campaign_sessions")
+}
+
+model SessionAttendee {
+  id                String    @id @default(uuid())
+  campaignSessionId String    @map("campaign_session_id")
+  userId            String    @map("user_id")
+  joinedAt          DateTime  @default(now()) @map("joined_at")
+  leftAt            DateTime? @map("left_at")
+
+  campaignSession CampaignSession @relation("SessionAttendees", fields: [campaignSessionId], references: [id], onDelete: Cascade)
+  user            User            @relation("UserSessionAttendances", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, leftAt])
+  @@index([campaignSessionId, leftAt])
+  @@map("session_attendees")
 }
 
 model Encounter {
@@ -34,41 +50,41 @@ model Encounter {
 }
 
 model EncounterParticipant {
-  id                           String          @id @default(uuid())
-  encounterId                  String          @map("encounter_id")
-  encounter                    Encounter       @relation("EncounterParticipants", fields: [encounterId], references: [id], onDelete: Cascade)
-  characterId                  String?         @map("character_id")
-  character                    Character?      @relation("CharacterParticipations", fields: [characterId], references: [id], onDelete: SetNull)
-  type                         ParticipantType
-  name                         String
-  sortOrder                    Int             @map("sort_order")
-  maxHp                        Int             @map("max_hp")
-  armorClass                   Int             @map("armor_class")
-  attacks                      Json            @default("[]")
-  currentHp                    Int             @map("current_hp")
-  tempHp                       Int             @default(0) @map("temp_hp")
-  conditions                   String[]        @default([])
-  isVisible                    Boolean         @default(true) @map("is_visible")
-  acHidden                     Boolean         @default(false) @map("ac_hidden")
-  typeHidden                   Boolean         @default(false) @map("type_hidden")
-  usesShield                   Boolean         @default(false) @map("uses_shield")
-  abilityScores                Json?           @map("ability_scores")
-  spellSlots                   Json?           @map("spell_slots")
-  spellAbility                 AbilityName?    @map("spell_ability")
-  proficiencyBonus             Int?            @map("proficiency_bonus")
-  deathSaveSuccesses           Int             @default(0) @map("death_save_successes")
-  deathSaveFailures            Int             @default(0) @map("death_save_failures")
-  speed                        String?
-  senses                       String?
-  challengeRating              Float?          @map("challenge_rating")
-  damageVulnerabilities        String?         @map("damage_vulnerabilities")
-  damageResistances            String?         @map("damage_resistances")
-  damageImmunities             String?         @map("damage_immunities")
-  conditionImmunities          String?         @map("condition_immunities")
-  abilities                    Json?
-  resources                    Json?
-  createdAt                    DateTime        @default(now()) @map("created_at")
-  updatedAt                    DateTime        @updatedAt @map("updated_at")
+  id                    String          @id @default(uuid())
+  encounterId           String          @map("encounter_id")
+  encounter             Encounter       @relation("EncounterParticipants", fields: [encounterId], references: [id], onDelete: Cascade)
+  characterId           String?         @map("character_id")
+  character             Character?      @relation("CharacterParticipations", fields: [characterId], references: [id], onDelete: SetNull)
+  type                  ParticipantType
+  name                  String
+  sortOrder             Int             @map("sort_order")
+  maxHp                 Int             @map("max_hp")
+  armorClass            Int             @map("armor_class")
+  attacks               Json            @default("[]")
+  currentHp             Int             @map("current_hp")
+  tempHp                Int             @default(0) @map("temp_hp")
+  conditions            String[]        @default([])
+  isVisible             Boolean         @default(true) @map("is_visible")
+  acHidden              Boolean         @default(false) @map("ac_hidden")
+  typeHidden            Boolean         @default(false) @map("type_hidden")
+  usesShield            Boolean         @default(false) @map("uses_shield")
+  abilityScores         Json?           @map("ability_scores")
+  spellSlots            Json?           @map("spell_slots")
+  spellAbility          AbilityName?    @map("spell_ability")
+  proficiencyBonus      Int?            @map("proficiency_bonus")
+  deathSaveSuccesses    Int             @default(0) @map("death_save_successes")
+  deathSaveFailures     Int             @default(0) @map("death_save_failures")
+  speed                 String?
+  senses                String?
+  challengeRating       Float?          @map("challenge_rating")
+  damageVulnerabilities String?         @map("damage_vulnerabilities")
+  damageResistances     String?         @map("damage_resistances")
+  damageImmunities      String?         @map("damage_immunities")
+  conditionImmunities   String?         @map("condition_immunities")
+  abilities             Json?
+  resources             Json?
+  createdAt             DateTime        @default(now()) @map("created_at")
+  updatedAt             DateTime        @updatedAt @map("updated_at")
 
   @@index([encounterId, sortOrder])
   @@map("encounter_participants")

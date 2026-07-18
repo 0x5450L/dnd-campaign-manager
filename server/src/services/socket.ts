@@ -20,6 +20,13 @@ import {
 import { AppError } from '../utils/errors';
 import prisma from './prisma';
 import { notifySessionStatusChanged } from './sessions/sessionsNotifications';
+import {
+  closeAllAttendances,
+  closeAttendance,
+  findOpenAttendance,
+  isSessionAttendee,
+  openAttendance,
+} from './sessions/sessionsAttendance';
 
 const campaignRoom = (campaignId: string) => `campaign:${campaignId}`;
 
@@ -180,13 +187,21 @@ export const initSocket = (httpServer: HttpServer): AppIo => {
           getIo()
             .to(campaignRoom(campaignId))
             .emit('session_ended', { campaignId, sessionId: active.id });
+          await closeAllAttendances(active.id);
           notifySessionStatusChanged(campaignId).catch((error) => {
             console.error('session_status_changed notify failed', error);
           });
           active = null;
         }
 
-        ack({ ok: true, activeSession: active ? toSessionDTO(active) : null });
+        const attending = active
+          ? await isSessionAttendee(active.id, socket.data.userId)
+          : false;
+        ack({
+          ok: true,
+          activeSession: active ? toSessionDTO(active) : null,
+          isAttendee: attending,
+        });
         await broadcastPresence(campaignId);
       } catch (error) {
         if (error instanceof AppError && error.statusCode === 404) {
@@ -206,6 +221,18 @@ export const initSocket = (httpServer: HttpServer): AppIo => {
       try {
         await requireCampaignDM(socket.data.userId, payload.campaignId);
 
+        const open = await findOpenAttendance(socket.data.userId);
+        if (open && open.campaignSession.campaignId !== payload.campaignId) {
+          return ack({
+            ok: false,
+            errorCode: 'session_conflict',
+            conflict: {
+              campaignId: open.campaignSession.campaignId,
+              campaignName: open.campaignSession.campaign.name,
+            },
+          });
+        }
+
         let session = await findActiveSession(payload.campaignId);
         if (!session) {
           const { _max } = await prisma.campaignSession.aggregate({
@@ -220,6 +247,10 @@ export const initSocket = (httpServer: HttpServer): AppIo => {
               ...(title ? { title } : {}),
             },
           });
+        }
+
+        if (!open) {
+          await openAttendance(session.id, socket.data.userId);
         }
 
         getIo()
@@ -257,6 +288,7 @@ export const initSocket = (httpServer: HttpServer): AppIo => {
           where: { id: payload.sessionId },
           data: { status: 'ended', endedAt: new Date() },
         });
+        await closeAllAttendances(payload.sessionId);
 
         getIo()
           .to(campaignRoom(payload.campaignId))
@@ -273,6 +305,78 @@ export const initSocket = (httpServer: HttpServer): AppIo => {
           return ack({ ok: false, errorCode: 'forbidden' });
         }
         console.error('session:end failed', error);
+        ack({ ok: false, errorCode: 'internal' });
+      }
+    });
+
+    socket.on('session:join', async (payload, ack) => {
+      try {
+        await requireCampaignAccess(socket.data.userId, payload.campaignId);
+
+        const session = await prisma.campaignSession.findFirst({
+          where: {
+            id: payload.sessionId,
+            campaignId: payload.campaignId,
+            status: 'active',
+          },
+          select: { id: true },
+        });
+        if (!session) {
+          return ack({ ok: false, errorCode: 'forbidden' });
+        }
+
+        const open = await findOpenAttendance(socket.data.userId);
+        if (open && open.campaignSessionId !== payload.sessionId) {
+          return ack({
+            ok: false,
+            errorCode: 'session_conflict',
+            conflict: {
+              campaignId: open.campaignSession.campaignId,
+              campaignName: open.campaignSession.campaign.name,
+            },
+          });
+        }
+
+        if (!open) {
+          await openAttendance(payload.sessionId, socket.data.userId);
+          getIo().to(campaignRoom(payload.campaignId)).emit('session_attendance_changed', {
+            campaignId: payload.campaignId,
+            sessionId: payload.sessionId,
+            userId: socket.data.userId,
+            displayName: socket.data.displayName,
+            action: 'joined',
+          });
+        }
+        ack({ ok: true });
+      } catch (error) {
+        if (error instanceof AppError && error.statusCode === 404) {
+          return ack({ ok: false, errorCode: 'forbidden' });
+        }
+        console.error('session:join failed', error);
+        ack({ ok: false, errorCode: 'internal' });
+      }
+    });
+
+    socket.on('session:leave', async (payload, ack) => {
+      try {
+        await requireCampaignAccess(socket.data.userId, payload.campaignId);
+
+        const closed = await closeAttendance(payload.sessionId, socket.data.userId);
+        if (closed.count > 0) {
+          getIo().to(campaignRoom(payload.campaignId)).emit('session_attendance_changed', {
+            campaignId: payload.campaignId,
+            sessionId: payload.sessionId,
+            userId: socket.data.userId,
+            displayName: socket.data.displayName,
+            action: 'left',
+          });
+        }
+        ack({ ok: true });
+      } catch (error) {
+        if (error instanceof AppError && error.statusCode === 404) {
+          return ack({ ok: false, errorCode: 'forbidden' });
+        }
+        console.error('session:leave failed', error);
         ack({ ok: false, errorCode: 'internal' });
       }
     });
