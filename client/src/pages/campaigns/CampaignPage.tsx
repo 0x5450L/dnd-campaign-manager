@@ -26,11 +26,11 @@ function CampaignPage() {
   const navigate = useNavigate();
   const notify = useNotificationStore((s) => s.notify);
   const activeCampaignId = useLiveSessionStore((s) => s.activeCampaignId);
-  const hasLiveSession = useLiveSessionStore((s) => s.session !== null);
+  const isAttendee = useLiveSessionStore((s) => s.isAttendee);
   const markVisited = useCampaignVisitsStore((s) => s.markVisited);
 
   const isBlocked =
-    !!id && hasLiveSession && activeCampaignId !== null && id !== activeCampaignId;
+    !!id && isAttendee && activeCampaignId !== null && id !== activeCampaignId;
 
   useEffect(() => {
     if (!isBlocked) return;

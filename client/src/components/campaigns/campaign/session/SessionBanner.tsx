@@ -22,7 +22,7 @@ export const SessionBanner = ({ isDM }: SessionBannerProps) => {
   const session = useLiveSessionStore((s) => s.session);
   const { encounter } = useActiveEncounter();
   const { connectedCount } = usePresence();
-  const { endSession } = useSessionCommands();
+  const { endSession, leaveSession } = useSessionCommands();
   const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
@@ -60,13 +60,21 @@ export const SessionBanner = ({ isDM }: SessionBannerProps) => {
           label="Round"
           value={encounter ? `${encounter.round}` : "—"}
         />
-        {isDM && (
+        {isDM ? (
           <button
             type="button"
             onClick={endSession}
             className="cs-btn-ghost border-rust/70 text-rust hover:!border-rust hover:!text-rust hover:!bg-rust/10"
           >
             End session
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={leaveSession}
+            className="cs-btn-ghost border-rust/70 text-rust hover:!border-rust hover:!text-rust hover:!bg-rust/10"
+          >
+            Leave session
           </button>
         )}
       </div>

@@ -6,9 +6,10 @@ import { useSessionCommands } from "@/hooks/liveSession/useSessionCommands";
 export const SessionDiceBridge = () => {
   const registerSessionSink = useDiceRollerStore((s) => s.registerSessionSink);
   const session = useLiveSessionStore((s) => s.session);
+  const isAttendee = useLiveSessionStore((s) => s.isAttendee);
   const { logRoll } = useSessionCommands();
 
-  const sessionIsActive = session?.status === "active";
+  const sessionIsActive = session?.status === "active" && isAttendee;
 
   useEffect(() => {
     if (!sessionIsActive) return;

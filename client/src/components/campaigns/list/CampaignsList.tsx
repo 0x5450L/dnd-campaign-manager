@@ -7,7 +7,7 @@ import { useCampaignVisitsStore } from "@/state/campaigns/campaignVisitsStore";
 function CampaignsList() {
   const { data: campaigns, isLoading, isError, error } = useCampaignsQuery();
   const activeCampaignId = useLiveSessionStore((s) => s.activeCampaignId);
-  const hasLiveSession = useLiveSessionStore((s) => s.session !== null);
+  const isAttendee = useLiveSessionStore((s) => s.isAttendee);
   const visitedAt = useCampaignVisitsStore((s) => s.visitedAt);
 
   const sortedCampaigns = useMemo(() => {
@@ -35,7 +35,7 @@ function CampaignsList() {
           key={campaign.id}
           campaign={campaign}
           isLive={campaign.activeSessionId !== null}
-          isLocked={hasLiveSession && campaign.id !== activeCampaignId}
+          isLocked={isAttendee && campaign.id !== activeCampaignId}
         />
       ))}
     </ul>

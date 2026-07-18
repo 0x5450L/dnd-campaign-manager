@@ -22,7 +22,7 @@ export const useLiveSessionStore = create<LiveSessionStore>()(
       setActiveCampaign: (campaignId) =>
         set((state) => {
           if (state.activeCampaignId === campaignId) return state;
-          if (state.session) return state;
+          if (state.isAttendee) return state;
           return {
             ...liveSessionReducer(state, { type: "RESET" }),
             activeCampaignId: campaignId,
