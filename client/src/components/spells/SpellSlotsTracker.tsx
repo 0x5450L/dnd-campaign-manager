@@ -42,6 +42,8 @@ export const SpellSlotsTracker = ({
   const remaining = configured.reduce((sum, s) => sum + (s.total - s.used), 0);
   const totalSlots = configured.reduce((sum, s) => sum + s.total, 0);
 
+  const capacityEditable = editable && (!!onChange || !!onCapacityCommit);
+
   const [collapsed, setCollapsed] = useState(() => !hasSlots);
   const [editing, setEditing] = useState(false);
 
@@ -135,13 +137,15 @@ export const SpellSlotsTracker = ({
                   ? "Tap to set how many slots you have"
                   : "Tap a slot to spend or restore it"}
               </span>
-              <button
-                type="button"
-                onClick={() => setEditing((e) => !e)}
-                className="font-fantasy text-xs uppercase tracking-widest text-dim transition-colors hover:text-gold-bright"
-              >
-                {editing ? "Done" : "Edit"}
-              </button>
+              {capacityEditable && (
+                <button
+                  type="button"
+                  onClick={() => setEditing((e) => !e)}
+                  className="font-fantasy text-xs uppercase tracking-widest text-dim transition-colors hover:text-gold-bright"
+                >
+                  {editing ? "Done" : "Edit"}
+                </button>
+              )}
             </div>
           )}
 
@@ -206,7 +210,7 @@ export const SpellSlotsTracker = ({
             </div>
           ) : (
             <p className="py-1 text-center text-xs italic text-faint">
-              {editable
+              {capacityEditable
                 ? "No spell slots yet. Tap Edit to add them."
                 : "No spell slots."}
             </p>
