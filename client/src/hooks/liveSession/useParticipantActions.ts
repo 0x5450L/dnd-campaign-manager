@@ -2,6 +2,7 @@ import { useCallback, useMemo } from "react";
 import { useLiveSessionStore } from "@/state/liveSession/liveSessionStore";
 import {
   useAbilityUsageMutation,
+  useSpellSlotUsageMutation,
   useActiveEncounterQuery,
   useCreateParticipantMutation,
   useRemoveParticipantMutation,
@@ -29,6 +30,7 @@ export const useParticipantActions = () => {
 
   const { mutate: mutateParticipant } = useUpdateParticipantMutation(sessionId);
   const { mutate: mutateAbilityUsage } = useAbilityUsageMutation(sessionId);
+  const { mutate: mutateSpellSlotUsage } = useSpellSlotUsageMutation(sessionId);
   const { mutate: mutateRollInitiative } = useRollInitiativeMutation(sessionId);
   const { mutate: mutateCreateParticipant } = useCreateParticipantMutation(sessionId);
   const { mutate: mutateRemoveParticipant } = useRemoveParticipantMutation(sessionId);
@@ -144,11 +146,19 @@ export const useParticipantActions = () => {
   );
 
   const applyAbilityUsage = useCallback(
-    (participantId: string, abilityId: string, action: AbilityUsageAction) => {
+    (participantId: string, abilityId: string, action: AbilityUsageAction, slotLevel?: number) => {
       if (!encounter) return;
-      mutateAbilityUsage({ encounterId: encounter.id, participantId, abilityId, action });
+      mutateAbilityUsage({ encounterId: encounter.id, participantId, abilityId, action, slotLevel });
     },
     [encounter, mutateAbilityUsage],
+  );
+
+  const applySpellSlotUsage = useCallback(
+    (participantId: string, level: number, action: AbilityUsageAction) => {
+      if (!encounter) return;
+      mutateSpellSlotUsage({ encounterId: encounter.id, participantId, level, action });
+    },
+    [encounter, mutateSpellSlotUsage],
   );
 
   const addParticipant = useCallback(
@@ -180,6 +190,7 @@ export const useParticipantActions = () => {
       updateParticipant,
       rollInitiative,
       applyAbilityUsage,
+      applySpellSlotUsage,
       addParticipant,
       removeParticipant,
     }),
@@ -195,6 +206,7 @@ export const useParticipantActions = () => {
       updateParticipant,
       rollInitiative,
       applyAbilityUsage,
+      applySpellSlotUsage,
       addParticipant,
       removeParticipant,
     ],

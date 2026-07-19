@@ -192,6 +192,12 @@ export type RollInitiativePayload = {
 
 export type AbilityUsagePayload = {
   action: AbilityUsageAction;
+  slotLevel?: number;
+};
+
+export type SpellSlotUsagePayload = {
+  level: number;
+  action: AbilityUsageAction;
 };
 
 export type BulkInitiativePayload = {

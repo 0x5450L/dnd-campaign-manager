@@ -5,6 +5,7 @@ import { validateBody } from "../middleware/validateBody";
 import { asyncHandler } from "../utils/asyncHandler";
 import type {
   AbilityUsagePayload,
+  SpellSlotUsagePayload,
   RollInitiativePayload,
   BulkCreateParticipantsPayload,
   BulkInitiativePayload,
@@ -14,6 +15,7 @@ import type {
 } from "@shared/dto/session";
 import {
   abilityUsageSchema,
+  spellSlotUsageSchema,
   bulkCreateParticipantsSchema,
   bulkInitiativeSchema,
   createEncounterSchema,
@@ -98,6 +100,18 @@ router.post<{ id: string; pid: string; abilityId: string }>("/:id/participants/:
     req.params.id,
     req.params.pid,
     req.params.abilityId,
+    req.body.action,
+    req.body.slotLevel,
+  );
+  res.json({ status: "ok", participant });
+}));
+
+router.post<{ id: string; pid: string }>("/:id/participants/:pid/spell-slots", authMiddleware, validateBody(spellSlotUsageSchema), asyncHandler<{ id: string; pid: string }, unknown, SpellSlotUsagePayload>(async (req, res) => {
+  const participant = await encountersService.applyParticipantSpellSlotUsage(
+    req.userId!,
+    req.params.id,
+    req.params.pid,
+    req.body.level,
     req.body.action,
   );
   res.json({ status: "ok", participant });

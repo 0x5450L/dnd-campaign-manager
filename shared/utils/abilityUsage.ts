@@ -1,8 +1,11 @@
 import type { Ability, AbilityUsageAction, ResourcePool } from "../types/abilities";
+import type { SpellSlotLevel } from "../types/dnd";
+import { applySpellSlotUsage, listCastableSlotLevels } from "./spellSlotUsage";
 
 export type AbilityUsageResult = {
   abilities: Ability[];
   resources: ResourcePool[];
+  spellSlots: SpellSlotLevel[];
 };
 
 const replaceAbility = (abilities: Ability[], next: Ability): Ability[] =>
@@ -14,8 +17,10 @@ const replacePool = (resources: ResourcePool[], next: ResourcePool): ResourcePoo
 export const applyAbilityUsage = (
   abilities: Ability[],
   resources: ResourcePool[],
+  spellSlots: SpellSlotLevel[],
   abilityId: string,
   action: AbilityUsageAction,
+  slotLevel?: number,
 ): AbilityUsageResult | null => {
   const ability = abilities.find((entry) => entry.id === abilityId);
   if (!ability?.cost) return null;
@@ -31,6 +36,7 @@ export const applyAbilityUsage = (
           cost: { ...cost, charged: !spending },
         }),
         resources,
+        spellSlots,
       };
     }
     case "perDay": {
@@ -39,6 +45,7 @@ export const applyAbilityUsage = (
       return {
         abilities: replaceAbility(abilities, { ...ability, cost: { ...cost, remaining } }),
         resources,
+        spellSlots,
       };
     }
     case "pool": {
@@ -47,19 +54,32 @@ export const applyAbilityUsage = (
       const remaining =
         action === "spend" ? pool.remaining - cost.amount : pool.remaining + cost.amount;
       if (remaining < 0 || remaining > pool.max) return null;
-      return { abilities, resources: replacePool(resources, { ...pool, remaining }) };
+      return {
+        abilities,
+        resources: replacePool(resources, { ...pool, remaining }),
+        spellSlots,
+      };
     }
-    case "spellSlot":
-      return null;
+    case "spellSlot": {
+      const targetLevel =
+        slotLevel ?? listCastableSlotLevels(spellSlots, cost.level, action)[0];
+      if (targetLevel === undefined || targetLevel < cost.level) return null;
+      const nextSlots = applySpellSlotUsage(spellSlots, targetLevel, action);
+      if (!nextSlots) return null;
+      return { abilities, resources, spellSlots: nextSlots };
+    }
   }
 };
 
 export const canApplyAbilityUsage = (
   abilities: Ability[],
   resources: ResourcePool[],
+  spellSlots: SpellSlotLevel[],
   abilityId: string,
   action: AbilityUsageAction,
-): boolean => applyAbilityUsage(abilities, resources, abilityId, action) !== null;
+  slotLevel?: number,
+): boolean =>
+  applyAbilityUsage(abilities, resources, spellSlots, abilityId, action, slotLevel) !== null;
 
 export type RechargeRollResult = {
   abilityId: string;

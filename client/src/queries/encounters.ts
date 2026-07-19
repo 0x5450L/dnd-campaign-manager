@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   advanceTurn as advanceTurnRequest,
   applyAbilityUsage as applyAbilityUsageRequest,
+  applySpellSlotUsage as applySpellSlotUsageRequest,
   rollInitiative as rollInitiativeRequest,
   createEncounter as createEncounterRequest,
   createParticipant as createParticipantRequest,
@@ -130,6 +131,7 @@ type AbilityUsageVars = {
   participantId: string;
   abilityId: string;
   action: AbilityUsageAction;
+  slotLevel?: number;
 };
 
 export const useAbilityUsageMutation = (campaignSessionId: string | undefined) => {
@@ -137,9 +139,37 @@ export const useAbilityUsageMutation = (campaignSessionId: string | undefined) =
   const key = encounterKeys.list(campaignSessionId ?? "");
 
   return useMutation({
-    mutationFn: async ({ encounterId, participantId, abilityId, action }: AbilityUsageVars) =>
-      (await applyAbilityUsageRequest(encounterId, participantId, abilityId, { action }))
+    mutationFn: async ({
+      encounterId,
+      participantId,
+      abilityId,
+      action,
+      slotLevel,
+    }: AbilityUsageVars) =>
+      (await applyAbilityUsageRequest(encounterId, participantId, abilityId, { action, slotLevel }))
         .participant,
+    onSuccess: (participant, { encounterId }) => {
+      queryClient.setQueryData<EncounterList>(key, (list) =>
+        replaceParticipant(list, encounterId, participant),
+      );
+    },
+  });
+};
+
+type SpellSlotUsageVars = {
+  encounterId: string;
+  participantId: string;
+  level: number;
+  action: AbilityUsageAction;
+};
+
+export const useSpellSlotUsageMutation = (campaignSessionId: string | undefined) => {
+  const queryClient = useQueryClient();
+  const key = encounterKeys.list(campaignSessionId ?? "");
+
+  return useMutation({
+    mutationFn: async ({ encounterId, participantId, level, action }: SpellSlotUsageVars) =>
+      (await applySpellSlotUsageRequest(encounterId, participantId, { level, action })).participant,
     onSuccess: (participant, { encounterId }) => {
       queryClient.setQueryData<EncounterList>(key, (list) =>
         replaceParticipant(list, encounterId, participant),

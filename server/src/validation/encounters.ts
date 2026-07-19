@@ -1,6 +1,7 @@
 import { z } from "zod";
 import type {
   AbilityUsagePayload,
+  SpellSlotUsagePayload,
   BulkCreateParticipantsPayload,
   BulkInitiativePayload,
   CreateParticipantPayload,
@@ -116,7 +117,13 @@ export const rollInitiativeSchema = z.object({
 
 export const abilityUsageSchema = z.object({
   action: z.enum(["spend", "restore"]),
+  slotLevel: z.number().int().min(1).max(9).optional(),
 }) satisfies z.ZodType<AbilityUsagePayload>;
+
+export const spellSlotUsageSchema = z.object({
+  level: z.number().int().min(1).max(9),
+  action: z.enum(["spend", "restore"]),
+}) satisfies z.ZodType<SpellSlotUsagePayload>;
 
 export const listEncountersQuerySchema = z.object({
   campaignSessionId: z.string().min(1),

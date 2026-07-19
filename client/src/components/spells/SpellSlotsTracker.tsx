@@ -4,11 +4,14 @@ import {
   SPELL_SLOT_MAX_BY_LEVEL,
 } from "@shared/constants/dnd";
 import type { SpellSlotLevel } from "@shared/types/dnd";
+import type { AbilityUsageAction } from "@shared/types/abilities";
 
 type SpellSlotsTrackerProps = {
   slots: SpellSlotLevel[] | null;
   editable: boolean;
   onChange?: (slots: SpellSlotLevel[]) => void;
+  onCapacityCommit?: (slots: SpellSlotLevel[]) => void;
+  onToggleUsed?: (level: number, action: AbilityUsageAction) => void;
 };
 
 const emptyLevel = (level: number): SpellSlotLevel => ({
@@ -27,6 +30,8 @@ export const SpellSlotsTracker = ({
   slots,
   editable,
   onChange,
+  onCapacityCommit,
+  onToggleUsed,
 }: SpellSlotsTrackerProps) => {
   const byLevel = normalize(slots);
   const configured = SPELL_SLOT_LEVELS.map(
@@ -40,16 +45,18 @@ export const SpellSlotsTracker = ({
   const [collapsed, setCollapsed] = useState(() => !hasSlots);
   const [editing, setEditing] = useState(false);
 
-  const commit = (next: Map<number, SpellSlotLevel>) => {
-    if (!onChange) return;
-    const result = SPELL_SLOT_LEVELS.map((level) => next.get(level))
+  const buildResult = (next: Map<number, SpellSlotLevel>): SpellSlotLevel[] =>
+    SPELL_SLOT_LEVELS.map((level) => next.get(level))
       .filter((slot): slot is SpellSlotLevel => !!slot && slot.total > 0)
       .map((slot) => ({
         level: slot.level,
         total: slot.total,
         used: Math.min(slot.used, slot.total),
       }));
-    onChange(result);
+
+  const commit = (next: Map<number, SpellSlotLevel>) => {
+    if (!onChange) return;
+    onChange(buildResult(next));
   };
 
   const setCapacity = (level: number, total: number) => {
@@ -61,6 +68,10 @@ export const SpellSlotsTracker = ({
       total,
       used: Math.min(current.used, total),
     });
+    if (onCapacityCommit) {
+      onCapacityCommit(buildResult(next));
+      return;
+    }
     commit(next);
   };
 
@@ -69,6 +80,10 @@ export const SpellSlotsTracker = ({
     const next = normalize(slots);
     const current = next.get(level);
     if (!current) return;
+    if (onToggleUsed) {
+      onToggleUsed(level, index < current.used ? "restore" : "spend");
+      return;
+    }
     const used = index < current.used ? index : index + 1;
     next.set(level, {
       ...current,

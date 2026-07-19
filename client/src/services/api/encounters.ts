@@ -19,6 +19,7 @@ import type {
   UpdateParticipantResponse,
   BulkInitiativePayload,
   AbilityUsagePayload,
+  SpellSlotUsagePayload,
   RollInitiativePayload,
   RollInitiativeResponse,
 } from "@/types/encounter";
@@ -115,6 +116,20 @@ export const applyAbilityUsage = async (
 ) => {
   return apiClient<UpdateParticipantResponse>(
     `/api/encounters/${id}/participants/${pid}/abilities/${abilityId}/usage`,
+    {
+      method: "POST",
+      body: JSON.stringify(payload),
+    },
+  );
+};
+
+export const applySpellSlotUsage = async (
+  id: string,
+  pid: string,
+  payload: SpellSlotUsagePayload,
+) => {
+  return apiClient<UpdateParticipantResponse>(
+    `/api/encounters/${id}/participants/${pid}/spell-slots`,
     {
       method: "POST",
       body: JSON.stringify(payload),

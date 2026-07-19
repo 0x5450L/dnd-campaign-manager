@@ -1,6 +1,6 @@
 import { AppError } from "../../utils/errors";
 import { requireEncounterDM } from "../../utils/accessControl";
-import { jsonInput, pickDefined, trimOrNull } from "../../utils/payload";
+import { ensureAttackIds, jsonInput, pickDefined, trimOrNull } from "../../utils/payload";
 import type {
   BulkInitiativePayload,
   BulkCreateParticipantsPayload,
@@ -9,9 +9,11 @@ import type {
   UpdateParticipantPayload,
 } from "@shared/dto/session";
 import type { Ability, AbilityUsageAction, ResourcePool } from "@shared/types/abilities";
+import type { SpellSlotLevel } from "@shared/types/dnd";
 import type { InitiativeRollDTO, RollInitiativePayload } from "@shared/dto/session";
 import { rollInitiative } from "@shared/utils/initiative";
 import { applyAbilityUsage, applyTurnStart } from "@shared/utils/abilityUsage";
+import { applySpellSlotUsage } from "@shared/utils/spellSlotUsage";
 import { rollDie } from "@shared/utils/dice";
 import * as encountersRepo from "./encountersRepository";
 import { mapEncounterToDTO, mapParticipantToDTO } from "./encountersMappers";
@@ -292,7 +294,7 @@ export const updateParticipant = async (
         maxHp: body.maxHp,
         armorClass: body.armorClass,
         usesShield: body.usesShield,
-        attacks: body.attacks,
+        attacks: ensureAttackIds(body.attacks),
         spellAbility: body.spellAbility,
         proficiencyBonus: body.proficiencyBonus,
         abilityScores: jsonInput(body.abilityScores),
@@ -405,17 +407,7 @@ export const rollEncounterInitiative = async (
   return { participants: updated, rolls };
 };
 
-export const applyParticipantAbilityUsage = async (
-  userId: string,
-  id: string,
-  pid: string,
-  abilityId: string,
-  action: AbilityUsageAction,
-) => {
-  if (action !== "spend" && action !== "restore") {
-    throw new AppError(400, "Unknown ability usage action");
-  }
-
+const findParticipantForUsage = async (userId: string, id: string, pid: string) => {
   const participant = await encountersRepo.findParticipantForEdit(pid);
   if (!participant || participant.encounterId !== id) {
     throw new AppError(404, "Participant not found");
@@ -427,9 +419,27 @@ export const applyParticipantAbilityUsage = async (
     throw new AppError(403, "You can only modify your own character or as DM");
   }
 
+  return participant;
+};
+
+export const applyParticipantAbilityUsage = async (
+  userId: string,
+  id: string,
+  pid: string,
+  abilityId: string,
+  action: AbilityUsageAction,
+  slotLevel?: number,
+) => {
+  if (action !== "spend" && action !== "restore") {
+    throw new AppError(400, "Unknown ability usage action");
+  }
+
+  const participant = await findParticipantForUsage(userId, id, pid);
+
   const abilities = (participant.abilities as unknown as Ability[] | null) ?? [];
   const resources = (participant.resources as unknown as ResourcePool[] | null) ?? [];
-  const result = applyAbilityUsage(abilities, resources, abilityId, action);
+  const spellSlots = (participant.spellSlots as unknown as SpellSlotLevel[] | null) ?? [];
+  const result = applyAbilityUsage(abilities, resources, spellSlots, abilityId, action, slotLevel);
   if (!result) {
     throw new AppError(409, "Ability usage is not available");
   }
@@ -437,6 +447,46 @@ export const applyParticipantAbilityUsage = async (
   const updated = await encountersRepo.updateParticipant(pid, {
     abilities: jsonInput(result.abilities),
     resources: jsonInput(result.resources),
+    spellSlots: jsonInput(result.spellSlots),
+  });
+
+  try {
+    await broadcastParticipantUpdate(
+      participant.encounter.campaignSession.campaign.id,
+      participant.encounter.campaignSession.campaign.dmId,
+      id,
+      mapParticipantToDTO(updated),
+      participant.isVisible,
+      participant.encounter.status === "setup",
+    );
+  } catch (error) {
+    console.error("participant broadcast failed", error);
+  }
+
+  return updated;
+};
+
+export const applyParticipantSpellSlotUsage = async (
+  userId: string,
+  id: string,
+  pid: string,
+  level: number,
+  action: AbilityUsageAction,
+) => {
+  if (action !== "spend" && action !== "restore") {
+    throw new AppError(400, "Unknown spell slot usage action");
+  }
+
+  const participant = await findParticipantForUsage(userId, id, pid);
+
+  const spellSlots = (participant.spellSlots as unknown as SpellSlotLevel[] | null) ?? [];
+  const nextSlots = applySpellSlotUsage(spellSlots, level, action);
+  if (!nextSlots) {
+    throw new AppError(409, "Spell slot usage is not available");
+  }
+
+  const updated = await encountersRepo.updateParticipant(pid, {
+    spellSlots: jsonInput(nextSlots),
   });
 
   try {
