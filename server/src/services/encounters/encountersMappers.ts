@@ -25,7 +25,9 @@ export const mapParticipantToDTO = (
   currentHp: participant.currentHp,
   tempHp: participant.tempHp,
   armorClass: participant.armorClass,
-  attacks: participant.attacks as unknown as CharacterAttackDTO[] | [],
+  attacks: ((participant.attacks as unknown as CharacterAttackDTO[] | null) ?? []).map(
+    (attack, index) => ({ ...attack, id: attack.id ?? `legacy-${index}` }),
+  ),
   conditions: participant.conditions,
   isVisible: participant.isVisible,
   acHidden: participant.acHidden,

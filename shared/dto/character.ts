@@ -28,6 +28,7 @@ export type CharacterSkillDTO = {
 };
 
 export type CharacterAttackInput = {
+  id?: string;
   name: string;
   damage: string;
   attackBonus: number;

@@ -1,4 +1,6 @@
+import { randomUUID } from "node:crypto";
 import { Prisma } from "@prisma/client";
+import type { CharacterAttackInput } from "@shared/dto/character";
 
 export const jsonInput = <T>(
   value: T | null | undefined,
@@ -25,3 +27,8 @@ export const trimOrNull = (
   if (value === null) return null;
   return value.trim();
 };
+
+export const ensureAttackIds = (
+  attacks: CharacterAttackInput[] | undefined,
+): CharacterAttackInput[] | undefined =>
+  attacks?.map((attack) => ({ ...attack, id: attack.id ?? randomUUID() }));

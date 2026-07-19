@@ -12,6 +12,7 @@ import type { ParticipantAbilityScore } from "@shared/dto/session";
 export const abilityNameSchema = z.enum(ABILITY_NAMES);
 
 export const attackInputSchema = z.object({
+  id: z.string().optional(),
   name: z.string().min(1),
   damage: z.string(),
   attackBonus: z.number().int(),

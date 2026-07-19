@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 import prisma from "../prisma";
-import { jsonInput, pickDefined, trimOrNull } from "../../utils/payload";
+import { ensureAttackIds, jsonInput, pickDefined, trimOrNull } from "../../utils/payload";
 import { getLevelFromXp, getProficiencyBonus } from "@shared/utils/dndMath";
 import { rollInitiative } from "@shared/utils/initiative";
 import type {
@@ -118,7 +118,7 @@ const buildParticipantCreateData = (
     tempHp: input.tempHp,
     conditions: input.conditions,
     isVisible: input.isVisible,
-    attacks: input.attacks,
+    attacks: ensureAttackIds(input.attacks),
     acHidden: input.acHidden,
     typeHidden: input.typeHidden,
     usesShield: input.usesShield,
@@ -224,6 +224,7 @@ export const seedPartyForEncounter = async (
       deathSaveSuccesses: character.deathSaveSuccesses,
       deathSaveFailures: character.deathSaveFailures,
       proficiencyBonus: getProficiencyBonus(getLevelFromXp(character.experience)),
+      spellSlots: character.spellSlots ?? Prisma.DbNull,
       abilityScores: character.abilityScores.map((a) => ({ name: a.name, score: a.score })),
       abilities: character.abilities ?? Prisma.DbNull,
       resources: character.resources ?? Prisma.DbNull,
