@@ -10,6 +10,7 @@ import {
   creatureAbilities,
   creatureResourcePools,
 } from "./abilities";
+import { creatureSpellcastingSeed } from "./creatureSpellcastingParser";
 
 const TO_HIT_BONUS = /^[+-]\d+$/;
 
@@ -31,6 +32,9 @@ type ParticipantSeed = Pick<
   | "conditionImmunities"
   | "abilities"
   | "resources"
+  | "spellAbility"
+  | "proficiencyBonus"
+  | "spellSlots"
 >;
 
 const buildAbilityScores = (creature: SrdCreature): ParticipantAbilityScore[] =>
@@ -65,6 +69,7 @@ const formatSpeed = (speed: SrdCreature["speed"]): string | null => {
 export const srdCreatureToParticipant = (creature: SrdCreature): ParticipantSeed => {
   const abilities = creatureAbilities(creature);
   const resources = creatureResourcePools(creature);
+  const spellcasting = creatureSpellcastingSeed(creature);
 
   return {
     type: "monster",
@@ -83,5 +88,11 @@ export const srdCreatureToParticipant = (creature: SrdCreature): ParticipantSeed
     conditionImmunities: creature.conditionImmunities,
     abilities: abilities.length > 0 ? abilities : null,
     resources: resources.length > 0 ? resources : null,
+    spellAbility: spellcasting?.spellAbility ?? null,
+    proficiencyBonus: spellcasting?.proficiencyBonus ?? null,
+    spellSlots:
+      spellcasting && spellcasting.spellSlots.length > 0
+        ? spellcasting.spellSlots
+        : null,
   };
 };

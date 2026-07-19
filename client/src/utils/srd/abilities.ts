@@ -6,6 +6,12 @@ import type {
   ResourcePool,
 } from "@shared/types/abilities";
 import { parseCreatureAction } from "./creatureActionParser";
+import {
+  isSpellcastingTraitName,
+  parseSpellcastingTrait,
+  type ParsedSpellcastingTrait,
+  type SpellcastingSpellGroup,
+} from "./creatureSpellcastingParser";
 
 const TO_HIT_BONUS = /^[+-]\d+$/;
 const RECHARGE = /Recharge\s+(\d)/i;
@@ -29,6 +35,47 @@ const detectCost = (text: string): AbilityCost | null => {
   return null;
 };
 
+const titleCase = (spell: string): string =>
+  spell.replace(/\b\w/g, (char) => char.toUpperCase());
+
+const spellGroupCost = (group: SpellcastingSpellGroup): AbilityCost | null => {
+  switch (group.kind) {
+    case "slot":
+      return { type: "spellSlot", level: group.level };
+    case "perDay":
+      return { type: "perDay", max: group.max, remaining: group.max };
+    default:
+      return null;
+  }
+};
+
+const spellcastingAbilities = (
+  traitName: string,
+  parsed: ParsedSpellcastingTrait,
+): Ability[] => {
+  const result: Ability[] = [
+    {
+      id: crypto.randomUUID(),
+      name: traitName,
+      description: parsed.header,
+      activation: "passive",
+      cost: null,
+    },
+  ];
+  for (const group of parsed.groups) {
+    for (const spell of group.spells) {
+      result.push({
+        id: crypto.randomUUID(),
+        name: titleCase(spell),
+        description: "",
+        activation: "action",
+        cost: spellGroupCost(group),
+      });
+    }
+  }
+  return result;
+};
+
 const toAbility = (
   action: SrdCreatureAction,
   activation: AbilityActivation,
@@ -45,6 +92,13 @@ export const creatureAbilities = (creature: SrdCreature): Ability[] => {
   const abilities: Ability[] = [];
 
   for (const ability of creature.specialAbilities) {
+    if (isSpellcastingTraitName(ability.name)) {
+      const parsed = parseSpellcastingTrait(ability.description);
+      if (parsed) {
+        abilities.push(...spellcastingAbilities(ability.name, parsed));
+        continue;
+      }
+    }
     const isLegendaryResistance = LEGENDARY_RESISTANCE.test(ability.name);
     const cost: AbilityCost | null = isLegendaryResistance
       ? { type: "pool", pool: LEGENDARY_RESISTANCE_POOL, amount: 1 }
