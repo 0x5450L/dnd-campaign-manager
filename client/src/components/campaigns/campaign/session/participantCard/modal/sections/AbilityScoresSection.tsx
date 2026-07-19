@@ -16,16 +16,16 @@ const setScore = (
     : [...base, { name, score }];
 };
 
-export const AbilityScoresSection = ({ draft, updateDraft, canEditOwn }: EditorBodyProps) => (
+export const AbilityScoresSection = ({ participant, patchParticipant, canEditOwn }: EditorBodyProps) => (
   <div className="flex flex-col gap-1.5">
     <span className="text-xs sm:text-sm uppercase tracking-[0.18em] text-faint">
       Ability scores
     </span>
     <AbilityScoresStrip
-      scores={draft.abilityScores}
+      scores={participant.abilityScores}
       editable={canEditOwn}
       onScoreChange={(name, score) =>
-        updateDraft({ abilityScores: setScore(draft.abilityScores, name, score) })
+        patchParticipant({ abilityScores: setScore(participant.abilityScores, name, score) })
       }
     />
   </div>

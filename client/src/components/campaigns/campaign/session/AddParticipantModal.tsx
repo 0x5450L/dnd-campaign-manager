@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParticipantActions } from "@/hooks/liveSession/useParticipantActions";
 import type {
+  UpdateParticipantPayload,
   CreateParticipantPayload,
   EncounterParticipantDTO,
   ParticipantType,
@@ -62,8 +63,8 @@ export const AddParticipantModal = ({ onClose }: AddParticipantModalProps) => {
   const [draft, setDraft] = useState<EncounterParticipantDTO>(() => blankParticipant("monster"));
   const [isBestiaryOpen, setIsBestiaryOpen] = useState(false);
 
-  const updateDraft = (fields: Partial<EncounterParticipantDTO>) =>
-    setDraft((current) => ({ ...current, ...fields }));
+  const updateDraft = (fields: UpdateParticipantPayload & { type?: ParticipantType }) =>
+    setDraft((current) => ({ ...current, ...fields }) as EncounterParticipantDTO);
 
   const handlePickCreature = (creature: SrdCreature) => {
     setDraft((current) => ({ ...current, ...srdCreatureToParticipant(creature) }));
@@ -172,8 +173,8 @@ export const AddParticipantModal = ({ onClose }: AddParticipantModalProps) => {
         )}
 
         <ParticipantEditorBody
-          draft={draft}
-          updateDraft={updateDraft}
+          participant={draft}
+          patchParticipant={updateDraft}
           canEditOwn
           canManage
         />

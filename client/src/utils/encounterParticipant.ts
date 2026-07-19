@@ -1,8 +1,4 @@
 import { clamp } from "./dndMath";
-import type {
-  EncounterParticipantDTO,
-  UpdateParticipantPayload,
-} from "../types/encounter";
 
 type HpState = {
   currentHp: number;
@@ -58,51 +54,3 @@ export const incrementDeathSave = (
       ? Math.min(MAX_DEATH_SAVES, saves.deathSaveFailures + 1)
       : saves.deathSaveFailures,
 });
-
-const SCALAR_FIELDS = [
-  "name",
-  "sortOrder",
-  "maxHp",
-  "currentHp",
-  "tempHp",
-  "armorClass",
-  "isVisible",
-  "acHidden",
-  "usesShield",
-  "spellAbility",
-  "proficiencyBonus",
-  "deathSaveSuccesses",
-  "deathSaveFailures",
-  "speed",
-  "senses",
-  "challengeRating",
-  "damageVulnerabilities",
-  "damageResistances",
-  "damageImmunities",
-  "conditionImmunities",
-] as const;
-
-const JSON_FIELDS = [
-  "conditions",
-  "abilityScores",
-  "spellSlots",
-  "attacks",
-  "abilities",
-  "resources",
-] as const;
-
-export const diffParticipant = (
-  base: EncounterParticipantDTO,
-  next: EncounterParticipantDTO,
-): UpdateParticipantPayload => {
-  const patch: Record<string, unknown> = {};
-  for (const field of SCALAR_FIELDS) {
-    if (next[field] !== base[field]) patch[field] = next[field];
-  }
-  for (const field of JSON_FIELDS) {
-    if (JSON.stringify(next[field]) !== JSON.stringify(base[field])) {
-      patch[field] = next[field];
-    }
-  }
-  return patch as UpdateParticipantPayload;
-};

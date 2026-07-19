@@ -1,10 +1,9 @@
-import { useEffect, useRef, useState } from "react";
-import type { EncounterParticipantDTO } from "@/types/encounter";
-import { diffParticipant } from "@/utils/encounterParticipant";
+import { useEffect } from "react";
+import type { EncounterParticipantDTO, UpdateParticipantPayload } from "@/types/encounter";
 import { useParticipantActions } from "@/hooks/liveSession/useParticipantActions";
 import TypeBadge from "../blocks/TypeBadge";
 import VisibilityToggle from "../blocks/VisibilityToggle";
-import { CheckIcon, CloseIcon } from "../blocks/icons";
+import { CloseIcon } from "../blocks/icons";
 import EditableText from "./EditableText";
 import ParticipantEditorBody from "./ParticipantEditorBody";
 
@@ -26,52 +25,21 @@ export const ParticipantDetailsModal = ({
   const canManage = isDM;
   const canEditOwn = isDM || isOwner;
 
-  const [savedParticipant, setSavedParticipant] = useState(participant);
-  const [draft, setDraft] = useState(participant);
-  const externalRef = useRef(participant);
-
-  const updateDraft = (fields: Partial<EncounterParticipantDTO>) =>
-    setDraft((current) => ({ ...current, ...fields }));
-
-  const pendingPatch = diffParticipant(savedParticipant, draft);
-  const hasUnsavedChanges = Object.keys(pendingPatch).length > 0;
-
-  useEffect(() => {
-    setDraft((currentDraft) => {
-      const localChanges = diffParticipant(externalRef.current, currentDraft);
-      const merged: EncounterParticipantDTO = { ...participant };
-      for (const key of Object.keys(localChanges)) {
-        (merged as Record<string, unknown>)[key] = (currentDraft as Record<string, unknown>)[key];
-      }
-      return merged;
-    });
-    setSavedParticipant(participant);
-    externalRef.current = participant;
-  }, [participant]);
-
-  const commitChanges = () => {
-    if (!hasUnsavedChanges) return;
-    updateParticipant(participant.id, pendingPatch);
-    setSavedParticipant(draft);
-  };
-
-  const saveAndClose = () => {
-    if (hasUnsavedChanges) updateParticipant(participant.id, pendingPatch);
-    onClose();
-  };
+  const patchParticipant = (fields: UpdateParticipantPayload) =>
+    updateParticipant(participant.id, fields);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") saveAndClose();
+      if (e.key === "Escape") onClose();
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
-  });
+  }, [onClose]);
 
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
-      onClick={saveAndClose}
+      onClick={onClose}
     >
       <div
         onClick={(e) => e.stopPropagation()}
@@ -79,35 +47,25 @@ export const ParticipantDetailsModal = ({
       >
         <div className="flex items-center justify-between gap-3">
           <EditableText
-            value={draft.name}
+            value={participant.name}
             editable={canEditOwn}
-            onCommit={(name) => updateDraft({ name })}
+            onCommit={(name) => patchParticipant({ name })}
             ariaLabel="Participant name"
             className={`w-full truncate font-fantasy text-xl sm:text-2xl font-bold text-gold-bright ${
               canEditOwn ? "rounded border-b border-transparent focus:border-rule" : ""
             }`}
           />
           <div className="flex shrink-0 items-center gap-2">
-            <TypeBadge type={draft.type} />
+            <TypeBadge type={participant.type} />
             {canManage && (
               <VisibilityToggle
-                isVisible={draft.isVisible}
-                onToggle={() => updateDraft({ isVisible: !draft.isVisible })}
+                isVisible={participant.isVisible}
+                onToggle={() => patchParticipant({ isVisible: !participant.isVisible })}
               />
-            )}
-            {canEditOwn && hasUnsavedChanges && (
-              <button
-                type="button"
-                onClick={commitChanges}
-                aria-label="Save changes"
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded border border-leaf/70 bg-leaf/15 text-leaf-soft transition-colors hover:bg-leaf/25 hover:brightness-110"
-              >
-                <CheckIcon />
-              </button>
             )}
             <button
               type="button"
-              onClick={saveAndClose}
+              onClick={onClose}
               aria-label="Close"
               className="flex h-8 w-8 shrink-0 items-center justify-center rounded border border-rule text-faint transition-colors hover:border-hover hover:text-ink"
             >
@@ -117,8 +75,8 @@ export const ParticipantDetailsModal = ({
         </div>
 
         <ParticipantEditorBody
-          draft={draft}
-          updateDraft={updateDraft}
+          participant={participant}
+          patchParticipant={patchParticipant}
           canEditOwn={canEditOwn}
           canManage={canManage}
         />

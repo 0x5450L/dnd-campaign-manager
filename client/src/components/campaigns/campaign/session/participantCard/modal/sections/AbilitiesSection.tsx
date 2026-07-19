@@ -1,4 +1,6 @@
-import type { Ability, AbilityCost, ResourcePool } from "@/types/encounter";
+import { useState } from "react";
+import type { Ability, AbilityCost, ResourcePool, SpellSlotLevel } from "@/types/encounter";
+import type { AbilityUsageAction } from "@/types/encounter";
 import {
   ABILITY_ACTIVATION_LABELS,
   ABILITY_ACTIVATION_ORDER,
@@ -7,6 +9,7 @@ import type { EditorBodyProps } from "@/types/components/participantCard";
 import { useActiveEncounter } from "@/hooks/liveSession/useActiveEncounter";
 import { useParticipantActions } from "@/hooks/liveSession/useParticipantActions";
 import { canApplyAbilityUsage } from "@shared/utils/abilityUsage";
+import { listCastableSlotLevels } from "@shared/utils/spellSlotUsage";
 
 const costBadge = (cost: AbilityCost | null, pools: ResourcePool[] | null): string | null => {
   if (!cost) return null;
@@ -28,15 +31,52 @@ type AbilityCardProps = {
   ability: Ability;
   abilities: Ability[];
   resources: ResourcePool[];
+  spellSlots: SpellSlotLevel[];
   interactive: boolean;
-  onUsage: (abilityId: string, action: "spend" | "restore") => void;
+  onUsage: (abilityId: string, action: AbilityUsageAction, slotLevel?: number) => void;
 };
 
-const AbilityCard = ({ ability, abilities, resources, interactive, onUsage }: AbilityCardProps) => {
+const AbilityCard = ({
+  ability,
+  abilities,
+  resources,
+  spellSlots,
+  interactive,
+  onUsage,
+}: AbilityCardProps) => {
+  const [picker, setPicker] = useState<AbilityUsageAction | null>(null);
   const badge = costBadge(ability.cost, resources);
-  const canSpend = interactive && canApplyAbilityUsage(abilities, resources, ability.id, "spend");
+  const canSpend =
+    interactive && canApplyAbilityUsage(abilities, resources, spellSlots, ability.id, "spend");
   const canRestore =
-    interactive && canApplyAbilityUsage(abilities, resources, ability.id, "restore");
+    interactive && canApplyAbilityUsage(abilities, resources, spellSlots, ability.id, "restore");
+
+  const slotCostLevel = ability.cost?.type === "spellSlot" ? ability.cost.level : null;
+  const pickerLevels =
+    slotCostLevel !== null && picker
+      ? listCastableSlotLevels(spellSlots, slotCostLevel, picker)
+      : [];
+
+  const handleUsage = (action: AbilityUsageAction) => {
+    if (slotCostLevel === null) {
+      onUsage(ability.id, action);
+      return;
+    }
+    const levels = listCastableSlotLevels(spellSlots, slotCostLevel, action);
+    if (levels.length === 0) return;
+    if (levels.length === 1) {
+      onUsage(ability.id, action, levels[0]);
+      setPicker(null);
+      return;
+    }
+    setPicker((current) => (current === action ? null : action));
+  };
+
+  const pickLevel = (level: number) => {
+    if (!picker) return;
+    onUsage(ability.id, picker, level);
+    setPicker(null);
+  };
 
   return (
     <div className="rounded-md border border-rule bg-bg/60 px-3 py-2">
@@ -48,7 +88,7 @@ const AbilityCard = ({ ability, abilities, resources, interactive, onUsage }: Ab
               <button
                 type="button"
                 disabled={!canSpend}
-                onClick={() => onUsage(ability.id, "spend")}
+                onClick={() => handleUsage("spend")}
                 className={`rounded border px-1.5 py-0.5 text-[11px] uppercase tracking-wider transition-colors ${
                   canSpend
                     ? "border-gold/40 bg-gold/10 text-gold hover:bg-gold/25"
@@ -60,7 +100,7 @@ const AbilityCard = ({ ability, abilities, resources, interactive, onUsage }: Ab
               {canRestore && (
                 <button
                   type="button"
-                  onClick={() => onUsage(ability.id, "restore")}
+                  onClick={() => handleUsage("restore")}
                   aria-label={`Restore ${ability.name}`}
                   className="rounded border border-rule px-1 py-0.5 text-[11px] text-faint transition-colors hover:border-hover hover:text-ink"
                 >
@@ -74,6 +114,23 @@ const AbilityCard = ({ ability, abilities, resources, interactive, onUsage }: Ab
             </span>
           ))}
       </div>
+      {picker && pickerLevels.length > 0 && (
+        <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+          <span className="text-[11px] uppercase tracking-wider text-faint">
+            {picker === "spend" ? "Use slot:" : "Restore slot:"}
+          </span>
+          {pickerLevels.map((level) => (
+            <button
+              key={level}
+              type="button"
+              onClick={() => pickLevel(level)}
+              className="rounded border border-gold/40 bg-gold/10 px-1.5 py-0.5 text-[11px] uppercase tracking-wider text-gold transition-colors hover:bg-gold/25"
+            >
+              Lvl {level}
+            </button>
+          ))}
+        </div>
+      )}
       {ability.description && (
         <p className="mt-1 text-sm leading-snug text-dim">{ability.description}</p>
       )}
@@ -81,14 +138,15 @@ const AbilityCard = ({ ability, abilities, resources, interactive, onUsage }: Ab
   );
 };
 
-export const AbilitiesSection = ({ draft, canEditOwn }: EditorBodyProps) => {
+export const AbilitiesSection = ({ participant, canEditOwn }: EditorBodyProps) => {
   const { participants } = useActiveEncounter();
   const { applyAbilityUsage } = useParticipantActions();
-  const abilities = draft.abilities ?? [];
-  const resources = draft.resources ?? [];
+  const abilities = participant.abilities ?? [];
+  const resources = participant.resources ?? [];
+  const spellSlots = participant.spellSlots ?? [];
   if (abilities.length === 0) return null;
 
-  const interactive = canEditOwn && participants.some((p) => p.id === draft.id);
+  const interactive = canEditOwn && participants.some((p) => p.id === participant.id);
 
   const groups = ABILITY_ACTIVATION_ORDER.map((activation) => ({
     activation,
@@ -109,8 +167,11 @@ export const AbilitiesSection = ({ draft, canEditOwn }: EditorBodyProps) => {
                 ability={ability}
                 abilities={abilities}
                 resources={resources}
+                spellSlots={spellSlots}
                 interactive={interactive}
-                onUsage={(abilityId, action) => applyAbilityUsage(draft.id, abilityId, action)}
+                onUsage={(abilityId, action, slotLevel) =>
+                  applyAbilityUsage(participant.id, abilityId, action, slotLevel)
+                }
               />
             ))}
           </div>

@@ -1,7 +1,7 @@
 import type { EditorBodyProps } from "@/types/components/participantCard";
 
-export const ResourcePoolsSection = ({ draft }: EditorBodyProps) => {
-  const pools = draft.resources ?? [];
+export const ResourcePoolsSection = ({ participant }: EditorBodyProps) => {
+  const pools = participant.resources ?? [];
   if (pools.length === 0) return null;
 
   return (

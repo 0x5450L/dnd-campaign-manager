@@ -3,17 +3,19 @@ import { SpellSlotsTracker } from "@/components/spells/SpellSlotsTracker";
 import SpellAbilitySelect from "../fields/SpellAbilitySelect";
 import StatInput from "../fields/StatInput";
 import type { EditorBodyProps } from "@/types/components/participantCard";
+import { useParticipantActions } from "@/hooks/liveSession/useParticipantActions";
 
-export const SpellcastingSection = ({ draft, updateDraft, canEditOwn }: EditorBodyProps) => {
-  const spellScore = draft.spellAbility
-    ? draft.abilityScores?.find((s) => s.name === draft.spellAbility)?.score
+export const SpellcastingSection = ({ participant, patchParticipant, canEditOwn }: EditorBodyProps) => {
+  const { applySpellSlotUsage } = useParticipantActions();
+  const spellScore = participant.spellAbility
+    ? participant.abilityScores?.find((s) => s.name === participant.spellAbility)?.score
     : undefined;
   const spellMod = typeof spellScore === "number" ? calcModifier(spellScore) : null;
   const spellDerived =
-    spellMod !== null && draft.proficiencyBonus !== null
+    spellMod !== null && participant.proficiencyBonus !== null
       ? {
-          dc: SPELL_SAVE_DC_BASE + draft.proficiencyBonus + spellMod,
-          attack: draft.proficiencyBonus + spellMod,
+          dc: SPELL_SAVE_DC_BASE + participant.proficiencyBonus + spellMod,
+          attack: participant.proficiencyBonus + spellMod,
         }
       : null;
 
@@ -21,15 +23,15 @@ export const SpellcastingSection = ({ draft, updateDraft, canEditOwn }: EditorBo
     <>
       <div className="flex flex-wrap items-stretch gap-2.5">
         <SpellAbilitySelect
-          value={draft.spellAbility}
+          value={participant.spellAbility}
           editable={canEditOwn}
-          onChange={(spellAbility) => updateDraft({ spellAbility })}
+          onChange={(spellAbility) => patchParticipant({ spellAbility })}
         />
         <StatInput
           label="Prof"
-          value={draft.proficiencyBonus ?? 0}
+          value={participant.proficiencyBonus ?? 0}
           editable={canEditOwn}
-          onCommit={(proficiencyBonus) => updateDraft({ proficiencyBonus })}
+          onCommit={(proficiencyBonus) => patchParticipant({ proficiencyBonus })}
           min={0}
         />
         {spellDerived && (
@@ -46,9 +48,10 @@ export const SpellcastingSection = ({ draft, updateDraft, canEditOwn }: EditorBo
       </div>
 
       <SpellSlotsTracker
-        slots={draft.spellSlots ?? null}
+        slots={participant.spellSlots ?? null}
         editable={canEditOwn}
-        onChange={(spellSlots) => updateDraft({ spellSlots })}
+        onCapacityCommit={(spellSlots) => patchParticipant({ spellSlots })}
+        onToggleUsed={(level, action) => applySpellSlotUsage(participant.id, level, action)}
       />
     </>
   );

@@ -1,8 +1,8 @@
-import type { EncounterParticipantDTO } from "../encounter";
+import type { EncounterParticipantDTO, UpdateParticipantPayload } from "../encounter";
 
 export type EditorBodyProps = {
-  draft: EncounterParticipantDTO;
-  updateDraft: (fields: Partial<EncounterParticipantDTO>) => void;
+  participant: EncounterParticipantDTO;
+  patchParticipant: (fields: UpdateParticipantPayload) => void;
   canEditOwn: boolean;
   canManage: boolean;
 };

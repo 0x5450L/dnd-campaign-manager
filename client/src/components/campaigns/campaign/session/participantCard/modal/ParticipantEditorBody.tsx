@@ -4,7 +4,7 @@ import PcEditorBody from "./bodies/PcEditorBody";
 import type { EditorBodyProps } from "@/types/components/participantCard";
 
 export const ParticipantEditorBody = (props: EditorBodyProps) => {
-  switch (props.draft.type) {
+  switch (props.participant.type) {
     case "pc":
       return <PcEditorBody {...props} />;
     case "npc":

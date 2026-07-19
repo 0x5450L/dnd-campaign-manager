@@ -11,18 +11,18 @@ const formatChallenge = (cr: number | null): string | null => {
   return xp === null ? label : `${label} (${xp.toLocaleString()} XP)`;
 };
 
-export const MonsterStatsSection = ({ draft }: EditorBodyProps) => {
+export const MonsterStatsSection = ({ participant }: EditorBodyProps) => {
   const statline = [
-    ["Speed", draft.speed],
-    ["Senses", draft.senses],
-    ["CR", formatChallenge(draft.challengeRating)],
+    ["Speed", participant.speed],
+    ["Senses", participant.senses],
+    ["CR", formatChallenge(participant.challengeRating)],
   ].filter((entry): entry is [string, string] => Boolean(entry[1]));
 
   const defenses = [
-    ["Vulnerable", draft.damageVulnerabilities],
-    ["Resistant", draft.damageResistances],
-    ["Immune", draft.damageImmunities],
-    ["Cond. immune", draft.conditionImmunities],
+    ["Vulnerable", participant.damageVulnerabilities],
+    ["Resistant", participant.damageResistances],
+    ["Immune", participant.damageImmunities],
+    ["Cond. immune", participant.conditionImmunities],
   ].filter((entry): entry is [string, string] => Boolean(entry[1]));
 
   if (statline.length === 0 && defenses.length === 0) return null;
