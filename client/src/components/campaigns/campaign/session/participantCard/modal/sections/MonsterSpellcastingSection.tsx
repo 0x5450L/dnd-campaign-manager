@@ -25,21 +25,32 @@ export const MonsterSpellcastingSection = ({ participant, canEditOwn }: EditorBo
   return (
     <>
       {spellDerived && (
-        <div className="flex h-14 items-center justify-center gap-4 rounded-md border border-rule bg-bg/60 font-fantasy">
-          <span className="text-sm sm:text-base leading-none text-dim">
-            Save DC <span className="font-bold text-ink">{spellDerived.dc}</span>
-          </span>
-          <span className="text-sm sm:text-base leading-none text-dim">
-            Spell atk{" "}
-            <span className="font-bold text-ink">{formatSigned(spellDerived.attack)}</span>
-          </span>
+        <div className="flex flex-wrap items-stretch gap-2.5">
+          <div className="flex min-w-24 grow basis-0 flex-col items-center justify-center gap-1 rounded-md border border-rule bg-bg/60 px-3 py-2 font-fantasy">
+            <span className="text-xs sm:text-sm uppercase tracking-[0.18em] text-faint">
+              Save DC
+            </span>
+            <span className="text-sm sm:text-base font-bold leading-snug text-ink">
+              {spellDerived.dc}
+            </span>
+          </div>
+          <div className="flex min-w-24 grow basis-0 flex-col items-center justify-center gap-1 rounded-md border border-rule bg-bg/60 px-3 py-2 font-fantasy">
+            <span className="text-xs sm:text-sm uppercase tracking-[0.18em] text-faint">
+              Spell atk
+            </span>
+            <span className="text-sm sm:text-base font-bold leading-snug text-ink">
+              {formatSigned(spellDerived.attack)}
+            </span>
+          </div>
         </div>
       )}
       {hasSlots && (
         <SpellSlotsTracker
           slots={spellSlots}
           editable={canEditOwn}
-          onToggleUsed={(level, action) => applySpellSlotUsage(participant.id, level, action)}
+          onToggleUsed={(level, action, count) =>
+            applySpellSlotUsage(participant.id, level, action, count)
+          }
         />
       )}
     </>

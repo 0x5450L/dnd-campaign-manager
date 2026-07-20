@@ -123,6 +123,7 @@ export const abilityUsageSchema = z.object({
 export const spellSlotUsageSchema = z.object({
   level: z.number().int().min(1).max(9),
   action: z.enum(["spend", "restore"]),
+  count: z.number().int().min(1).max(9).optional(),
 }) satisfies z.ZodType<SpellSlotUsagePayload>;
 
 export const listEncountersQuerySchema = z.object({

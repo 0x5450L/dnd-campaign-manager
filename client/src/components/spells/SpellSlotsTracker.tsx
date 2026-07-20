@@ -11,7 +11,7 @@ type SpellSlotsTrackerProps = {
   editable: boolean;
   onChange?: (slots: SpellSlotLevel[]) => void;
   onCapacityCommit?: (slots: SpellSlotLevel[]) => void;
-  onToggleUsed?: (level: number, action: AbilityUsageAction) => void;
+  onToggleUsed?: (level: number, action: AbilityUsageAction, count: number) => void;
 };
 
 const emptyLevel = (level: number): SpellSlotLevel => ({
@@ -83,7 +83,10 @@ export const SpellSlotsTracker = ({
     const current = next.get(level);
     if (!current) return;
     if (onToggleUsed) {
-      onToggleUsed(level, index < current.used ? "restore" : "spend");
+      const target = index < current.used ? index : index + 1;
+      const count = Math.abs(target - current.used);
+      if (count === 0) return;
+      onToggleUsed(level, target < current.used ? "restore" : "spend", count);
       return;
     }
     const used = index < current.used ? index : index + 1;

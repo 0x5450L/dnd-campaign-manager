@@ -51,7 +51,9 @@ export const SpellcastingSection = ({ participant, patchParticipant, canEditOwn 
         slots={participant.spellSlots ?? null}
         editable={canEditOwn}
         onCapacityCommit={(spellSlots) => patchParticipant({ spellSlots })}
-        onToggleUsed={(level, action) => applySpellSlotUsage(participant.id, level, action)}
+        onToggleUsed={(level, action, count) =>
+          applySpellSlotUsage(participant.id, level, action, count)
+        }
       />
     </>
   );

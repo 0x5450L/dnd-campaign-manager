@@ -472,6 +472,7 @@ export const applyParticipantSpellSlotUsage = async (
   pid: string,
   level: number,
   action: AbilityUsageAction,
+  count?: number,
 ) => {
   if (action !== "spend" && action !== "restore") {
     throw new AppError(400, "Unknown spell slot usage action");
@@ -480,7 +481,7 @@ export const applyParticipantSpellSlotUsage = async (
   const participant = await findParticipantForUsage(userId, id, pid);
 
   const spellSlots = (participant.spellSlots as unknown as SpellSlotLevel[] | null) ?? [];
-  const nextSlots = applySpellSlotUsage(spellSlots, level, action);
+  const nextSlots = applySpellSlotUsage(spellSlots, level, action, count ?? 1);
   if (!nextSlots) {
     throw new AppError(409, "Spell slot usage is not available");
   }

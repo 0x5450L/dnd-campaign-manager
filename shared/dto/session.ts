@@ -198,6 +198,7 @@ export type AbilityUsagePayload = {
 export type SpellSlotUsagePayload = {
   level: number;
   action: AbilityUsageAction;
+  count?: number;
 };
 
 export type BulkInitiativePayload = {

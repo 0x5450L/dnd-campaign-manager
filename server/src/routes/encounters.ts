@@ -113,6 +113,7 @@ router.post<{ id: string; pid: string }>("/:id/participants/:pid/spell-slots", a
     req.params.pid,
     req.body.level,
     req.body.action,
+    req.body.count,
   );
   res.json({ status: "ok", participant });
 }));

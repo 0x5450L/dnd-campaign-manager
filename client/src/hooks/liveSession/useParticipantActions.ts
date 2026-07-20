@@ -154,9 +154,9 @@ export const useParticipantActions = () => {
   );
 
   const applySpellSlotUsage = useCallback(
-    (participantId: string, level: number, action: AbilityUsageAction) => {
+    (participantId: string, level: number, action: AbilityUsageAction, count?: number) => {
       if (!encounter) return;
-      mutateSpellSlotUsage({ encounterId: encounter.id, participantId, level, action });
+      mutateSpellSlotUsage({ encounterId: encounter.id, participantId, level, action, count });
     },
     [encounter, mutateSpellSlotUsage],
   );

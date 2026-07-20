@@ -161,6 +161,7 @@ type SpellSlotUsageVars = {
   participantId: string;
   level: number;
   action: AbilityUsageAction;
+  count?: number;
 };
 
 export const useSpellSlotUsageMutation = (campaignSessionId: string | undefined) => {
@@ -168,8 +169,8 @@ export const useSpellSlotUsageMutation = (campaignSessionId: string | undefined)
   const key = encounterKeys.list(campaignSessionId ?? "");
 
   return useMutation({
-    mutationFn: async ({ encounterId, participantId, level, action }: SpellSlotUsageVars) =>
-      (await applySpellSlotUsageRequest(encounterId, participantId, { level, action })).participant,
+    mutationFn: async ({ encounterId, participantId, level, action, count }: SpellSlotUsageVars) =>
+      (await applySpellSlotUsageRequest(encounterId, participantId, { level, action, count })).participant,
     onSuccess: (participant, { encounterId }) => {
       queryClient.setQueryData<EncounterList>(key, (list) =>
         replaceParticipant(list, encounterId, participant),
