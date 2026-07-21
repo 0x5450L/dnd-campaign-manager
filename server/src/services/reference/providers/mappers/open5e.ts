@@ -6,7 +6,27 @@ import type {
   SrdCreatureAction,
   SrdCreatureSummary,
   SrdSource,
+  SrdSpell,
 } from "@shared/dto/srd";
+
+export type Open5eSpellResult = {
+  slug: string;
+  name: string;
+  desc: string;
+  higher_level: string | null;
+  range: string;
+  components: string | null;
+  material: string | null;
+  ritual: string;
+  can_be_cast_as_ritual: boolean;
+  requires_concentration: boolean;
+  duration: string;
+  casting_time: string;
+  level_int: number;
+  school: string | null;
+  dnd_class: string | null;
+  spell_lists: string[] | null;
+};
 
 export type Open5eConditionResult = {
   slug: string;
@@ -127,6 +147,43 @@ export const mapOpen5eCreatureSummary = (
   source,
   challengeRating: raw.cr,
   type: raw.type ?? null,
+});
+
+const splitList = (raw: string | null): string[] =>
+  raw
+    ? raw
+        .split(",")
+        .map((entry) => entry.trim())
+        .filter((entry) => entry.length > 0)
+    : [];
+
+const spellClasses = (raw: Open5eSpellResult): string[] =>
+  raw.spell_lists && raw.spell_lists.length > 0
+    ? raw.spell_lists.map((entry) => entry.trim()).filter((entry) => entry.length > 0)
+    : splitList(raw.dnd_class);
+
+export const mapOpen5eSpell = (
+  raw: Open5eSpellResult,
+  source: SrdSource,
+): SrdSpell => ({
+  slug: raw.slug,
+  name: raw.name,
+  source,
+  level: raw.level_int,
+  school: emptyToNull(raw.school),
+  description: raw.desc,
+  higherLevel: emptyToNull(raw.higher_level),
+  range: raw.range,
+  components: splitList(raw.components),
+  material: emptyToNull(raw.material),
+  ritual: raw.can_be_cast_as_ritual,
+  concentration: raw.requires_concentration,
+  castingTime: raw.casting_time,
+  duration: raw.duration,
+  damage: null,
+  saveAbility: null,
+  areaOfEffect: null,
+  classes: spellClasses(raw),
 });
 
 export const mapOpen5eCreature = (

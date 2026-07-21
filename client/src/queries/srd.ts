@@ -1,5 +1,10 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { getSrdCreature, searchSrdCreatures } from "../services/api/srd";
+import {
+  getSrdCreature,
+  listSrdSpells,
+  searchSrdCreatures,
+} from "../services/api/srd";
+import { buildSpellIndex } from "../utils/srd/spellIndex";
 import { useAuthStore } from "../state/auth/authStore";
 
 export const srdKeys = {
@@ -8,6 +13,21 @@ export const srdKeys = {
   creatureSearch: (search: string) =>
     [...srdKeys.creatures(), "search", search] as const,
   creature: (slug: string) => [...srdKeys.creatures(), "detail", slug] as const,
+  spells: () => [...srdKeys.all, "spells"] as const,
+  spellPool: () => [...srdKeys.spells(), "pool"] as const,
+};
+
+const SPELL_POOL_STALE_MS = 60 * 60 * 1000;
+
+export const useSrdSpellIndexQuery = () => {
+  const token = useAuthStore((s) => s.token);
+  return useQuery({
+    queryKey: srdKeys.spellPool(),
+    queryFn: () => listSrdSpells(),
+    enabled: !!token,
+    staleTime: SPELL_POOL_STALE_MS,
+    select: (page) => buildSpellIndex(page.results),
+  });
 };
 
 export const useSrdCreatureSearchQuery = (search: string) => {

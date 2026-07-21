@@ -1,5 +1,5 @@
 import { SRD_CATEGORY } from "@shared/constants/srd";
-import type { SrdCategory, SrdCondition, SrdConditionSummary, SrdItem, SrdItemSummary, SrdListPage, SrdCreature, SrdCreatureSummary, SrdQuery, SrdSource, SrdSpell, SrdSpellSummary } from "@shared/dto/srd";
+import type { SrdCategory, SrdCondition, SrdConditionSummary, SrdItem, SrdItemSummary, SrdListPage, SrdCreature, SrdCreatureSummary, SrdQuery, SrdSource, SrdSpell } from "@shared/dto/srd";
 import type { ContentProvider } from "./contentProvider";
 import {
   ProviderRequestError,
@@ -18,7 +18,7 @@ export abstract class AbstractContentProvider implements ContentProvider {
     return this.unsupported(SRD_CATEGORY.Spell);
   }
 
-  async searchSpells(_query: SrdQuery): Promise<SrdListPage<SrdSpellSummary>> {
+  async searchSpells(_query: SrdQuery): Promise<SrdListPage<SrdSpell>> {
     return this.unsupported(SRD_CATEGORY.Spell);
   }
 

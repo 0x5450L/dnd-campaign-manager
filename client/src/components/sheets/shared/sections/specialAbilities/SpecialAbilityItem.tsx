@@ -3,6 +3,7 @@ import {
   ABILITY_ACTIVATION_NAMES,
   ABILITY_ACTIVATION_ORDER,
 } from "@/constants/abilities";
+import { SpellReferenceAccordion } from "./SpellReferenceAccordion";
 
 type CostKind = "none" | "recharge" | "perDay" | "pool";
 
@@ -153,6 +154,8 @@ export const SpecialAbilityItem = ({
         placeholder="Description..."
         className="custom-scrollbar min-h-14 w-full resize-none bg-transparent text-xs leading-relaxed text-ink outline-none placeholder:text-faint"
       />
+
+      <SpellReferenceAccordion name={ability.name} />
     </div>
   );
 };

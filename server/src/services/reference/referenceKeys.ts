@@ -17,4 +17,5 @@ export const referenceKeys = {
     `srd:${category}:detail:${slug}`,
   search: (category: SrdCategory, query: SrdQuery): string =>
     `srd:${category}:search:${serializeQuery(query)}`,
+  spellPool: (): string => "srd:spell:pool",
 };

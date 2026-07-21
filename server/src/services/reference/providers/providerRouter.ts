@@ -1,5 +1,5 @@
 import { SRD_CATEGORY } from "@shared/constants/srd";
-import type { SrdCategory, SrdCondition, SrdConditionSummary, SrdItem, SrdItemSummary, SrdListPage, SrdCreature, SrdCreatureSummary, SrdQuery, SrdSource, SrdSpell, SrdSpellSummary } from "@shared/dto/srd";
+import type { SrdCategory, SrdCondition, SrdConditionSummary, SrdItem, SrdItemSummary, SrdListPage, SrdCreature, SrdCreatureSummary, SrdQuery, SrdSource, SrdSpell } from "@shared/dto/srd";
 import type { ContentProvider } from "./contentProvider";
 import { NoProviderAvailableError } from "./providerErrors";
 import { DEFAULT_ROUTING, type ProviderRouting } from "./routing";
@@ -18,7 +18,7 @@ export class ProviderRouter {
     return this.run(SRD_CATEGORY.Spell, (provider) => provider.getSpell(slug));
   }
 
-  searchSpells(query: SrdQuery): Promise<SrdListPage<SrdSpellSummary>> {
+  searchSpells(query: SrdQuery): Promise<SrdListPage<SrdSpell>> {
     return this.run(SRD_CATEGORY.Spell, (provider) => provider.searchSpells(query));
   }
 

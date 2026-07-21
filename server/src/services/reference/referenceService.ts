@@ -1,5 +1,5 @@
 import { SRD_CATEGORY } from "@shared/constants/srd";
-import type { SrdCategory, SrdCondition, SrdConditionSummary, SrdItem, SrdItemSummary, SrdListPage, SrdCreature, SrdCreatureSummary, SrdQuery, SrdSpell, SrdSpellSummary } from "@shared/dto/srd";
+import type { SrdCategory, SrdCondition, SrdConditionSummary, SrdItem, SrdItemSummary, SrdListPage, SrdCreature, SrdCreatureSummary, SrdQuery, SrdSpell } from "@shared/dto/srd";
 import type { CacheStore } from "./cache/cacheStore";
 import type { ProviderRouter } from "./providers/providerRouter";
 import { referenceKeys } from "./referenceKeys";
@@ -21,10 +21,33 @@ export class ReferenceService {
     );
   }
 
-  searchSpells(query: SrdQuery): Promise<SrdListPage<SrdSpellSummary>> {
+  searchSpells(query: SrdQuery): Promise<SrdListPage<SrdSpell>> {
     return this.resolveSearch(SRD_CATEGORY.Spell, query, () =>
       this.router.searchSpells(query),
     );
+  }
+
+  async listSpellPool(): Promise<SrdSpell[]> {
+    const key = referenceKeys.spellPool();
+    const cached = await this.cache.get(key);
+    if (cached) {
+      return JSON.parse(cached) as SrdSpell[];
+    }
+    const pageSize = 100;
+    const maxPages = 50;
+    const spells: SrdSpell[] = [];
+    for (let page = 1; page <= maxPages; page += 1) {
+      const result = await this.router.searchSpells({
+        limit: pageSize,
+        filters: { page },
+      });
+      spells.push(...result.results);
+      if (!result.next || result.results.length === 0) {
+        break;
+      }
+    }
+    await this.cache.set(key, JSON.stringify(spells), this.ttlSeconds);
+    return spells;
   }
 
   getCreature(slug: string): Promise<SrdCreature | null> {

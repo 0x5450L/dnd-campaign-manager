@@ -10,6 +10,9 @@ import { useActiveEncounter } from "@/hooks/liveSession/useActiveEncounter";
 import { useParticipantActions } from "@/hooks/liveSession/useParticipantActions";
 import { canApplyAbilityUsage } from "@shared/utils/abilityUsage";
 import { listCastableSlotLevels } from "@shared/utils/spellSlotUsage";
+import { useSrdSpellIndexQuery } from "@/queries/srd";
+import { lookupSpell } from "@/utils/srd/spellIndex";
+import { SpellDetailBody } from "@/components/sheets/shared/sections/specialAbilities/SpellReferenceAccordion";
 
 const costBadge = (cost: AbilityCost | null, pools: ResourcePool[] | null): string | null => {
   if (!cost) return null;
@@ -45,6 +48,9 @@ const AbilityCard = ({
   onUsage,
 }: AbilityCardProps) => {
   const [picker, setPicker] = useState<AbilityUsageAction | null>(null);
+  const [expanded, setExpanded] = useState(false);
+  const { data: spellIndex } = useSrdSpellIndexQuery();
+  const spell = spellIndex ? lookupSpell(spellIndex, ability.name) : null;
   const badge = costBadge(ability.cost, resources);
   const canSpend =
     interactive && canApplyAbilityUsage(abilities, resources, spellSlots, ability.id, "spend");
@@ -81,7 +87,19 @@ const AbilityCard = ({
   return (
     <div className="rounded-md border border-rule bg-bg/60 px-3 py-2">
       <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-        <span className="font-fantasy font-bold text-ink">{ability.name}</span>
+        {spell ? (
+          <button
+            type="button"
+            onClick={() => setExpanded((value) => !value)}
+            aria-expanded={expanded}
+            className="flex items-center gap-1 font-fantasy font-bold text-ink cursor-pointer transition-colors hover:text-gold"
+          >
+            <span className="text-xs text-faint">{expanded ? "▾" : "▸"}</span>
+            {ability.name}
+          </button>
+        ) : (
+          <span className="font-fantasy font-bold text-ink">{ability.name}</span>
+        )}
         {badge &&
           (canSpend || canRestore ? (
             <span className="flex items-center gap-1">
@@ -133,6 +151,11 @@ const AbilityCard = ({
       )}
       {ability.description && (
         <p className="mt-1 text-sm leading-snug text-dim">{ability.description}</p>
+      )}
+      {spell && expanded && (
+        <div className="mt-2">
+          <SpellDetailBody spell={spell} />
+        </div>
       )}
     </div>
   );

@@ -52,4 +52,26 @@ router.get<{ slug: string }>(
   }),
 );
 
+router.get(
+  "/spells",
+  authMiddleware,
+  asyncHandler(async (_req, res) => {
+    const spells = await getReferenceService().listSpellPool();
+    res.json({ results: spells, total: spells.length, next: null });
+  }),
+);
+
+router.get<{ slug: string }>(
+  "/spells/:slug",
+  authMiddleware,
+  asyncHandler(async (req, res) => {
+    const { slug } = req.params;
+    const spell = await getReferenceService().getSpell(slug);
+    if (!spell) {
+      throw new AppError(404, "Spell not found");
+    }
+    res.json(spell);
+  }),
+);
+
 export default router;

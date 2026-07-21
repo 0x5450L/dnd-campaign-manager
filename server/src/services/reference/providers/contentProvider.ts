@@ -1,11 +1,11 @@
-import type { SrdCategory, SrdCondition, SrdConditionSummary, SrdItem, SrdItemSummary, SrdListPage, SrdCreature, SrdCreatureSummary, SrdQuery, SrdSource, SrdSpell, SrdSpellSummary } from "@shared/dto/srd";
+import type { SrdCategory, SrdCondition, SrdConditionSummary, SrdItem, SrdItemSummary, SrdListPage, SrdCreature, SrdCreatureSummary, SrdQuery, SrdSource, SrdSpell } from "@shared/dto/srd";
 
 export interface ContentProvider {
   readonly id: SrdSource;
   readonly capabilities: ReadonlySet<SrdCategory>;
 
   getSpell(slug: string): Promise<SrdSpell | null>;
-  searchSpells(query: SrdQuery): Promise<SrdListPage<SrdSpellSummary>>;
+  searchSpells(query: SrdQuery): Promise<SrdListPage<SrdSpell>>;
 
   getCreature(slug: string): Promise<SrdCreature | null>;
   searchCreatures(query: SrdQuery): Promise<SrdListPage<SrdCreatureSummary>>;
