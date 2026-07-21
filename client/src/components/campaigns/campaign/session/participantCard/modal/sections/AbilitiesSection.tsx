@@ -11,7 +11,7 @@ import { useParticipantActions } from "@/hooks/liveSession/useParticipantActions
 import { canApplyAbilityUsage } from "@shared/utils/abilityUsage";
 import { listCastableSlotLevels } from "@shared/utils/spellSlotUsage";
 import { useSrdSpellIndexQuery } from "@/queries/srd";
-import { lookupSpell } from "@/utils/srd/spellIndex";
+import { lookupSpell, type SpellIndex } from "@/utils/srd/spellIndex";
 import { SpellDetailBody } from "@/components/sheets/shared/sections/specialAbilities/SpellReferenceAccordion";
 
 const costBadge = (cost: AbilityCost | null, pools: ResourcePool[] | null): string | null => {
@@ -35,6 +35,7 @@ type AbilityCardProps = {
   abilities: Ability[];
   resources: ResourcePool[];
   spellSlots: SpellSlotLevel[];
+  spellIndex: SpellIndex | undefined;
   interactive: boolean;
   onUsage: (abilityId: string, action: AbilityUsageAction, slotLevel?: number) => void;
 };
@@ -44,12 +45,12 @@ const AbilityCard = ({
   abilities,
   resources,
   spellSlots,
+  spellIndex,
   interactive,
   onUsage,
 }: AbilityCardProps) => {
   const [picker, setPicker] = useState<AbilityUsageAction | null>(null);
   const [expanded, setExpanded] = useState(false);
-  const { data: spellIndex } = useSrdSpellIndexQuery();
   const spell = spellIndex ? lookupSpell(spellIndex, ability.name) : null;
   const badge = costBadge(ability.cost, resources);
   const canSpend =
@@ -167,6 +168,13 @@ export const AbilitiesSection = ({ participant, canEditOwn }: EditorBodyProps) =
   const abilities = participant.abilities ?? [];
   const resources = participant.resources ?? [];
   const spellSlots = participant.spellSlots ?? [];
+
+  const isCaster =
+    participant.spellAbility != null ||
+    spellSlots.some((slot) => slot.total > 0) ||
+    abilities.some((ability) => ability.cost?.type === "spellSlot");
+  const { data: spellIndex } = useSrdSpellIndexQuery(isCaster);
+
   if (abilities.length === 0) return null;
 
   const interactive = canEditOwn && participants.some((p) => p.id === participant.id);
@@ -191,6 +199,7 @@ export const AbilitiesSection = ({ participant, canEditOwn }: EditorBodyProps) =
                 abilities={abilities}
                 resources={resources}
                 spellSlots={spellSlots}
+                spellIndex={spellIndex}
                 interactive={interactive}
                 onUsage={(abilityId, action, slotLevel) =>
                   applyAbilityUsage(participant.id, abilityId, action, slotLevel)

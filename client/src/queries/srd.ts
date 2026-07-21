@@ -19,12 +19,12 @@ export const srdKeys = {
 
 const SPELL_POOL_STALE_MS = 60 * 60 * 1000;
 
-export const useSrdSpellIndexQuery = () => {
+export const useSrdSpellIndexQuery = (enabled = true) => {
   const token = useAuthStore((s) => s.token);
   return useQuery({
     queryKey: srdKeys.spellPool(),
     queryFn: () => listSrdSpells(),
-    enabled: !!token,
+    enabled: enabled && !!token,
     staleTime: SPELL_POOL_STALE_MS,
     select: (page) => buildSpellIndex(page.results),
   });

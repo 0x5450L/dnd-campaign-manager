@@ -1,7 +1,6 @@
 import { useState } from "react";
 import type { SrdSpell } from "@shared/dto/srd";
-import { useSrdSpellIndexQuery } from "@/queries/srd";
-import { lookupSpell } from "@/utils/srd/spellIndex";
+import { lookupSpell, type SpellIndex } from "@/utils/srd/spellIndex";
 
 const levelLabel = (level: number): string =>
   level === 0 ? "Cantrip" : `Level ${level}`;
@@ -63,11 +62,11 @@ export const SpellDetailBody = ({ spell }: { spell: SrdSpell }) => {
 
 type SpellReferenceAccordionProps = {
   name: string;
+  index: SpellIndex | undefined;
 };
 
-export const SpellReferenceAccordion = ({ name }: SpellReferenceAccordionProps) => {
+export const SpellReferenceAccordion = ({ name, index }: SpellReferenceAccordionProps) => {
   const [open, setOpen] = useState(false);
-  const { data: index } = useSrdSpellIndexQuery();
   const spell = index ? lookupSpell(index, name) : null;
 
   if (!spell) {

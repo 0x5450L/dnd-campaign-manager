@@ -5,12 +5,18 @@ import {
   RESOURCE_RESET_ORDER,
 } from "@/constants/resources";
 import { AddButton } from "@/components/sheets/shared/buttons/AddButton";
+import { useSrdSpellIndexQuery } from "@/queries/srd";
 import { SpecialAbilityItem } from "./SpecialAbilityItem";
 
 export const SpecialAbilities = () => {
   const specialAbilities = useSheet((s) => s.specialAbilities);
   const resources = useSheet((s) => s.resources);
   const { setSharedField } = useSheetActions();
+
+  const isCaster = specialAbilities.some(
+    (ability) => ability.cost?.type === "spellSlot",
+  );
+  const { data: spellIndex } = useSrdSpellIndexQuery(isCaster);
 
   const updateAbility = (id: string, patch: Partial<Ability>) =>
     setSharedField(
@@ -71,6 +77,7 @@ export const SpecialAbilities = () => {
           key={ability.id}
           ability={ability}
           resources={resources}
+          spellIndex={spellIndex}
           onChange={(patch) => updateAbility(ability.id, patch)}
           onRemove={() => removeAbility(ability.id)}
         />

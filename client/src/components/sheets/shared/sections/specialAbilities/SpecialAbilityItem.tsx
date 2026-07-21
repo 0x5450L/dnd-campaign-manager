@@ -3,6 +3,7 @@ import {
   ABILITY_ACTIVATION_NAMES,
   ABILITY_ACTIVATION_ORDER,
 } from "@/constants/abilities";
+import type { SpellIndex } from "@/utils/srd/spellIndex";
 import { SpellReferenceAccordion } from "./SpellReferenceAccordion";
 
 type CostKind = "none" | "recharge" | "perDay" | "pool";
@@ -26,6 +27,7 @@ const defaultCost = (kind: CostKind, resources: ResourcePool[]): AbilityCost | n
 type SpecialAbilityItemProps = {
   ability: Ability;
   resources: ResourcePool[];
+  spellIndex: SpellIndex | undefined;
   onChange: (patch: Partial<Ability>) => void;
   onRemove: () => void;
 };
@@ -33,6 +35,7 @@ type SpecialAbilityItemProps = {
 export const SpecialAbilityItem = ({
   ability,
   resources,
+  spellIndex,
   onChange,
   onRemove,
 }: SpecialAbilityItemProps) => {
@@ -155,7 +158,7 @@ export const SpecialAbilityItem = ({
         className="custom-scrollbar min-h-14 w-full resize-none bg-transparent text-xs leading-relaxed text-ink outline-none placeholder:text-faint"
       />
 
-      <SpellReferenceAccordion name={ability.name} />
+      <SpellReferenceAccordion name={ability.name} index={spellIndex} />
     </div>
   );
 };
