@@ -1,0 +1,37 @@
+export const AI_PROVIDER_ID = {
+  Gemini: "gemini",
+  Mock: "mock",
+} as const;
+
+export const AI_GENERATION_KIND = {
+  Loot: "loot",
+} as const;
+
+export const LOOT_FIND_TYPE = {
+  Hoard: "hoard",
+  Body: "body",
+  Stash: "stash",
+  Reward: "reward",
+} as const;
+
+export const LOOT_RICHNESS = {
+  Meager: "meager",
+  Modest: "modest",
+  Generous: "generous",
+} as const;
+
+export const LOOT_RARITY = {
+  Common: "common",
+  Uncommon: "uncommon",
+  Rare: "rare",
+  VeryRare: "very-rare",
+  Legendary: "legendary",
+} as const;
+
+export const LOOT_ITEM_COUNT = {
+  Min: 1,
+  Max: 8,
+  Default: 3,
+} as const;
+
+export const LOOT_CONTEXT_MAX_LENGTH = 400;
