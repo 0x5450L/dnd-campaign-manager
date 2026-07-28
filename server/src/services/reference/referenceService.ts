@@ -1,5 +1,5 @@
 import { SRD_CATEGORY } from "@shared/constants/srd";
-import type { SrdCategory, SrdCondition, SrdConditionSummary, SrdItem, SrdItemSummary, SrdListPage, SrdCreature, SrdCreatureSummary, SrdQuery, SrdSpell } from "@shared/dto/srd";
+import type { SrdCategory, SrdCondition, SrdConditionSummary, SrdItem, SrdItemSummary, SrdListPage, SrdCreature, SrdCreatureSummary, SrdQuery, SrdSource, SrdSpell } from "@shared/dto/srd";
 import type { CacheStore } from "./cache/cacheStore";
 import type { ProviderRouter } from "./providers/providerRouter";
 import { referenceKeys } from "./referenceKeys";
@@ -48,6 +48,42 @@ export class ReferenceService {
     }
     await this.cache.set(key, JSON.stringify(spells), this.ttlSeconds);
     return spells;
+  }
+
+  async listItemPool(): Promise<SrdItemSummary[]> {
+    const key = referenceKeys.itemPool();
+    const cached = await this.cache.get(key);
+    if (cached) {
+      return JSON.parse(cached) as SrdItemSummary[];
+    }
+    const bySlug = new Map<string, SrdItemSummary>();
+    for (const source of this.router.itemSources()) {
+      for (const item of await this.drainItemSource(source)) {
+        if (!bySlug.has(item.slug)) {
+          bySlug.set(item.slug, item);
+        }
+      }
+    }
+    const items = [...bySlug.values()];
+    await this.cache.set(key, JSON.stringify(items), this.ttlSeconds);
+    return items;
+  }
+
+  private async drainItemSource(source: SrdSource): Promise<SrdItemSummary[]> {
+    const pageSize = 100;
+    const maxPages = 50;
+    const items: SrdItemSummary[] = [];
+    for (let page = 1; page <= maxPages; page += 1) {
+      const result = await this.router.searchItemsFrom(source, {
+        limit: pageSize,
+        filters: { page },
+      });
+      items.push(...result.results);
+      if (!result.next) {
+        break;
+      }
+    }
+    return items;
   }
 
   getCreature(slug: string): Promise<SrdCreature | null> {

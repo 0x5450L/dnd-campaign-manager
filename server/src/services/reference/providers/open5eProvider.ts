@@ -1,14 +1,17 @@
 import { SRD_CATEGORY, SRD_SOURCE } from "@shared/constants/srd";
-import type { SrdCategory, SrdCondition, SrdConditionSummary, SrdListPage, SrdCreature, SrdCreatureSummary, SrdQuery, SrdSource, SrdSpell } from "@shared/dto/srd";
+import type { SrdCategory, SrdCondition, SrdConditionSummary, SrdItem, SrdItemSummary, SrdListPage, SrdCreature, SrdCreatureSummary, SrdQuery, SrdSource, SrdSpell } from "@shared/dto/srd";
 import { AbstractContentProvider } from "./abstractContentProvider";
 import {
   mapOpen5eCondition,
   mapOpen5eConditionSummary,
   mapOpen5eCreature,
   mapOpen5eCreatureSummary,
+  mapOpen5eMagicItem,
+  mapOpen5eMagicItemSummary,
   mapOpen5eSpell,
   type Open5eConditionResult,
   type Open5eListResponse,
+  type Open5eMagicItemResult,
   type Open5eMonsterResult,
   type Open5eSpellResult,
 } from "./mappers/open5e";
@@ -19,6 +22,7 @@ export class Open5eProvider extends AbstractContentProvider {
   readonly id: SrdSource = SRD_SOURCE.Open5e;
   readonly capabilities: ReadonlySet<SrdCategory> = new Set<SrdCategory>([
     SRD_CATEGORY.Condition,
+    SRD_CATEGORY.Item,
     SRD_CATEGORY.Monster,
     SRD_CATEGORY.Spell,
   ]);
@@ -46,6 +50,37 @@ export class Open5eProvider extends AbstractContentProvider {
       await this.getJson<Open5eListResponse<Open5eSpellResult>>(path);
     return {
       results: response.results.map((item) => mapOpen5eSpell(item, this.id)),
+      total: response.count,
+      next: response.next,
+    };
+  }
+
+  override async getItem(slug: string): Promise<SrdItem | null> {
+    const response = await this.getOrNull<Open5eMagicItemResult>(
+      `/magicitems/${slug}/`,
+    );
+    if (!response) {
+      return null;
+    }
+    return mapOpen5eMagicItem(response, this.id);
+  }
+
+  override async searchItems(
+    query: SrdQuery,
+  ): Promise<SrdListPage<SrdItemSummary>> {
+    const path = `/magicitems/${this.encodeQuery({
+      search: query.search,
+      limit: query.limit,
+      offset: query.offset,
+      page: query.filters?.page,
+      document__slug: OFFICIAL_SRD_DOCUMENT,
+    })}`;
+    const response =
+      await this.getJson<Open5eListResponse<Open5eMagicItemResult>>(path);
+    return {
+      results: response.results.map((item) =>
+        mapOpen5eMagicItemSummary(item, this.id),
+      ),
       total: response.count,
       next: response.next,
     };

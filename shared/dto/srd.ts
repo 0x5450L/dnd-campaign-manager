@@ -1,5 +1,5 @@
 import type { AbilityName } from "../types/dnd";
-import { SRD_CATEGORY, SRD_SOURCE } from "../constants/srd";
+import { SRD_CATEGORY, SRD_RARITY, SRD_SOURCE } from "../constants/srd";
 
 export type SrdSource = (typeof SRD_SOURCE)[keyof typeof SRD_SOURCE];
 
@@ -84,10 +84,12 @@ export type SrdCreature = SrdCreatureSummary & {
   legendaryActions: SrdCreatureAction[];
 };
 
+export type SrdRarity = (typeof SRD_RARITY)[keyof typeof SRD_RARITY];
+
 export type SrdItemSummary = SrdRef & {
   source: SrdSource;
   itemType: string | null;
-  rarity: string | null;
+  rarity: SrdRarity | null;
 };
 
 export type SrdItem = SrdItemSummary & {

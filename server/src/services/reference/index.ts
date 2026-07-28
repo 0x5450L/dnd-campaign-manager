@@ -1,6 +1,7 @@
 import { createCacheStore } from "./cache/createCacheStore";
 import { Dnd5eApiProvider } from "./providers/dnd5eApiProvider";
 import { Open5eProvider } from "./providers/open5eProvider";
+import { Open5eV2Provider } from "./providers/open5eV2Provider";
 import { ProviderRouter } from "./providers/providerRouter";
 import { ReferenceService } from "./referenceService";
 import { NullReferenceStore } from "./referenceStore";
@@ -12,6 +13,7 @@ export function getReferenceService(): ReferenceService {
     const router = new ProviderRouter([
       new Dnd5eApiProvider(),
       new Open5eProvider(),
+      new Open5eV2Provider(),
     ]);
     instance = new ReferenceService(
       router,

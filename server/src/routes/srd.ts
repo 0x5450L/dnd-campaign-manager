@@ -53,6 +53,33 @@ router.get<{ slug: string }>(
 );
 
 router.get(
+  "/items",
+  authMiddleware,
+  asyncHandler(async (req, res) => {
+    const search = typeof req.query.search === "string" ? req.query.search : undefined;
+    const page = await getReferenceService().searchItems({
+      search,
+      limit: parseLimit(req.query.limit),
+      offset: parseOffset(req.query.offset),
+    });
+    res.json(page);
+  }),
+);
+
+router.get<{ slug: string }>(
+  "/items/:slug",
+  authMiddleware,
+  asyncHandler(async (req, res) => {
+    const { slug } = req.params;
+    const item = await getReferenceService().getItem(slug);
+    if (!item) {
+      throw new AppError(404, "Item not found");
+    }
+    res.json(item);
+  }),
+);
+
+router.get(
   "/spells",
   authMiddleware,
   asyncHandler(async (_req, res) => {

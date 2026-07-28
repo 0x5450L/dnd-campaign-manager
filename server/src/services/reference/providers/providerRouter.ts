@@ -40,6 +40,21 @@ export class ProviderRouter {
     return this.run(SRD_CATEGORY.Item, (provider) => provider.searchItems(query));
   }
 
+  itemSources(): SrdSource[] {
+    return this.resolve(SRD_CATEGORY.Item).map((provider) => provider.id);
+  }
+
+  searchItemsFrom(
+    source: SrdSource,
+    query: SrdQuery,
+  ): Promise<SrdListPage<SrdItemSummary>> {
+    const provider = this.byId.get(source);
+    if (!provider?.capabilities.has(SRD_CATEGORY.Item)) {
+      throw new NoProviderAvailableError(SRD_CATEGORY.Item, []);
+    }
+    return provider.searchItems(query);
+  }
+
   getCondition(slug: string): Promise<SrdCondition | null> {
     return this.run(SRD_CATEGORY.Condition, (provider) =>
       provider.getCondition(slug),

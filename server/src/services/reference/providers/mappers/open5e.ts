@@ -5,9 +5,12 @@ import type {
   SrdCreature,
   SrdCreatureAction,
   SrdCreatureSummary,
+  SrdItem,
+  SrdItemSummary,
   SrdSource,
   SrdSpell,
 } from "@shared/dto/srd";
+import { normalizeSrdRarity } from "./rarity";
 
 export type Open5eSpellResult = {
   slug: string;
@@ -32,6 +35,16 @@ export type Open5eConditionResult = {
   slug: string;
   name: string;
   desc: string;
+};
+
+export type Open5eMagicItemResult = {
+  slug: string;
+  name: string;
+  type: string | null;
+  desc: string;
+  rarity: string | null;
+  requires_attunement: string | null;
+  document__slug: string;
 };
 
 export type Open5eActionResult = {
@@ -118,6 +131,28 @@ const collectSaves = (
   }
   return result;
 };
+
+export const mapOpen5eMagicItemSummary = (
+  raw: Open5eMagicItemResult,
+  source: SrdSource,
+): SrdItemSummary => ({
+  slug: raw.slug,
+  name: raw.name,
+  source,
+  itemType: emptyToNull(raw.type),
+  rarity: normalizeSrdRarity(raw.rarity),
+});
+
+export const mapOpen5eMagicItem = (
+  raw: Open5eMagicItemResult,
+  source: SrdSource,
+): SrdItem => ({
+  ...mapOpen5eMagicItemSummary(raw, source),
+  description: raw.desc,
+  requiresAttunement: !!raw.requires_attunement?.trim(),
+  cost: null,
+  weight: null,
+});
 
 export const mapOpen5eCondition = (
   raw: Open5eConditionResult,
