@@ -19,6 +19,7 @@ import PartyRow from "@/components/campaigns/campaign/PartyRow";
 import CampaignCharactersController from "@/components/campaigns/campaign/characters/controller/CampaignCharactersController";
 import { useCampaignSessionBinding } from "@/hooks/liveSession/useCampaignSessionBinding";
 import SessionPanel from "@/components/campaigns/campaign/session/SessionPanel";
+import DmToolboxPanel from "@/components/campaigns/campaign/ai/DmToolboxPanel";
 
 function CampaignPage() {
   const { id } = useParams();
@@ -147,6 +148,8 @@ function CampaignPage() {
             />
           </div>
         </div>
+
+        {isDM && <DmToolboxPanel campaignId={campaign.id} />}
     </CampaignCharactersController>
   );
 }

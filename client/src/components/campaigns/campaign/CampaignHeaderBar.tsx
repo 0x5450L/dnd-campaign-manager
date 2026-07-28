@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import type { Campaign } from "@/types/campaigns";
 import CommonButton from "@/components/ui/buttons/CommonButton";
+import { useDmToolboxStore } from "@/state/ai/dmToolboxStore";
 
 type CampaignHeaderBarProps = {
   campaign: Campaign;
@@ -10,6 +11,7 @@ type CampaignHeaderBarProps = {
 
 function CampaignHeaderBar({ campaign, isDM, onChange }: CampaignHeaderBarProps) {
   const navigate = useNavigate();
+  const toggleToolbox = useDmToolboxStore((s) => s.toggle);
   const name = campaign.name ?? "";
   const nameInvalid = isDM && !name.trim();
 
@@ -41,6 +43,17 @@ function CampaignHeaderBar({ campaign, isDM, onChange }: CampaignHeaderBarProps)
           className="w-full min-w-0 bg-transparent text-center font-fantasy text-3xl tracking-wide text-gold outline-none placeholder:text-faint/40"
         />
       </label>
+
+      {isDM && (
+        <CommonButton
+          onClick={toggleToolbox}
+          variant="secondary"
+          size="md"
+          className="h-11"
+        >
+          DM Toolbox
+        </CommonButton>
+      )}
 
       <div className="flex h-11 items-baseline gap-3 rounded-md border border-rule bg-surface/40 px-4 py-2">
         <span className="font-fantasy text-sm font-bold uppercase tracking-[0.2em] text-gold-bright">
