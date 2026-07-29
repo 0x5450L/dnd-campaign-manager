@@ -105,8 +105,7 @@ function LootGeneratorForm({ isGenerating, onSubmit }: LootGeneratorFormProps) {
           maxLength={LOOT_CONTEXT_MAX_LENGTH}
           onChange={(e) => setContext(e.target.value)}
           placeholder="Cult shrine under the docks, the party just killed the priest"
-          rows={3}
-          className={`${fieldControl} resize-none placeholder:text-faint/50`}
+          className={`${fieldControl} custom-scrollbar h-20 resize-none placeholder:text-faint/50`}
         />
       </label>
 

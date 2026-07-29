@@ -1,5 +1,5 @@
 import { apiClient } from ".";
-import type { SrdListPage, SrdCreature, SrdCreatureSummary, SrdSpell } from "@shared/dto/srd";
+import type { SrdItem, SrdListPage, SrdCreature, SrdCreatureSummary, SrdSpell } from "@shared/dto/srd";
 
 export const searchSrdCreatures = async (search: string) =>
   apiClient<SrdListPage<SrdCreatureSummary>>(
@@ -9,6 +9,11 @@ export const searchSrdCreatures = async (search: string) =>
 
 export const getSrdCreature = async (slug: string) =>
   apiClient<SrdCreature>(`/api/srd/monsters/${encodeURIComponent(slug)}`, {
+    method: "GET",
+  });
+
+export const getSrdItem = async (slug: string) =>
+  apiClient<SrdItem>(`/api/srd/items/${encodeURIComponent(slug)}`, {
     method: "GET",
   });
 

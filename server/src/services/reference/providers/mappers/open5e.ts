@@ -152,6 +152,8 @@ export const mapOpen5eMagicItem = (
   requiresAttunement: !!raw.requires_attunement?.trim(),
   cost: null,
   weight: null,
+  weapon: null,
+  armor: null,
 });
 
 export const mapOpen5eCondition = (

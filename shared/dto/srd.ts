@@ -92,11 +92,33 @@ export type SrdItemSummary = SrdRef & {
   rarity: SrdRarity | null;
 };
 
+export type SrdItemProperty = {
+  name: string;
+  kind: string | null;
+  description: string;
+};
+
+export type SrdWeaponDetail = {
+  damageDice: string | null;
+  damageType: string | null;
+  category: string | null;
+  properties: SrdItemProperty[];
+};
+
+export type SrdArmorDetail = {
+  category: string | null;
+  armorClass: string | null;
+  strengthRequired: number | null;
+  stealthDisadvantage: boolean;
+};
+
 export type SrdItem = SrdItemSummary & {
   description: string;
   requiresAttunement: boolean;
   cost: string | null;
   weight: string | null;
+  weapon: SrdWeaponDetail | null;
+  armor: SrdArmorDetail | null;
 };
 
 export type SrdConditionSummary = SrdRef & {

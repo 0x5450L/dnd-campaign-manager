@@ -33,7 +33,9 @@ export class ProviderRouter {
   }
 
   getItem(slug: string): Promise<SrdItem | null> {
-    return this.run(SRD_CATEGORY.Item, (provider) => provider.getItem(slug));
+    return this.runUntilFound(SRD_CATEGORY.Item, (provider) =>
+      provider.getItem(slug),
+    );
   }
 
   searchItems(query: SrdQuery): Promise<SrdListPage<SrdItemSummary>> {
@@ -74,6 +76,32 @@ export class ProviderRouter {
         (provider): provider is ContentProvider =>
           provider !== undefined && provider.capabilities.has(category),
       );
+  }
+
+  private async runUntilFound<TResult>(
+    category: SrdCategory,
+    operation: (provider: ContentProvider) => Promise<TResult | null>,
+  ): Promise<TResult | null> {
+    const providers = this.resolve(category);
+    const causes: unknown[] = [];
+    let reached = false;
+
+    for (const provider of providers) {
+      try {
+        const result = await operation(provider);
+        reached = true;
+        if (result !== null) {
+          return result;
+        }
+      } catch (error) {
+        causes.push(error);
+      }
+    }
+
+    if (!reached) {
+      throw new NoProviderAvailableError(category, causes);
+    }
+    return null;
   }
 
   private async run<TResult>(

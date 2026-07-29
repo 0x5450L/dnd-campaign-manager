@@ -1,6 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   getSrdCreature,
+  getSrdItem,
   listSrdSpells,
   searchSrdCreatures,
 } from "../services/api/srd";
@@ -15,7 +16,11 @@ export const srdKeys = {
   creature: (slug: string) => [...srdKeys.creatures(), "detail", slug] as const,
   spells: () => [...srdKeys.all, "spells"] as const,
   spellPool: () => [...srdKeys.spells(), "pool"] as const,
+  items: () => [...srdKeys.all, "items"] as const,
+  item: (slug: string) => [...srdKeys.items(), "detail", slug] as const,
 };
+
+const ITEM_STALE_MS = 60 * 60 * 1000;
 
 const SPELL_POOL_STALE_MS = 60 * 60 * 1000;
 
@@ -38,6 +43,16 @@ export const useSrdCreatureSearchQuery = (search: string) => {
     queryFn: () => searchSrdCreatures(trimmed),
     enabled: !!token && trimmed.length > 0,
     staleTime: 5 * 60 * 1000,
+  });
+};
+
+export const useSrdItemQuery = (slug: string | null) => {
+  const token = useAuthStore((s) => s.token);
+  return useQuery({
+    queryKey: srdKeys.item(slug ?? ""),
+    queryFn: () => getSrdItem(slug as string),
+    enabled: !!token && !!slug,
+    staleTime: ITEM_STALE_MS,
   });
 };
 

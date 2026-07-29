@@ -1,9 +1,37 @@
-import type { SrdItem, SrdItemSummary, SrdSource } from "@shared/dto/srd";
+import type {
+  SrdArmorDetail,
+  SrdItem,
+  SrdItemProperty,
+  SrdItemSummary,
+  SrdSource,
+  SrdWeaponDetail,
+} from "@shared/dto/srd";
 import { normalizeSrdRarity } from "./rarity";
 
 export type Open5eV2Document = {
   key: string;
   name: string;
+};
+
+export type Open5eV2WeaponProperty = {
+  property: { name: string; type: string | null; desc: string | null } | null;
+  detail: string | null;
+};
+
+export type Open5eV2Weapon = {
+  damage_dice: string | null;
+  damage_type: { name: string } | null;
+  is_martial: boolean | null;
+  is_simple: boolean | null;
+  properties: Open5eV2WeaponProperty[] | null;
+};
+
+export type Open5eV2Armor = {
+  category: string | null;
+  ac_display: string | null;
+  ac_base: number | null;
+  grants_stealth_disadvantage: boolean | null;
+  strength_score_required: number | null;
 };
 
 export type Open5eV2ItemResult = {
@@ -13,6 +41,8 @@ export type Open5eV2ItemResult = {
   rarity: string | null;
   category: { key: string; name: string } | null;
   requires_attunement: boolean | string | null;
+  weapon: Open5eV2Weapon | null;
+  armor: Open5eV2Armor | null;
   weight: string | null;
   weight_unit: string | null;
   cost: string | null;
@@ -47,6 +77,49 @@ const formatWeight = (raw: string | null, unit: string | null): string | null =>
   return amount ? `${amount} ${unit ?? "lb"}` : null;
 };
 
+const capitalize = (raw: string | null): string | null =>
+  raw ? raw.charAt(0).toUpperCase() + raw.slice(1) : null;
+
+const mapProperties = (
+  raw: Open5eV2WeaponProperty[] | null,
+): SrdItemProperty[] =>
+  (raw ?? [])
+    .map(({ property, detail }) => {
+      if (!property?.name) {
+        return null;
+      }
+      const description = [property.desc, detail]
+        .filter((part): part is string => !!part?.trim())
+        .join(" ");
+      return { name: property.name, kind: property.type, description };
+    })
+    .filter((property): property is SrdItemProperty => property !== null);
+
+const mapWeapon = (raw: Open5eV2Weapon | null): SrdWeaponDetail | null => {
+  if (!raw) {
+    return null;
+  }
+  const category = raw.is_martial ? "Martial" : raw.is_simple ? "Simple" : null;
+  return {
+    damageDice: raw.damage_dice,
+    damageType: raw.damage_type?.name ?? null,
+    category,
+    properties: mapProperties(raw.properties),
+  };
+};
+
+const mapArmor = (raw: Open5eV2Armor | null): SrdArmorDetail | null => {
+  if (!raw) {
+    return null;
+  }
+  return {
+    category: capitalize(raw.category),
+    armorClass: raw.ac_display ?? (raw.ac_base !== null ? String(raw.ac_base) : null),
+    strengthRequired: raw.strength_score_required,
+    stealthDisadvantage: !!raw.grants_stealth_disadvantage,
+  };
+};
+
 export const mapOpen5eV2ItemSummary = (
   raw: Open5eV2ItemResult,
   source: SrdSource,
@@ -70,4 +143,6 @@ export const mapOpen5eV2Item = (
       : !!raw.requires_attunement,
   cost: formatCost(raw.cost),
   weight: formatWeight(raw.weight, raw.weight_unit),
+  weapon: mapWeapon(raw.weapon),
+  armor: mapArmor(raw.armor),
 });
