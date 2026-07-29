@@ -20,14 +20,6 @@ export const LOOT_RICHNESS = {
   Generous: "generous",
 } as const;
 
-export const LOOT_RARITY = {
-  Common: "common",
-  Uncommon: "uncommon",
-  Rare: "rare",
-  VeryRare: "very-rare",
-  Legendary: "legendary",
-} as const;
-
 export const LOOT_ITEM_COUNT = {
   Min: 1,
   Max: 8,
@@ -35,3 +27,5 @@ export const LOOT_ITEM_COUNT = {
 } as const;
 
 export const LOOT_CONTEXT_MAX_LENGTH = 400;
+
+export const LOOT_CANDIDATE_COUNT = 40;

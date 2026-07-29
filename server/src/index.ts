@@ -12,6 +12,7 @@ import charactersRoutes from './routes/characters';
 import sessionsRoutes from './routes/sessions';
 import encountersRoutes from './routes/encounters';
 import srdRoutes from './routes/srd';
+import aiRoutes from './routes/ai';
 
 import { errorMiddleware } from './middleware/errors';
 import { createServer } from 'node:http';
@@ -30,6 +31,7 @@ app.use('/api/characters', charactersRoutes);
 app.use('/api/sessions', sessionsRoutes);
 app.use('/api/encounters', encountersRoutes);
 app.use('/api/srd', srdRoutes);
+app.use('/api/ai', aiRoutes);
 
 app.use(errorMiddleware);
 

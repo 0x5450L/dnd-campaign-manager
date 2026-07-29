@@ -2,9 +2,9 @@ import {
   AI_GENERATION_KIND,
   AI_PROVIDER_ID,
   LOOT_FIND_TYPE,
-  LOOT_RARITY,
   LOOT_RICHNESS,
 } from "../constants/ai";
+import type { SrdRarity, SrdSource } from "./srd";
 
 export type AiProviderId = (typeof AI_PROVIDER_ID)[keyof typeof AI_PROVIDER_ID];
 
@@ -15,8 +15,6 @@ export type LootFindType = (typeof LOOT_FIND_TYPE)[keyof typeof LOOT_FIND_TYPE];
 
 export type LootRichness = (typeof LOOT_RICHNESS)[keyof typeof LOOT_RICHNESS];
 
-export type LootRarity = (typeof LOOT_RARITY)[keyof typeof LOOT_RARITY];
-
 export type GenerateLootPayload = {
   campaignId: string;
   findType: LootFindType;
@@ -26,8 +24,11 @@ export type GenerateLootPayload = {
 };
 
 export type GeneratedLootItem = {
+  slug: string;
   name: string;
-  rarity: LootRarity;
+  rarity: SrdRarity | null;
+  itemType: string | null;
+  source: SrdSource;
   note: string;
 };
 

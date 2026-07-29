@@ -15,7 +15,7 @@ export type AiConfig = {
   rateLimit: AiRateLimitConfig;
 };
 
-const DEFAULT_GEMINI_MODEL = "gemini-2.5-flash";
+const DEFAULT_GEMINI_MODEL = "gemini-3.6-flash";
 const DEFAULT_TIMEOUT_MS = 20_000;
 const DEFAULT_MAX_RETRIES = 2;
 const DEFAULT_RATE_LIMIT_WINDOW_MS = 60_000;
