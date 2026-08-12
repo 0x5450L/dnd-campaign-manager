@@ -7,6 +7,7 @@ import {
   rollInitiative as rollInitiativeRequest,
   createEncounter as createEncounterRequest,
   createParticipant as createParticipantRequest,
+  bulkCreateParticipants as bulkCreateParticipantsRequest,
   deleteParticipant as deleteParticipantRequest,
   listEncounters,
   setInitiative as setInitiativeRequest,
@@ -221,6 +222,32 @@ export const useCreateParticipantMutation = (campaignSessionId: string | undefin
     onSuccess: (participant, { encounterId }) => {
       queryClient.setQueryData<EncounterList>(key, (list) =>
         replaceParticipant(list, encounterId, participant),
+      );
+    },
+  });
+};
+
+type BulkCreateParticipantsVars = {
+  encounterId: string;
+  participants: CreateParticipantPayload[];
+};
+
+export const useBulkCreateParticipantsMutation = (
+  campaignSessionId: string | undefined,
+) => {
+  const queryClient = useQueryClient();
+  const key = encounterKeys.list(campaignSessionId ?? "");
+
+  return useMutation({
+    mutationFn: async ({ encounterId, participants }: BulkCreateParticipantsVars) =>
+      (await bulkCreateParticipantsRequest(encounterId, { participants }))
+        .participants,
+    onSuccess: (created, { encounterId }) => {
+      queryClient.setQueryData<EncounterList>(key, (list) =>
+        created.reduce(
+          (acc, participant) => replaceParticipant(acc, encounterId, participant),
+          list,
+        ),
       );
     },
   });

@@ -261,12 +261,37 @@ export const addParticipants = async (
   id: string,
   body: BulkCreateParticipantsPayload,
 ) => {
-  const participants = body.participants;
-  await requireEncounterDM(userId, id);
-  return encountersRepo.createParticipants(
+  const access = await requireEncounterDM(userId, id);
+  const created = await encountersRepo.createParticipants(
     id,
-    participants.map((participant) => withRolledInitiative(participant).body),
+    body.participants.map((participant) => withRolledInitiative(participant).body),
   );
+  const participants = created.map(mapParticipantToDTO);
+
+  try {
+    for (const participant of participants) {
+      await broadcastParticipantUpdate(
+        access.campaignSession.campaign.id,
+        access.campaignSession.campaign.dmId,
+        id,
+        participant,
+        false,
+        access.status === "setup",
+      );
+    }
+    await broadcastInitiative(
+      access.campaignSession.campaign.id,
+      access.campaignSession.campaign.dmId,
+      id,
+      (await encountersRepo.listParticipants(id)).map(mapParticipantToDTO),
+      undefined,
+      access.status === "setup",
+    );
+  } catch (error) {
+    console.error("bulk participant add broadcast failed", error);
+  }
+
+  return participants;
 };
 
 export const updateParticipant = async (
