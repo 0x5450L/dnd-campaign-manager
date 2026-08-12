@@ -1,20 +1,18 @@
-import { ABILITY_NAMES } from "@shared/constants/dnd";
-import type { SrdCreature } from "@shared/dto/srd";
+import { ABILITY_NAMES } from "../../constants/dnd";
+import type { SrdCreature } from "../../dto/srd";
 import type {
   EncounterParticipantDTO,
   ParticipantAbilityScore,
-} from "@/types/encounter";
-import type { CharacterAttackDTO } from "@/types/characters/characters";
+} from "../../dto/session";
+import type { CharacterAttackDTO } from "../../dto/character";
+import { randomId } from "../id";
 import { parseCreatureAction } from "./creatureActionParser";
-import {
-  creatureAbilities,
-  creatureResourcePools,
-} from "./abilities";
+import { creatureAbilities, creatureResourcePools } from "./abilities";
 import { creatureSpellcastingSeed } from "./creatureSpellcastingParser";
 
 const TO_HIT_BONUS = /^[+-]\d+$/;
 
-type ParticipantSeed = Pick<
+export type ParticipantSeed = Pick<
   EncounterParticipantDTO,
   | "type"
   | "name"
@@ -46,7 +44,7 @@ const buildAttacks = (creature: SrdCreature): CharacterAttackDTO[] => {
     const parsed = parseCreatureAction(action.description);
     if (!TO_HIT_BONUS.test(parsed.attackBonus)) continue;
     attacks.push({
-      id: crypto.randomUUID(),
+      id: randomId(),
       name: action.name,
       attackBonus: Number(parsed.attackBonus),
       damage: parsed.damage,

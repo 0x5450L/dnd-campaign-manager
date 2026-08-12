@@ -7,7 +7,7 @@ import type {
   ParticipantType,
 } from "@/types/encounter";
 import type { SrdCreature } from "@shared/dto/srd";
-import { srdCreatureToParticipant } from "@/utils/srd/creatureParticipantMapper";
+import { srdCreatureToParticipant } from "@shared/utils/srd/creatureParticipantMapper";
 import CommonButton from "@/components/ui/buttons/CommonButton";
 import CreatureBrowser from "../characters/CreatureBrowser";
 import { CloseIcon } from "./participantCard/blocks/icons";

@@ -1,4 +1,7 @@
-import { creatureAbilities, creatureResourcePools } from "./abilities";
+import {
+  creatureAbilities,
+  creatureResourcePools,
+} from "@shared/utils/srd/abilities";
 import {
   ABILITY_NAMES,
   SKILL_DEFINITIONS,

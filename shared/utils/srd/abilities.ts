@@ -1,10 +1,11 @@
-import type { SrdCreature, SrdCreatureAction } from "@shared/dto/srd";
+import { randomId } from "../id";
+import type { SrdCreature, SrdCreatureAction } from "../../dto/srd";
 import type {
   Ability,
   AbilityActivation,
   AbilityCost,
   ResourcePool,
-} from "@shared/types/abilities";
+} from "../../types/abilities";
 import { parseCreatureAction } from "./creatureActionParser";
 import {
   isSpellcastingTraitName,
@@ -55,7 +56,7 @@ const spellcastingAbilities = (
 ): Ability[] => {
   const result: Ability[] = [
     {
-      id: crypto.randomUUID(),
+      id: randomId(),
       name: traitName,
       description: parsed.header,
       activation: "passive",
@@ -65,7 +66,7 @@ const spellcastingAbilities = (
   for (const group of parsed.groups) {
     for (const spell of group.spells) {
       result.push({
-        id: crypto.randomUUID(),
+        id: randomId(),
         name: titleCase(spell),
         description: "",
         activation: "action",
@@ -81,7 +82,7 @@ const toAbility = (
   activation: AbilityActivation,
   cost: AbilityCost | null,
 ): Ability => ({
-  id: crypto.randomUUID(),
+  id: randomId(),
   name: action.name,
   description: action.description,
   activation,
