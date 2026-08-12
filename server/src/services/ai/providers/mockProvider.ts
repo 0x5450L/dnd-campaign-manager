@@ -75,10 +75,17 @@ export class MockTextProvider implements TextProvider {
           : this.buildText(key);
       case "integer":
       case "number":
-        return this.next();
+        return this.buildNumber(node);
       case "boolean":
         return this.next() % 2 === 0;
     }
+  }
+
+  private buildNumber(node: JsonSchemaNode): number {
+    const min = node.minimum ?? 1;
+    const max = node.maximum ?? min + 9;
+    const span = Math.max(1, Math.floor(max) - Math.floor(min) + 1);
+    return Math.floor(min) + (this.next() % span);
   }
 
   private buildText(key: string): string {

@@ -9,6 +9,8 @@ export type GeminiSchema = {
   items?: GeminiSchema;
   minItems?: string;
   maxItems?: string;
+  minimum?: number;
+  maximum?: number;
 };
 
 export type GeminiGenerateContentResponse = {
@@ -47,6 +49,12 @@ export const toGeminiSchema = (node: JsonSchemaNode): GeminiSchema => {
   }
   if (node.maxItems !== undefined) {
     schema.maxItems = String(node.maxItems);
+  }
+  if (node.minimum !== undefined) {
+    schema.minimum = node.minimum;
+  }
+  if (node.maximum !== undefined) {
+    schema.maximum = node.maximum;
   }
 
   return schema;

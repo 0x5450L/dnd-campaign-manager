@@ -17,6 +17,8 @@ export type JsonSchemaNode = {
   items?: JsonSchemaNode;
   minItems?: number;
   maxItems?: number;
+  minimum?: number;
+  maximum?: number;
 };
 
 export type StructuredTextRequest = {
