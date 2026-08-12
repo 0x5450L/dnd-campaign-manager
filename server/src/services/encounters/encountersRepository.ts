@@ -8,7 +8,10 @@ import type {
   CreateParticipantPayload,
 } from "@shared/dto/session";
 
-const bySortOrder = { sortOrder: "asc" } as const;
+const bySortOrder: Prisma.EncounterParticipantOrderByWithRelationInput[] = [
+  { sortOrder: "desc" },
+  { id: "asc" },
+];
 
 export const runInTransaction = <T extends Prisma.PrismaPromise<unknown>[]>(ops: [...T]) =>
   prisma.$transaction(ops);

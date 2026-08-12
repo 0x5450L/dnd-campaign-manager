@@ -13,6 +13,11 @@ const mapEncounter = (
 ): EncounterList | undefined =>
   list?.map((encounter) => (encounter.id === encounterId ? fn(encounter) : encounter));
 
+const byInitiative = (
+  a: EncounterParticipantDTO,
+  b: EncounterParticipantDTO,
+): number => b.sortOrder - a.sortOrder || a.id.localeCompare(b.id);
+
 export const replaceParticipant = (
   list: EncounterList | undefined,
   encounterId: string,
@@ -23,7 +28,7 @@ export const replaceParticipant = (
     const participants = exists
       ? encounter.participants.map((p) => (p.id === participant.id ? participant : p))
       : [...encounter.participants, participant];
-    return { ...encounter, participants: participants.sort((a, b) => b.sortOrder - a.sortOrder) };
+    return { ...encounter, participants: [...participants].sort(byInitiative) };
   });
 
 export const removeParticipant = (
@@ -43,4 +48,8 @@ export const setParticipants = (
   list: EncounterList | undefined,
   encounterId: string,
   participants: EncounterParticipantDTO[],
-) => mapEncounter(list, encounterId, (encounter) => ({ ...encounter, participants }));
+) =>
+  mapEncounter(list, encounterId, (encounter) => ({
+    ...encounter,
+    participants: [...participants].sort(byInitiative),
+  }));
