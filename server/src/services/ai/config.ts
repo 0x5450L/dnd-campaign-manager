@@ -12,12 +12,14 @@ export type AiConfig = {
   geminiModel: string;
   timeoutMs: number;
   maxRetries: number;
+  maxOutputTokens: number;
   rateLimit: AiRateLimitConfig;
 };
 
 const DEFAULT_GEMINI_MODEL = "gemini-3.6-flash";
 const DEFAULT_TIMEOUT_MS = 20_000;
 const DEFAULT_MAX_RETRIES = 2;
+const DEFAULT_MAX_OUTPUT_TOKENS = 8_192;
 const DEFAULT_RATE_LIMIT_WINDOW_MS = 60_000;
 const DEFAULT_RATE_LIMIT_MAX = 10;
 
@@ -47,6 +49,10 @@ export const readAiConfig = (): AiConfig => {
     geminiModel: process.env.GEMINI_MODEL?.trim() || DEFAULT_GEMINI_MODEL,
     timeoutMs: readNumber(process.env.AI_TIMEOUT_MS, DEFAULT_TIMEOUT_MS),
     maxRetries: readNumber(process.env.AI_MAX_RETRIES, DEFAULT_MAX_RETRIES),
+    maxOutputTokens: readNumber(
+      process.env.AI_MAX_OUTPUT_TOKENS,
+      DEFAULT_MAX_OUTPUT_TOKENS,
+    ),
     rateLimit: {
       windowMs: readNumber(
         process.env.AI_RATE_LIMIT_WINDOW_MS,

@@ -60,17 +60,22 @@ export const toGeminiSchema = (node: JsonSchemaNode): GeminiSchema => {
   return schema;
 };
 
+export type GeminiTextResult = {
+  text: string | null;
+  finishReason: string | null;
+  blockReason: string | null;
+};
+
 export const readGeminiText = (
   response: GeminiGenerateContentResponse,
-): string | null => {
-  const blockReason = response.promptFeedback?.blockReason;
-  if (blockReason) {
-    return null;
-  }
-  const parts = response.candidates?.[0]?.content?.parts;
-  if (!parts?.length) {
-    return null;
-  }
-  const text = parts.map((part) => part.text ?? "").join("").trim();
-  return text || null;
+): GeminiTextResult => {
+  const blockReason = response.promptFeedback?.blockReason ?? null;
+  const candidate = response.candidates?.[0];
+  const finishReason = candidate?.finishReason ?? null;
+  const parts = candidate?.content?.parts;
+  const text = parts?.length
+    ? parts.map((part) => part.text ?? "").join("").trim()
+    : "";
+
+  return { text: text || null, finishReason, blockReason };
 };

@@ -20,38 +20,112 @@ import {
 import type { TextProvider } from "./providers/aiProvider";
 import {
   AiInvalidOutputError,
+  AiProviderBlockedError,
+  AiProviderEmptyOutputError,
+  AiProviderMalformedJsonError,
   AiProviderNotConfiguredError,
   AiProviderRateLimitedError,
   AiProviderRequestError,
   AiProviderTimeoutError,
+  AiProviderTruncatedError,
 } from "./providers/providerErrors";
+
+const requestErrorMessage = (error: AiProviderRequestError): AppError => {
+  switch (error.status) {
+    case 400:
+      return new AppError(
+        502,
+        "The AI provider rejected the request as malformed. This is a bug on our side, not something you did.",
+      );
+    case 401:
+    case 403:
+      return new AppError(
+        503,
+        "The AI provider rejected our API key. Check GEMINI_API_KEY on the server.",
+      );
+    case 404:
+      return new AppError(
+        503,
+        "The configured AI model does not exist. Check GEMINI_MODEL on the server.",
+      );
+    case null:
+      return new AppError(
+        502,
+        "Could not reach the AI provider. Check the server's network connection.",
+      );
+    default:
+      return new AppError(
+        502,
+        `The AI provider answered with an error (HTTP ${error.status}). Try again in a moment.`,
+      );
+  }
+};
 
 const toAppError = (error: unknown): AppError => {
   if (error instanceof AppError) {
     return error;
   }
   if (error instanceof AiProviderNotConfiguredError) {
-    return new AppError(503, "AI generation is not configured on this server");
+    return new AppError(
+      503,
+      "AI generation is not configured on this server. Set GEMINI_API_KEY or switch AI_PROVIDER to mock.",
+    );
   }
   if (error instanceof NotEnoughCandidatesError) {
-    return new AppError(503, "The item catalogue is unavailable, try again shortly");
+    return new AppError(
+      503,
+      `The item catalogue offered only ${error.available} item(s) for the ${error.requested} you asked for. Try again shortly or ask for fewer items.`,
+    );
   }
   if (error instanceof NoCreatureCandidatesError) {
-    return new AppError(503, "The creature catalogue is unavailable, try again shortly");
+    return new AppError(503, error.humanMessage);
   }
   if (error instanceof AiProviderTimeoutError) {
-    return new AppError(504, "The AI provider took too long to respond");
+    return new AppError(
+      504,
+      `The AI provider did not answer within ${Math.round(error.timeoutMs / 1000)}s. Try again, or raise AI_TIMEOUT_MS.`,
+    );
   }
   if (error instanceof AiProviderRateLimitedError) {
-    return new AppError(429, "The AI provider is rate limiting requests, try again shortly");
+    return new AppError(
+      429,
+      "The AI provider is rate limiting us. Wait a moment and try again.",
+    );
+  }
+  if (error instanceof AiProviderBlockedError) {
+    return new AppError(
+      422,
+      "The AI provider refused this prompt as unsafe. Rewrite the context and try again.",
+    );
+  }
+  if (error instanceof AiProviderTruncatedError) {
+    return new AppError(
+      502,
+      `The AI provider ran out of room mid-answer (${error.maxOutputTokens} token budget). Ask for fewer creatures, or raise AI_MAX_OUTPUT_TOKENS.`,
+    );
+  }
+  if (error instanceof AiProviderEmptyOutputError) {
+    return new AppError(
+      502,
+      "The AI provider returned an empty answer. Try again — this is usually transient.",
+    );
+  }
+  if (error instanceof AiProviderMalformedJsonError) {
+    return new AppError(
+      502,
+      "The AI provider returned something that is not valid JSON. Try again.",
+    );
   }
   if (error instanceof AiInvalidOutputError) {
-    return new AppError(502, "The AI provider returned an unusable result");
+    return new AppError(
+      502,
+      `The AI provider broke the rules of the request (${error.issues[0] ?? "schema mismatch"}). Try again.`,
+    );
   }
   if (error instanceof AiProviderRequestError) {
-    return new AppError(502, "The AI provider failed to answer");
+    return requestErrorMessage(error);
   }
-  return new AppError(500, "AI generation failed");
+  return new AppError(500, "AI generation failed for an unexpected reason");
 };
 
 export class AiService {

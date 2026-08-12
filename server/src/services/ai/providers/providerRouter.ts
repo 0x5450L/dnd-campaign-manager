@@ -22,5 +22,6 @@ export const createTextProvider = (config: AiConfig): TextProvider => {
     model: config.geminiModel,
     timeoutMs: config.timeoutMs,
     maxRetries: config.maxRetries,
+    maxOutputTokens: config.maxOutputTokens,
   });
 };
