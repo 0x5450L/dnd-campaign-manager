@@ -18,23 +18,23 @@ function LootResultCard({
   const [openItem, setOpenItem] = useState<GeneratedLootItem | null>(null);
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-3">
+    <div className="custom-scrollbar flex min-h-0 flex-1 flex-col gap-3 pr-1">
       <section className="shrink-0 rounded-md border border-gold-dim/50 bg-surface-light/30">
         <h4 className="px-3 pt-3 font-fantasy text-xs font-bold uppercase tracking-[0.2em] text-gold-bright">
           Read aloud
         </h4>
-        <div className="custom-scrollbar max-h-44 px-3 pb-3 pt-2">
+        <div className="px-3 pb-3 pt-2">
           <p className="whitespace-pre-line text-sm leading-relaxed text-ink">
             {generation.output.readAloud}
           </p>
         </div>
       </section>
 
-      <section className="flex min-h-0 flex-1 flex-col gap-2">
-        <h4 className="shrink-0 font-fantasy text-xs font-bold uppercase tracking-[0.2em] text-gold">
+      <section className="flex shrink-0 flex-col gap-2">
+        <h4 className="font-fantasy text-xs font-bold uppercase tracking-[0.2em] text-gold">
           Items
         </h4>
-        <ul className="custom-scrollbar flex min-h-0 flex-1 flex-col gap-2 pr-1">
+        <ul className="flex flex-col gap-2">
           {generation.output.items.map((item) => {
             const rarity = describeRarity(item.rarity);
             return (

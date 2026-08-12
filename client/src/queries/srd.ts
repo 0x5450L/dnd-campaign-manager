@@ -56,6 +56,16 @@ export const useSrdItemQuery = (slug: string | null) => {
   });
 };
 
+export const useSrdCreatureQuery = (slug: string | null) => {
+  const token = useAuthStore((s) => s.token);
+  return useQuery({
+    queryKey: srdKeys.creature(slug ?? ""),
+    queryFn: () => getSrdCreature(slug as string),
+    enabled: !!token && !!slug,
+    staleTime: 5 * 60 * 1000,
+  });
+};
+
 export const useSrdCreatureFetcher = () => {
   const queryClient = useQueryClient();
   return (slug: string) =>

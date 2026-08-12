@@ -3,6 +3,7 @@ import { useActiveEncounter } from "@/hooks/liveSession/useActiveEncounter";
 import { useEncounterCommands } from "@/hooks/liveSession/useEncounterCommands";
 import { useParticipantActions } from "@/hooks/liveSession/useParticipantActions";
 import { useIsOwnParticipant } from "@/hooks/liveSession/useIsOwnParticipant";
+import { useDmToolboxStore } from "@/state/ai/dmToolboxStore";
 import CommonButton from "@/components/ui/buttons/CommonButton";
 import EncounterParticipantCard from "./participantCard/EncounterParticipantCard";
 import AddParticipantModal from "./AddParticipantModal";
@@ -16,6 +17,7 @@ export const EncounterTracker = ({ isDM }: EncounterTrackerProps) => {
   const { startEncounter, beginCombat, endEncounter, advanceTurn } = useEncounterCommands();
   const { rollInitiative } = useParticipantActions();
   const isOwnParticipant = useIsOwnParticipant();
+  const openToolbox = useDmToolboxStore((s) => s.open);
   const [isAddOpen, setIsAddOpen] = useState(false);
 
   if (!encounter || encounter.status === "ended") {
@@ -58,6 +60,15 @@ export const EncounterTracker = ({ isDM }: EncounterTrackerProps) => {
             <CommonButton onClick={() => setIsAddOpen(true)} variant="secondary" size="sm">
               + Add
             </CommonButton>
+            {isSetup && (
+              <CommonButton
+                onClick={() => openToolbox("encounter")}
+                variant="secondary"
+                size="sm"
+              >
+                Autofill
+              </CommonButton>
+            )}
             <CommonButton onClick={() => rollInitiative()} variant="secondary" size="sm">
               Roll initiative
             </CommonButton>
