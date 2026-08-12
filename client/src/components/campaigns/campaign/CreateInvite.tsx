@@ -27,7 +27,7 @@ export default function CreateInvite({ campaignId }: { campaignId: string }) {
           setTimeout(() => setLinkButtonText("Get invite link"), 2000);
         },
         onError: (error) => {
-          console.error((error as ApiError).data.error.message);
+          console.error((error as ApiError).message);
           setLinkButtonText("Error!");
           setTimeout(() => setLinkButtonText("Get invite link"), 2000);
         },
@@ -56,7 +56,7 @@ export default function CreateInvite({ campaignId }: { campaignId: string }) {
           setTimeout(() => setEmailSuccess(null), 3000);
         },
         onError: (error) => {
-          setEmailError((error as ApiError).data.error.message);
+          setEmailError((error as ApiError).message);
         },
       },
     );

@@ -5,15 +5,25 @@ import type {
   CreatureProfileInput,
 } from "@shared/dto/character";
 
+const MISSING_FIELD_LABELS: Record<string, string> = {
+  name: "name",
+  type: "character type",
+  race: "species",
+  characterClass: "class",
+  campaignId: "campaign",
+};
+
 export const requireCreateCharacterFields = (body: CreateCharacterPayload) => {
-  if (
-    !body.name ||
-    !body.type ||
-    !body.race ||
-    !body.characterClass ||
-    !body.campaignId
-  ) {
-    throw new AppError(400, "Provide all necessary character details");
+  const required: (keyof CreateCharacterPayload)[] =
+    body.type === "monster"
+      ? ["name", "type", "campaignId"]
+      : ["name", "type", "race", "characterClass", "campaignId"];
+
+  const missing = required.filter((field) => !body[field]);
+
+  if (missing.length > 0) {
+    const labels = missing.map((field) => MISSING_FIELD_LABELS[field] ?? field);
+    throw new AppError(400, `Fill in the ${labels.join(", ")} before saving`);
   }
 };
 

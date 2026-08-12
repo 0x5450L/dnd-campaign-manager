@@ -24,7 +24,7 @@ function Login({ handleRedirect }: { handleRedirect: () => void }) {
           handleRedirect();
         },
         onError: (error) => {
-          setLoginError((error as ApiError).data.error.message);
+          setLoginError((error as ApiError).message);
         },
       },
     );

@@ -37,7 +37,7 @@ function CreateNewCampaign() {
           setCreateCampaignError(null);
         },
         onError: (error) => {
-          setCreateCampaignError((error as ApiError).data.error.message);
+          setCreateCampaignError((error as ApiError).message);
         },
       }
     );

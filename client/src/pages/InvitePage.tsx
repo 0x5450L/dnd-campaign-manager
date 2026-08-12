@@ -43,7 +43,7 @@ function InvitePage() {
 
   const isLoading = respondToInvite.isPending || respondToInvite.isIdle;
   const error = respondToInvite.isError
-    ? (respondToInvite.error as ApiError).data.error.message
+    ? (respondToInvite.error as ApiError).message
     : null;
 
   return (
