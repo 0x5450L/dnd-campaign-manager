@@ -1,4 +1,5 @@
 import {
+  CHALLENGE_RATINGS,
   MAX_LEVEL,
   MIN_LEVEL,
   SHIELD_AC_BONUS,
@@ -7,6 +8,7 @@ import {
 } from "../constants/dndMath";
 
 export {
+  CHALLENGE_RATINGS,
   MAX_LEVEL,
   MIN_LEVEL,
   SHIELD_AC_BONUS,
@@ -38,3 +40,9 @@ export const getXpFromLevel = (level: number): number => {
 
 export const getProficiencyBonus = (level: number): number =>
   Math.ceil(level / 4) + 1;
+
+export const xpForChallengeRating = (cr: number | null): number | null =>
+  CHALLENGE_RATINGS.find((entry) => entry.value === cr)?.xp ?? null;
+
+export const challengeRatingLabel = (cr: number | null): string | null =>
+  CHALLENGE_RATINGS.find((entry) => entry.value === cr)?.label ?? null;
