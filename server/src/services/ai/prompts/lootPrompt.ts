@@ -54,10 +54,16 @@ const formatCandidate = (item: SrdItemSummary): string => {
   return `${item.slug} | ${item.name}${details ? ` (${details})` : ""}`;
 };
 
+const formatAvoided = (names: string[]): string | null =>
+  names.length > 0
+    ? `You offered these a moment ago and the DM asked for something else, so do not pick them again: ${names.join(", ")}.`
+    : null;
+
 export const buildLootUserPrompt = (
   context: CampaignLootContext,
   payload: GenerateLootPayload,
   candidates: SrdItemSummary[],
+  avoidedNames: string[] = [],
 ): string =>
   [
     `Campaign: ${context.name}.`,
@@ -70,6 +76,7 @@ export const buildLootUserPrompt = (
     payload.context?.trim()
       ? `The DM adds this context, which outranks everything above: ${payload.context.trim()}`
       : null,
+    formatAvoided(avoidedNames),
     "",
     `Choose exactly ${payload.itemCount} item(s) from the list below. Do not repeat an item.`,
     "Each line is: slug | name (type, rarity)",

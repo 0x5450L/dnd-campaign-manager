@@ -15,6 +15,17 @@ import { selectLootCandidates } from "./lootCandidates";
 
 const MAX_VALIDATION_ATTEMPTS = 2;
 
+const namesForSlugs = (
+  pool: { slug: string; name: string }[],
+  slugs: string[],
+): string[] => {
+  if (slugs.length === 0) {
+    return [];
+  }
+  const wanted = new Set(slugs);
+  return pool.filter((entry) => wanted.has(entry.slug)).map((entry) => entry.name);
+};
+
 export class NotEnoughCandidatesError extends Error {
   constructor(
     readonly available: number,
@@ -41,8 +52,10 @@ export class LootGenerator {
     payload: GenerateLootPayload,
   ): Promise<LootGenerationOutcome> {
     const pool = await this.reference.listItemPool();
+    const excluded = new Set(payload.excludeSlugs ?? []);
+    const remaining = pool.filter((item) => !excluded.has(item.slug));
     const candidates = selectLootCandidates(
-      pool,
+      remaining.length >= payload.itemCount ? remaining : pool,
       payload.richness,
       LOOT_CANDIDATE_COUNT,
     );
@@ -55,7 +68,12 @@ export class LootGenerator {
     const outputSchema = buildLootOutputSchema(slugs);
     const request = {
       systemPrompt: LOOT_SYSTEM_PROMPT,
-      userPrompt: buildLootUserPrompt(context, payload, candidates),
+      userPrompt: buildLootUserPrompt(
+        context,
+        payload,
+        candidates,
+        namesForSlugs(pool, payload.excludeSlugs ?? []),
+      ),
       responseSchema: buildLootResponseSchema(payload.itemCount, slugs),
     };
 
