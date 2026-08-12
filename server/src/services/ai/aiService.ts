@@ -1,9 +1,18 @@
 import { randomUUID } from "node:crypto";
 import { AI_GENERATION_KIND } from "@shared/constants/ai";
-import type { GenerateLootPayload, LootGeneration } from "@shared/dto/ai";
-import { requireCampaignDM } from "../../utils/accessControl";
+import type {
+  EncounterGeneration,
+  GenerateEncounterPayload,
+  GenerateLootPayload,
+  LootGeneration,
+} from "@shared/dto/ai";
+import { requireCampaignDM, requireEncounterDM } from "../../utils/accessControl";
 import { AppError } from "../../utils/errors";
 import { loadCampaignLootContext } from "./aiContextRepository";
+import {
+  NoCreatureCandidatesError,
+  type EncounterGenerator,
+} from "./generators/encounterGenerator";
 import {
   NotEnoughCandidatesError,
   type LootGenerator,
@@ -27,6 +36,9 @@ const toAppError = (error: unknown): AppError => {
   if (error instanceof NotEnoughCandidatesError) {
     return new AppError(503, "The item catalogue is unavailable, try again shortly");
   }
+  if (error instanceof NoCreatureCandidatesError) {
+    return new AppError(503, "The creature catalogue is unavailable, try again shortly");
+  }
   if (error instanceof AiProviderTimeoutError) {
     return new AppError(504, "The AI provider took too long to respond");
   }
@@ -46,6 +58,7 @@ export class AiService {
   constructor(
     private readonly provider: TextProvider,
     private readonly lootGenerator: LootGenerator,
+    private readonly encounterGenerator: EncounterGenerator,
   ) {}
 
   async generateLoot(
@@ -75,6 +88,43 @@ export class AiService {
       };
     } catch (error) {
       console.error("loot generation failed", error);
+      throw toAppError(error);
+    }
+  }
+
+  async generateEncounter(
+    userId: string,
+    payload: GenerateEncounterPayload,
+  ): Promise<EncounterGeneration> {
+    const access = await requireEncounterDM(userId, payload.encounterId);
+    if (access.campaignSession.campaign.id !== payload.campaignId) {
+      throw new AppError(404, "Encounter not found");
+    }
+
+    const context = await loadCampaignLootContext(payload.campaignId);
+    if (!context) {
+      throw new AppError(404, "Campaign not found");
+    }
+
+    try {
+      const { output, model } = await this.encounterGenerator.generate(
+        context,
+        payload,
+      );
+      return {
+        meta: {
+          id: randomUUID(),
+          kind: AI_GENERATION_KIND.Encounter,
+          campaignId: payload.campaignId,
+          provider: this.provider.id,
+          model,
+          createdAt: new Date().toISOString(),
+        },
+        input: payload,
+        output,
+      };
+    } catch (error) {
+      console.error("encounter generation failed", error);
       throw toAppError(error);
     }
   }

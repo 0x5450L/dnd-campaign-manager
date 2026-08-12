@@ -4,7 +4,12 @@ import { authMiddleware } from "../middleware/auth";
 import { createRateLimit } from "../middleware/rateLimit";
 import { validateBody } from "../middleware/validateBody";
 import { asyncHandler } from "../utils/asyncHandler";
-import { generateLootSchema, type GenerateLootBody } from "../validation/ai";
+import {
+  generateEncounterSchema,
+  generateLootSchema,
+  type GenerateEncounterBody,
+  type GenerateLootBody,
+} from "../validation/ai";
 import { getAiConfig, getAiService } from "../services/ai";
 
 const router = Router();
@@ -23,6 +28,22 @@ router.post(
     const generation = await getAiService().generateLoot(req.userId!, req.body);
     res.json({ status: "ok", generation });
   }),
+);
+
+router.post(
+  "/encounter",
+  authMiddleware,
+  aiRateLimit,
+  validateBody(generateEncounterSchema),
+  asyncHandler<ParamsDictionary, unknown, GenerateEncounterBody>(
+    async (req, res) => {
+      const generation = await getAiService().generateEncounter(
+        req.userId!,
+        req.body,
+      );
+      res.json({ status: "ok", generation });
+    },
+  ),
 );
 
 export default router;

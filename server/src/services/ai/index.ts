@@ -1,6 +1,7 @@
 import { getReferenceService } from "../reference";
 import { AiService } from "./aiService";
 import { readAiConfig, type AiConfig } from "./config";
+import { EncounterGenerator } from "./generators/encounterGenerator";
 import { LootGenerator } from "./generators/lootGenerator";
 import { createTextProvider } from "./providers/providerRouter";
 
@@ -20,6 +21,7 @@ export function getAiService(): AiService {
     instance = new AiService(
       provider,
       new LootGenerator(provider, getReferenceService()),
+      new EncounterGenerator(provider, getReferenceService()),
     );
   }
   return instance;
