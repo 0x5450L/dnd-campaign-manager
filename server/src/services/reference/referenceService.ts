@@ -98,6 +98,35 @@ export class ReferenceService {
     );
   }
 
+  async listCreaturePool(): Promise<SrdCreatureSummary[]> {
+    const key = referenceKeys.creaturePool();
+    const cached = await this.cache.get(key);
+    if (cached) {
+      return JSON.parse(cached) as SrdCreatureSummary[];
+    }
+    const pageSize = 100;
+    const maxPages = 20;
+    const bySlug = new Map<string, SrdCreatureSummary>();
+    for (let page = 1; page <= maxPages; page += 1) {
+      const result = await this.router.searchCreatures({
+        limit: pageSize,
+        filters: { page },
+      });
+      const before = bySlug.size;
+      for (const creature of result.results) {
+        if (!bySlug.has(creature.slug)) {
+          bySlug.set(creature.slug, creature);
+        }
+      }
+      if (!result.next || result.results.length === 0 || bySlug.size === before) {
+        break;
+      }
+    }
+    const creatures = [...bySlug.values()];
+    await this.cache.set(key, JSON.stringify(creatures), this.ttlSeconds);
+    return creatures;
+  }
+
   getItem(slug: string): Promise<SrdItem | null> {
     return this.resolveDetail(SRD_CATEGORY.Item, slug, () =>
       this.router.getItem(slug),

@@ -19,4 +19,5 @@ export const referenceKeys = {
     `srd:${category}:search:${serializeQuery(query)}`,
   spellPool: (): string => "srd:spell:pool",
   itemPool: (): string => "srd:item:pool",
+  creaturePool: (): string => "srd:monster:pool",
 };

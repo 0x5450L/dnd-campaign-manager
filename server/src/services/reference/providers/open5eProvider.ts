@@ -132,6 +132,7 @@ export class Open5eProvider extends AbstractContentProvider {
       search: query.search,
       limit: query.limit,
       offset: query.offset,
+      page: query.filters?.page,
       document__slug: OFFICIAL_SRD_DOCUMENT,
     })}`;
     const response =
