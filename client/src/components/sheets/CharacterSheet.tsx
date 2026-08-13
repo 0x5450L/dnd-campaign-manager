@@ -24,6 +24,7 @@ import {
   sheetStateToUpdatePayload,
 } from "@/utils/characterSheetMapping";
 import { StatusChip, type StatusChipState } from "../ui/StatusChip";
+import { useOverlayLayer } from "@/hooks/useOverlayLayer";
 
 const DRAFT_SHEET_ID = "draft";
 
@@ -158,22 +159,7 @@ export const CharacterSheet = ({
     onClose();
   }, [onClose]);
 
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") handleClose();
-    };
-    window.addEventListener("keydown", handleKeyDown);
-
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = prevOverflow;
-    };
-  }, [isOpen, handleClose]);
+  useOverlayLayer(handleClose, { enabled: isOpen, lockScroll: true });
 
   const handleSaveError = (err: unknown) => {
     console.error("Error saving character:", err);

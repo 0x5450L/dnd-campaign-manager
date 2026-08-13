@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParticipantActions } from "@/hooks/liveSession/useParticipantActions";
 import type {
   UpdateParticipantPayload,
@@ -9,8 +9,8 @@ import type {
 import type { SrdCreature } from "@shared/dto/srd";
 import { srdCreatureToParticipant } from "@shared/utils/srd/creatureParticipantMapper";
 import CommonButton from "@/components/ui/buttons/CommonButton";
+import Modal from "@/components/ui/Modal";
 import CreatureBrowser from "../characters/CreatureBrowser";
-import { CloseIcon } from "./participantCard/blocks/icons";
 import ParticipantEditorBody from "./participantCard/modal/ParticipantEditorBody";
 
 type AddParticipantModalProps = {
@@ -71,16 +71,6 @@ export const AddParticipantModal = ({ onClose }: AddParticipantModalProps) => {
     setIsBestiaryOpen(false);
   };
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key !== "Escape") return;
-      if (isBestiaryOpen) setIsBestiaryOpen(false);
-      else onClose();
-    };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [onClose, isBestiaryOpen]);
-
   const canSubmit = draft.name.trim().length > 0 && draft.maxHp >= 1;
 
   const submit = () => {
@@ -118,15 +108,10 @@ export const AddParticipantModal = ({ onClose }: AddParticipantModalProps) => {
 
   return (
     <>
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
-      onClick={onClose}
-    >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        className="custom-scrollbar relative flex max-h-[85vh] w-full max-w-xl flex-col gap-4 overflow-y-auto rounded-md border border-rule bg-surface p-4 shadow-xl sm:p-5"
-      >
-        <div className="flex items-center justify-between gap-3">
+      <Modal
+        onClose={onClose}
+        label="Add participant"
+        title={
           <input
             autoFocus
             value={draft.name}
@@ -135,16 +120,8 @@ export const AddParticipantModal = ({ onClose }: AddParticipantModalProps) => {
             aria-label="Participant name"
             className="w-full truncate rounded border-b border-rule bg-transparent font-fantasy text-xl sm:text-2xl font-bold text-gold-bright placeholder:text-faint focus:border-hover focus:outline-none"
           />
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Close"
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded border border-rule text-faint transition-colors hover:border-hover hover:text-ink"
-          >
-            <CloseIcon />
-          </button>
-        </div>
-
+        }
+      >
         <div className="flex gap-2">
           {ADDABLE_TYPES.map((option) => (
             <button
@@ -187,14 +164,13 @@ export const AddParticipantModal = ({ onClose }: AddParticipantModalProps) => {
             Add
           </CommonButton>
         </div>
-      </div>
-    </div>
+      </Modal>
 
-    <CreatureBrowser
-      isOpen={isBestiaryOpen}
-      onClose={() => setIsBestiaryOpen(false)}
-      onSelectCreature={handlePickCreature}
-    />
+      <CreatureBrowser
+        isOpen={isBestiaryOpen}
+        onClose={() => setIsBestiaryOpen(false)}
+        onSelectCreature={handlePickCreature}
+      />
     </>
   );
 };

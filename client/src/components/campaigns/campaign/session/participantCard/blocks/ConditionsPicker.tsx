@@ -3,7 +3,8 @@ import { CONDITIONS, CONDITION_THEME } from "@/constants/conditions";
 import { isKnownCondition } from "@/utils/conditions";
 import type { ConditionName } from "@/types/conditions";
 import ConditionIcon from "../conditionIcons";
-import { PlusIcon, CloseIcon } from "./icons";
+import { CloseIcon } from "@/components/ui/icons";
+import { PlusIcon } from "./icons";
 
 type ConditionsPickerProps = {
   active: string[];

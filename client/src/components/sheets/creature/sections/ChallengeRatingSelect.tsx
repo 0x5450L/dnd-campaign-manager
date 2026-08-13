@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { CHALLENGE_RATINGS } from "@/utils/dndMath";
+import { useOverlayLayer } from "@/hooks/useOverlayLayer";
 
 type ChallengeRatingSelectProps = {
   value: number | null;
@@ -17,6 +18,8 @@ export const ChallengeRatingSelect = ({ value, onChange }: ChallengeRatingSelect
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  useOverlayLayer(() => setOpen(false), { enabled: open });
+
   useEffect(() => {
     if (!open) return;
 
@@ -25,16 +28,8 @@ export const ChallengeRatingSelect = ({ value, onChange }: ChallengeRatingSelect
         setOpen(false);
       }
     };
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setOpen(false);
-    };
-
     document.addEventListener("pointerdown", onPointerDown);
-    document.addEventListener("keydown", onKeyDown);
-    return () => {
-      document.removeEventListener("pointerdown", onPointerDown);
-      document.removeEventListener("keydown", onKeyDown);
-    };
+    return () => document.removeEventListener("pointerdown", onPointerDown);
   }, [open]);
 
   const selected = CHALLENGE_RATINGS.find((cr) => cr.value === value);

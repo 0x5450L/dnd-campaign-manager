@@ -1,10 +1,10 @@
-import { useEffect } from "react";
 import { useDiceRollerStore } from "@/state/diceRoller/diceRollerStore";
 import { DICE_TYPES, type AdvDis, type DiceType } from "@/types/dice";
 import DiceShape from "./DiceShape";
 import DiceResult from "./DiceResult";
 import DiceHistory from "./DiceHistory";
 import CommonButton from "../ui/buttons/CommonButton";
+import { useOverlayLayer } from "@/hooks/useOverlayLayer";
 
 export const DiceRoller = () => {
   const isOpen = useDiceRollerStore((s) => s.isOpen);
@@ -24,14 +24,7 @@ export const DiceRoller = () => {
   const roll = useDiceRollerStore((s) => s.roll);
   const setShareToSession = useDiceRollerStore((s) => s.setShareToSession);
 
-  useEffect(() => {
-    if (!isOpen) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") close();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [isOpen, close]);
+  useOverlayLayer(close, { enabled: isOpen });
 
   const fabGlow = lastResult?.critSuccess
     ? "success"

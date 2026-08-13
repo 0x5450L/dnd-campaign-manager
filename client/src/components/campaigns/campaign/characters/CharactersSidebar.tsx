@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import type { Character } from "@/types/characters/characters";
+import { useOverlayLayer } from "@/hooks/useOverlayLayer";
 import CommonButton from "@/components/ui/buttons/CommonButton";
 import CharacterCard from "./CharacterCard";
 import CharactersEmptyState from "./CharactersEmptyState";
@@ -28,6 +29,8 @@ function CharactersSidebar({
   onDeleteCharacter,
 }: CharactersSidebarProps) {
   const [activeTab, setActiveTab] = useState<CharactersSidebarTab>("players");
+
+  useOverlayLayer(onClose, { enabled: isOpen, lockScroll: true });
 
   const { players, npcs } = useMemo(() => {
     const players: Character[] = [];

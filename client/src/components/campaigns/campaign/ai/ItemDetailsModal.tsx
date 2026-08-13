@@ -1,8 +1,7 @@
-import { useEffect } from "react";
-import { createPortal } from "react-dom";
 import type { GeneratedLootItem } from "@shared/dto/ai";
 import type { SrdArmorDetail, SrdWeaponDetail } from "@shared/dto/srd";
 import { useSrdItemQuery } from "@/queries/srd";
+import Modal from "@/components/ui/Modal";
 import { describeRarity } from "./itemRarity";
 
 type ItemDetailsModalProps = {
@@ -94,94 +93,72 @@ function ItemDetailsModal({ item, onClose }: ItemDetailsModalProps) {
   const { data, isLoading, isError, error } = useSrdItemQuery(item.slug);
   const rarity = describeRarity(item.rarity);
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [onClose]);
-
-  return createPortal(
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
-      onClick={onClose}
+  return (
+    <Modal
+      onClose={onClose}
+      width="lg"
+      label={item.name}
+      title={
+        <>
+          <h3 className="font-fantasy text-2xl font-bold text-gold-bright sm:text-3xl">
+            {item.name}
+          </h3>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className={`${badge} ${rarity.style}`}>{rarity.label}</span>
+            {item.itemType ? (
+              <span className={`${badge} border-rule text-dim`}>{item.itemType}</span>
+            ) : null}
+            {data?.requiresAttunement ? (
+              <span className={`${badge} border-arcane/60 text-arcane-soft`}>
+                Attunement
+              </span>
+            ) : null}
+          </div>
+        </>
+      }
     >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        className="custom-scrollbar relative flex max-h-[85vh] w-full max-w-2xl flex-col gap-5 overflow-y-auto rounded-md border border-rule bg-surface p-5 shadow-xl sm:p-6"
-      >
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex min-w-0 flex-col gap-2.5">
-            <h3 className="font-fantasy text-2xl font-bold text-gold-bright sm:text-3xl">
-              {item.name}
-            </h3>
-            <div className="flex flex-wrap items-center gap-2">
-              <span className={`${badge} ${rarity.style}`}>{rarity.label}</span>
-              {item.itemType ? (
-                <span className={`${badge} border-rule text-dim`}>{item.itemType}</span>
-              ) : null}
-              {data?.requiresAttunement ? (
-                <span className={`${badge} border-arcane/60 text-arcane-soft`}>
-                  Attunement
-                </span>
-              ) : null}
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Close"
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded border border-rule text-lg text-faint transition-colors hover:border-hover hover:text-ink"
-          >
-            &times;
-          </button>
+      {isLoading ? (
+        <div className="flex animate-pulse flex-col gap-2.5">
+          <div className="h-4 w-full rounded bg-rule/70" />
+          <div className="h-4 w-11/12 rounded bg-rule/70" />
+          <div className="h-4 w-9/12 rounded bg-rule/70" />
         </div>
-
-        {isLoading ? (
-          <div className="flex animate-pulse flex-col gap-2.5">
-            <div className="h-4 w-full rounded bg-rule/70" />
-            <div className="h-4 w-11/12 rounded bg-rule/70" />
-            <div className="h-4 w-9/12 rounded bg-rule/70" />
-          </div>
-        ) : isError ? (
-          <p className="text-base text-rust-soft">
-            {(error as Error).message || "Could not load this item."}
-          </p>
-        ) : (
-          <>
-            {data?.weapon ? <WeaponBlock weapon={data.weapon} /> : null}
-            {data?.armor ? <ArmorBlock armor={data.armor} /> : null}
-
-            {data?.cost || data?.weight ? (
-              <div className="flex flex-wrap gap-8">
-                {data.cost ? <Fact label="Cost" value={data.cost} /> : null}
-                {data.weight ? <Fact label="Weight" value={data.weight} /> : null}
-              </div>
-            ) : null}
-
-            {data?.description ? (
-              <div className="flex flex-col gap-1.5">
-                <span className={sectionLabel}>Rules text</span>
-                <p className="whitespace-pre-line text-base leading-relaxed text-ink">
-                  {data.description}
-                </p>
-              </div>
-            ) : null}
-          </>
-        )}
-
-        <div className="flex flex-col gap-1.5 border-t border-rule pt-4">
-          <span className={sectionLabel}>Why it is here</span>
-          <p className="text-base leading-relaxed text-dim">{item.note}</p>
-        </div>
-
-        <p className="text-[11px] uppercase tracking-widest text-faint">
-          {item.source} · {item.slug}
+      ) : isError ? (
+        <p className="text-base text-rust-soft">
+          {(error as Error).message || "Could not load this item."}
         </p>
+      ) : (
+        <>
+          {data?.weapon ? <WeaponBlock weapon={data.weapon} /> : null}
+          {data?.armor ? <ArmorBlock armor={data.armor} /> : null}
+
+          {data?.cost || data?.weight ? (
+            <div className="flex flex-wrap gap-8">
+              {data.cost ? <Fact label="Cost" value={data.cost} /> : null}
+              {data.weight ? <Fact label="Weight" value={data.weight} /> : null}
+            </div>
+          ) : null}
+
+          {data?.description ? (
+            <div className="flex flex-col gap-1.5">
+              <span className={sectionLabel}>Rules text</span>
+              <p className="whitespace-pre-line text-base leading-relaxed text-ink">
+                {data.description}
+              </p>
+            </div>
+          ) : null}
+        </>
+      )}
+
+      <div className="flex flex-col gap-1.5 border-t border-rule pt-4">
+        <span className={sectionLabel}>Why it is here</span>
+        <p className="text-base leading-relaxed text-dim">{item.note}</p>
       </div>
-    </div>,
-    document.body,
+
+      <p className="text-[11px] uppercase tracking-widest text-faint">
+        {item.source} · {item.slug}
+      </p>
+    </Modal>
   );
 }
 

@@ -1,9 +1,8 @@
-import { useEffect } from "react";
-import { createPortal } from "react-dom";
 import { ABILITY_NAMES } from "@shared/constants/dnd";
 import type { GeneratedEncounterEntry } from "@shared/dto/ai";
 import type { SrdCreature, SrdCreatureAction } from "@shared/dto/srd";
 import { useSrdCreatureQuery } from "@/queries/srd";
+import Modal from "@/components/ui/Modal";
 import { challengeRatingLabel, formatAbilityModifier } from "@/utils/dndMath";
 
 type CreatureDetailsModalProps = {
@@ -139,81 +138,58 @@ function TraitList({ label, traits }: { label: string; traits: SrdCreatureAction
 function CreatureDetailsModal({ entry, onClose }: CreatureDetailsModalProps) {
   const { data, isLoading, isError, error } = useSrdCreatureQuery(entry.slug);
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [onClose]);
-
-  return createPortal(
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
-      onClick={onClose}
+  return (
+    <Modal
+      onClose={onClose}
+      label={entry.name}
+      title={
+        <>
+          <h3 className="truncate font-fantasy text-xl font-bold text-gold-bright sm:text-2xl">
+            {entry.name}
+          </h3>
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className={`${badge} border-gold-dim/60 font-bold text-gold`}>
+              CR {challengeRatingLabel(entry.challengeRating) ?? "?"}
+            </span>
+            <span className={`${badge} border-rule text-dim`}>{entry.xpEach} XP</span>
+            {entry.count > 1 ? (
+              <span className={`${badge} border-rule text-dim`}>× {entry.count}</span>
+            ) : null}
+            {data?.type ? (
+              <span className={`${badge} border-rule text-dim`}>{data.type}</span>
+            ) : null}
+          </div>
+        </>
+      }
     >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        className="custom-scrollbar relative flex max-h-[85vh] w-full max-w-xl flex-col gap-4 overflow-y-auto rounded-md border border-rule bg-surface p-4 shadow-xl"
-      >
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex min-w-0 flex-col gap-2">
-            <h3 className="truncate font-fantasy text-xl font-bold text-gold-bright sm:text-2xl">
-              {entry.name}
-            </h3>
-            <div className="flex flex-wrap items-center gap-1.5">
-              <span className={`${badge} border-gold-dim/60 font-bold text-gold`}>
-                CR {challengeRatingLabel(entry.challengeRating) ?? "?"}
-              </span>
-              <span className={`${badge} border-rule text-dim`}>{entry.xpEach} XP</span>
-              {entry.count > 1 ? (
-                <span className={`${badge} border-rule text-dim`}>× {entry.count}</span>
-              ) : null}
-              {data?.type ? (
-                <span className={`${badge} border-rule text-dim`}>{data.type}</span>
-              ) : null}
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Close"
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded border border-rule text-faint transition-colors hover:border-hover hover:text-ink"
-          >
-            &times;
-          </button>
+      {isLoading ? (
+        <div className="flex animate-pulse flex-col gap-2">
+          <div className="h-3 w-full rounded bg-rule/70" />
+          <div className="h-3 w-11/12 rounded bg-rule/70" />
+          <div className="h-3 w-9/12 rounded bg-rule/70" />
         </div>
+      ) : isError ? (
+        <p className="text-sm font-medium text-rust-soft">
+          {(error as Error).message || "Could not load this creature."}
+        </p>
+      ) : data ? (
+        <>
+          <VitalsBlock creature={data} />
+          <AbilityStrip creature={data} />
+          <TraitList label="Traits" traits={data.specialAbilities} />
+          <TraitList label="Actions" traits={data.actions} />
+          <TraitList label="Legendary actions" traits={data.legendaryActions} />
+        </>
+      ) : null}
 
-        {isLoading ? (
-          <div className="flex animate-pulse flex-col gap-2">
-            <div className="h-3 w-full rounded bg-rule/70" />
-            <div className="h-3 w-11/12 rounded bg-rule/70" />
-            <div className="h-3 w-9/12 rounded bg-rule/70" />
-          </div>
-        ) : isError ? (
-          <p className="text-sm font-medium text-rust-soft">
-            {(error as Error).message || "Could not load this creature."}
-          </p>
-        ) : data ? (
-          <>
-            <VitalsBlock creature={data} />
-            <AbilityStrip creature={data} />
-            <TraitList label="Traits" traits={data.specialAbilities} />
-            <TraitList label="Actions" traits={data.actions} />
-            <TraitList label="Legendary actions" traits={data.legendaryActions} />
-          </>
-        ) : null}
-
-        <section className="flex flex-col gap-1.5">
-          <h4 className={`${groupLabel} border-b border-rule pb-1.5`}>Why it is here</h4>
-          <p className="text-sm font-medium leading-relaxed text-dim">{entry.note}</p>
-          <p className="text-[10px] uppercase tracking-widest text-faint">
-            {entry.source} · {entry.slug}
-          </p>
-        </section>
-      </div>
-    </div>,
-    document.body,
+      <section className="flex flex-col gap-1.5">
+        <h4 className={`${groupLabel} border-b border-rule pb-1.5`}>Why it is here</h4>
+        <p className="text-sm font-medium leading-relaxed text-dim">{entry.note}</p>
+        <p className="text-[10px] uppercase tracking-widest text-faint">
+          {entry.source} · {entry.slug}
+        </p>
+      </section>
+    </Modal>
   );
 }
 

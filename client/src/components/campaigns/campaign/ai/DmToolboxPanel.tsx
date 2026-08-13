@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import type { LootFindType, LootRichness } from "@shared/dto/ai";
 import { useGenerateEncounterMutation, useGenerateLootMutation } from "@/queries/ai";
 import { useBulkCreateParticipantsMutation } from "@/queries/encounters";
@@ -12,6 +11,7 @@ import EncounterGeneratorForm, {
 import EncounterResultCard from "./EncounterResultCard";
 import LootGeneratorForm from "./LootGeneratorForm";
 import LootResultCard from "./LootResultCard";
+import { useOverlayLayer } from "@/hooks/useOverlayLayer";
 
 type DmToolboxPanelProps = {
   campaignId: string;
@@ -76,14 +76,7 @@ function DmToolboxPanel({ campaignId }: DmToolboxPanelProps) {
   const generateEncounter = useGenerateEncounterMutation();
   const landParticipants = useBulkCreateParticipantsMutation(sessionId);
 
-  useEffect(() => {
-    if (!isOpen) return;
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") close();
-    };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [isOpen, close]);
+  useOverlayLayer(close, { enabled: isOpen, lockScroll: true });
 
   const runLootGeneration = (input: LootFormInput) => {
     generateLoot.mutate(
