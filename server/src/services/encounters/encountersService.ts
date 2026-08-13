@@ -1,5 +1,6 @@
 import { AppError } from "../../utils/errors";
 import { requireEncounterDM } from "../../utils/accessControl";
+import type { EncounterWithCampaignDM } from "../../types/accessControl";
 import { ensureAttackIds, jsonInput, pickDefined, trimOrNull } from "../../utils/payload";
 import type {
   BulkInitiativePayload,
@@ -12,6 +13,7 @@ import type { Ability, AbilityUsageAction, ResourcePool } from "@shared/types/ab
 import type { SpellSlotLevel } from "@shared/types/dnd";
 import type { InitiativeRollDTO, RollInitiativePayload } from "@shared/dto/session";
 import { rollInitiative } from "@shared/utils/initiative";
+import { nextTurn, turnAfterRemoval } from "@shared/utils/turnOrder";
 import { applyAbilityUsage, applyTurnStart } from "@shared/utils/abilityUsage";
 import { applySpellSlotUsage } from "@shared/utils/spellSlotUsage";
 import { rollDie } from "@shared/utils/dice";
@@ -90,16 +92,33 @@ export const getEncounter = async (userId: string, id: string) => {
   return { ...fields, participants: participantsForUser };
 };
 
+const turnFieldsForStatus = async (
+  encounter: EncounterWithCampaignDM,
+  status: UpdateEncounterPayload["status"],
+) => {
+  if (status === "ended") {
+    return { currentParticipantId: null };
+  }
+  if (status !== "active" || encounter.status === "active") {
+    return {};
+  }
+
+  const [first] = await encountersRepo.listParticipants(encounter.id);
+  return { currentParticipantId: first?.id ?? null, round: 1 };
+};
+
 export const updateEncounter = async (
   userId: string,
   id: string,
   body: UpdateEncounterPayload,
 ) => {
   const access = await requireEncounterDM(userId, id);
+  const turnFields = await turnFieldsForStatus(access, body.status);
 
   const encounter = await encountersRepo.updateEncounter(id, {
     ...pickDefined({ status: body.status, name: trimOrNull(body.name) }),
     ...(body.status === "ended" && { endedAt: new Date() }),
+    ...turnFields,
   });
 
   try {
@@ -126,24 +145,22 @@ export const advanceTurn = async (userId: string, id: string) => {
     throw new AppError(400, "Encounter is not active");
   }
   const participants = await encountersRepo.listParticipants(id);
-  const total = participants.length;
+  const { participant: active, wrapped } = nextTurn(
+    participants,
+    encounter.currentParticipantId,
+  );
 
-  if (total === 0) {
+  if (!active) {
     throw new AppError(400, "No participants in encounter");
   }
-
-  const next = encounter.currentTurnIndex + 1;
-  const wraps = next >= total;
-  const newIndex = wraps ? 0 : next;
-  const active = participants[newIndex];
 
   const abilities = (active.abilities as unknown as Ability[] | null) ?? [];
   const resources = (active.resources as unknown as ResourcePool[] | null) ?? [];
   const turnStart = applyTurnStart(abilities, resources, () => rollDie(6));
 
   const encounterUpdate = encountersRepo.updateEncounter(id, {
-    currentTurnIndex: newIndex,
-    round: wraps ? encounter.round + 1 : encounter.round,
+    currentParticipantId: active.id,
+    round: wrapped ? encounter.round + 1 : encounter.round,
   });
 
   const [updated, updatedActive] = turnStart.changed
@@ -531,19 +548,74 @@ export const applyParticipantSpellSlotUsage = async (
   return updated;
 };
 
+const deleteWithTurnHandoff = async (
+  encounter: EncounterWithCampaignDM,
+  ids: string[],
+) => {
+  const participants = await encountersRepo.listParticipants(encounter.id);
+  const { participant, wrapped } = turnAfterRemoval(
+    participants,
+    encounter.currentParticipantId,
+    ids,
+  );
+  const currentParticipantId = participant?.id ?? null;
+
+  if (currentParticipantId === encounter.currentParticipantId) {
+    await encountersRepo.deleteParticipants(ids, encounter.id);
+    return null;
+  }
+
+  const [updated] = await encountersRepo.runInTransaction([
+    encountersRepo.updateEncounter(encounter.id, {
+      currentParticipantId,
+      round: wrapped ? encounter.round + 1 : encounter.round,
+    }),
+    encountersRepo.deleteParticipants(ids, encounter.id),
+  ]);
+
+  return updated;
+};
+
+const broadcastRemoval = async (
+  encounter: EncounterWithCampaignDM,
+  ids: string[],
+  updated: Awaited<ReturnType<typeof deleteWithTurnHandoff>>,
+) => {
+  const campaignId = encounter.campaignSession.campaign.id;
+
+  for (const removedId of ids) {
+    broadcastParticipantRemoved(campaignId, encounter.id, removedId);
+  }
+
+  if (updated) {
+    await broadcastEncounterUpdated(
+      campaignId,
+      encounter.campaignSession.campaign.dmId,
+      mapEncounterToDTO(updated),
+    );
+  }
+};
+
 export const removeParticipants = async (
   userId: string,
   id: string,
   ids: string[],
 ) => {
-  await requireEncounterDM(userId, id);
+  const access = await requireEncounterDM(userId, id);
 
   const owned = await encountersRepo.findParticipantIds(ids, id);
   if (owned.length !== ids.length) {
     throw new AppError(400, "Some participants do not belong to this encounter");
   }
 
-  await encountersRepo.deleteParticipants(ids, id);
+  const updated = await deleteWithTurnHandoff(access, ids);
+
+  try {
+    await broadcastRemoval(access, ids, updated);
+  } catch (error) {
+    console.error("participant removal broadcast failed", error);
+  }
+
   return ids;
 };
 
@@ -559,11 +631,11 @@ export const removeParticipant = async (
     throw new AppError(404, "Participant not found");
   }
 
-  await encountersRepo.deleteParticipant(pid);
+  const updated = await deleteWithTurnHandoff(access, [pid]);
 
   try {
-    broadcastParticipantRemoved(access.campaignSession.campaign.id, id, pid);
+    await broadcastRemoval(access, [pid], updated);
   } catch (error) {
-    console.error("participant_removed broadcast failed", error);
+    console.error("participant removal broadcast failed", error);
   }
 };

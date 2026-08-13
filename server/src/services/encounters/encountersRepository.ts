@@ -191,9 +191,6 @@ export const findParticipantEncounter = (pid: string) =>
     select: { encounterId: true },
   });
 
-export const deleteParticipant = (pid: string) =>
-  prisma.encounterParticipant.delete({ where: { id: pid } });
-
 export const deleteParticipants = (ids: string[], encounterId: string) =>
   prisma.encounterParticipant.deleteMany({
     where: { id: { in: ids }, encounterId },
