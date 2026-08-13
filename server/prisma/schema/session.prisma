@@ -41,10 +41,12 @@ model Encounter {
   updatedAt         DateTime               @updatedAt @map("updated_at")
   endedAt           DateTime?              @map("ended_at")
   round             Int                    @default(1)
-  currentTurnIndex  Int                    @default(0)
   campaignSessionId String                 @map("campaign_session_id")
   campaignSession   CampaignSession        @relation("SessionEncounters", fields: [campaignSessionId], references: [id], onDelete: Cascade)
   participants      EncounterParticipant[] @relation("EncounterParticipants")
+
+  currentParticipantId String?               @unique @map("current_participant_id")
+  currentParticipant   EncounterParticipant? @relation("EncounterCurrentTurn", fields: [currentParticipantId], references: [id], onDelete: SetNull)
 
   @@map("encounters")
 }
@@ -53,6 +55,7 @@ model EncounterParticipant {
   id                    String          @id @default(uuid())
   encounterId           String          @map("encounter_id")
   encounter             Encounter       @relation("EncounterParticipants", fields: [encounterId], references: [id], onDelete: Cascade)
+  currentTurnOf         Encounter?      @relation("EncounterCurrentTurn")
   characterId           String?         @map("character_id")
   character             Character?      @relation("CharacterParticipations", fields: [characterId], references: [id], onDelete: SetNull)
   type                  ParticipantType

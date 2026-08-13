@@ -57,7 +57,7 @@ export const mapEncounterToDTO = (encounter: Encounter): EncounterDTO => ({
   name: encounter.name,
   status: encounter.status,
   round: encounter.round,
-  currentTurnIndex: encounter.currentTurnIndex,
+  currentParticipantId: encounter.currentParticipantId,
   campaignSessionId: encounter.campaignSessionId,
   startedAt: encounter.startedAt.toISOString(),
   updatedAt: encounter.updatedAt.toISOString(),

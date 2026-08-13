@@ -38,7 +38,7 @@ export type EncounterDTO = {
   name: string | null;
   status: EncounterStatus;
   round: number;
-  currentTurnIndex: number;
+  currentParticipantId: string | null;
   campaignSessionId: string;
   startedAt: string;
   updatedAt: string;
