@@ -67,14 +67,11 @@ export const findEncounterForMember = (
     include: encounterForMemberInclude,
   });
 
-export const updateEncounter = (id: string, data: Prisma.EncounterUpdateInput) =>
+export const updateEncounter = (id: string, data: Prisma.EncounterUncheckedUpdateInput) =>
   prisma.encounter.update({ where: { id }, data });
 
 export const deleteEncounter = (id: string) =>
   prisma.encounter.delete({ where: { id } });
-
-export const countParticipants = (encounterId: string) =>
-  prisma.encounterParticipant.count({ where: { encounterId } });
 
 export const findParticipantIds = (ids: string[], encounterId: string) =>
   prisma.encounterParticipant.findMany({
