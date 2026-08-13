@@ -2,13 +2,13 @@ import type { Request, Response } from "express";
 
 const clients = new Map<string, Response[]>();
 
-export const addClient = (email: string, res: Response) => {
+const addClient = (email: string, res: Response) => {
   const existing = clients.get(email) || [];
   existing.push(res);
   clients.set(email, existing);
 };
 
-export const removeClient = (email: string, res: Response) => {
+const removeClient = (email: string, res: Response) => {
   const existing = clients.get(email) || [];
   clients.set(email, existing.filter((c) => c !== res));
 };

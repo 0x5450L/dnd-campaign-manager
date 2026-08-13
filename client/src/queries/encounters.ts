@@ -10,7 +10,6 @@ import {
   bulkCreateParticipants as bulkCreateParticipantsRequest,
   deleteParticipant as deleteParticipantRequest,
   listEncounters,
-  setInitiative as setInitiativeRequest,
   updateEncounter as updateEncounterRequest,
   updateParticipant as updateParticipantRequest,
 } from "../services/api/encounters";
@@ -18,7 +17,6 @@ import { useAuthStore } from "../state/auth/authStore";
 import { getSocket } from "../services/socket";
 import type {
   AbilityUsageAction,
-  BulkInitiativePayload,
   CreateEncounterPayload,
   CreateParticipantPayload,
   UpdateEncounterPayload,
@@ -188,21 +186,6 @@ export const useAdvanceTurnMutation = (campaignSessionId: string | undefined) =>
     mutationFn: async (encounterId: string) => (await advanceTurnRequest(encounterId)).encounter,
     onSuccess: (encounter) => {
       queryClient.setQueryData<EncounterList>(key, (list) => patchEncounterScalar(list, encounter));
-    },
-  });
-};
-
-export const useSetInitiativeMutation = (campaignSessionId: string | undefined) => {
-  const queryClient = useQueryClient();
-  const key = encounterKeys.list(campaignSessionId ?? "");
-
-  return useMutation({
-    mutationFn: async (vars: { encounterId: string; payload: BulkInitiativePayload }) =>
-      (await setInitiativeRequest(vars.encounterId, vars.payload)).participants,
-    onSuccess: (participants, { encounterId }) => {
-      queryClient.setQueryData<EncounterList>(key, (list) =>
-        setParticipants(list, encounterId, participants),
-      );
     },
   });
 };
