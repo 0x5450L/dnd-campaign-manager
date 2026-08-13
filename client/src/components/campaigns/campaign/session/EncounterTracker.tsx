@@ -89,11 +89,11 @@ export const EncounterTracker = ({ isDM }: EncounterTrackerProps) => {
       </div>
 
       <ul className="custom-scrollbar-x -mx-1 flex snap-x snap-mandatory gap-3 px-1 pb-2">
-        {participants.map((p, idx) => (
+        {participants.map((p) => (
           <EncounterParticipantCard
             key={p.id}
             participant={p}
-            isActive={!isSetup && idx === encounter.currentTurnIndex}
+            isActive={!isSetup && p.id === encounter.currentParticipantId}
             isDM={isDM}
             isOwner={isOwnParticipant(p)}
           />

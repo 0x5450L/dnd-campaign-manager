@@ -11,7 +11,7 @@ export const useActiveEncounter = () => {
 
   const activeParticipant = useMemo(() => {
     if (!encounter || participants.length === 0) return null;
-    return participants[encounter.currentTurnIndex] ?? null;
+    return participants.find((p) => p.id === encounter.currentParticipantId) ?? null;
   }, [encounter, participants]);
 
   return { encounter, participants, activeParticipant };
