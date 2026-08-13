@@ -1,3 +1,4 @@
+html,
 .custom-scrollbar,
 .custom-scrollbar-x {
   --_sb-size: 4px;
@@ -7,6 +8,10 @@
 
   scrollbar-width: thin;
   scrollbar-color: var(--_sb-thumb) var(--_sb-track);
+}
+
+html {
+  scrollbar-gutter: stable;
 }
 
 .custom-scrollbar {
@@ -19,6 +24,7 @@
   overflow-x: overlay;
 }
 
+html::-webkit-scrollbar-button,
 .custom-scrollbar::-webkit-scrollbar-button:start:decrement,
 .custom-scrollbar::-webkit-scrollbar-button:start:increment,
 .custom-scrollbar::-webkit-scrollbar-button:end:decrement,
@@ -30,6 +36,7 @@
   height: 0 !important;
 }
 
+html::-webkit-scrollbar,
 .custom-scrollbar::-webkit-scrollbar {
   width: var(--_sb-size);
 }
@@ -38,17 +45,20 @@
   height: var(--_sb-size);
 }
 
+html::-webkit-scrollbar-track,
 .custom-scrollbar::-webkit-scrollbar-track,
 .custom-scrollbar-x::-webkit-scrollbar-track {
   background: var(--_sb-track);
 }
 
+html::-webkit-scrollbar-thumb,
 .custom-scrollbar::-webkit-scrollbar-thumb,
 .custom-scrollbar-x::-webkit-scrollbar-thumb {
   background: var(--_sb-thumb);
   border-radius: 999px;
 }
 
+html::-webkit-scrollbar-thumb:hover,
 .custom-scrollbar::-webkit-scrollbar-thumb:hover,
 .custom-scrollbar-x::-webkit-scrollbar-thumb:hover {
   background: var(--_sb-thumb-hover);
