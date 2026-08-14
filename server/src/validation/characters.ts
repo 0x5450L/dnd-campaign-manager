@@ -45,7 +45,7 @@ export const createCharacterSchema = z.object({
   name: z.string().min(1),
   type: characterTypeSchema,
   race: z.string(),
-  characterClass: z.string(),
+  characterClass: z.string().optional(),
   campaignId: z.string().min(1),
   background: z.string().optional(),
   alignment: alignmentSchema.optional(),

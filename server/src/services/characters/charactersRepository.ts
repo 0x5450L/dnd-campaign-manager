@@ -56,11 +56,14 @@ export const createCharacter = (userId: string, input: CreateCharacterPayload) =
       name: input.name,
       type: input.type,
       race: input.race,
-      characterClass: input.characterClass,
       background: input.background ?? "",
       campaignId: input.campaignId,
       userId,
-      ...pickDefined({ alignment: input.alignment, notes: input.notes }),
+      ...pickDefined({
+        characterClass: input.characterClass,
+        alignment: input.alignment,
+        notes: input.notes,
+      }),
       abilityScores: {
         create: ABILITY_NAMES.map((ability) => ({
           name: ability,

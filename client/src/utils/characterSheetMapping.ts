@@ -161,10 +161,12 @@ export const sheetStateToCreatePayload = (
   name: state.name,
   type,
   race: state.race,
-  characterClass: state.kind === "character" ? state.characterClass : "",
   campaignId,
-  background: state.kind === "character" ? state.background : "",
   notes: state.notes || null,
+  ...(state.kind === "character" && {
+    characterClass: state.characterClass,
+    background: state.background,
+  }),
 });
 
 const sheetStateToCreatureProfile = (

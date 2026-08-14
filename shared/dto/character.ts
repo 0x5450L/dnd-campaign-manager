@@ -95,7 +95,7 @@ export type CreateCharacterPayload = {
   name: string;
   type: CharacterType;
   race: string;
-  characterClass: string;
+  characterClass?: string;
   campaignId: string;
   background?: string;
   alignment?: Alignment;
