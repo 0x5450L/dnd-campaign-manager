@@ -1,6 +1,6 @@
 import { ABILITY_NAMES, SKILL_DEFINITIONS } from "@shared/constants/dnd";
 import { MIN_ATTACKS, createInitialCharacterSheet, createInitialCreatureSheet } from "../constants/characterSheet";
-import { getLevelFromXp } from "./dndMath";
+import { formatSigned, getLevelFromXp } from "./dndMath";
 import type {
   CharacterAbilityDTO,
   CharacterAttackInput,
@@ -61,7 +61,7 @@ const buildAttacksFromDto = (attacks: CharacterDTO["attacks"]): Attack[] => {
   const mapped: Attack[] = attacks.map((a) => ({
     id: a.id,
     name: a.name,
-    attackBonus: String(a.attackBonus),
+    attackBonus: formatSigned(a.attackBonus),
     damage: a.damage,
     notes: a.notes ?? "",
   }));
