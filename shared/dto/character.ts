@@ -56,6 +56,7 @@ export type CharacterDTO = {
   type: CharacterType;
   race: string;
   characterClass: string;
+  subclass: string | null;
   background: string;
   alignment: Alignment;
   notes: string | null;
@@ -78,6 +79,12 @@ export type CharacterDTO = {
   damageResistances: string | null;
   damageImmunities: string | null;
   conditionImmunities: string | null;
+  classFeatures: string | null;
+  racialTraits: string | null;
+  feats: string | null;
+  armorProficiencies: string | null;
+  weaponProficiencies: string | null;
+  toolProficiencies: string | null;
   campaignId: string;
   userId: string;
   abilityScores: CharacterAbilityDTO[];
@@ -108,6 +115,7 @@ export type UpdateCharacterPayload = Partial<{
   type: CharacterType;
   race: string;
   characterClass: string;
+  subclass: string | null;
   background: string;
   alignment: Alignment;
   notes: string | null;
@@ -130,6 +138,12 @@ export type UpdateCharacterPayload = Partial<{
   damageResistances: string | null;
   damageImmunities: string | null;
   conditionImmunities: string | null;
+  classFeatures: string | null;
+  racialTraits: string | null;
+  feats: string | null;
+  armorProficiencies: string | null;
+  weaponProficiencies: string | null;
+  toolProficiencies: string | null;
   abilityScores: CharacterAbilityDTO[];
   skills: CharacterSkillDTO[];
   attacks: CharacterAttackInput[];

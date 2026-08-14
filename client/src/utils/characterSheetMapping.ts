@@ -107,6 +107,7 @@ const dtoToCharacterSheetState = (dto: CharacterDTO): CharacterSheetState => ({
   ...dtoToSharedFields(dto),
 
   characterClass: dto.characterClass,
+  subclass: dto.subclass ?? "",
   background: dto.background,
   xp: dto.experience,
 
@@ -117,6 +118,14 @@ const dtoToCharacterSheetState = (dto: CharacterDTO): CharacterSheetState => ({
   inspiration: dto.inspiration,
 
   spellSlots: dto.spellSlots ?? null,
+
+  classFeatures: dto.classFeatures ?? "",
+  racialTraits: dto.racialTraits ?? "",
+  feats: dto.feats ?? "",
+
+  armorProficiencies: dto.armorProficiencies ?? "",
+  weaponProficiencies: dto.weaponProficiencies ?? "",
+  toolProficiencies: dto.toolProficiencies ?? "",
 });
 
 const dtoToCreatureSheetState = (dto: CharacterDTO): CreatureSheetState => ({
@@ -202,6 +211,7 @@ export const sheetStateToUpdatePayload = (
   ...(state.kind === "character"
     ? {
         characterClass: state.characterClass,
+        subclass: state.subclass || null,
         background: state.background,
         experience: state.xp,
         hitDiceType: state.hitDiceType,
@@ -210,6 +220,12 @@ export const sheetStateToUpdatePayload = (
         deathSaveFailures: state.deathSaveFailures,
         inspiration: state.inspiration,
         spellSlots: state.spellSlots,
+        classFeatures: state.classFeatures || null,
+        racialTraits: state.racialTraits || null,
+        feats: state.feats || null,
+        armorProficiencies: state.armorProficiencies || null,
+        weaponProficiencies: state.weaponProficiencies || null,
+        toolProficiencies: state.toolProficiencies || null,
       }
     : {
         creatureProfile: sheetStateToCreatureProfile(state),
