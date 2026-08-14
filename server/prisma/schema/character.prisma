@@ -4,7 +4,8 @@ model Character {
   type                    CharacterType          @default(player)
   race                    String
   experience              Int                    @default(0)
-  characterClass          String                 @map("character_class")
+  characterClass          String                 @default("") @map("character_class")
+  subclass                String?
   background              String?
   alignment               Alignment?
   notes                   String?
@@ -27,6 +28,12 @@ model Character {
   damageResistances       String?                @map("damage_resistances")
   damageImmunities        String?                @map("damage_immunities")
   conditionImmunities     String?                @map("condition_immunities")
+  classFeatures           String?                @map("class_features")
+  racialTraits            String?                @map("racial_traits")
+  feats                   String?
+  armorProficiencies      String?                @map("armor_proficiencies")
+  weaponProficiencies     String?                @map("weapon_proficiencies")
+  toolProficiencies       String?                @map("tool_proficiencies")
   abilities               Json?
   resources               Json?
   campaignId              String
