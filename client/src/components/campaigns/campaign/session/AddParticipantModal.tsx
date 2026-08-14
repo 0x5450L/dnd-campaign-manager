@@ -15,6 +15,7 @@ import ParticipantEditorBody from "./participantCard/modal/ParticipantEditorBody
 
 type AddParticipantModalProps = {
   onClose: () => void;
+  seed?: EncounterParticipantDTO;
 };
 
 const ADDABLE_TYPES: { value: ParticipantType; label: string }[] = [
@@ -58,9 +59,11 @@ const blankParticipant = (type: ParticipantType): EncounterParticipantDTO => ({
   updatedAt: "",
 });
 
-export const AddParticipantModal = ({ onClose }: AddParticipantModalProps) => {
+export const AddParticipantModal = ({ onClose, seed }: AddParticipantModalProps) => {
   const { addParticipant } = useParticipantActions();
-  const [draft, setDraft] = useState<EncounterParticipantDTO>(() => blankParticipant("monster"));
+  const [draft, setDraft] = useState<EncounterParticipantDTO>(
+    () => seed ?? blankParticipant("monster"),
+  );
   const [isBestiaryOpen, setIsBestiaryOpen] = useState(false);
 
   const updateDraft = (fields: UpdateParticipantPayload & { type?: ParticipantType }) =>
@@ -103,6 +106,10 @@ export const AddParticipantModal = ({ onClose }: AddParticipantModalProps) => {
       resources: draft.resources,
     };
     addParticipant(payload);
+    if (seed) {
+      onClose();
+      return;
+    }
     setDraft(blankParticipant("monster"));
   };
 

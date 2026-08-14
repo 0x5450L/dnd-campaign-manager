@@ -6,9 +6,12 @@ import { srdCreatureToSheetState } from "@/utils/srd/creatureMapper";
 import { CharacterSheet } from "@/components/sheets/CharacterSheet";
 import {
   useCampaignCharactersQuery,
+  useCharacterQuery,
   useCharactersRealtimeSync,
   useDeleteCharacterMutation,
 } from "@/queries/characters";
+import { characterToParticipantDraft } from "@/utils/characterParticipantMapping";
+import AddParticipantModal from "../../session/AddParticipantModal";
 import { useActiveEncounter } from "@/hooks/liveSession/useActiveEncounter";
 import { useNotificationStore } from "@/state/notifications/notificationStore";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
@@ -47,6 +50,9 @@ function CampaignCharactersController({
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isBestiaryOpen, setIsBestiaryOpen] = useState(false);
   const [characterToDelete, setCharacterToDelete] = useState<Character | null>(null);
+  const [characterToEnlistId, setCharacterToEnlistId] = useState<string | null>(null);
+
+  const { data: characterToEnlist } = useCharacterQuery(characterToEnlistId ?? undefined);
 
   const isDM = currentUserId !== null && currentUserId === dmId;
   const isSheetLocked = !isDM && encounter !== null;
@@ -143,6 +149,9 @@ function CampaignCharactersController({
             onCreateNpc={handleCreateNpc}
             onOpenBestiary={handleOpenBestiary}
             onDeleteCharacter={(c) => setCharacterToDelete(c)}
+            onAddToEncounter={
+              encounter ? (c) => setCharacterToEnlistId(c.id) : undefined
+            }
           />
 
           <CreatureBrowser
@@ -150,6 +159,14 @@ function CampaignCharactersController({
             onClose={() => setIsBestiaryOpen(false)}
             onSelectCreature={handleSelectCreature}
           />
+
+          {encounter && characterToEnlist && (
+            <AddParticipantModal
+              key={characterToEnlist.id}
+              seed={characterToParticipantDraft(characterToEnlist)}
+              onClose={() => setCharacterToEnlistId(null)}
+            />
+          )}
         </>
       )}
 

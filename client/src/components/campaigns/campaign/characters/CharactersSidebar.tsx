@@ -16,6 +16,7 @@ type CharactersSidebarProps = {
   onCreateNpc: () => void;
   onOpenBestiary: () => void;
   onDeleteCharacter: (character: Character) => void;
+  onAddToEncounter?: (character: Character) => void;
 };
 
 function CharactersSidebar({
@@ -27,6 +28,7 @@ function CharactersSidebar({
   onCreateNpc,
   onOpenBestiary,
   onDeleteCharacter,
+  onAddToEncounter,
 }: CharactersSidebarProps) {
   const [activeTab, setActiveTab] = useState<CharactersSidebarTab>("players");
 
@@ -143,6 +145,9 @@ function CharactersSidebar({
                 isOwnedByDm={character.userId === dmId}
                 onOpen={onOpenCharacter}
                 onDelete={onDeleteCharacter}
+                onAddToEncounter={
+                  character.type === "player" ? undefined : onAddToEncounter
+                }
               />
             ))
           )}

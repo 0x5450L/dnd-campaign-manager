@@ -5,6 +5,7 @@ type CharacterCardProps = {
   isOwnedByDm: boolean;
   onOpen: (character: Character) => void;
   onDelete: (character: Character) => void;
+  onAddToEncounter?: (character: Character) => void;
 };
 
 const typeChipStyles: Record<CharacterType, string> = {
@@ -25,7 +26,13 @@ const getHpBarColor = (ratio: number) => {
   return "bg-rust";
 };
 
-function CharacterCard({ character, isOwnedByDm, onOpen, onDelete }: CharacterCardProps) {
+function CharacterCard({
+  character,
+  isOwnedByDm,
+  onOpen,
+  onDelete,
+  onAddToEncounter,
+}: CharacterCardProps) {
   const hpRatio = character.maxHp > 0 ? Math.max(0, Math.min(1, character.currentHp / character.maxHp)) : 0;
   const ownerLabel = isOwnedByDm ? "DM" : character.user?.displayName ?? "—";
 
@@ -34,6 +41,11 @@ function CharacterCard({ character, isOwnedByDm, onOpen, onDelete }: CharacterCa
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
     onDelete(character);
+  };
+
+  const handleAddToEncounter = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onAddToEncounter?.(character);
   };
 
   return (
@@ -67,27 +79,59 @@ function CharacterCard({ character, isOwnedByDm, onOpen, onDelete }: CharacterCa
           </p>
         </div>
 
-        <button
-          type="button"
-          aria-label={`Delete ${character.name}`}
-          onClick={handleDelete}
-          className="shrink-0 w-8 h-8 rounded-md text-faint hover:text-rust hover:bg-rust/20 flex items-center justify-center transition-colors duration-150 cursor-pointer"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="w-4 h-4"
+        <div className="shrink-0 flex items-center gap-1">
+          {onAddToEncounter && (
+            <button
+              type="button"
+              aria-label={`Add ${character.name} to the encounter`}
+              title="Add to encounter"
+              onClick={handleAddToEncounter}
+              className="w-8 h-8 rounded-md text-faint hover:text-gold-bright hover:bg-gold-dim/20 flex items-center justify-center transition-colors duration-150 cursor-pointer"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="w-4 h-4"
+              >
+                <polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5" />
+                <line x1="13" x2="19" y1="19" y2="13" />
+                <line x1="16" x2="20" y1="16" y2="20" />
+                <line x1="19" x2="21" y1="21" y2="19" />
+                <polyline points="14.5 6.5 18 3 21 3 21 6 17.5 9.5" />
+                <line x1="5" x2="9" y1="14" y2="18" />
+                <line x1="7" x2="4" y1="17" y2="20" />
+                <line x1="3" x2="5" y1="19" y2="21" />
+              </svg>
+            </button>
+          )}
+
+          <button
+            type="button"
+            aria-label={`Delete ${character.name}`}
+            onClick={handleDelete}
+            className="w-8 h-8 rounded-md text-faint hover:text-rust hover:bg-rust/20 flex items-center justify-center transition-colors duration-150 cursor-pointer"
           >
-            <path d="M3 6h18" />
-            <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-          </svg>
-        </button>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="w-4 h-4"
+            >
+              <path d="M3 6h18" />
+              <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       <div className="flex flex-col gap-1.5">
