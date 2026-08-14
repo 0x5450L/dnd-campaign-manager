@@ -10,7 +10,7 @@ import {
   useSheetStore,
 } from "@/state/sheet";
 import { createInitialSheetState } from "@/constants/characterSheet";
-import type { SheetState } from "@/types/characters/characterSheet";
+import type { SheetKind, SheetState } from "@/types/characters/characterSheet";
 import type { CharacterType } from "@/types/characters/characters";
 import {
   useCharacterQuery,
@@ -39,17 +39,17 @@ type CharacterSheetProps = {
 };
 
 const CharacterSheetInner = ({
-  sheetType,
+  sheetKind,
   onClose,
   onForceSave,
 }: {
-  sheetType: CharacterType;
+  sheetKind: SheetKind;
   onClose: () => void;
   onForceSave?: () => void;
 }) => {
   const isMobile = useIsMobile();
 
-  if (sheetType === "monster") {
+  if (sheetKind === "creature") {
     return isMobile ? (
       <MobileCreatureSheet onClose={onClose} onForceSave={onForceSave} />
     ) : (
@@ -126,6 +126,7 @@ export const CharacterSheet = ({
 }: CharacterSheetProps) => {
   const { data: loadedCharacter, isLoading, error } = useCharacterQuery(characterId);
   const sheetType: CharacterType = loadedCharacter?.type ?? defaultType;
+  const sheetKind = sheetKindFromCharacterType(sheetType);
   const createCharacterMutation = useCreateCharacterMutation();
   const updateCharacterMutation = useUpdateCharacterMutation();
   const [saveStatus, setSaveStatus] = useState<StatusChipState>({ status: "idle" });
@@ -142,12 +143,8 @@ export const CharacterSheet = ({
       }
       return;
     }
-    openSheet(
-      DRAFT_SHEET_ID,
-      seedState ?? createInitialSheetState(sheetKindFromCharacterType(defaultType)),
-      false,
-    );
-  }, [isOpen, characterId, loadedCharacter, seedState, defaultType, openSheet]);
+    openSheet(DRAFT_SHEET_ID, seedState ?? createInitialSheetState(sheetKind), false);
+  }, [isOpen, characterId, loadedCharacter, seedState, sheetKind, openSheet]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -237,7 +234,7 @@ export const CharacterSheet = ({
               saveStatus={saveStatus}
               onDismissStatus={dismissStatus}
             />
-            <CharacterSheetInner sheetType={sheetType} onClose={handleClose} onForceSave={handleSave} />
+            <CharacterSheetInner sheetKind={sheetKind} onClose={handleClose} onForceSave={handleSave} />
           </>
         )}
       </div>
