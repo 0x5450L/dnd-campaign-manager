@@ -1,4 +1,4 @@
-import { EncounterStatus, Prisma } from "@prisma/client";
+import { EncounterStatus, type Prisma } from "@prisma/client";
 import prisma from "../prisma";
 import { jsonInput, pickDefined } from "../../utils/payload";
 import {

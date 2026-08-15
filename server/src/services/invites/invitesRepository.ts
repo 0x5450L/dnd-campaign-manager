@@ -1,4 +1,4 @@
-import { CampaignMemberRole } from "@prisma/client";
+import { type CampaignMemberRole } from "@prisma/client";
 import prisma from "../prisma";
 
 const inviteWithCampaignDm = {

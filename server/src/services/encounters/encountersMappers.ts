@@ -1,4 +1,4 @@
-import { Encounter, EncounterParticipant } from "@prisma/client";
+import { type Encounter, type EncounterParticipant } from "@prisma/client";
 import type {
   EncounterDTO,
   EncounterParticipantDTO,
