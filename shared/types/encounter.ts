@@ -1,7 +1,7 @@
 import type {
   ENCOUNTER_DIFFICULTY,
   ENCOUNTER_SIZE_BAND,
-} from "../constants/encounter";
+} from "../constants/encounter.js";
 
 export type EncounterDifficulty =
   (typeof ENCOUNTER_DIFFICULTY)[keyof typeof ENCOUNTER_DIFFICULTY];

@@ -4,8 +4,8 @@ import {
   LOOT_FIND_TYPE,
   LOOT_ITEM_COUNT,
   LOOT_RICHNESS,
-} from "@shared/constants/ai";
-import type { LootFindType, LootRichness } from "@shared/dto/ai";
+} from "@dnd/shared/constants/ai";
+import type { LootFindType, LootRichness } from "@dnd/shared/dto/ai";
 import CommonButton from "@/components/ui/buttons/CommonButton";
 
 type LootGeneratorFormProps = {

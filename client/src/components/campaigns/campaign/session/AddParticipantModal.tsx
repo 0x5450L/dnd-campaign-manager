@@ -6,8 +6,8 @@ import type {
   EncounterParticipantDTO,
   ParticipantType,
 } from "@/types/encounter";
-import type { SrdCreature } from "@shared/dto/srd";
-import { srdCreatureToParticipant } from "@shared/utils/srd/creatureParticipantMapper";
+import type { SrdCreature } from "@dnd/shared/dto/srd";
+import { srdCreatureToParticipant } from "@dnd/shared/utils/srd/creatureParticipantMapper";
 import CommonButton from "@/components/ui/buttons/CommonButton";
 import Modal from "@/components/ui/Modal";
 import CreatureBrowser from "../characters/CreatureBrowser";

@@ -6,12 +6,12 @@ import {
   ENCOUNTER_SIZE_BANDS,
   MAX_PARTY_SIZE,
   MIN_PARTY_SIZE,
-} from "@shared/constants/encounter";
-import { MAX_LEVEL, MIN_LEVEL } from "@shared/constants/dndMath";
+} from "@dnd/shared/constants/encounter";
+import { MAX_LEVEL, MIN_LEVEL } from "@dnd/shared/constants/dndMath";
 import type {
   EncounterDifficulty,
   EncounterSizeBand,
-} from "@shared/types/encounter";
+} from "@dnd/shared/types/encounter";
 import CommonButton from "@/components/ui/buttons/CommonButton";
 
 export type EncounterFormInput = {

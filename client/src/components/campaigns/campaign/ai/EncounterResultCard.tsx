@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { EncounterGeneration, GeneratedEncounterEntry } from "@shared/dto/ai";
+import type { EncounterGeneration, GeneratedEncounterEntry } from "@dnd/shared/dto/ai";
 import CommonButton from "@/components/ui/buttons/CommonButton";
 import { challengeRatingLabel } from "@/utils/dndMath";
 import CreatureDetailsModal from "./CreatureDetailsModal";

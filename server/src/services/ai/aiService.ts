@@ -1,11 +1,11 @@
 import { randomUUID } from "node:crypto";
-import { AI_GENERATION_KIND } from "@shared/constants/ai";
+import { AI_GENERATION_KIND } from "@dnd/shared/constants/ai";
 import type {
   EncounterGeneration,
   GenerateEncounterPayload,
   GenerateLootPayload,
   LootGeneration,
-} from "@shared/dto/ai";
+} from "@dnd/shared/dto/ai";
 import { requireCampaignDM, requireEncounterDM } from "../../utils/accessControl";
 import { AppError } from "../../utils/errors";
 import { loadCampaignLootContext } from "./aiContextRepository";

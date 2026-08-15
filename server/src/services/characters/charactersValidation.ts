@@ -3,7 +3,7 @@ import type {
   CharacterType,
   CreateCharacterPayload,
   CreatureProfileInput,
-} from "@shared/dto/character";
+} from "@dnd/shared/dto/character";
 
 const MISSING_FIELD_LABELS: Record<string, string> = {
   name: "name",

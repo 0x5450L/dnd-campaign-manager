@@ -13,9 +13,9 @@ export {
   CHALLENGE_RATINGS,
   MIN_LEVEL,
   MAX_LEVEL,
-} from "@shared/utils/dndMath";
+} from "@dnd/shared/utils/dndMath";
 
-import { calcModifier as toModifier } from "@shared/utils/dndMath";
+import { calcModifier as toModifier } from "@dnd/shared/utils/dndMath";
 
 export const formatSigned = (value: number): string =>
   value >= 0 ? `+${value}` : `${value}`;

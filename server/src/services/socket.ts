@@ -8,8 +8,8 @@ import type {
   SocketClientToServerEvents,
   SocketServerToClientEvents,
   SocketData,
-} from '@shared/dto/socketEvents';
-import type { CampaignSessionDTO, SessionDiceRollDTO } from '@shared/dto/session';
+} from '@dnd/shared/dto/socketEvents';
+import type { CampaignSessionDTO, SessionDiceRollDTO } from '@dnd/shared/dto/session';
 import { getTokenFromCookie } from '../utils/cookies';
 import { verifyToken } from '../utils/jwt';
 import {

@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import type {
   GenerateEncounterPayload,
   GenerateLootPayload,
-} from "@shared/dto/ai";
+} from "@dnd/shared/dto/ai";
 import { generateEncounter, generateLoot } from "../services/api/ai";
 
 export const aiKeys = {

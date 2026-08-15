@@ -1,13 +1,13 @@
 import {
   creatureAbilities,
   creatureResourcePools,
-} from "@shared/utils/srd/abilities";
+} from "@dnd/shared/utils/srd/abilities";
 import {
   ABILITY_NAMES,
   SKILL_DEFINITIONS,
-} from "@shared/constants/dnd";
-import type { AbilityName } from "@shared/types/dnd";
-import type { SrdCreature } from "@shared/dto/srd";
+} from "@dnd/shared/constants/dnd";
+import type { AbilityName } from "@dnd/shared/types/dnd";
+import type { SrdCreature } from "@dnd/shared/dto/srd";
 import type {
   AbilityState,
   CreatureSheetState,

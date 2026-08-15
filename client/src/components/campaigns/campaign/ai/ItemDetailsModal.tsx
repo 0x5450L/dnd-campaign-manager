@@ -1,5 +1,5 @@
-import type { GeneratedLootItem } from "@shared/dto/ai";
-import type { SrdArmorDetail, SrdWeaponDetail } from "@shared/dto/srd";
+import type { GeneratedLootItem } from "@dnd/shared/dto/ai";
+import type { SrdArmorDetail, SrdWeaponDetail } from "@dnd/shared/dto/srd";
 import { useSrdItemQuery } from "@/queries/srd";
 import Modal from "@/components/ui/Modal";
 import { describeRarity } from "./itemRarity";

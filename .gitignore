@@ -8,6 +8,7 @@
 client/dist/
 client/dist-ssr/
 server/dist/
+shared/dist/
 
 # IDE
 .vscode/

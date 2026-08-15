@@ -8,8 +8,8 @@ import {
 import type { EditorBodyProps } from "@/types/components/participantCard";
 import { useActiveEncounter } from "@/hooks/liveSession/useActiveEncounter";
 import { useParticipantActions } from "@/hooks/liveSession/useParticipantActions";
-import { canApplyAbilityUsage } from "@shared/utils/abilityUsage";
-import { listCastableSlotLevels } from "@shared/utils/spellSlotUsage";
+import { canApplyAbilityUsage } from "@dnd/shared/utils/abilityUsage";
+import { listCastableSlotLevels } from "@dnd/shared/utils/spellSlotUsage";
 import { useSrdSpellIndexQuery } from "@/queries/srd";
 import { lookupSpell, type SpellIndex } from "@/utils/srd/spellIndex";
 import { SpellDetailBody } from "@/components/sheets/shared/sections/specialAbilities/SpellReferenceAccordion";

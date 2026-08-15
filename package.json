@@ -1,0 +1,20 @@
+{
+  "name": "dnd-campaign-manager",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "shared",
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "build": "npm run build -w shared && npm run build -w server && npm run build -w client",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm test --workspaces --if-present",
+    "dev": "npm run build -w shared && concurrently -n shared,server,client -c gray,green,cyan \"npm run dev -w shared\" \"npm run dev -w server\" \"npm run dev -w client\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

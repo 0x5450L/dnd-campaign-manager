@@ -1,5 +1,5 @@
-import { SRD_RARITY } from "@shared/constants/srd";
-import type { SrdRarity } from "@shared/dto/srd";
+import { SRD_RARITY } from "@dnd/shared/constants/srd";
+import type { SrdRarity } from "@dnd/shared/dto/srd";
 
 const styles: Record<SrdRarity, string> = {
   [SRD_RARITY.Common]: "border-rule text-dim",

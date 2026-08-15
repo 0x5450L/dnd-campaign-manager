@@ -6,15 +6,15 @@ import {
   MAX_PARTY_SIZE,
   MIN_PARTY_SIZE,
   SMALL_PARTY_SIZE,
-} from "../constants/encounter";
-import { MAX_LEVEL, MIN_LEVEL } from "../constants/dndMath";
+} from "../constants/encounter.js";
+import { MAX_LEVEL, MIN_LEVEL } from "../constants/dndMath.js";
 import type {
   EncounterBudget,
   EncounterDifficulty,
   EncounterSizeBand,
   EncounterXpReport,
-} from "../types/encounter";
-import { clamp } from "./dndMath";
+} from "../types/encounter.js";
+import { clamp } from "./dndMath.js";
 
 const ladderShift = (partySize: number): number => {
   if (partySize < SMALL_PARTY_SIZE) return 1;

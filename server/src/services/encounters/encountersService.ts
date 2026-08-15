@@ -8,15 +8,15 @@ import type {
   CreateParticipantPayload,
   UpdateEncounterPayload,
   UpdateParticipantPayload,
-} from "@shared/dto/session";
-import type { Ability, AbilityUsageAction, ResourcePool } from "@shared/types/abilities";
-import type { SpellSlotLevel } from "@shared/types/dnd";
-import type { InitiativeRollDTO, RollInitiativePayload } from "@shared/dto/session";
-import { rollInitiative } from "@shared/utils/initiative";
-import { nextTurn, turnAfterRemoval } from "@shared/utils/turnOrder";
-import { applyAbilityUsage, applyTurnStart } from "@shared/utils/abilityUsage";
-import { applySpellSlotUsage } from "@shared/utils/spellSlotUsage";
-import { rollDie } from "@shared/utils/dice";
+} from "@dnd/shared/dto/session";
+import type { Ability, AbilityUsageAction, ResourcePool } from "@dnd/shared/types/abilities";
+import type { SpellSlotLevel } from "@dnd/shared/types/dnd";
+import type { InitiativeRollDTO, RollInitiativePayload } from "@dnd/shared/dto/session";
+import { rollInitiative } from "@dnd/shared/utils/initiative";
+import { nextTurn, turnAfterRemoval } from "@dnd/shared/utils/turnOrder";
+import { applyAbilityUsage, applyTurnStart } from "@dnd/shared/utils/abilityUsage";
+import { applySpellSlotUsage } from "@dnd/shared/utils/spellSlotUsage";
+import { rollDie } from "@dnd/shared/utils/dice";
 import * as encountersRepo from "./encountersRepository";
 import { mapEncounterToDTO, mapParticipantToDTO } from "./encountersMappers";
 import {

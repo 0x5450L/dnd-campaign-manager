@@ -5,7 +5,7 @@ import type {
   SrdItemSummary,
   SrdSource,
   SrdWeaponDetail,
-} from "@shared/dto/srd";
+} from "@dnd/shared/dto/srd";
 import { normalizeSrdRarity } from "./rarity";
 
 export type Open5eV2Document = {

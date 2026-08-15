@@ -1,6 +1,6 @@
-import { LOOT_CANDIDATE_COUNT } from "@shared/constants/ai";
-import type { GenerateLootPayload, GeneratedLoot, GeneratedLootItem } from "@shared/dto/ai";
-import type { SrdItemSummary } from "@shared/dto/srd";
+import { LOOT_CANDIDATE_COUNT } from "@dnd/shared/constants/ai";
+import type { GenerateLootPayload, GeneratedLoot, GeneratedLootItem } from "@dnd/shared/dto/ai";
+import type { SrdItemSummary } from "@dnd/shared/dto/srd";
 import type { ReferenceService } from "../../reference/referenceService";
 import type { CampaignLootContext } from "../aiContextRepository";
 import { buildLootUserPrompt, LOOT_SYSTEM_PROMPT } from "../prompts/lootPrompt";

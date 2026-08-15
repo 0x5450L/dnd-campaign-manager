@@ -1,4 +1,4 @@
-import type { LootFindType, LootRichness } from "@shared/dto/ai";
+import type { LootFindType, LootRichness } from "@dnd/shared/dto/ai";
 import { useGenerateEncounterMutation, useGenerateLootMutation } from "@/queries/ai";
 import { useBulkCreateParticipantsMutation } from "@/queries/encounters";
 import { useActiveEncounter } from "@/hooks/liveSession/useActiveEncounter";

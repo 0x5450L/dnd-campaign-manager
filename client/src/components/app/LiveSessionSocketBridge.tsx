@@ -10,7 +10,7 @@ import type {
   SessionEndedPayload,
   SessionStartedPayload,
   TurnAdvancedPayload,
-} from "@shared/dto/socketEvents";
+} from "@dnd/shared/dto/socketEvents";
 
 export const LiveSessionSocketBridge = () => {
   const campaignId = useLiveSessionStore((s) => s.activeCampaignId);

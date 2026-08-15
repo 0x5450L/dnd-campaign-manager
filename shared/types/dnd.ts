@@ -1,4 +1,4 @@
-import { ABILITY_NAMES } from "../constants/dnd";
+import { ABILITY_NAMES } from "../constants/dnd.js";
 
 export type AbilityName = (typeof ABILITY_NAMES)[number];
 

@@ -1,6 +1,6 @@
-import { ABILITY_NAMES } from "@shared/constants/dnd";
-import type { GeneratedEncounterEntry } from "@shared/dto/ai";
-import type { SrdCreature, SrdCreatureAction } from "@shared/dto/srd";
+import { ABILITY_NAMES } from "@dnd/shared/constants/dnd";
+import type { GeneratedEncounterEntry } from "@dnd/shared/dto/ai";
+import type { SrdCreature, SrdCreatureAction } from "@dnd/shared/dto/srd";
 import { useSrdCreatureQuery } from "@/queries/srd";
 import Modal from "@/components/ui/Modal";
 import { challengeRatingLabel, formatAbilityModifier } from "@/utils/dndMath";

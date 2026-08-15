@@ -1,5 +1,5 @@
-import type { AbilityUsageAction } from "../types/abilities";
-import type { SpellSlotLevel } from "../types/dnd";
+import type { AbilityUsageAction } from "../types/abilities.js";
+import type { SpellSlotLevel } from "../types/dnd.js";
 
 export const applySpellSlotUsage = (
   spellSlots: SpellSlotLevel[],

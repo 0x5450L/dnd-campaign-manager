@@ -3,15 +3,15 @@ import {
   AI_PROVIDER_ID,
   LOOT_FIND_TYPE,
   LOOT_RICHNESS,
-} from "../constants/ai";
-import type { SrdRarity, SrdSource } from "./srd";
+} from "../constants/ai.js";
+import type { SrdRarity, SrdSource } from "./srd.js";
 import type {
   EncounterBudget,
   EncounterDifficulty,
   EncounterSizeBand,
   EncounterXpReport,
-} from "../types/encounter";
-import type { CreateParticipantPayload } from "./session";
+} from "../types/encounter.js";
+import type { CreateParticipantPayload } from "./session.js";
 
 export type AiProviderId = (typeof AI_PROVIDER_ID)[keyof typeof AI_PROVIDER_ID];
 

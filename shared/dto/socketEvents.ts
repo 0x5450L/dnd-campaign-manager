@@ -4,7 +4,7 @@ import type {
   EncounterParticipantDTO,
   InitiativeRollDTO,
   SessionDiceRollDTO,
-} from "./session";
+} from "./session.js";
 
 export type SocketAck<T> = (response: T) => void;
 

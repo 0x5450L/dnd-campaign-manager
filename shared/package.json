@@ -1,0 +1,32 @@
+{
+  "name": "@dnd/shared",
+  "version": "1.0.0",
+  "private": true,
+  "exports": {
+    "./*": {
+      "import": {
+        "types": "./dist/esm/*.d.ts",
+        "default": "./dist/esm/*.js"
+      },
+      "require": {
+        "types": "./dist/cjs/*.d.ts",
+        "default": "./dist/cjs/*.js"
+      }
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.cjs.json && tsc -p tsconfig.esm.json && node scripts/finalize-dist.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "dev": "node scripts/finalize-dist.mjs && concurrently -n cjs,esm -c blue,magenta \"tsc -p tsconfig.cjs.json --watch --preserveWatchOutput\" \"tsc -p tsconfig.esm.json --watch --preserveWatchOutput\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.7"
+  },
+  "files": [
+    "dist"
+  ]
+}

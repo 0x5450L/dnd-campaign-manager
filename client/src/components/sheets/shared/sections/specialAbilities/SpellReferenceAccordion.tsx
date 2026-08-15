@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { SrdSpell } from "@shared/dto/srd";
+import type { SrdSpell } from "@dnd/shared/dto/srd";
 import { lookupSpell, type SpellIndex } from "@/utils/srd/spellIndex";
 
 const levelLabel = (level: number): string =>

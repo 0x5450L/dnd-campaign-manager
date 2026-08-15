@@ -1,4 +1,4 @@
-import type { SkillDefinition } from "../types/dnd";
+import type { SkillDefinition } from "../types/dnd.js";
 
 export const ABILITY_NAMES = ["str", "dex", "con", "int", "wis", "cha"] as const;
 

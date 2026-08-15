@@ -1,4 +1,4 @@
-import type { SrdCategory, SrdCondition, SrdConditionSummary, SrdItem, SrdItemSummary, SrdListPage, SrdCreature, SrdCreatureSummary, SrdQuery, SrdSource, SrdSpell } from "@shared/dto/srd";
+import type { SrdCategory, SrdCondition, SrdConditionSummary, SrdItem, SrdItemSummary, SrdListPage, SrdCreature, SrdCreatureSummary, SrdQuery, SrdSource, SrdSpell } from "@dnd/shared/dto/srd";
 
 export interface ContentProvider {
   readonly id: SrdSource;

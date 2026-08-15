@@ -1,4 +1,4 @@
-import { AI_PROVIDER_ID } from "@shared/constants/ai";
+import { AI_PROVIDER_ID } from "@dnd/shared/constants/ai";
 import type { AiConfig } from "../config";
 import type { TextProvider } from "./aiProvider";
 import { GeminiProvider } from "./geminiProvider";

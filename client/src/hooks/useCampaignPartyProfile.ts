@@ -1,7 +1,7 @@
 import { useMemo } from "react";
-import { MAX_PARTY_SIZE, MIN_PARTY_SIZE } from "@shared/constants/encounter";
-import { MIN_LEVEL } from "@shared/constants/dndMath";
-import { clamp, getLevelFromXp } from "@shared/utils/dndMath";
+import { MAX_PARTY_SIZE, MIN_PARTY_SIZE } from "@dnd/shared/constants/encounter";
+import { MIN_LEVEL } from "@dnd/shared/constants/dndMath";
+import { clamp, getLevelFromXp } from "@dnd/shared/utils/dndMath";
 import { useCampaignCharactersQuery } from "@/queries/characters";
 
 export type CampaignPartyProfile = {

@@ -1,6 +1,6 @@
-import type { CharacterAttackDTO, CharacterAttackInput } from "./character";
-import type { AbilityName, SpellSlotLevel } from "../types/dnd";
-import type { Ability, AbilityUsageAction, ResourcePool } from "../types/abilities";
+import type { CharacterAttackDTO, CharacterAttackInput } from "./character.js";
+import type { AbilityName, SpellSlotLevel } from "../types/dnd.js";
+import type { Ability, AbilityUsageAction, ResourcePool } from "../types/abilities.js";
 
 export type { SpellSlotLevel };
 
@@ -50,7 +50,7 @@ export type ParticipantAbilityScore = {
   score: number;
 };
 
-export type { Ability, AbilityActivation, AbilityCost, AbilityUsageAction, ResourcePool, ResourceReset } from "../types/abilities";
+export type { Ability, AbilityActivation, AbilityCost, AbilityUsageAction, ResourcePool, ResourceReset } from "../types/abilities.js";
 
 export type EncounterParticipantDTO = {
   id: string;

@@ -1,7 +1,7 @@
-import { LOOT_RICHNESS } from "@shared/constants/ai";
-import { SRD_RARITY } from "@shared/constants/srd";
-import type { LootRichness } from "@shared/dto/ai";
-import type { SrdItemSummary, SrdRarity } from "@shared/dto/srd";
+import { LOOT_RICHNESS } from "@dnd/shared/constants/ai";
+import { SRD_RARITY } from "@dnd/shared/constants/srd";
+import type { LootRichness } from "@dnd/shared/dto/ai";
+import type { SrdItemSummary, SrdRarity } from "@dnd/shared/dto/srd";
 
 const MUNDANE = null;
 

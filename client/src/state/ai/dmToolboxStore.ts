@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { EncounterGeneration, LootGeneration } from "@shared/dto/ai";
+import type { EncounterGeneration, LootGeneration } from "@dnd/shared/dto/ai";
 
 export type DmTool = "loot" | "encounter";
 

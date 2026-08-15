@@ -1,10 +1,10 @@
-import { LOOT_FIND_TYPE, LOOT_RICHNESS } from "@shared/constants/ai";
+import { LOOT_FIND_TYPE, LOOT_RICHNESS } from "@dnd/shared/constants/ai";
 import type {
   GenerateLootPayload,
   LootFindType,
   LootRichness,
-} from "@shared/dto/ai";
-import type { SrdItemSummary } from "@shared/dto/srd";
+} from "@dnd/shared/dto/ai";
+import type { SrdItemSummary } from "@dnd/shared/dto/srd";
 import type { CampaignLootContext } from "../aiContextRepository";
 
 const FIND_TYPE_HINTS: Record<LootFindType, string> = {

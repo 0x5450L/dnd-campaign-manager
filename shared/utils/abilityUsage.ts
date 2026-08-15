@@ -1,6 +1,6 @@
-import type { Ability, AbilityUsageAction, ResourcePool } from "../types/abilities";
-import type { SpellSlotLevel } from "../types/dnd";
-import { applySpellSlotUsage, listCastableSlotLevels } from "./spellSlotUsage";
+import type { Ability, AbilityUsageAction, ResourcePool } from "../types/abilities.js";
+import type { SpellSlotLevel } from "../types/dnd.js";
+import { applySpellSlotUsage, listCastableSlotLevels } from "./spellSlotUsage.js";
 
 export type AbilityUsageResult = {
   abilities: Ability[];

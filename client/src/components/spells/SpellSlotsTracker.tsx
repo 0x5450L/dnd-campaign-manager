@@ -2,9 +2,9 @@ import { useState } from "react";
 import {
   SPELL_SLOT_LEVELS,
   SPELL_SLOT_MAX_BY_LEVEL,
-} from "@shared/constants/dnd";
-import type { SpellSlotLevel } from "@shared/types/dnd";
-import type { AbilityUsageAction } from "@shared/types/abilities";
+} from "@dnd/shared/constants/dnd";
+import type { SpellSlotLevel } from "@dnd/shared/types/dnd";
+import type { AbilityUsageAction } from "@dnd/shared/types/abilities";
 
 type SpellSlotsTrackerProps = {
   slots: SpellSlotLevel[] | null;

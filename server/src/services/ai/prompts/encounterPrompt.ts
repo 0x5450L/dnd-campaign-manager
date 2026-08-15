@@ -1,12 +1,12 @@
-import { ENCOUNTER_DIFFICULTY, ENCOUNTER_SIZE_BAND } from "@shared/constants/encounter";
-import type { GenerateEncounterPayload } from "@shared/dto/ai";
-import type { SrdCreatureSummary } from "@shared/dto/srd";
+import { ENCOUNTER_DIFFICULTY, ENCOUNTER_SIZE_BAND } from "@dnd/shared/constants/encounter";
+import type { GenerateEncounterPayload } from "@dnd/shared/dto/ai";
+import type { SrdCreatureSummary } from "@dnd/shared/dto/srd";
 import type {
   EncounterBudget,
   EncounterDifficulty,
   EncounterSizeBand,
-} from "@shared/types/encounter";
-import { challengeRatingLabel, xpForChallengeRating } from "@shared/utils/dndMath";
+} from "@dnd/shared/types/encounter";
+import { challengeRatingLabel, xpForChallengeRating } from "@dnd/shared/utils/dndMath";
 import type { CampaignLootContext } from "../aiContextRepository";
 
 const DIFFICULTY_HINTS: Record<EncounterDifficulty, string> = {

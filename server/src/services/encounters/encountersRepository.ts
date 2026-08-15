@@ -1,12 +1,12 @@
 import { Prisma } from "@prisma/client";
 import prisma from "../prisma";
 import { ensureAttackIds, jsonInput, pickDefined, trimOrNull } from "../../utils/payload";
-import { getLevelFromXp, getProficiencyBonus } from "@shared/utils/dndMath";
-import { rollInitiative } from "@shared/utils/initiative";
+import { getLevelFromXp, getProficiencyBonus } from "@dnd/shared/utils/dndMath";
+import { rollInitiative } from "@dnd/shared/utils/initiative";
 import type {
   BulkInitiativeEntry,
   CreateParticipantPayload,
-} from "@shared/dto/session";
+} from "@dnd/shared/dto/session";
 
 const bySortOrder: Prisma.EncounterParticipantOrderByWithRelationInput[] = [
   { sortOrder: "desc" },

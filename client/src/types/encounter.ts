@@ -22,7 +22,7 @@ import type {
   BulkCreateParticipantsPayload,
   InitiativeRollDTO,
   RollInitiativePayload,
-} from "@shared/dto/session";
+} from "@dnd/shared/dto/session";
 
 export type {
   EncounterDTO,

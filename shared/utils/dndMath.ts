@@ -5,7 +5,7 @@ import {
   SHIELD_AC_BONUS,
   SPELL_SAVE_DC_BASE,
   XP_THRESHOLDS,
-} from "../constants/dndMath";
+} from "../constants/dndMath.js";
 
 export {
   CHALLENGE_RATINGS,

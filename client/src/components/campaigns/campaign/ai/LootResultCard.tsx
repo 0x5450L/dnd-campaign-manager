@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { GeneratedLootItem, LootGeneration } from "@shared/dto/ai";
+import type { GeneratedLootItem, LootGeneration } from "@dnd/shared/dto/ai";
 import CommonButton from "@/components/ui/buttons/CommonButton";
 import ItemDetailsModal from "./ItemDetailsModal";
 import { describeRarity } from "./itemRarity";

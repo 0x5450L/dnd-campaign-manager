@@ -1,6 +1,6 @@
-import type { SrdCreatureSummary } from "@shared/dto/srd";
-import type { EncounterBudget } from "@shared/types/encounter";
-import { xpForChallengeRating } from "@shared/utils/dndMath";
+import type { SrdCreatureSummary } from "@dnd/shared/dto/srd";
+import type { EncounterBudget } from "@dnd/shared/types/encounter";
+import { xpForChallengeRating } from "@dnd/shared/utils/dndMath";
 
 const LOWER_BOUND_DIVISOR = 3;
 

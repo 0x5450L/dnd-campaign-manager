@@ -1,4 +1,4 @@
-import type { AiProviderId } from "@shared/dto/ai";
+import type { AiProviderId } from "@dnd/shared/dto/ai";
 import type {
   StructuredTextRequest,
   StructuredTextResult,

@@ -1,4 +1,4 @@
-import type { AbilityName } from "@shared/types/dnd";
+import type { AbilityName } from "@dnd/shared/types/dnd";
 import type {
   SrdCondition,
   SrdConditionSummary,
@@ -9,7 +9,7 @@ import type {
   SrdItemSummary,
   SrdSource,
   SrdSpell,
-} from "@shared/dto/srd";
+} from "@dnd/shared/dto/srd";
 import { normalizeSrdRarity } from "./rarity";
 
 export type Open5eSpellResult = {

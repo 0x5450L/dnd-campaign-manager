@@ -1,5 +1,5 @@
-import { calcModifier } from "./dndMath";
-import { rollDie } from "./dice";
+import { calcModifier } from "./dndMath.js";
+import { rollDie } from "./dice.js";
 
 export type InitiativeRollResult = {
   roll: number;

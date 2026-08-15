@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { Prisma } from "@prisma/client";
-import type { CharacterAttackInput } from "@shared/dto/character";
+import type { CharacterAttackInput } from "@dnd/shared/dto/character";
 
 export const jsonInput = <T>(
   value: T | null | undefined,

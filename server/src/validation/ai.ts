@@ -5,20 +5,20 @@ import {
   LOOT_FIND_TYPE,
   LOOT_ITEM_COUNT,
   LOOT_RICHNESS,
-} from "@shared/constants/ai";
+} from "@dnd/shared/constants/ai";
 import {
   ENCOUNTER_CONTEXT_MAX_LENGTH,
   ENCOUNTER_DIFFICULTY,
   ENCOUNTER_SIZE_BAND,
   MAX_PARTY_SIZE,
   MIN_PARTY_SIZE,
-} from "@shared/constants/encounter";
-import { MAX_LEVEL, MIN_LEVEL } from "@shared/constants/dndMath";
-import type { LootFindType, LootRichness } from "@shared/dto/ai";
+} from "@dnd/shared/constants/encounter";
+import { MAX_LEVEL, MIN_LEVEL } from "@dnd/shared/constants/dndMath";
+import type { LootFindType, LootRichness } from "@dnd/shared/dto/ai";
 import type {
   EncounterDifficulty,
   EncounterSizeBand,
-} from "@shared/types/encounter";
+} from "@dnd/shared/types/encounter";
 
 const findTypeValues = Object.values(LOOT_FIND_TYPE) as [
   LootFindType,

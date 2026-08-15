@@ -1,4 +1,4 @@
-import { SRD_CATEGORY, SRD_SOURCE } from "@shared/constants/srd";
+import { SRD_CATEGORY, SRD_SOURCE } from "@dnd/shared/constants/srd";
 import type {
   SrdCategory,
   SrdItem,
@@ -6,7 +6,7 @@ import type {
   SrdListPage,
   SrdQuery,
   SrdSource,
-} from "@shared/dto/srd";
+} from "@dnd/shared/dto/srd";
 import { AbstractContentProvider } from "./abstractContentProvider";
 import {
   mapOpen5eV2Item,

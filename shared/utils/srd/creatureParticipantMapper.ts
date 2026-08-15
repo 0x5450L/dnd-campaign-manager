@@ -1,14 +1,14 @@
-import { ABILITY_NAMES } from "../../constants/dnd";
-import type { SrdCreature } from "../../dto/srd";
+import { ABILITY_NAMES } from "../../constants/dnd.js";
+import type { SrdCreature } from "../../dto/srd.js";
 import type {
   EncounterParticipantDTO,
   ParticipantAbilityScore,
-} from "../../dto/session";
-import type { CharacterAttackDTO } from "../../dto/character";
-import { randomId } from "../id";
-import { parseCreatureAction } from "./creatureActionParser";
-import { creatureAbilities, creatureResourcePools } from "./abilities";
-import { creatureSpellcastingSeed } from "./creatureSpellcastingParser";
+} from "../../dto/session.js";
+import type { CharacterAttackDTO } from "../../dto/character.js";
+import { randomId } from "../id.js";
+import { parseCreatureAction } from "./creatureActionParser.js";
+import { creatureAbilities, creatureResourcePools } from "./abilities.js";
+import { creatureSpellcastingSeed } from "./creatureSpellcastingParser.js";
 
 const TO_HIT_BONUS = /^[+-]\d+$/;
 

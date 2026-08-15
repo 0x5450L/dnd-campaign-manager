@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import type { Character, CharacterType } from "@/types/characters/characters";
 import type { CreatureSheetState } from "@/types/characters/characterSheet";
-import type { SrdCreature } from "@shared/dto/srd";
+import type { SrdCreature } from "@dnd/shared/dto/srd";
 import { srdCreatureToSheetState } from "@/utils/srd/creatureMapper";
 import { CharacterSheet } from "@/components/sheets/CharacterSheet";
 import {

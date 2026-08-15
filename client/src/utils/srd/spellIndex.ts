@@ -1,4 +1,4 @@
-import type { SrdSpell } from "@shared/dto/srd";
+import type { SrdSpell } from "@dnd/shared/dto/srd";
 
 export type SpellIndex = Map<string, SrdSpell>;
 

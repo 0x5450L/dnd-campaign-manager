@@ -8,7 +8,7 @@ import type {
   RollInitiativePayload,
   UpdateEncounterPayload,
   UpdateParticipantPayload,
-} from "@shared/dto/session";
+} from "@dnd/shared/dto/session";
 import {
   abilityNameSchema,
   abilitySchema,

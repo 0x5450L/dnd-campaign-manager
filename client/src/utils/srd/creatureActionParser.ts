@@ -1,5 +1,5 @@
-import type { SrdCreatureAction } from "@shared/dto/srd";
-import { parseCreatureAction } from "@shared/utils/srd/creatureActionParser";
+import type { SrdCreatureAction } from "@dnd/shared/dto/srd";
+import { parseCreatureAction } from "@dnd/shared/utils/srd/creatureActionParser";
 import { MIN_ATTACKS } from "@/constants/characterSheet";
 import type { Attack } from "@/types/characters/characterSheet";
 

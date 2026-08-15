@@ -12,7 +12,7 @@ import type {
   CreateParticipantPayload,
   UpdateEncounterPayload,
   UpdateParticipantPayload,
-} from "@shared/dto/session";
+} from "@dnd/shared/dto/session";
 import {
   abilityUsageSchema,
   spellSlotUsageSchema,

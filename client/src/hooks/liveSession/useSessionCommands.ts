@@ -3,7 +3,7 @@ import { getSocket } from "@/services/socket";
 import { useLiveSessionStore } from "@/state/liveSession/liveSessionStore";
 import { useNotificationStore } from "@/state/notifications/notificationStore";
 import type { SessionRollInput } from "@/state/liveSession/liveSessionReducer";
-import type { SessionAckResponse } from "@shared/dto/socketEvents";
+import type { SessionAckResponse } from "@dnd/shared/dto/socketEvents";
 
 export const useSessionCommands = () => {
   const campaignId = useLiveSessionStore((s) => s.activeCampaignId);

@@ -1,7 +1,7 @@
-import { ABILITY_NAMES } from "../../constants/dnd";
-import type { AbilityName, SpellSlotLevel } from "../../types/dnd";
-import type { SrdCreature } from "../../dto/srd";
-import { calcModifier } from "../dndMath";
+import { ABILITY_NAMES } from "../../constants/dnd.js";
+import type { AbilityName, SpellSlotLevel } from "../../types/dnd.js";
+import type { SrdCreature } from "../../dto/srd.js";
+import { calcModifier } from "../dndMath.js";
 
 export type SpellcastingSpellGroup =
   | { kind: "cantrip"; spells: string[] }

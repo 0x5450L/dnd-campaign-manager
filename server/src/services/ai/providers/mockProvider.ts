@@ -1,5 +1,5 @@
-import { AI_PROVIDER_ID } from "@shared/constants/ai";
-import type { AiProviderId } from "@shared/dto/ai";
+import { AI_PROVIDER_ID } from "@dnd/shared/constants/ai";
+import type { AiProviderId } from "@dnd/shared/dto/ai";
 import type {
   JsonSchemaNode,
   StructuredTextRequest,

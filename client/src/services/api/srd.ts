@@ -1,5 +1,5 @@
 import { apiClient } from ".";
-import type { SrdItem, SrdListPage, SrdCreature, SrdCreatureSummary, SrdSpell } from "@shared/dto/srd";
+import type { SrdItem, SrdListPage, SrdCreature, SrdCreatureSummary, SrdSpell } from "@dnd/shared/dto/srd";
 
 export const searchSrdCreatures = async (search: string) =>
   apiClient<SrdListPage<SrdCreatureSummary>>(

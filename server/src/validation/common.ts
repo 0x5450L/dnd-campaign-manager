@@ -1,13 +1,13 @@
 import { z } from "zod";
-import { ABILITY_NAMES } from "@shared/constants/dnd";
+import { ABILITY_NAMES } from "@dnd/shared/constants/dnd";
 import type {
   Ability,
   AbilityCost,
   ResourcePool,
-} from "@shared/types/abilities";
-import type { SpellSlotLevel } from "@shared/types/dnd";
-import type { CharacterAttackInput } from "@shared/dto/character";
-import type { ParticipantAbilityScore } from "@shared/dto/session";
+} from "@dnd/shared/types/abilities";
+import type { SpellSlotLevel } from "@dnd/shared/types/dnd";
+import type { CharacterAttackInput } from "@dnd/shared/dto/character";
+import type { ParticipantAbilityScore } from "@dnd/shared/dto/session";
 
 export const abilityNameSchema = z.enum(ABILITY_NAMES);
 

@@ -1,4 +1,4 @@
-import type { AiProviderId } from "@shared/dto/ai";
+import type { AiProviderId } from "@dnd/shared/dto/ai";
 
 export class AiProviderNotConfiguredError extends Error {
   constructor(readonly provider: AiProviderId, detail: string) {

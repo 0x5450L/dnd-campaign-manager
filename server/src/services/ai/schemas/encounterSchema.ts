@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { EncounterBudget } from "@shared/types/encounter";
+import type { EncounterBudget } from "@dnd/shared/types/encounter";
 import type { JsonSchemaNode } from "../providers/aiProvider";
 
 const MAX_DISTINCT_ENTRIES = 5;

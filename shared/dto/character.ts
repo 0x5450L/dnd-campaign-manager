@@ -1,5 +1,5 @@
-import type { Ability, ResourcePool } from "../types/abilities";
-import type { AbilityName, SpellSlotLevel } from "../types/dnd";
+import type { Ability, ResourcePool } from "../types/abilities.js";
+import type { AbilityName, SpellSlotLevel } from "../types/dnd.js";
 
 export type CharacterType = "player" | "npc" | "monster";
 

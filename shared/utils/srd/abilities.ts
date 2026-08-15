@@ -1,18 +1,18 @@
-import { randomId } from "../id";
-import type { SrdCreature, SrdCreatureAction } from "../../dto/srd";
+import { randomId } from "../id.js";
+import type { SrdCreature, SrdCreatureAction } from "../../dto/srd.js";
 import type {
   Ability,
   AbilityActivation,
   AbilityCost,
   ResourcePool,
-} from "../../types/abilities";
-import { parseCreatureAction } from "./creatureActionParser";
+} from "../../types/abilities.js";
+import { parseCreatureAction } from "./creatureActionParser.js";
 import {
   isSpellcastingTraitName,
   parseSpellcastingTrait,
   type ParsedSpellcastingTrait,
   type SpellcastingSpellGroup,
-} from "./creatureSpellcastingParser";
+} from "./creatureSpellcastingParser.js";
 
 const TO_HIT_BONUS = /^[+-]\d+$/;
 const RECHARGE = /Recharge\s+(\d)/i;

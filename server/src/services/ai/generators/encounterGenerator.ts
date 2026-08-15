@@ -1,15 +1,15 @@
-import { ENCOUNTER_CANDIDATE_COUNT } from "@shared/constants/encounter";
+import { ENCOUNTER_CANDIDATE_COUNT } from "@dnd/shared/constants/encounter";
 import type {
   GenerateEncounterPayload,
   GeneratedEncounter,
   GeneratedEncounterEntry,
-} from "@shared/dto/ai";
-import type { CreateParticipantPayload } from "@shared/dto/session";
-import type { SrdCreature, SrdCreatureSummary } from "@shared/dto/srd";
-import type { EncounterBudget } from "@shared/types/encounter";
-import { xpForChallengeRating } from "@shared/utils/dndMath";
-import { buildEncounterBudget, buildXpReport } from "@shared/utils/encounterBudget";
-import { srdCreatureToParticipant } from "@shared/utils/srd/creatureParticipantMapper";
+} from "@dnd/shared/dto/ai";
+import type { CreateParticipantPayload } from "@dnd/shared/dto/session";
+import type { SrdCreature, SrdCreatureSummary } from "@dnd/shared/dto/srd";
+import type { EncounterBudget } from "@dnd/shared/types/encounter";
+import { xpForChallengeRating } from "@dnd/shared/utils/dndMath";
+import { buildEncounterBudget, buildXpReport } from "@dnd/shared/utils/encounterBudget";
+import { srdCreatureToParticipant } from "@dnd/shared/utils/srd/creatureParticipantMapper";
 import type { ReferenceService } from "../../reference/referenceService";
 import type { CampaignLootContext } from "../aiContextRepository";
 import {

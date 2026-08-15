@@ -4,7 +4,7 @@ import type {
   GenerateEncounterResponse,
   GenerateLootPayload,
   GenerateLootResponse,
-} from "@shared/dto/ai";
+} from "@dnd/shared/dto/ai";
 
 export const generateLoot = async (payload: GenerateLootPayload) =>
   apiClient<GenerateLootResponse>("/api/ai/loot", {
