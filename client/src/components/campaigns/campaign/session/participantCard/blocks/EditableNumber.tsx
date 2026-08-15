@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { clamp } from "@/utils/dndMath";
 
 type EditableNumberProps = {
@@ -21,11 +21,13 @@ export const EditableNumber = ({
   ariaLabel,
 }: EditableNumberProps) => {
   const [draft, setDraft] = useState(String(value));
+  const [syncedValue, setSyncedValue] = useState(value);
   const cancelled = useRef(false);
 
-  useEffect(() => {
+  if (value !== syncedValue) {
+    setSyncedValue(value);
     setDraft(String(value));
-  }, [value]);
+  }
 
   const commit = () => {
     if (cancelled.current) {

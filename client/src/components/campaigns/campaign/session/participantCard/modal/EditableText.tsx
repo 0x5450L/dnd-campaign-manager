@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 type EditableTextProps = {
   value: string;
@@ -20,11 +20,13 @@ export const EditableText = ({
   allowEmpty = false,
 }: EditableTextProps) => {
   const [draft, setDraft] = useState(value);
+  const [syncedValue, setSyncedValue] = useState(value);
   const cancelled = useRef(false);
 
-  useEffect(() => {
+  if (value !== syncedValue) {
+    setSyncedValue(value);
     setDraft(value);
-  }, [value]);
+  }
 
   const commit = () => {
     if (cancelled.current) {
