@@ -1,8 +1,8 @@
 import {
-  AI_GENERATION_KIND,
-  AI_PROVIDER_ID,
-  LOOT_FIND_TYPE,
-  LOOT_RICHNESS,
+  type AI_GENERATION_KIND,
+  type AI_PROVIDER_ID,
+  type LOOT_FIND_TYPE,
+  type LOOT_RICHNESS,
 } from "../constants/ai.js";
 import type { SrdRarity, SrdSource } from "./srd.js";
 import type {

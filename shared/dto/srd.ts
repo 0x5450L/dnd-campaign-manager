@@ -1,5 +1,5 @@
 import type { AbilityName } from "../types/dnd.js";
-import { SRD_CATEGORY, SRD_RARITY, SRD_SOURCE } from "../constants/srd.js";
+import { type SRD_CATEGORY, type SRD_RARITY, type SRD_SOURCE } from "../constants/srd.js";
 
 export type SrdSource = (typeof SRD_SOURCE)[keyof typeof SRD_SOURCE];
 

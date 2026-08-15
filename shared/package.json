@@ -19,11 +19,14 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "dev": "node scripts/finalize-dist.mjs && concurrently -n cjs,esm -c blue,magenta \"tsc -p tsconfig.cjs.json --watch --preserveWatchOutput\" \"tsc -p tsconfig.esm.json --watch --preserveWatchOutput\""
+    "dev": "node scripts/finalize-dist.mjs && concurrently -n cjs,esm -c blue,magenta \"tsc -p tsconfig.cjs.json --watch --preserveWatchOutput\" \"tsc -p tsconfig.esm.json --watch --preserveWatchOutput\"",
+    "lint": "eslint ."
   },
   "devDependencies": {
     "concurrently": "^9.1.2",
+    "eslint": "^9.39.5",
     "typescript": "^5.9.3",
+    "typescript-eslint": "^8.48.0",
     "vitest": "^3.2.7"
   },
   "files": [

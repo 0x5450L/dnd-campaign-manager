@@ -1,6 +1,6 @@
 import type { Server as HttpServer } from 'node:http';
 import { randomUUID } from 'node:crypto';
-import { DefaultEventsMap, Server } from 'socket.io';
+import { type DefaultEventsMap, Server } from 'socket.io';
 
 import type { CampaignSession, DiceRoll } from '@prisma/client';
 
@@ -161,7 +161,7 @@ export const initSocket = (httpServer: HttpServer): AppIo => {
       }
       socket.data.userId = userId;
       socket.data.displayName = user.displayName;
-    } catch (error) {
+    } catch {
       return next(new Error('Unauthorized'));
     }
     return next();

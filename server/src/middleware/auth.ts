@@ -1,5 +1,5 @@
 import { verifyToken } from "../utils/jwt";
-import { NextFunction, Request, Response } from "express";
+import { type NextFunction, type Request, type Response } from "express";
 
 export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   const token =
@@ -14,7 +14,7 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
     const userId = verifyToken(token);
     req.userId = userId;
     next();
-  } catch (error) {
+  } catch {
     return res.status(401).json({ status: 'error', error: { message: 'Unauthorized', statusCode: 401 } });
   }
 }
