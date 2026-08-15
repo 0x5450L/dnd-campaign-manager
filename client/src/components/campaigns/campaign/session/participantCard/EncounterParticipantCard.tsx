@@ -4,11 +4,11 @@ import type { EncounterParticipantDTO } from "@/types/encounter";
 import InitiativeBlock from "./blocks/InitiativeBlock";
 import ArmorClassBlock from "./blocks/ArmorClassBlock";
 import TypeBadge from "./blocks/TypeBadge";
-import HpBar from "./blocks/HpBar";
+import VitalsSlot from "./blocks/VitalsSlot";
 import HpControls from "./blocks/HpControls";
+import HpControlsPopover from "./blocks/HpControlsPopover";
 import ConditionsPicker from "./blocks/ConditionsPicker";
 import AttackAbilitiesStrip from "./blocks/AttackAbilitiesStrip";
-import DeathSavesBlock from "./blocks/DeathSavesBlock";
 import ParticipantDetailsModal from "./modal/ParticipantDetailsModal";
 import VisibilityToggle from "./blocks/VisibilityToggle";
 import { InfoIcon, TrashIcon } from "./blocks/icons";
@@ -48,10 +48,12 @@ export const EncounterParticipantCard = ({
   return (
     <>
       <li
-        className={`relative flex w-[320px] shrink-0 snap-start flex-col gap-2.5 rounded-md border px-3 py-3 transition-colors ${
+        className={`relative flex h-full w-[320px] shrink-0 snap-start flex-col gap-2 rounded-md border px-3 py-2.5 transition-colors ${
           isActive
             ? "border-gold bg-gold/5 shadow-[inset_0_0_0_1px_rgba(212,165,116,0.25)]"
-            : "border-rule bg-surface/40 hover:border-hover/60"
+            : isDownedPc
+              ? "border-rust/45 bg-rust/5 hover:border-rust/70"
+              : "border-rule bg-surface/40 hover:border-hover/60"
         } ${hiddenForDm ? "opacity-70" : ""}`}
       >
         {isActive && (
@@ -79,7 +81,9 @@ export const EncounterParticipantCard = ({
 
           <div className="flex min-w-0 flex-1 flex-col gap-1">
             <div className="flex items-center gap-1">
-              <span className="truncate font-fantasy text-base text-ink">
+              <span
+                className={`truncate font-fantasy text-base ${isDownedPc ? "text-rust-soft" : "text-ink"}`}
+              >
                 {participant.name}
               </span>
             </div>
@@ -115,14 +119,29 @@ export const EncounterParticipantCard = ({
           </div>
         </div>
 
-        <HpBar
+        <VitalsSlot
           currentHp={participant.currentHp}
           maxHp={participant.maxHp}
           tempHp={participant.tempHp}
           hidden={!participant.isVisible}
+          showDeathSaves={isDownedPc}
+          successes={participant.deathSaveSuccesses}
+          failures={participant.deathSaveFailures}
+          canEdit={canEditOwn}
+          onRecordDeathSave={(outcome) => recordDeathSave(participant.id, outcome)}
+          trailingSlot={!isDM}
+          trailing={
+            isOwner ? (
+              <HpControlsPopover
+                onDamage={(amount) => adjustHp(participant.id, -amount)}
+                onHeal={(amount) => adjustHp(participant.id, amount)}
+                onTemp={(amount) => grantTempHp(participant.id, amount)}
+              />
+            ) : null
+          }
         />
 
-        {canEditOwn && (
+        {isDM && (
           <HpControls
             onDamage={(amount) => adjustHp(participant.id, -amount)}
             onHeal={(amount) => adjustHp(participant.id, amount)}
@@ -130,7 +149,7 @@ export const EncounterParticipantCard = ({
           />
         )}
 
-        {isDM && (participant.abilityScores || participant.proficiencyBonus !== null) && (
+        {isDM && (
           <AttackAbilitiesStrip
             scores={participant.abilityScores}
             spellAbility={participant.spellAbility}
@@ -138,20 +157,13 @@ export const EncounterParticipantCard = ({
           />
         )}
 
-        {isDownedPc && (
-          <DeathSavesBlock
-            successes={participant.deathSaveSuccesses}
-            failures={participant.deathSaveFailures}
-            canEdit={canEditOwn}
-            onRecord={(outcome) => recordDeathSave(participant.id, outcome)}
+        <div className="mt-auto">
+          <ConditionsPicker
+            active={participant.conditions}
+            isDM={canEditOwn}
+            onToggle={(c) => toggleCondition(participant.id, c)}
           />
-        )}
-
-        <ConditionsPicker
-          active={participant.conditions}
-          isDM={canEditOwn}
-          onToggle={(c) => toggleCondition(participant.id, c)}
-        />
+        </div>
       </li>
 
       {detailsOpen && (

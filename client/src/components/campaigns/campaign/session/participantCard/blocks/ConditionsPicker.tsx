@@ -6,6 +6,8 @@ import ConditionIcon from "../conditionIcons";
 import { CloseIcon } from "@/components/ui/icons";
 import { PlusIcon } from "./icons";
 
+const MAX_VISIBLE_CONDITIONS = 5;
+
 type ConditionsPickerProps = {
   active: string[];
   isDM: boolean;
@@ -57,9 +59,12 @@ export const ConditionsPicker = ({
     return [...head, ...tail];
   }, [activeKnown]);
 
+  const visible = activeKnown.slice(0, MAX_VISIBLE_CONDITIONS);
+  const overflowCount = activeKnown.length - visible.length;
+
   return (
-    <div className="flex flex-wrap min-h-13 content-start items-start justify-start gap-2.5">
-      {activeKnown.map((c) => (
+    <div className="flex h-7 items-center justify-start gap-2 overflow-hidden">
+      {visible.map((c) => (
         <ConditionDot
           key={c}
           condition={c}
@@ -68,12 +73,23 @@ export const ConditionsPicker = ({
         />
       ))}
 
+      {overflowCount > 0 && (
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          aria-label="Show all conditions"
+          className="flex h-7 shrink-0 items-center justify-center rounded-full border border-rule px-2 font-fantasy text-[11px] text-faint transition-colors hover:border-hover hover:text-ink"
+        >
+          +{overflowCount}
+        </button>
+      )}
+
       {isDM && (
         <button
           type="button"
           onClick={() => setOpen(true)}
           aria-label="Manage conditions"
-          className="flex h-7 w-7 items-center justify-center  rounded-full border border-dashed border-rule text-faint transition-colors hover:border-hover hover:text-ink"
+          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-dashed border-rule text-faint transition-colors hover:border-hover hover:text-ink"
         >
           <PlusIcon />
         </button>

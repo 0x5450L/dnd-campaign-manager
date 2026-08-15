@@ -1,3 +1,5 @@
+import HpReadout from "./HpReadout";
+
 type HpBarProps = {
   currentHp: number;
   maxHp: number;
@@ -21,7 +23,7 @@ export const HpBar = ({ currentHp, maxHp, tempHp, hidden }: HpBarProps) => {
   const tempVisible = !hidden && tempHp > 0;
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex w-full items-center gap-2">
       <div className="relative h-3 flex-1 overflow-hidden rounded-full border border-rule bg-bg/70">
         {hidden ? (
           <div className="absolute inset-0 bg-dim/30" />
@@ -44,14 +46,12 @@ export const HpBar = ({ currentHp, maxHp, tempHp, hidden }: HpBarProps) => {
           />
         )}
       </div>
-      <div className="flex w-16 flex-col items-end font-fantasy tabular-nums leading-none">
-        <span className="text-xs text-ink">
-          {hidden ? "??/??" : `${currentHp}/${maxHp}`}
-        </span>
-        <span className="text-[11px] text-frost-soft">
-          {hidden ? "+??" : `+${tempHp}`}
-        </span>
-      </div>
+      <HpReadout
+        currentHp={currentHp}
+        maxHp={maxHp}
+        tempHp={tempHp}
+        hidden={hidden}
+      />
     </div>
   );
 };

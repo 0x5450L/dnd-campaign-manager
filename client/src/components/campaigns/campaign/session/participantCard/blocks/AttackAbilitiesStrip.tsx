@@ -46,7 +46,7 @@ export const AttackAbilitiesStrip = ({
       {cells.map((cell) => (
         <div
           key={cell.key}
-          className="flex items-center justify-center gap-1.5 p-2.5"
+          className="flex h-7 items-center justify-center gap-1.5 px-1"
         >
           <span className="font-fantasy text-xs font-semibold uppercase tracking-[0.16em] text-gold-bright">
             {cell.label}
