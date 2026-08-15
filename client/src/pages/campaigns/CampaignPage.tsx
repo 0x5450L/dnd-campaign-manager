@@ -66,8 +66,7 @@ function CampaignPage() {
     serverCampaign &&
     (campaign.name !== serverCampaign.name ||
       campaign.description !== serverCampaign.description ||
-      campaign.setting !== serverCampaign.setting ||
-      campaign.imageUrl !== serverCampaign.imageUrl)
+      campaign.setting !== serverCampaign.setting)
   );
 
   const handleSave = () => {
@@ -79,7 +78,6 @@ function CampaignPage() {
           name: campaign.name,
           description: campaign.description,
           setting: campaign.setting,
-          imageUrl: campaign.imageUrl,
         },
       },
       {

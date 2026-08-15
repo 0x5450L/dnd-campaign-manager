@@ -22,14 +22,13 @@ function CreateNewCampaign() {
     const name = formData.get("name") as string;
     const description = formData.get("description") as string;
     const setting = formData.get("setting") as string;
-    const imageUrl = formData.get("imageUrl") as string;
     if (!name) {
       setNameError("Campaign name is required");
       return;
     }
 
     createCampaign.mutate(
-      { name, description, setting, imageUrl },
+      { name, description, setting },
       {
         onSuccess: () => {
           form.reset();
@@ -51,7 +50,6 @@ function CreateNewCampaign() {
         {nameError && <p className="text-rust text-sm">{nameError}</p>}
         <CommonInput type="text" name="description" placeholder="Description (optional)" variant="boxed" />
         <CommonInput type="text" name="setting" placeholder="Setting (optional)" variant="boxed" />
-        <CommonInput type="text" name="imageUrl" placeholder="Image URL (optional)" variant="boxed" />
         <CommonButton type="submit" disabled={createCampaign.isPending}>
           {createCampaign.isPending ? "Creating..." : "Create Campaign"}
         </CommonButton>

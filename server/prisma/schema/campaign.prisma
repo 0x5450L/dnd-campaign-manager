@@ -3,6 +3,8 @@ model Campaign {
   name        String
   description String?
   setting     String?
+  /// Reserved for campaign cover art. No UI writes it yet — planned to be fed by
+  /// an upload endpoint (object storage + signed URL), not by a user-typed URL.
   imageUrl    String?
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")

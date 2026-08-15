@@ -25,14 +25,12 @@ export type CreateCampaignInput = {
   name: string;
   description?: string;
   setting?: string;
-  imageUrl?: string;
 }
 
 export type UpdateCampaignPayload = {
   name?: string;
   description?: string;
   setting?: string;
-  imageUrl?: string;
 }
 
 export type Campaign = {
@@ -42,7 +40,6 @@ export type Campaign = {
   name: string;
   description: string;
   setting: string;
-  imageUrl: string;
   createdAt: Date;
   updatedAt: Date;
   members: CampaignMember[];

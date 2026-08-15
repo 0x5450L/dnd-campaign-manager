@@ -39,7 +39,7 @@ export const useCreateCampaignMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (input: CreateCampaignInput) =>
-      (await createCampaign(input.name, input.description, input.setting, input.imageUrl)).campaign,
+      (await createCampaign(input.name, input.description, input.setting)).campaign,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: campaignKeys.lists() });
     },
