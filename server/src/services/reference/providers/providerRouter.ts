@@ -15,7 +15,9 @@ export class ProviderRouter {
   }
 
   getSpell(slug: string): Promise<SrdSpell | null> {
-    return this.run(SRD_CATEGORY.Spell, (provider) => provider.getSpell(slug));
+    return this.runUntilFound(SRD_CATEGORY.Spell, (provider) =>
+      provider.getSpell(slug),
+    );
   }
 
   searchSpells(query: SrdQuery): Promise<SrdListPage<SrdSpell>> {
@@ -23,7 +25,9 @@ export class ProviderRouter {
   }
 
   getCreature(slug: string): Promise<SrdCreature | null> {
-    return this.run(SRD_CATEGORY.Monster, (provider) => provider.getCreature(slug));
+    return this.runUntilFound(SRD_CATEGORY.Monster, (provider) =>
+      provider.getCreature(slug),
+    );
   }
 
   searchCreatures(query: SrdQuery): Promise<SrdListPage<SrdCreatureSummary>> {
@@ -58,7 +62,7 @@ export class ProviderRouter {
   }
 
   getCondition(slug: string): Promise<SrdCondition | null> {
-    return this.run(SRD_CATEGORY.Condition, (provider) =>
+    return this.runUntilFound(SRD_CATEGORY.Condition, (provider) =>
       provider.getCondition(slug),
     );
   }
