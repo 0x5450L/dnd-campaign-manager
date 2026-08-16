@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { TEXT_LIMITS } from "../constants/limits";
 import type {
   CreateCharacterPayload,
   UpdateCharacterPayload,
@@ -27,7 +28,7 @@ const alignmentSchema = z.enum([
 
 const creatureProfileSchema = z.object({
   challengeRating: z.number().nullable().optional(),
-  creatureType: z.string().nullable().optional(),
+  creatureType: z.string().max(TEXT_LIMITS.Name).nullable().optional(),
 });
 
 const characterAbilityScoreSchema = z.object({
@@ -37,32 +38,32 @@ const characterAbilityScoreSchema = z.object({
 });
 
 const characterSkillSchema = z.object({
-  name: z.string(),
+  name: z.string().max(TEXT_LIMITS.Name),
   proficient: z.boolean(),
 });
 
 export const createCharacterSchema = z.object({
-  name: z.string().min(1),
+  name: z.string().min(1).max(TEXT_LIMITS.Name),
   type: characterTypeSchema,
-  race: z.string(),
-  characterClass: z.string().optional(),
-  campaignId: z.string().min(1),
-  background: z.string().optional(),
+  race: z.string().max(TEXT_LIMITS.Name),
+  characterClass: z.string().max(TEXT_LIMITS.Name).optional(),
+  campaignId: z.string().min(1).max(TEXT_LIMITS.ShortText),
+  background: z.string().max(TEXT_LIMITS.Name).optional(),
   alignment: alignmentSchema.optional(),
-  notes: z.string().nullable().optional(),
+  notes: z.string().max(TEXT_LIMITS.Notes).nullable().optional(),
   creatureProfile: creatureProfileSchema.optional(),
 }) satisfies z.ZodType<CreateCharacterPayload>;
 
 export const updateCharacterSchema = z
   .object({
-    name: z.string().min(1),
+    name: z.string().min(1).max(TEXT_LIMITS.Name),
     type: characterTypeSchema,
-    race: z.string(),
-    characterClass: z.string(),
-    subclass: z.string().nullable(),
-    background: z.string(),
+    race: z.string().max(TEXT_LIMITS.Name),
+    characterClass: z.string().max(TEXT_LIMITS.Name),
+    subclass: z.string().max(TEXT_LIMITS.Name).nullable(),
+    background: z.string().max(TEXT_LIMITS.Name),
     alignment: alignmentSchema,
-    notes: z.string().nullable(),
+    notes: z.string().max(TEXT_LIMITS.Notes).nullable(),
     experience: z.number().int(),
     speed: z.number().int(),
     hitDiceType: z.enum(["d6", "d8", "d10", "d12"]),
@@ -75,19 +76,19 @@ export const updateCharacterSchema = z
     armorClass: z.number().int(),
     usesShield: z.boolean(),
     inspiration: z.boolean(),
-    size: z.string().nullable(),
-    senses: z.string().nullable(),
-    languages: z.string().nullable(),
-    damageVulnerabilities: z.string().nullable(),
-    damageResistances: z.string().nullable(),
-    damageImmunities: z.string().nullable(),
-    conditionImmunities: z.string().nullable(),
-    classFeatures: z.string().nullable(),
-    racialTraits: z.string().nullable(),
-    feats: z.string().nullable(),
-    armorProficiencies: z.string().nullable(),
-    weaponProficiencies: z.string().nullable(),
-    toolProficiencies: z.string().nullable(),
+    size: z.string().max(TEXT_LIMITS.Name).nullable(),
+    senses: z.string().max(TEXT_LIMITS.ShortText).nullable(),
+    languages: z.string().max(TEXT_LIMITS.ShortText).nullable(),
+    damageVulnerabilities: z.string().max(TEXT_LIMITS.ShortText).nullable(),
+    damageResistances: z.string().max(TEXT_LIMITS.ShortText).nullable(),
+    damageImmunities: z.string().max(TEXT_LIMITS.ShortText).nullable(),
+    conditionImmunities: z.string().max(TEXT_LIMITS.ShortText).nullable(),
+    classFeatures: z.string().max(TEXT_LIMITS.Paragraph).nullable(),
+    racialTraits: z.string().max(TEXT_LIMITS.Paragraph).nullable(),
+    feats: z.string().max(TEXT_LIMITS.Paragraph).nullable(),
+    armorProficiencies: z.string().max(TEXT_LIMITS.Paragraph).nullable(),
+    weaponProficiencies: z.string().max(TEXT_LIMITS.Paragraph).nullable(),
+    toolProficiencies: z.string().max(TEXT_LIMITS.Paragraph).nullable(),
     abilityScores: z.array(characterAbilityScoreSchema),
     skills: z.array(characterSkillSchema),
     attacks: z.array(attackInputSchema),

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ARRAY_LIMITS, TEXT_LIMITS } from "../constants/limits";
 import type {
   AbilityUsagePayload,
   SpellSlotUsagePayload,
@@ -21,8 +22,8 @@ import {
 const participantTypeSchema = z.enum(["pc", "npc", "monster"]);
 
 export const createEncounterSchema = z.object({
-  campaignSessionId: z.string().min(1),
-  name: z.string().optional(),
+  campaignSessionId: z.string().min(1).max(TEXT_LIMITS.ShortText),
+  name: z.string().max(TEXT_LIMITS.Name).optional(),
 });
 
 export type CreateEncounterBody = z.infer<typeof createEncounterSchema>;
@@ -30,20 +31,20 @@ export type CreateEncounterBody = z.infer<typeof createEncounterSchema>;
 export const updateEncounterSchema = z
   .object({
     status: z.enum(["setup", "active", "ended"]),
-    name: z.string(),
+    name: z.string().max(TEXT_LIMITS.Name),
   })
   .partial() satisfies z.ZodType<UpdateEncounterPayload>;
 
 export const createParticipantSchema = z.object({
   type: participantTypeSchema,
-  name: z.string().min(1),
-  characterId: z.string().nullable().optional(),
+  name: z.string().min(1).max(TEXT_LIMITS.Name),
+  characterId: z.string().max(TEXT_LIMITS.ShortText).nullable().optional(),
   sortOrder: z.number().int(),
   maxHp: z.number().int(),
   currentHp: z.number().int(),
   armorClass: z.number().int(),
   tempHp: z.number().int().optional(),
-  conditions: z.array(z.string()).optional(),
+  conditions: z.array(z.string().max(TEXT_LIMITS.Name)).max(ARRAY_LIMITS.Conditions).optional(),
   isVisible: z.boolean().optional(),
   acHidden: z.boolean().optional(),
   typeHidden: z.boolean().optional(),
@@ -52,32 +53,32 @@ export const createParticipantSchema = z.object({
   spellAbility: abilityNameSchema.nullable().optional(),
   proficiencyBonus: z.number().int().nullable().optional(),
   spellSlots: z.array(spellSlotSchema).nullable().optional(),
-  attacks: z.array(attackInputSchema).optional(),
-  speed: z.string().nullable().optional(),
-  senses: z.string().nullable().optional(),
+  attacks: z.array(attackInputSchema).max(ARRAY_LIMITS.Attacks).optional(),
+  speed: z.string().max(TEXT_LIMITS.Name).nullable().optional(),
+  senses: z.string().max(TEXT_LIMITS.ShortText).nullable().optional(),
   challengeRating: z.number().nullable().optional(),
-  damageVulnerabilities: z.string().nullable().optional(),
-  damageResistances: z.string().nullable().optional(),
-  damageImmunities: z.string().nullable().optional(),
-  conditionImmunities: z.string().nullable().optional(),
-  abilities: z.array(abilitySchema).nullable().optional(),
+  damageVulnerabilities: z.string().max(TEXT_LIMITS.ShortText).nullable().optional(),
+  damageResistances: z.string().max(TEXT_LIMITS.ShortText).nullable().optional(),
+  damageImmunities: z.string().max(TEXT_LIMITS.ShortText).nullable().optional(),
+  conditionImmunities: z.string().max(TEXT_LIMITS.ShortText).nullable().optional(),
+  abilities: z.array(abilitySchema).max(ARRAY_LIMITS.Abilities).nullable().optional(),
   resources: z.array(resourcePoolSchema).nullable().optional(),
 }) satisfies z.ZodType<CreateParticipantPayload>;
 
 export const bulkCreateParticipantsSchema = z.object({
-  participants: z.array(createParticipantSchema).min(1),
+  participants: z.array(createParticipantSchema).min(1).max(ARRAY_LIMITS.Participants),
 }) satisfies z.ZodType<BulkCreateParticipantsPayload>;
 
 export const updateParticipantSchema = z
   .object({
-    name: z.string().min(1),
+    name: z.string().min(1).max(TEXT_LIMITS.Name),
     sortOrder: z.number().int(),
     maxHp: z.number().int(),
     currentHp: z.number().int(),
     tempHp: z.number().int(),
     armorClass: z.number().int(),
-    attacks: z.array(attackInputSchema),
-    conditions: z.array(z.string()),
+    attacks: z.array(attackInputSchema).max(ARRAY_LIMITS.Attacks),
+    conditions: z.array(z.string().max(TEXT_LIMITS.Name)).max(ARRAY_LIMITS.Conditions),
     isVisible: z.boolean(),
     acHidden: z.boolean(),
     typeHidden: z.boolean(),
@@ -88,14 +89,14 @@ export const updateParticipantSchema = z
     spellSlots: z.array(spellSlotSchema).nullable(),
     deathSaveSuccesses: z.number().int().min(0).max(3),
     deathSaveFailures: z.number().int().min(0).max(3),
-    speed: z.string().nullable(),
-    senses: z.string().nullable(),
+    speed: z.string().max(TEXT_LIMITS.Name).nullable(),
+    senses: z.string().max(TEXT_LIMITS.ShortText).nullable(),
     challengeRating: z.number().nullable(),
-    damageVulnerabilities: z.string().nullable(),
-    damageResistances: z.string().nullable(),
-    damageImmunities: z.string().nullable(),
-    conditionImmunities: z.string().nullable(),
-    abilities: z.array(abilitySchema).nullable(),
+    damageVulnerabilities: z.string().max(TEXT_LIMITS.ShortText).nullable(),
+    damageResistances: z.string().max(TEXT_LIMITS.ShortText).nullable(),
+    damageImmunities: z.string().max(TEXT_LIMITS.ShortText).nullable(),
+    conditionImmunities: z.string().max(TEXT_LIMITS.ShortText).nullable(),
+    abilities: z.array(abilitySchema).max(ARRAY_LIMITS.Abilities).nullable(),
     resources: z.array(resourcePoolSchema).nullable(),
   })
   .partial() satisfies z.ZodType<UpdateParticipantPayload>;
@@ -104,7 +105,7 @@ export const bulkInitiativeSchema = z.object({
   entries: z
     .array(
       z.object({
-        participantId: z.string().min(1),
+        participantId: z.string().min(1).max(TEXT_LIMITS.ShortText),
         sortOrder: z.number().int(),
       }),
     )
@@ -127,7 +128,7 @@ export const spellSlotUsageSchema = z.object({
 }) satisfies z.ZodType<SpellSlotUsagePayload>;
 
 export const listEncountersQuerySchema = z.object({
-  campaignSessionId: z.string().min(1),
+  campaignSessionId: z.string().min(1).max(TEXT_LIMITS.ShortText),
 });
 
 export const removeParticipantsQuerySchema = z.object({

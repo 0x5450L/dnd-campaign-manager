@@ -46,6 +46,30 @@ describe("POST /api/auth/register", () => {
     expect(stored?.passwordHash).not.toBe(body.password);
   });
 
+  it("rejects a password short enough to guess", async () => {
+    const response = await request(app)
+      .post("/api/auth/register")
+      .send({ ...credentials(), password: "short" });
+
+    expect(response.status).toBe(400);
+  });
+
+  it("rejects a password past the length bcrypt actually hashes", async () => {
+    const response = await request(app)
+      .post("/api/auth/register")
+      .send({ ...credentials(), password: "x".repeat(73) });
+
+    expect(response.status).toBe(400);
+  });
+
+  it("rejects an unbounded display name", async () => {
+    const response = await request(app)
+      .post("/api/auth/register")
+      .send({ ...credentials(), displayName: "x".repeat(10_000) });
+
+    expect(response.status).toBe(400);
+  });
+
   it("rejects a malformed email", async () => {
     const response = await request(app)
       .post("/api/auth/register")
