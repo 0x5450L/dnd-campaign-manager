@@ -1,4 +1,5 @@
 import { useState } from "react";
+import DemoLogin from "../components/auth/DemoLogin";
 import Login from "../components/auth/Login";
 import Register from "../components/auth/Register";
 import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
@@ -27,6 +28,7 @@ function AuthPage() {
   return (
     <div className="flex flex-col items-center justify-center h-screen gap-4">
       <h1 className="text-3xl font-bold text-gold">DnD Campaign Manager</h1>
+      <DemoLogin onSuccess={handleRedirect} />
       {isLogin ? <Login handleRedirect={handleRedirect} /> : <Register handleRedirect={handleRedirect} />}
       <button
         onClick={() => setIsLogin(!isLogin)}
