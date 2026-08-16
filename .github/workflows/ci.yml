@@ -15,7 +15,23 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+      DATABASE_URL: postgresql://dnd_user:dnd_secret@localhost:5432/dnd_test
+      JWT_SECRET: integration-tests-only
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: dnd_user
+          POSTGRES_PASSWORD: dnd_secret
+          POSTGRES_DB: dnd_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U dnd_user -d dnd_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
 
     steps:
       - uses: actions/checkout@v4
@@ -40,8 +56,11 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Test
+      - name: Unit tests
         run: npm test
+
+      - name: Integration tests
+        run: npm run test:integration -w server
 
       - name: Production build
         run: npm run build
