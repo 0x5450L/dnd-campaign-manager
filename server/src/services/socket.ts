@@ -4,6 +4,8 @@ import { type DefaultEventsMap, Server } from 'socket.io';
 
 import type { CampaignSession, DiceRoll } from '@prisma/client';
 
+import { config } from '../config';
+
 import type {
   SocketClientToServerEvents,
   SocketServerToClientEvents,
@@ -137,12 +139,9 @@ export const initSocket = (httpServer: HttpServer): AppIo => {
   }
 
   io = new Server<SocketClientToServerEvents, SocketServerToClientEvents, DefaultEventsMap, SocketData>
-    (httpServer, {
-      cors: {
-        origin: 'http://localhost:5173',
-        credentials: true,
-      },
-    });
+    (httpServer, config.allowedOrigins.length > 0
+      ? { cors: { origin: config.allowedOrigins, credentials: true } }
+      : {});
 
   io.use(async (socket, next) => {
     const token = getTokenFromCookie(socket.handshake.headers.cookie);

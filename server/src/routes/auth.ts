@@ -1,5 +1,6 @@
 import { Router } from "express";
 import type { Response } from "express";
+import { config } from "../config";
 import type { ParamsDictionary } from "express-serve-static-core";
 import { asyncHandler } from "../utils/asyncHandler";
 import { validateBody } from "../middleware/validateBody";
@@ -13,12 +14,14 @@ import * as authService from "../services/auth/authService";
 
 const router = Router();
 
+const AUTH_COOKIE_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
+
 const setAuthCookie = (res: Response, token: string) => {
   res.cookie("token", token, {
     httpOnly: true,
-    secure: false,
-    sameSite: "lax",
-    maxAge: 7 * 24 * 60 * 60 * 1000,
+    secure: config.cookie.secure,
+    sameSite: config.cookie.sameSite,
+    maxAge: AUTH_COOKIE_MAX_AGE_MS,
   });
 };
 
@@ -35,7 +38,11 @@ router.post("/login", validateBody(loginSchema), asyncHandler<ParamsDictionary, 
 }));
 
 router.post("/logout", (_req, res) => {
-  res.clearCookie("token");
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: config.cookie.secure,
+    sameSite: config.cookie.sameSite,
+  });
   res.json({ status: "ok", message: "Logout successful" });
 });
 

@@ -1,5 +1,9 @@
+import path from 'node:path';
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
 import express, { type Express } from 'express';
+
+import { config } from './config';
 
 import authRoutes from './routes/auth';
 import meRoutes from './routes/me';
@@ -13,11 +17,28 @@ import aiRoutes from './routes/ai';
 
 import { errorMiddleware } from './middleware/errors';
 
+const serveClient = (app: Express, clientDistPath: string) => {
+  const indexHtml = path.join(clientDistPath, 'index.html');
+
+  app.use(express.static(clientDistPath));
+  app.use((req, res, next) => {
+    if (req.method !== 'GET' || req.path.startsWith('/api')) {
+      next();
+      return;
+    }
+    res.sendFile(indexHtml);
+  });
+};
+
 export const createApp = (): Express => {
   const app = express();
 
+  if (config.allowedOrigins.length > 0) {
+    app.use(cors({ origin: config.allowedOrigins, credentials: true }));
+  }
+
   app.use(cookieParser());
-  app.use(express.json());
+  app.use(express.json({ limit: '256kb' }));
 
   app.use('/api/auth', authRoutes);
   app.use('/api/me', meRoutes);
@@ -28,6 +49,10 @@ export const createApp = (): Express => {
   app.use('/api/encounters', encountersRoutes);
   app.use('/api/srd', srdRoutes);
   app.use('/api/ai', aiRoutes);
+
+  if (config.clientDistPath) {
+    serveClient(app, config.clientDistPath);
+  }
 
   app.use(errorMiddleware);
 
