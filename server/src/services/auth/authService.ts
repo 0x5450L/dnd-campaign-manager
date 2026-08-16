@@ -1,7 +1,11 @@
 import bcrypt from "bcrypt";
+import { Prisma } from "@prisma/client";
 import { generateToken } from "../../utils/jwt";
 import { AppError } from "../../utils/errors";
 import * as authRepo from "./authRepository";
+
+const isEmailAlreadyTaken = (error: unknown) =>
+  error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002";
 
 export const register = async (body: {
   email: string;
@@ -10,7 +14,16 @@ export const register = async (body: {
 }) => {
   const { email, password, displayName } = body;
   const passwordHash = await bcrypt.hash(password, 10);
-  const user = await authRepo.createUser(email, passwordHash, displayName);
+
+  const user = await authRepo
+    .createUser(email, passwordHash, displayName)
+    .catch((error: unknown) => {
+      if (isEmailAlreadyTaken(error)) {
+        throw new AppError(409, "Email already registered");
+      }
+      throw error;
+    });
+
   const token = generateToken(user.id);
   return { user: { email, displayName, id: user.id }, token };
 };

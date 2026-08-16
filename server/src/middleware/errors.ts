@@ -1,20 +1,36 @@
+import { Prisma } from "@prisma/client";
 import { AppError } from "../utils/errors";
 import { type NextFunction, type Request, type Response } from "express";
 
-export const errorMiddleware = (err: Error | AppError, req: Request, res: Response, _next: NextFunction) => {
+const UNIQUE_CONSTRAINT_VIOLATION = "P2002";
+
+const respond = (res: Response, statusCode: number, message: string) => {
+  res.status(statusCode).json({
+    status: "error",
+    message,
+    error: { message, statusCode },
+  });
+};
+
+export const errorMiddleware = (
+  err: Error | AppError,
+  req: Request,
+  res: Response,
+  _next: NextFunction,
+) => {
   if (err instanceof AppError) {
-    res.status(err.statusCode).json({
-      status: 'error',
-      message: err.message,
-      error: { message: err.message, statusCode: err.statusCode },
-    });
+    respond(res, err.statusCode, err.message);
     return;
   }
+
+  if (
+    err instanceof Prisma.PrismaClientKnownRequestError &&
+    err.code === UNIQUE_CONSTRAINT_VIOLATION
+  ) {
+    respond(res, 409, "That value is already taken");
+    return;
+  }
+
   console.error(`[${req.method} ${req.originalUrl}] Unhandled error:`, err);
-  const message = err instanceof Error ? err.message : String(err);
-  res.status(500).json({
-    status: 'error',
-    message: message || 'Internal Server Error',
-    error: { message: message || 'Internal Server Error', statusCode: 500 },
-  });
-}
+  respond(res, 500, "Internal Server Error");
+};
