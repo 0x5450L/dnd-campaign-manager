@@ -5,6 +5,7 @@ import express, { type Express } from 'express';
 
 import { config } from './config';
 
+import healthRoutes from './routes/health';
 import authRoutes from './routes/auth';
 import meRoutes from './routes/me';
 import campaignsRoutes from './routes/campaigns';
@@ -40,6 +41,7 @@ export const createApp = (): Express => {
   app.use(cookieParser());
   app.use(express.json({ limit: '256kb' }));
 
+  app.use('/api/health', healthRoutes);
   app.use('/api/auth', authRoutes);
   app.use('/api/me', meRoutes);
   app.use('/api/campaigns', campaignsRoutes);
