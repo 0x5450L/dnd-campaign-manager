@@ -10,6 +10,7 @@ const envSchema = z.object({
   CORS_ORIGINS: z.string().optional(),
   CLIENT_DIST_PATH: z.string().optional(),
   REDIS_URL: z.string().optional(),
+  DEMO_RESEED_HOURS: z.coerce.number().positive().optional(),
 });
 
 const parsed = envSchema.safeParse(process.env);
@@ -39,6 +40,7 @@ export const config = {
   jwtSecret: env.JWT_SECRET,
   redisUrl: env.REDIS_URL ?? null,
   clientDistPath: env.CLIENT_DIST_PATH ?? null,
+  demoReseedHours: env.DEMO_RESEED_HOURS ?? null,
   allowedOrigins,
   cookie: {
     secure: servesCrossSite || isProduction,

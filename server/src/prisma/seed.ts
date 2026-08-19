@@ -317,7 +317,7 @@ const removeDemoData = async () => {
   await prisma.user.deleteMany({ where: { id: { in: userIds } } });
 };
 
-const seed = async () => {
+export const seedDemoData = async () => {
   await removeDemoData();
 
   const passwordHash = await bcrypt.hash(DEMO_PASSWORD, 10);
@@ -517,23 +517,23 @@ const seed = async () => {
     data: { currentParticipantId: created[2].id },
   });
 
-  console.log(
-    [
+  return [
       "Seeded demo data:",
       `  campaign      ${CAMPAIGN_NAME}`,
       `  accounts      ${DEMO_ACCOUNTS.map((a) => a.email).join(", ")}`,
       `  password      ${DEMO_PASSWORD}`,
       `  characters    ${CHARACTERS.length} player, ${MONSTERS.length} monster`,
       `  encounter     ${participants.length} participants, one hidden from players`,
-    ].join("\n"),
-  );
+  ].join("\n");
 };
 
-seed()
-  .catch((error) => {
-    console.error(error);
-    process.exitCode = 1;
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+if (require.main === module) {
+  seedDemoData()
+    .catch((error) => {
+      console.error(error);
+      process.exitCode = 1;
+    })
+    .finally(async () => {
+      await prisma.$disconnect();
+    });
+}
