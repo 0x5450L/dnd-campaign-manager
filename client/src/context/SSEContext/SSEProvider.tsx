@@ -8,12 +8,11 @@ export const SSEProvider = ({ children }: { children: React.ReactNode }) => {
   const listenersRef = useRef<Map<string, Set<(data: unknown) => void>>>(new Map());
 
   useEffect(() => {
-    const token = localStorage.getItem("dndCampaignManagerJWT");
-    if (!user || !token) return;
+    if (!user) return;
 
-    const eventSource = new EventSource(
-      `/api/invites/stream?token=${encodeURIComponent(token)}`,
-    );
+    const eventSource = new EventSource("/api/invites/stream", {
+      withCredentials: true,
+    });
     eventSourceRef.current = eventSource;
 
     eventSource.onmessage = (event) => {

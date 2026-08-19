@@ -171,6 +171,14 @@ describe("GET /api/me", () => {
     expect(response.status).toBe(401);
   });
 
+  it("refuses a token offered in the query string", async () => {
+    const user = await registerUser();
+
+    const response = await request(app).get(`/api/me?token=${user.token}`);
+
+    expect(response.status).toBe(401);
+  });
+
   it("rejects a forged token", async () => {
     const response = await request(app)
       .get("/api/me")
