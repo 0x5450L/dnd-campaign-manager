@@ -8,14 +8,24 @@ import type {
 
 export type SocketAck<T> = (response: T) => void;
 
-export type JoinAckErrorCode = 'internal' | 'forbidden';
+/**
+ * `unauthenticated` means the socket carries no usable identity, which is a
+ * different failure from being signed in without access, and is worth telling
+ * apart: the first is fixed by signing in again, the second never will be.
+ */
+export type JoinAckErrorCode = 'internal' | 'unauthenticated' | 'no_access';
 export type JoinAckResponse = { ok: true } | { ok: false, errorCode: JoinAckErrorCode };
 
 export type CampaignJoinAckResponse =
   | { ok: true; activeSession: CampaignSessionDTO | null; isAttendee: boolean; rolls: SessionDiceRollDTO[] }
   | { ok: false; errorCode: JoinAckErrorCode };
 
-export type SessionAckErrorCode = 'internal' | 'forbidden' | 'session_conflict';
+export type SessionAckErrorCode =
+  | 'internal'
+  | 'unauthenticated'
+  | 'no_access'
+  | 'not_dm'
+  | 'session_conflict';
 export type SessionConflictInfo = {
   campaignId: string;
   campaignName: string;

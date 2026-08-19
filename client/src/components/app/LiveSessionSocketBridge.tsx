@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { getSocket } from "@/services/socket";
 import { useLiveSessionStore } from "@/state/liveSession/liveSessionStore";
+import { useNotificationStore } from "@/state/notifications/notificationStore";
 import { useMeQuery } from "@/queries/auth";
 import type {
   InitiativeUpdatedPayload,
@@ -15,6 +16,7 @@ import type {
 export const LiveSessionSocketBridge = () => {
   const campaignId = useLiveSessionStore((s) => s.activeCampaignId);
   const dispatch = useLiveSessionStore((s) => s.dispatch);
+  const notify = useNotificationStore((s) => s.notify);
   const { data: user } = useMeQuery();
   const userId = user?.id;
 
@@ -25,7 +27,12 @@ export const LiveSessionSocketBridge = () => {
     const join = () => {
       socket.emit("campaign:join", campaignId, (response) => {
         if (!response.ok) {
-          console.error(`campaign:join failed: ${response.errorCode}`);
+          notify(
+            response.errorCode === "unauthenticated"
+              ? "Live updates are offline: your session expired. Sign in again."
+              : "Live updates are offline for this campaign.",
+            "error",
+          );
           return;
         }
         if (response.activeSession) {
@@ -109,7 +116,7 @@ export const LiveSessionSocketBridge = () => {
       socket.off("session_attendance_changed", handleAttendanceChanged);
       socket.emit("campaign:leave", campaignId);
     };
-  }, [campaignId, dispatch, userId]);
+  }, [campaignId, dispatch, notify, userId]);
 
   return null;
 };

@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { login, me, register, logout as logoutApi } from "../services/api/auth";
+import { resetSocket } from "../services/socket";
 import { useAuthStore } from "../state/auth/authStore";
 import type { User } from "../types/auth";
 
@@ -32,6 +33,7 @@ export const useAuthActions = () => {
 
   const setAuth = (user: User, token: string) => {
     setToken(token);
+    resetSocket();
     queryClient.setQueryData(authKeys.me, user);
   };
 
@@ -42,6 +44,7 @@ export const useAuthActions = () => {
       })
       .finally(() => {
         clearToken();
+        resetSocket();
         queryClient.removeQueries({ queryKey: authKeys.me });
       });
   };

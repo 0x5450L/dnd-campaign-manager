@@ -133,6 +133,34 @@ export type AppIo = Server<
 
 let io: AppIo | null = null;
 
+/**
+ * Mirrors authMiddleware: the bearer token the client already holds wins, and the
+ * cookie is the fallback. Reading only the cookie let HTTP and the socket
+ * authenticate as different users, which showed up as a page that loaded fine
+ * while every socket call answered "forbidden".
+ */
+const handshakeToken = (socket: { handshake: { auth: Record<string, unknown>; headers: { cookie?: string } } }) => {
+  const fromAuth = socket.handshake.auth?.token;
+  if (typeof fromAuth === 'string' && fromAuth.length > 0) {
+    return fromAuth;
+  }
+  return getTokenFromCookie(socket.handshake.headers.cookie);
+};
+
+type AccessFailure = 'unauthenticated' | 'no_access' | 'not_dm' | 'internal';
+
+const describeAccessFailure = (
+  error: unknown,
+  userId: string | undefined,
+  requiredRole: 'member' | 'dm',
+): AccessFailure => {
+  if (!userId) return 'unauthenticated';
+  if (error instanceof AppError && error.statusCode === 404) {
+    return requiredRole === 'dm' ? 'not_dm' : 'no_access';
+  }
+  return 'internal';
+};
+
 export const initSocket = (httpServer: HttpServer): AppIo => {
   if (io) {
     throw new Error('Socket.io is already initialized');
@@ -144,7 +172,7 @@ export const initSocket = (httpServer: HttpServer): AppIo => {
       : {});
 
   io.use(async (socket, next) => {
-    const token = getTokenFromCookie(socket.handshake.headers.cookie);
+    const token = handshakeToken(socket);
     if (!token) {
       return next(new Error('Unauthorized'));
     }
@@ -177,11 +205,13 @@ export const initSocket = (httpServer: HttpServer): AppIo => {
         await socket.join(`encounter:${encounterId}`);
         ack({ ok: true });
       } catch (error) {
-        if (error instanceof AppError && error.statusCode === 404) {
-          return ack({ ok: false, errorCode: 'forbidden' });
+        const reason = describeAccessFailure(error, socket.data.userId, 'member');
+        if (reason === 'internal') {
+          console.error('encounter:join failed', { encounterId, userId: socket.data.userId }, error);
+        } else {
+          console.warn('encounter:join refused', { encounterId, userId: socket.data.userId, reason });
         }
-        console.error('encounter:join failed', error);
-        ack({ ok: false, errorCode: 'internal' });
+        ack({ ok: false, errorCode: reason === 'not_dm' ? 'no_access' : reason });
       }
     });
 
@@ -226,11 +256,13 @@ export const initSocket = (httpServer: HttpServer): AppIo => {
         });
         await broadcastPresence(campaignId);
       } catch (error) {
-        if (error instanceof AppError && error.statusCode === 404) {
-          return ack({ ok: false, errorCode: 'forbidden' });
+        const reason = describeAccessFailure(error, socket.data.userId, 'member');
+        if (reason === 'internal') {
+          console.error('campaign:join failed', { campaignId, userId: socket.data.userId }, error);
+        } else {
+          console.warn('campaign:join refused', { campaignId, userId: socket.data.userId, reason });
         }
-        console.error('campaign:join failed', error);
-        ack({ ok: false, errorCode: 'internal' });
+        ack({ ok: false, errorCode: reason === 'not_dm' ? 'no_access' : reason });
       }
     });
 
@@ -286,11 +318,13 @@ export const initSocket = (httpServer: HttpServer): AppIo => {
         });
         ack({ ok: true });
       } catch (error) {
-        if (error instanceof AppError && error.statusCode === 404) {
-          return ack({ ok: false, errorCode: 'forbidden' });
+        const reason = describeAccessFailure(error, socket.data.userId, 'dm');
+        if (reason === 'internal') {
+          console.error('session:start failed', { campaignId: payload.campaignId, userId: socket.data.userId }, error);
+        } else {
+          console.warn('session:start refused', { campaignId: payload.campaignId, userId: socket.data.userId, reason });
         }
-        console.error('session:start failed', error);
-        ack({ ok: false, errorCode: 'internal' });
+        ack({ ok: false, errorCode: reason });
       }
     });
 
@@ -303,7 +337,8 @@ export const initSocket = (httpServer: HttpServer): AppIo => {
           select: { id: true },
         });
         if (!existing) {
-          return ack({ ok: false, errorCode: 'forbidden' });
+          console.warn('session:end refused', { ...payload, reason: 'session_not_found' });
+          return ack({ ok: false, errorCode: 'no_access' });
         }
 
         await prisma.campaignSession.update({
@@ -323,11 +358,13 @@ export const initSocket = (httpServer: HttpServer): AppIo => {
         });
         ack({ ok: true });
       } catch (error) {
-        if (error instanceof AppError && error.statusCode === 404) {
-          return ack({ ok: false, errorCode: 'forbidden' });
+        const reason = describeAccessFailure(error, socket.data.userId, 'dm');
+        if (reason === 'internal') {
+          console.error('session:end failed', { campaignId: payload.campaignId, userId: socket.data.userId }, error);
+        } else {
+          console.warn('session:end refused', { campaignId: payload.campaignId, userId: socket.data.userId, reason });
         }
-        console.error('session:end failed', error);
-        ack({ ok: false, errorCode: 'internal' });
+        ack({ ok: false, errorCode: reason });
       }
     });
 
@@ -344,7 +381,8 @@ export const initSocket = (httpServer: HttpServer): AppIo => {
           select: { id: true },
         });
         if (!session) {
-          return ack({ ok: false, errorCode: 'forbidden' });
+          console.warn('session:join refused', { ...payload, reason: 'session_not_active' });
+          return ack({ ok: false, errorCode: 'no_access' });
         }
 
         const open = await findOpenAttendance(socket.data.userId);
@@ -371,11 +409,13 @@ export const initSocket = (httpServer: HttpServer): AppIo => {
         }
         ack({ ok: true });
       } catch (error) {
-        if (error instanceof AppError && error.statusCode === 404) {
-          return ack({ ok: false, errorCode: 'forbidden' });
+        const reason = describeAccessFailure(error, socket.data.userId, 'member');
+        if (reason === 'internal') {
+          console.error('session:join failed', { campaignId: payload.campaignId, userId: socket.data.userId }, error);
+        } else {
+          console.warn('session:join refused', { campaignId: payload.campaignId, userId: socket.data.userId, reason });
         }
-        console.error('session:join failed', error);
-        ack({ ok: false, errorCode: 'internal' });
+        ack({ ok: false, errorCode: reason });
       }
     });
 
@@ -395,11 +435,13 @@ export const initSocket = (httpServer: HttpServer): AppIo => {
         }
         ack({ ok: true });
       } catch (error) {
-        if (error instanceof AppError && error.statusCode === 404) {
-          return ack({ ok: false, errorCode: 'forbidden' });
+        const reason = describeAccessFailure(error, socket.data.userId, 'member');
+        if (reason === 'internal') {
+          console.error('session:leave failed', { campaignId: payload.campaignId, userId: socket.data.userId }, error);
+        } else {
+          console.warn('session:leave refused', { campaignId: payload.campaignId, userId: socket.data.userId, reason });
         }
-        console.error('session:leave failed', error);
-        ack({ ok: false, errorCode: 'internal' });
+        ack({ ok: false, errorCode: reason });
       }
     });
 
