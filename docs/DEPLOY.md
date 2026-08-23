@@ -76,11 +76,40 @@ ECS Express Mode places the task in a public subnet with an address that is neit
 
 Mitigations: a 32-character random password, TLS required for every connection, and nothing but regenerable demo data in the database. The correct fix is a NAT instance on a `t4g.nano` at roughly $5 a month, which also lets the database go private. It is deferred, not forgotten.
 
-**Connection secrets are plain environment variables.** `DATABASE_URL` and `JWT_SECRET` are stored as plaintext in the task definition, visible to anyone with console access to the account. AWS Secrets Manager references are supported by the same field and would be the right answer for a system with more than one operator.
+**Connection secrets are plain environment variables.** `DATABASE_URL` and `JWT_SECRET` live in GitHub Secrets and are injected into the task definition by the deployment workflow, where they end up as plaintext visible to anyone with console access to the AWS account. The deploy action accepts a `secrets` input that takes Secrets Manager ARNs instead, which is the right answer for a system with more than one operator.
 
 **TLS to the database is encrypted but unverified.** The connection string uses `uselibpqcompat=true&sslmode=require`, which encrypts the traffic without validating the server certificate chain. Verification requires shipping the RDS CA bundle in the image and switching to `verify-full`. The exposure is a man-in-the-middle inside the AWS network. The fix is three lines and is queued behind getting the first deployment stable.
 
-**Rollback is partial.** Images are tagged both with `latest` and with the short commit hash, so any previously deployed artifact can still be found by name. But the service points at `latest`, so every ECS task-definition revision looks identical and the built-in "roll back to the previous revision" has nothing to distinguish. A failed deployment is reverted automatically by the circuit breaker. A deployment that succeeds and then misbehaves currently has to be fixed forward. Pinning the service to the commit-hash tag closes this, and belongs with the CI/CD work.
+**The database has no backups.** Automated backups are switched off, so there is no point-in-time recovery. The only data here is the demo campaign, which the seed recreates in two minutes, and paying for backups of regenerable data would be theatre. Any real content would flip this immediately.
+
+---
+
+## Continuous deployment
+
+`.github/workflows/ci.yml` runs typecheck, lint, unit tests, integration tests against a real Postgres, and a production build. On a push to `main`, and only if all of that passed, a second job builds the image, pushes it to ECR tagged with the short commit hash, and updates the Express service.
+
+**No AWS credentials are stored in GitHub.** The workflow authenticates through OIDC: GitHub issues a signed token for the run, AWS trusts that issuer for this repository only, and hands back credentials that expire when the job ends. There is no access key to leak or to rotate.
+
+**The service is pinned to the commit hash, never to `latest`.** This is what makes rollback real. Every deployment produces a distinct image tag and a distinct task-definition revision, so "go back to what was running yesterday" identifies something specific.
+
+The workflow is also the single source of truth for the service configuration: port, health check path, CPU, memory, task count and environment variables are all declared there, not clicked into a console where nobody can review them.
+
+### Configuration
+
+Repository variables (Settings, Secrets and variables, Actions, Variables):
+
+| Name | Value |
+| --- | --- |
+| `AWS_ACCOUNT_ID` | the 12-digit account id |
+
+Repository secrets, same page:
+
+| Name | Value |
+| --- | --- |
+| `DATABASE_URL` | full connection string including `?uselibpqcompat=true&sslmode=require` |
+| `JWT_SECRET` | the token signing key |
+
+Region, repository name, service name and cluster are plain `env` entries in the workflow, since none of them is sensitive.
 
 ---
 
@@ -88,24 +117,29 @@ Mitigations: a 32-character random password, TLS required for every connection, 
 
 ### Deploy a new version
 
-```powershell
-npm run typecheck -w server
-npm run test -w server
+Merge to `main`. That is the whole procedure.
 
+### Roll back
+
+Open the Actions tab, find the last workflow run that deployed a good version, and re-run its deploy job. It rebuilds nothing: the image for that commit is already in ECR under its own tag, and the service is repointed at it.
+
+A deployment that fails its health checks never needs this. The ECS circuit breaker reverts it automatically, and the canary means only 5% of traffic ever reached it.
+
+### Deploy from a workstation
+
+The fallback when CI is unavailable. It requires the `deploy` IAM user's credentials configured locally.
+
+```powershell
 docker build --platform linux/amd64 -t dnd-campaign-manager .
 
 $sha = git rev-parse --short HEAD
 $repo = "<account>.dkr.ecr.eu-north-1.amazonaws.com/dnd-campaign-manager"
 
 docker tag dnd-campaign-manager:latest "${repo}:${sha}"
-docker tag dnd-campaign-manager:latest "${repo}:latest"
 docker push "${repo}:${sha}"
-docker push "${repo}:latest"
-
-aws ecs update-service --cluster default --service dnd-campaign-manager --force-new-deployment --region eu-north-1
 ```
 
-`--force-new-deployment` is required because the task definition refers to `:latest`, an unchanged string. Without it ECS sees nothing to do.
+Then point the service at that tag from the ECS console. Doing this bypasses every test in CI, which is the reason it is written down as an exception rather than as the normal path.
 
 ### Apply migrations
 
@@ -137,7 +171,6 @@ Roughly in order of how much each one matters:
 1. Secrets in Secrets Manager rather than the task definition
 2. A private database, reached through a NAT instance
 3. `verify-full` TLS with the RDS CA bundle in the image
-4. The service pinned to an immutable image tag, making rollback a one-click operation
-5. Deployment moved into CI, so only reviewed and tested commits reach the registry
-6. Automated backups and a restore that has actually been rehearsed
-7. Multi-AZ for the database, and more than one task for the service
+4. Automated backups and a restore that has actually been rehearsed
+5. A required reviewer on the `production` GitHub environment, so a merge is not by itself a deploy
+6. Multi-AZ for the database, and more than one task for the service
