@@ -1,29 +1,23 @@
-<div align="center">
-
-<img src="docs/logo.png" alt="" width="140" />
-
 # DnD Campaign Manager
 
 **A campaign manager for D&D 5e: character sheets, live sessions, and a combat tracker that stays in sync across everyone at the table.**
 
-[![CI](https://github.com/0x5450L/dnd-campaign-manager/actions/workflows/ci.yml/badge.svg)](https://github.com/0x5450L/dnd-campaign-manager/actions/workflows/ci.yml)
-
-</div>
+[CI](https://github.com/0x5450L/dnd-campaign-manager/actions/workflows/ci.yml)
 
 ---
 
 ## Try it
 
-**[Live demo](#)** — the login screen has two buttons, no signup needed.
+**[Live demo](https://dn-079c6c706dd84aac8c820c42481f8dc3.ecs.eu-north-1.on.aws)**. The login screen has two buttons, no signup needed.
 
 Enter as the **Dungeon Master** and as a **player**, and compare what each of them sees: the DM runs the initiative order and can see the creature waiting in ambush; the player sees only their own party's view and can edit only their own character. That split is the point of the project, and it is easier to click than to describe.
 
 | Account | Password | Role |
 | --- | --- | --- |
 | `dm@demo.local` | `demo1234` | Dungeon Master |
-| `mira@demo.local` | `demo1234` | Player — wizard |
-| `borin@demo.local` | `demo1234` | Player — fighter |
-| `eli@demo.local` | `demo1234` | Player — rogue |
+| `mira@demo.local` | `demo1234` | Player, wizard |
+| `borin@demo.local` | `demo1234` | Player, fighter |
+| `eli@demo.local` | `demo1234` | Player, rogue |
 
 The demo data is shared and can be reset with `npm run db:seed -w server`.
 
@@ -31,36 +25,37 @@ The demo data is shared and can be reset with `npm run db:seed -w server`.
 
 ## What it does
 
-**Character sheets** for player characters, NPCs and monsters — ability scores, saves, skills, attacks, spell slots, and abilities with four kinds of cost: recharge on a die roll, uses per day, a shared resource pool, and spell slots with upcasting.
+**Character sheets** for player characters, NPCs and monsters: ability scores, saves, skills, attacks, spell slots, and abilities with four kinds of cost, namely recharge on a die roll, uses per day, a shared resource pool, and spell slots with upcasting.
 
-**Live sessions** — the DM opens a session, players join, and everyone sees attendance, dice rolls and session events as they happen.
+**Live sessions.** The DM opens a session, players join, and everyone sees attendance, dice rolls and session events as they happen.
 
-**Combat tracker** — initiative order, HP and conditions, turn advancement that rerolls recharge abilities and refills per-turn resources. Participants can be hidden from players, and a hidden monster still takes its turn.
+**Combat tracker.** Initiative order, HP and conditions, turn advancement that rerolls recharge abilities and refills per-turn resources. Participants can be hidden from players, and a hidden monster still takes its turn.
 
-**SRD reference and AI tools** — spells, creatures, items and conditions pulled from two public SRD sources with fallback between them, plus generators for encounters and loot.
+**SRD reference and AI tools.** Spells, creatures, items and conditions pulled from two public SRD sources with fallback between them, plus generators for encounters and loot.
 
 ---
 
 ## Why it is built this way
 
-**Two realtime transports on purpose.** Notifications (invites, members joining) go over **SSE**: one-way, server to client, and a plain `EventSource` is all it needs. Live sessions and combat go over **WebSocket** (socket.io), because there the traffic is two-way, frequent and shared by several participants at once. Using one mechanism for both would mean either overpaying for notifications or underserving combat.
+**Two realtime transports on purpose.** Notifications such as invites and members joining go over **SSE**: one-way, server to client, and a plain `EventSource` is all it needs. Live sessions and combat go over **WebSocket** (socket.io), because there the traffic is two-way, frequent and shared by several participants at once. Using one mechanism for both would mean either overpaying for notifications or underserving combat.
 
 **State is split by what owns it, not by convenience.** Server data lives in **TanStack Query**; UI state such as toasts and modals lives in **Zustand**; the live-session state machine is a pure reducer called from a Zustand store, so its transitions can be tested without React while subscriptions stay selector-scoped.
 
-**A shared package, not a shared folder.** `@dnd/shared` holds DTOs and the game rules used by both sides — turn order, ability costs, spell slots. It builds to both CommonJS and ESM because the server requires and the bundler imports.
+**A shared package, not a shared folder.** `@dnd/shared` holds DTOs and the game rules used by both sides: turn order, ability costs, spell slots. It builds to both CommonJS and ESM because the server requires and the bundler imports.
 
 **Fail at boot, not at request time.** The environment is parsed once against a schema at startup, so a missing variable stops the process instead of surfacing when the first user presses "log in".
 
-**One origin in production.** The server hands out the built client itself, which means no CORS and an auth cookie that keeps `SameSite=Lax`. Setting `CORS_ORIGINS` switches the whole thing — CORS and cookie flags together — to a two-origin deployment.
+**One origin in production.** The server hands out the built client itself, which means no CORS and an auth cookie that keeps `SameSite=Lax`. Setting `CORS_ORIGINS` switches the whole thing, CORS and cookie flags together, to a two-origin deployment.
 
 ---
 
 ## Stack
 
-**Backend** — Node.js, Express 5, TypeScript, Prisma 7, PostgreSQL 16, socket.io, JWT, zod
-**Frontend** — React 19, TypeScript, Vite 7, React Router 7, Tailwind CSS 4, TanStack Query, Zustand
-**Testing** — Vitest, Supertest
-**Tooling** — npm workspaces, ESLint 9, Docker, GitHub Actions
+**Backend:** Node.js, Express 5, TypeScript, Prisma 7, PostgreSQL 16, socket.io, JWT, zod
+**Frontend:** React 19, TypeScript, Vite 7, React Router 7, Tailwind CSS 4, TanStack Query, Zustand
+**Testing:** Vitest, Supertest
+**Tooling:** npm workspaces, ESLint 9, Docker, GitHub Actions
+**Infrastructure:** AWS ECS Express Mode on Fargate, ECR, RDS PostgreSQL
 
 ---
 
@@ -68,9 +63,9 @@ The demo data is shared and can be reset with `npm run db:seed -w server`.
 
 159 tests across three levels, all run on CI.
 
-**Unit** — the pure rules: turn order when the acting participant is removed mid-encounter, the four ability cost types and their bounds, spell slot upcasting, the live-session reducer, environment parsing, and SRD source fallback.
+**Unit.** The pure rules: turn order when the acting participant is removed mid-encounter, the four ability cost types and their bounds, spell slot upcasting, the live-session reducer, environment parsing, and SRD source fallback.
 
-**Integration** — the app over HTTP against a real Postgres: authentication, and the DM/player permissions that unit tests structurally cannot reach. They assert the stored row is untouched on refusal, so "returned 403 but wrote anyway" cannot pass.
+**Integration.** The app over HTTP against a real Postgres: authentication, and the DM/player permissions that unit tests structurally cannot reach. They assert the stored row is untouched on refusal, so "returned 403 but wrote anyway" cannot pass.
 
 ```bash
 npm test                          # unit
@@ -100,7 +95,7 @@ npm run dev
 
 The client is on `http://localhost:5173`, the API on `3001`.
 
-`npm install` runs at the repository root only — this is an npm workspaces monorepo, and installing inside a package would create a competing lockfile.
+`npm install` runs at the repository root only. This is an npm workspaces monorepo, and installing inside a package would create a competing lockfile.
 
 ### As a container
 
@@ -116,12 +111,22 @@ The image serves the API and the built client together on one port.
 
 ---
 
+## Deployment
+
+The demo runs on AWS: the image lives in **ECR**, an **ECS Express Mode** service runs it on Fargate behind an Application Load Balancer that terminates TLS, and the database is a **managed Postgres on RDS**. Migrations are applied deliberately from a workstation rather than on container start, so a deploy can never reshape the schema by surprise.
+
+Two things about running Node behind a load balancer are worth knowing, because neither shows up in local development. Node closes idle connections sooner than the balancer does, which produces sporadic 502s until the server is told to hold them longer. And an SSE stream with nothing to say gets cut at the idle timeout unless it sends a heartbeat.
+
+The full walkthrough, the cost breakdown and the trade-offs taken knowingly, including a database reachable from the internet, are in **[docs/DEPLOY.md](docs/DEPLOY.md)**.
+
+---
+
 ## Repository layout
 
 ```
 client/     React app
 server/     Express API, Prisma schema and migrations
-shared/     @dnd/shared — DTOs and game rules used by both
+shared/     @dnd/shared, DTOs and game rules used by both
 ```
 
 | Command | What it does |
