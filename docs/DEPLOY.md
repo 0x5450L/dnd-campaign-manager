@@ -35,6 +35,8 @@ Rewriting the string rather than handing TLS options to the driver is deliberate
 
 **The health check does not touch the database.** `/api/health` reports that the process is up and answering. A health check that failed on a database outage would restart the container in a loop. A restart cannot fix a database, and it removes the one thing still able to serve the client an error page.
 
+**Readiness is a separate endpoint with a separate consumer.** `/api/health/ready` runs `select 1` and answers `503` when it cannot. Nothing platform-side probes it, precisely so that a database outage cannot turn into a restart loop; the deployment workflow is its only caller. The split exists because liveness and readiness answer different questions, and the deploy needs the one liveness refuses to ask. It is unauthenticated and costs one trivial query per call, which is the price of being reachable by a workflow that holds no credentials for the application.
+
 **Deploy strategy is canary with automatic rollback.** ECS Express Mode routes 5% of traffic to the new version for three minutes, then bakes for three more before retiring the old task set. A deployment whose tasks fail their health checks is reverted without intervention.
 
 ---
@@ -96,7 +98,7 @@ Mitigations: a 32-character random password, TLS required for every connection, 
 
 The workflow is also the single source of truth for the service configuration: port, health check path, CPU, memory, task count and environment variables are all declared there, not clicked into a console where nobody can review them.
 
-**A green deploy job means a live service, not an accepted API call.** The deploy action returns once ECS has accepted the new task set, which is minutes before traffic actually moves, so a task that crashed on boot used to leave the run green while the old version kept serving. The last step of the job closes that gap. The image is stamped at build time with the short commit hash through a `BUILD_VERSION` build argument, `/api/health` reports that stamp, and the job polls the public URL until it reads the expected hash five times in a row, failing after fifteen minutes.
+**A green deploy job means a live service, not an accepted API call.** The deploy action returns once ECS has accepted the new task set, which is minutes before traffic actually moves, so a task that crashed on boot used to leave the run green while the old version kept serving. The last step of the job closes that gap. The image is stamped at build time with the short commit hash through a `BUILD_VERSION` build argument, both health endpoints report that stamp, and the job polls `/api/health/ready` until it reads the expected hash five times in a row, failing after fifteen minutes. Readiness rather than liveness, so that one poll settles both questions at once: this is the new build, and it can reach the database.
 
 Five consecutive reads rather than one, because the canary routes 5% of traffic to the new version for the first three minutes: a single matching answer proves the new task exists, not that it took over. Fifteen minutes, because the canary and bake windows together run past six, and a task that is slow to become healthy should be reported as slow rather than as broken.
 

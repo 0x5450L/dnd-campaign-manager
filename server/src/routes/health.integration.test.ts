@@ -22,3 +22,18 @@ describe("GET /api/health", () => {
     expect(response.body).toHaveProperty("version");
   });
 });
+
+describe("GET /api/health/ready", () => {
+  it("reports ready only after the database has answered a query", async () => {
+    const response = await request(app).get("/api/health/ready");
+
+    expect(response.status).toBe(200);
+    expect(response.body.status).toBe("ready");
+  });
+
+  it("names the build here too, so one poll proves both", async () => {
+    const response = await request(app).get("/api/health/ready");
+
+    expect(response.body).toHaveProperty("version");
+  });
+});

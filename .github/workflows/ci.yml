@@ -143,7 +143,7 @@ jobs:
           deadline=$((SECONDS + POLL_TIMEOUT_SECONDS))
           streak=0
           while [ "$SECONDS" -lt "$deadline" ]; do
-            live=$(curl -fsS --max-time 10 "$APP_URL/api/health" | jq -r '.version // empty' || true)
+            live=$(curl -fsS --max-time 10 "$APP_URL/api/health/ready" | jq -r '.version // empty' || true)
             if [ "$live" = "$EXPECTED_VERSION" ]; then
               streak=$((streak + 1))
             else
