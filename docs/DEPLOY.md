@@ -98,6 +98,8 @@ The workflow is also the single source of truth for the service configuration: p
 
 Five consecutive reads rather than one, because the canary routes 5% of traffic to the new version for the first three minutes: a single matching answer proves the new task exists, not that it took over. Fifteen minutes, because the canary and bake windows together run past six, and a task that is slow to become healthy should be reported as slow rather than as broken.
 
+**Log retention is set by the workflow, not clicked once.** CloudWatch keeps log groups forever by default, so a demo quietly pays storage rent on debug output nobody will read. The final step of the deploy job puts a seven-day expiry on every log group whose name contains `dnd` and does not already have it. In CI rather than in the console because Express Mode recreates the log group when the service is recreated, and a one-time console setting would silently not survive that. The step needs `logs:DescribeLogGroups` and `logs:PutRetentionPolicy` on `github-actions-ecs-role`.
+
 ### Configuration
 
 Repository variables (Settings, Secrets and variables, Actions, Variables):

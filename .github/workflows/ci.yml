@@ -82,6 +82,8 @@ jobs:
       ECS_SERVICE: dnd-campaign-manager
       ECS_CLUSTER: default
       APP_URL: https://dn-079c6c706dd84aac8c820c42481f8dc3.ecs.eu-north-1.on.aws
+      LOG_GROUP_PATTERN: dnd
+      LOG_RETENTION_DAYS: '7'
 
     steps:
       - uses: actions/checkout@v4
@@ -155,3 +157,21 @@ jobs:
           done
           echo "::error::$APP_URL never settled on $EXPECTED_VERSION"
           exit 1
+
+      - name: Cap CloudWatch log retention
+        run: |
+          aws logs describe-log-groups \
+            --query 'logGroups[].[logGroupName,retentionInDays]' --output text
+          matched=$(aws logs describe-log-groups \
+            --query "logGroups[?contains(logGroupName, '$LOG_GROUP_PATTERN') && retentionInDays != \`$LOG_RETENTION_DAYS\`].logGroupName" \
+            --output text)
+          if [ -z "$matched" ]; then
+            echo "::notice::no log group matching '$LOG_GROUP_PATTERN' needs a retention change"
+            exit 0
+          fi
+          for group in $matched; do
+            aws logs put-retention-policy \
+              --log-group-name "$group" \
+              --retention-in-days "$LOG_RETENTION_DAYS"
+            echo "$group now expires after $LOG_RETENTION_DAYS days"
+          done
