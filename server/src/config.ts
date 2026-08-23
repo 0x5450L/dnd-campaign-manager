@@ -12,6 +12,7 @@ const envSchema = z.object({
   REDIS_URL: z.string().optional(),
   DEMO_RESEED_HOURS: z.coerce.number().positive().optional(),
   BUILD_VERSION: z.string().optional(),
+  DATABASE_CA_PATH: z.string().optional(),
 });
 
 const parsed = envSchema.safeParse(process.env);
@@ -25,6 +26,23 @@ if (!parsed.success) {
 
 const env = parsed.data;
 
+const withVerifiedTls = (url: string, caPath: string | null) => {
+  if (!caPath) {
+    return url;
+  }
+
+  let parsed: URL;
+  try {
+    parsed = new URL(url);
+  } catch {
+    throw new Error("Environment is not usable:\n  DATABASE_URL: not a connection string");
+  }
+
+  parsed.searchParams.set("sslmode", "verify-full");
+  parsed.searchParams.set("sslrootcert", caPath);
+  return parsed.toString();
+};
+
 const allowedOrigins =
   env.CORS_ORIGINS?.split(",")
     .map((origin) => origin.trim())
@@ -37,7 +55,7 @@ export const config = {
   nodeEnv: env.NODE_ENV,
   isProduction,
   port: env.PORT,
-  databaseUrl: env.DATABASE_URL,
+  databaseUrl: withVerifiedTls(env.DATABASE_URL, env.DATABASE_CA_PATH?.trim() || null),
   jwtSecret: env.JWT_SECRET,
   redisUrl: env.REDIS_URL ?? null,
   clientDistPath: env.CLIENT_DIST_PATH ?? null,

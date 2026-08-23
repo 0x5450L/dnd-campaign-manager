@@ -29,6 +29,10 @@ The image is built locally, pushed to **ECR**, and pulled from there by ECS. The
 
 **Migrations are not run on container start.** They are applied deliberately from a workstation with `prisma migrate deploy`. Running them at boot means the schema changes at the moment a task happens to restart, including during an autoscaling event or a rollback, which is precisely when a schema change is least welcome.
 
+**The database connection is verified, not merely encrypted.** `sslmode=require` on its own encrypts the traffic and then accepts whatever certificate the other end presents: protection against listening, none against a man in the middle, which matters more than usual while the database is still reachable from the internet. The image ships Amazon's public RDS root certificates for `eu-north-1` in `server/certs`, the task definition points `DATABASE_CA_PATH` at them, and the configuration rewrites the connection string to `sslmode=verify-full` against that bundle. The bundle is a public file, so the deployment learns a path, not a password, and the secret is untouched.
+
+Rewriting the string rather than handing TLS options to the driver is deliberate. `node-postgres` merges the parsed connection string over any options passed beside it, so an `sslmode` inside `DATABASE_URL` silently overrides an `ssl` object set in code. Keeping the parameter in the string it belongs to removes that ambiguity, and the unit tests assert that a weaker `sslmode` is replaced rather than appended.
+
 **The health check does not touch the database.** `/api/health` reports that the process is up and answering. A health check that failed on a database outage would restart the container in a loop. A restart cannot fix a database, and it removes the one thing still able to serve the client an error page.
 
 **Deploy strategy is canary with automatic rollback.** ECS Express Mode routes 5% of traffic to the new version for three minutes, then bakes for three more before retiring the old task set. A deployment whose tasks fail their health checks is reverted without intervention.
@@ -78,8 +82,6 @@ Mitigations: a 32-character random password, TLS required for every connection, 
 
 **Connection secrets are plain environment variables.** `DATABASE_URL` and `JWT_SECRET` live in GitHub Secrets and are injected into the task definition by the deployment workflow, where they end up as plaintext visible to anyone with console access to the AWS account. The deploy action accepts a `secrets` input that takes Secrets Manager ARNs instead, which is the right answer for a system with more than one operator.
 
-**TLS to the database is encrypted but unverified.** The connection string uses `uselibpqcompat=true&sslmode=require`, which encrypts the traffic without validating the server certificate chain. Verification requires shipping the RDS CA bundle in the image and switching to `verify-full`. The exposure is a man-in-the-middle inside the AWS network. The fix is three lines and is queued behind getting the first deployment stable.
-
 **The database has no backups.** Automated backups are switched off, so there is no point-in-time recovery. The only data here is the demo campaign, which the seed recreates in two minutes, and paying for backups of regenerable data would be theatre. Any real content would flip this immediately.
 
 ---
@@ -112,7 +114,7 @@ Repository secrets, same page:
 
 | Name | Value |
 | --- | --- |
-| `DATABASE_URL` | full connection string including `?uselibpqcompat=true&sslmode=require` |
+| `DATABASE_URL` | full connection string; the TLS parameters are added by the application, not stored here |
 | `JWT_SECRET` | the token signing key |
 
 Region, repository name, service name, cluster and the public application URL are plain `env` entries in the workflow, since none of them is sensitive.
@@ -154,6 +156,8 @@ $env:DATABASE_URL = "postgresql://postgres:PASSWORD@HOST:5432/dnd?uselibpqcompat
 npm run db:migrate:deploy -w server
 ```
 
+Migrations are applied by Prisma's own engine, which reads `DATABASE_URL` exactly as given and does not pass through the application configuration. The `verify-full` rewrite therefore does not apply here, and the workstation connection is as verified as whatever the operator typed. An asymmetry worth knowing about rather than being surprised by.
+
 `migrate deploy` only applies migrations already committed to the repository and will never generate or reset anything. `migrate dev`, its development counterpart, may offer to drop the database and must never be pointed at this connection string.
 
 ### Reset the demo data
@@ -176,7 +180,6 @@ Roughly in order of how much each one matters:
 
 1. Secrets in Secrets Manager rather than the task definition
 2. A private database, reached through a NAT instance
-3. `verify-full` TLS with the RDS CA bundle in the image
-4. Automated backups and a restore that has actually been rehearsed
-5. A required reviewer on the `production` GitHub environment, so a merge is not by itself a deploy
-6. Multi-AZ for the database, and more than one task for the service
+3. Automated backups and a restore that has actually been rehearsed
+4. A required reviewer on the `production` GitHub environment, so a merge is not by itself a deploy
+5. Multi-AZ for the database, and more than one task for the service

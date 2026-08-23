@@ -82,7 +82,7 @@ jobs:
       ECS_SERVICE: dnd-campaign-manager
       ECS_CLUSTER: default
       APP_URL: https://dn-079c6c706dd84aac8c820c42481f8dc3.ecs.eu-north-1.on.aws
-      LOG_GROUP_PATTERN: dnd
+      LOG_GROUP_PATTERN: dnd-campaign-manager
       LOG_RETENTION_DAYS: '7'
 
     steps:
@@ -129,7 +129,8 @@ jobs:
             [
               {"name": "DATABASE_URL", "value": "${{ secrets.DATABASE_URL }}"},
               {"name": "JWT_SECRET", "value": "${{ secrets.JWT_SECRET }}"},
-              {"name": "DEMO_RESEED_HOURS", "value": "6"}
+              {"name": "DEMO_RESEED_HOURS", "value": "6"},
+              {"name": "DATABASE_CA_PATH", "value": "/app/certs/rds-eu-north-1.pem"}
             ]
 
       - name: Verify the live service runs this build

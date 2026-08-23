@@ -31,6 +31,7 @@ COPY --from=build /app/shared/dist ./shared/dist
 COPY --from=build /app/server/dist ./server/dist
 COPY --from=build /app/client/dist ./client/dist
 COPY --from=build /app/node_modules/.prisma ./node_modules/.prisma
+COPY server/certs ./certs
 
 ARG BUILD_VERSION=""
 ENV BUILD_VERSION=$BUILD_VERSION

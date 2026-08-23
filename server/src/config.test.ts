@@ -93,6 +93,46 @@ describe("origins and the cookie that follows from them", () => {
   });
 });
 
+describe("tls to the database", () => {
+  it("leaves the connection string alone when no bundle is configured", async () => {
+    const config = await loadConfig();
+
+    expect(config.databaseUrl).toBe(BASE_ENV.DATABASE_URL);
+  });
+
+  it("demands a verified chain once a bundle is there to verify against", async () => {
+    const config = await loadConfig({ DATABASE_CA_PATH: "/app/certs/rds.pem" });
+
+    expect(config.databaseUrl).toContain("sslmode=verify-full");
+    expect(config.databaseUrl).toContain("sslrootcert=%2Fapp%2Fcerts%2Frds.pem");
+  });
+
+  it("replaces a weaker sslmode instead of appending a second one", async () => {
+    const config = await loadConfig({
+      DATABASE_URL: "postgresql://user:pass@host:5432/db?uselibpqcompat=true&sslmode=require",
+      DATABASE_CA_PATH: "/app/certs/rds.pem",
+    });
+
+    expect(config.databaseUrl).not.toContain("sslmode=require");
+    expect(config.databaseUrl.match(/sslmode=/g)).toHaveLength(1);
+  });
+
+  it("keeps a password that needs escaping intact", async () => {
+    const config = await loadConfig({
+      DATABASE_URL: "postgresql://user:p%40ss%2Fword@host:5432/db",
+      DATABASE_CA_PATH: "/app/certs/rds.pem",
+    });
+
+    expect(config.databaseUrl).toContain("user:p%40ss%2Fword@host:5432");
+  });
+
+  it("refuses a connection string it cannot rewrite", async () => {
+    await expect(
+      loadConfig({ DATABASE_URL: "not-a-connection-string", DATABASE_CA_PATH: "/app/certs/rds.pem" }),
+    ).rejects.toThrow(/DATABASE_URL/);
+  });
+});
+
 describe("optional settings", () => {
   it("reports absent optional settings as null rather than undefined", async () => {
     const config = await loadConfig();
