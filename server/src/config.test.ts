@@ -99,5 +99,14 @@ describe("optional settings", () => {
 
     expect(config.redisUrl).toBeNull();
     expect(config.clientDistPath).toBeNull();
+    expect(config.buildVersion).toBeNull();
+  });
+
+  it("treats a blank build version as no version at all", async () => {
+    expect((await loadConfig({ BUILD_VERSION: "  " })).buildVersion).toBeNull();
+  });
+
+  it("reports the build version the image was stamped with", async () => {
+    expect((await loadConfig({ BUILD_VERSION: "a1b2c3d" })).buildVersion).toBe("a1b2c3d");
   });
 });

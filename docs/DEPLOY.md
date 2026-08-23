@@ -94,6 +94,10 @@ Mitigations: a 32-character random password, TLS required for every connection, 
 
 The workflow is also the single source of truth for the service configuration: port, health check path, CPU, memory, task count and environment variables are all declared there, not clicked into a console where nobody can review them.
 
+**A green deploy job means a live service, not an accepted API call.** The deploy action returns once ECS has accepted the new task set, which is minutes before traffic actually moves, so a task that crashed on boot used to leave the run green while the old version kept serving. The last step of the job closes that gap. The image is stamped at build time with the short commit hash through a `BUILD_VERSION` build argument, `/api/health` reports that stamp, and the job polls the public URL until it reads the expected hash five times in a row, failing after fifteen minutes.
+
+Five consecutive reads rather than one, because the canary routes 5% of traffic to the new version for the first three minutes: a single matching answer proves the new task exists, not that it took over. Fifteen minutes, because the canary and bake windows together run past six, and a task that is slow to become healthy should be reported as slow rather than as broken.
+
 ### Configuration
 
 Repository variables (Settings, Secrets and variables, Actions, Variables):
@@ -109,7 +113,7 @@ Repository secrets, same page:
 | `DATABASE_URL` | full connection string including `?uselibpqcompat=true&sslmode=require` |
 | `JWT_SECRET` | the token signing key |
 
-Region, repository name, service name and cluster are plain `env` entries in the workflow, since none of them is sensitive.
+Region, repository name, service name, cluster and the public application URL are plain `env` entries in the workflow, since none of them is sensitive.
 
 ---
 
@@ -123,7 +127,7 @@ Merge to `main`. That is the whole procedure.
 
 Open the Actions tab, find the last workflow run that deployed a good version, and re-run its deploy job. It rebuilds nothing: the image for that commit is already in ECR under its own tag, and the service is repointed at it.
 
-A deployment that fails its health checks never needs this. The ECS circuit breaker reverts it automatically, and the canary means only 5% of traffic ever reached it.
+A deployment that fails its health checks never needs this. The ECS circuit breaker reverts it automatically, and the canary means only 5% of traffic ever reached it. The verification step is what makes that visible: the reverted deployment leaves the old version live, the job never reads the new hash, and the run ends red.
 
 ### Deploy from a workstation
 

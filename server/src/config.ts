@@ -11,6 +11,7 @@ const envSchema = z.object({
   CLIENT_DIST_PATH: z.string().optional(),
   REDIS_URL: z.string().optional(),
   DEMO_RESEED_HOURS: z.coerce.number().positive().optional(),
+  BUILD_VERSION: z.string().optional(),
 });
 
 const parsed = envSchema.safeParse(process.env);
@@ -41,6 +42,7 @@ export const config = {
   redisUrl: env.REDIS_URL ?? null,
   clientDistPath: env.CLIENT_DIST_PATH ?? null,
   demoReseedHours: env.DEMO_RESEED_HOURS ?? null,
+  buildVersion: env.BUILD_VERSION?.trim() || null,
   allowedOrigins,
   cookie: {
     secure: servesCrossSite || isProduction,

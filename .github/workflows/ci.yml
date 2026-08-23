@@ -81,6 +81,7 @@ jobs:
       ECR_REPOSITORY: dnd-campaign-manager
       ECS_SERVICE: dnd-campaign-manager
       ECS_CLUSTER: default
+      APP_URL: https://dn-079c6c706dd84aac8c820c42481f8dc3.ecs.eu-north-1.on.aws
 
     steps:
       - uses: actions/checkout@v4
@@ -101,10 +102,12 @@ jobs:
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
-          uri="$REGISTRY/$ECR_REPOSITORY:${GITHUB_SHA::7}"
-          docker build --platform linux/amd64 -t "$uri" .
+          version="${GITHUB_SHA::7}"
+          uri="$REGISTRY/$ECR_REPOSITORY:$version"
+          docker build --platform linux/amd64 --build-arg BUILD_VERSION="$version" -t "$uri" .
           docker push "$uri"
           echo "uri=$uri" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
 
       - name: Deploy to ECS Express Mode
         uses: aws-actions/amazon-ecs-deploy-express-service@v1
@@ -126,3 +129,29 @@ jobs:
               {"name": "JWT_SECRET", "value": "${{ secrets.JWT_SECRET }}"},
               {"name": "DEMO_RESEED_HOURS", "value": "6"}
             ]
+
+      - name: Verify the live service runs this build
+        env:
+          EXPECTED_VERSION: ${{ steps.image.outputs.version }}
+          POLL_TIMEOUT_SECONDS: '900'
+          POLL_INTERVAL_SECONDS: '15'
+          REQUIRED_CONSECUTIVE_HITS: '5'
+        run: |
+          deadline=$((SECONDS + POLL_TIMEOUT_SECONDS))
+          streak=0
+          while [ "$SECONDS" -lt "$deadline" ]; do
+            live=$(curl -fsS --max-time 10 "$APP_URL/api/health" | jq -r '.version // empty' || true)
+            if [ "$live" = "$EXPECTED_VERSION" ]; then
+              streak=$((streak + 1))
+            else
+              streak=0
+            fi
+            echo "live=${live:-unreachable} expected=$EXPECTED_VERSION streak=$streak/$REQUIRED_CONSECUTIVE_HITS"
+            if [ "$streak" -ge "$REQUIRED_CONSECUTIVE_HITS" ]; then
+              echo "$APP_URL serves $EXPECTED_VERSION"
+              exit 0
+            fi
+            sleep "$POLL_INTERVAL_SECONDS"
+          done
+          echo "::error::$APP_URL never settled on $EXPECTED_VERSION"
+          exit 1

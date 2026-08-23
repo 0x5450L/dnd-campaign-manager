@@ -1,5 +1,7 @@
 import { Router } from "express";
 
+import { config } from "../config";
+
 const router = Router();
 
 /**
@@ -9,7 +11,11 @@ const router = Router();
  * a database outage and removes the one thing still able to serve the client.
  */
 router.get("", (_req, res) => {
-  res.json({ status: "ok", uptime: Math.floor(process.uptime()) });
+  res.json({
+    status: "ok",
+    uptime: Math.floor(process.uptime()),
+    version: config.buildVersion,
+  });
 });
 
 export default router;

@@ -32,5 +32,8 @@ COPY --from=build /app/server/dist ./server/dist
 COPY --from=build /app/client/dist ./client/dist
 COPY --from=build /app/node_modules/.prisma ./node_modules/.prisma
 
+ARG BUILD_VERSION=""
+ENV BUILD_VERSION=$BUILD_VERSION
+
 EXPOSE 3001
 CMD ["node", "server/dist/index.js"]

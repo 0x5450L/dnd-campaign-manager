@@ -15,4 +15,10 @@ describe("GET /api/health", () => {
 
     expect(response.body.uptime).toEqual(expect.any(Number));
   });
+
+  it("names the build it is running, which is what a deploy verifies from outside", async () => {
+    const response = await request(app).get("/api/health");
+
+    expect(response.body).toHaveProperty("version");
+  });
 });
