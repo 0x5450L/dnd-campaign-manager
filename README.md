@@ -2,7 +2,9 @@
 
 **A campaign manager for D&D 5e: character sheets, live sessions, and a combat tracker that stays in sync across everyone at the table.**
 
-[CI](https://github.com/0x5450L/dnd-campaign-manager/actions/workflows/ci.yml)
+[![CI](https://github.com/0x5450L/dnd-campaign-manager/actions/workflows/ci.yml/badge.svg)](https://github.com/0x5450L/dnd-campaign-manager/actions/workflows/ci.yml)
+
+![The combat tracker mid-encounter: initiative order, hit points and conditions, with a participant hidden from the players](docs/screenshot-encounter.png)
 
 ---
 
