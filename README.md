@@ -4,7 +4,7 @@
 
 [![CI](https://github.com/0x5450L/dnd-campaign-manager/actions/workflows/ci.yml/badge.svg)](https://github.com/0x5450L/dnd-campaign-manager/actions/workflows/ci.yml)
 
-![The combat tracker mid-encounter: initiative order, hit points and conditions, with a participant hidden from the players](docs/screenshot-encounter.png)
+![The DM's view of a live session: initiative order with hit points and modifiers, the dice roller, and the session log filling in as rolls land](docs/screenshot-encounter.png)
 
 ---
 
