@@ -45,6 +45,17 @@ export class NoCreatureCandidatesError extends Error {
   }
 }
 
+export class CreatureDetailsUnavailableError extends Error {
+  readonly humanMessage: string;
+
+  constructor(readonly slugs: string[]) {
+    super(`no creature detail could be loaded for ${slugs.join(", ")}`);
+    this.name = "CreatureDetailsUnavailableError";
+    this.humanMessage =
+      "The creatures were chosen, but their stat blocks could not be loaded from the SRD source, so there is nothing to put into the encounter. Try again in a moment.";
+  }
+}
+
 export type EncounterGenerationOutcome = {
   output: GeneratedEncounter;
   model: string;
@@ -149,10 +160,15 @@ export class EncounterGenerator {
         note: picked.note,
       });
 
-      const detail = await this.reference.getCreature(summary.slug);
-      if (detail) {
-        participants.push(...this.toParticipants(detail, picked.count));
-      }
+      participants.push(
+        ...(await this.seedParticipants(summary.slug, picked.count)),
+      );
+    }
+
+    if (entries.length > 0 && participants.length === 0) {
+      throw new CreatureDetailsUnavailableError(
+        entries.map((entry) => entry.slug),
+      );
     }
 
     return {
@@ -163,6 +179,19 @@ export class EncounterGenerator {
       xp: buildXpReport(rawXp, creatureCount, budget),
       participants,
     };
+  }
+
+  private async seedParticipants(
+    slug: string,
+    count: number,
+  ): Promise<CreateParticipantPayload[]> {
+    try {
+      const detail = await this.reference.getCreature(slug);
+      return detail ? this.toParticipants(detail, count) : [];
+    } catch (error) {
+      console.error(`creature detail unavailable (${slug})`, error);
+      return [];
+    }
   }
 
   private toParticipants(

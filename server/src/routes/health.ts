@@ -1,6 +1,7 @@
 import { Router } from "express";
 
 import { config } from "../config";
+import { getAiProviderStatus } from "../services/ai";
 import prisma from "../services/prisma";
 
 const router = Router();
@@ -28,7 +29,11 @@ router.get("", (_req, res) => {
 router.get("/ready", async (_req, res) => {
   try {
     await prisma.$queryRaw`select 1`;
-    res.json({ status: "ready", version: config.buildVersion });
+    res.json({
+      status: "ready",
+      version: config.buildVersion,
+      ai: getAiProviderStatus(),
+    });
   } catch {
     res.status(503).json({ status: "unavailable", version: config.buildVersion });
   }

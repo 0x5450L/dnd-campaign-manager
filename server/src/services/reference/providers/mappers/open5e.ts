@@ -49,7 +49,7 @@ export type Open5eMagicItemResult = {
 
 export type Open5eActionResult = {
   name: string;
-  desc: string;
+  desc: string | null;
 };
 
 export type Open5eMonsterResult = {
@@ -84,9 +84,9 @@ export type Open5eMonsterResult = {
   condition_immunities: string | null;
   challenge_rating: string;
   cr: number;
-  actions: Open5eActionResult[] | null;
-  special_abilities: Open5eActionResult[] | null;
-  legendary_actions: Open5eActionResult[] | null;
+  actions: Open5eActionResult[] | string | null;
+  special_abilities: Open5eActionResult[] | string | null;
+  legendary_actions: Open5eActionResult[] | string | null;
 };
 
 export type Open5eListResponse<TResult> = {
@@ -108,14 +108,14 @@ const emptyToNull = (value: string | null): string | null =>
   value && value.trim() !== "" ? value : null;
 
 const mapActions = (
-  actions: Open5eActionResult[] | null,
+  actions: Open5eActionResult[] | string | null,
 ): SrdCreatureAction[] => {
-  if (!actions) {
+  if (!Array.isArray(actions)) {
     return [];
   }
   return actions.map((action) => ({
     name: action.name,
-    description: action.desc,
+    description: action.desc ?? "",
   }));
 };
 

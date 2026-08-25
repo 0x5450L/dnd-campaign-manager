@@ -8,8 +8,13 @@ import type {
 } from "@dnd/shared/dto/ai";
 import { requireCampaignDM, requireEncounterDM } from "../../utils/accessControl";
 import { AppError } from "../../utils/errors";
+import {
+  NoProviderAvailableError,
+  ProviderRequestError as ReferenceRequestError,
+} from "../reference/providers/providerErrors";
 import { loadCampaignLootContext } from "./aiContextRepository";
 import {
+  CreatureDetailsUnavailableError,
   NoCreatureCandidatesError,
   type EncounterGenerator,
 } from "./generators/encounterGenerator";
@@ -79,6 +84,18 @@ const toAppError = (error: unknown): AppError => {
   }
   if (error instanceof NoCreatureCandidatesError) {
     return new AppError(503, error.humanMessage);
+  }
+  if (error instanceof CreatureDetailsUnavailableError) {
+    return new AppError(503, error.humanMessage);
+  }
+  if (
+    error instanceof NoProviderAvailableError ||
+    error instanceof ReferenceRequestError
+  ) {
+    return new AppError(
+      503,
+      "The SRD catalogue could not be reached, so there was nothing to pick from. Try again in a moment.",
+    );
   }
   if (error instanceof AiProviderTimeoutError) {
     return new AppError(
@@ -161,7 +178,10 @@ export class AiService {
         output,
       };
     } catch (error) {
-      console.error("loot generation failed", error);
+      console.error(
+        `loot generation failed (campaign ${payload.campaignId})`,
+        error,
+      );
       throw toAppError(error);
     }
   }
@@ -198,7 +218,10 @@ export class AiService {
         output,
       };
     } catch (error) {
-      console.error("encounter generation failed", error);
+      console.error(
+        `encounter generation failed (campaign ${payload.campaignId}, encounter ${payload.encounterId})`,
+        error,
+      );
       throw toAppError(error);
     }
   }

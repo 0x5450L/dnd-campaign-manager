@@ -41,6 +41,13 @@ const readProviderId = (raw: string | undefined, hasKey: boolean): AiProviderId 
   return hasKey ? AI_PROVIDER_ID.Gemini : AI_PROVIDER_ID.Mock;
 };
 
+export type AiProviderStatus = AiProviderId | "misconfigured";
+
+export const aiProviderStatus = (config: AiConfig): AiProviderStatus =>
+  config.providerId === AI_PROVIDER_ID.Gemini && !config.geminiApiKey
+    ? "misconfigured"
+    : config.providerId;
+
 export const readAiConfig = (): AiConfig => {
   const geminiApiKey = process.env.GEMINI_API_KEY?.trim() || null;
   return {

@@ -1,6 +1,11 @@
 import { getReferenceService } from "../reference";
 import { AiService } from "./aiService";
-import { readAiConfig, type AiConfig } from "./config";
+import {
+  aiProviderStatus,
+  readAiConfig,
+  type AiConfig,
+  type AiProviderStatus,
+} from "./config";
 import { EncounterGenerator } from "./generators/encounterGenerator";
 import { LootGenerator } from "./generators/lootGenerator";
 import { createTextProvider } from "./providers/providerRouter";
@@ -13,6 +18,10 @@ export function getAiConfig(): AiConfig {
     config = readAiConfig();
   }
   return config;
+}
+
+export function getAiProviderStatus(): AiProviderStatus {
+  return aiProviderStatus(getAiConfig());
 }
 
 export function getAiService(): AiService {

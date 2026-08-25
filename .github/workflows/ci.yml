@@ -130,7 +130,13 @@ jobs:
               {"name": "DATABASE_URL", "value": "${{ secrets.DATABASE_URL }}"},
               {"name": "JWT_SECRET", "value": "${{ secrets.JWT_SECRET }}"},
               {"name": "DEMO_RESEED_HOURS", "value": "6"},
-              {"name": "DATABASE_CA_PATH", "value": "/app/certs/rds-eu-north-1.pem"}
+              {"name": "DATABASE_CA_PATH", "value": "/app/certs/rds-eu-north-1.pem"},
+              {"name": "AI_PROVIDER", "value": "gemini"},
+              {"name": "AI_RATE_LIMIT_MAX", "value": "6"}
+            ]
+          secrets: |
+            [
+              {"name": "GEMINI_API_KEY", "valueFrom": "arn:aws:ssm:${{ env.AWS_REGION }}:${{ vars.AWS_ACCOUNT_ID }}:parameter/dnd-campaign-manager/GEMINI_API_KEY"}
             ]
 
       - name: Verify the live service runs this build
@@ -143,15 +149,21 @@ jobs:
           deadline=$((SECONDS + POLL_TIMEOUT_SECONDS))
           streak=0
           while [ "$SECONDS" -lt "$deadline" ]; do
-            live=$(curl -fsS --max-time 10 "$APP_URL/api/health/ready" | jq -r '.version // empty' || true)
+            ready=$(curl -fsS --max-time 10 "$APP_URL/api/health/ready" || true)
+            live=$(printf '%s' "$ready" | jq -r '.version // empty' 2>/dev/null || true)
+            provider=$(printf '%s' "$ready" | jq -r '.ai // empty' 2>/dev/null || true)
             if [ "$live" = "$EXPECTED_VERSION" ]; then
               streak=$((streak + 1))
             else
               streak=0
             fi
-            echo "live=${live:-unreachable} expected=$EXPECTED_VERSION streak=$streak/$REQUIRED_CONSECUTIVE_HITS"
+            echo "live=${live:-unreachable} expected=$EXPECTED_VERSION ai=${provider:-unknown} streak=$streak/$REQUIRED_CONSECUTIVE_HITS"
             if [ "$streak" -ge "$REQUIRED_CONSECUTIVE_HITS" ]; then
               echo "$APP_URL serves $EXPECTED_VERSION"
+              if [ "$provider" != "gemini" ]; then
+                echo "::error::the live service resolved the AI provider as '${provider:-unknown}', not gemini"
+                exit 1
+              fi
               exit 0
             fi
             sleep "$POLL_INTERVAL_SECONDS"

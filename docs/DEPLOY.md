@@ -41,7 +41,7 @@ Rewriting the string rather than handing TLS options to the driver is deliberate
 
 **The health check does not touch the database.** `/api/health` reports that the process is up and answering. A health check that failed on a database outage would restart the container in a loop. A restart cannot fix a database, and it removes the one thing still able to serve the client an error page.
 
-**Readiness is a separate endpoint with a separate consumer.** `/api/health/ready` runs `select 1` and answers `503` when it cannot. Nothing platform-side probes it, precisely so that a database outage cannot turn into a restart loop; the deployment workflow is its only caller. The split exists because liveness and readiness answer different questions, and the deploy needs the one liveness refuses to ask. It is unauthenticated and costs one trivial query per call, which is the price of being reachable by a workflow that holds no credentials for the application. Its failure branch is the one part of this that no live environment can exercise on demand, so it is covered by a unit test that hands the route a database which refuses to answer.
+**Readiness is a separate endpoint with a separate consumer.** `/api/health/ready` runs `select 1` and answers `503` when it cannot. Nothing platform-side probes it, precisely so that a database outage cannot turn into a restart loop; the deployment workflow is its only caller. The split exists because liveness and readiness answer different questions, and the deploy needs the one liveness refuses to ask. It also names the AI provider the process actually resolved, reporting `misconfigured` rather than `gemini` when the key never arrived, and the deploy fails on anything but `gemini`. That field exists because the demo once ran for days on the mock generator: `AI_PROVIDER` unset falls back to mock when there is no key, which is the correct default for a checkout and the wrong one for production, and nothing outside the app said so. Production now sets `AI_PROVIDER=gemini` explicitly, so a missing key is a loud 503 from the generator instead of plausible placeholder prose. It is unauthenticated and costs one trivial query per call, which is the price of being reachable by a workflow that holds no credentials for the application. Its failure branch is the one part of this that no live environment can exercise on demand, so it is covered by a unit test that hands the route a database which refuses to answer.
 
 **Deploy strategy is canary with automatic rollback.** ECS Express Mode routes 5% of traffic to the new version for three minutes, then bakes for three more before retiring the old task set. A deployment whose tasks fail their health checks is reverted without intervention.
 
@@ -88,6 +88,10 @@ It is deferred on purpose, because the threat it answers does not exist here. A 
 
 The part that does bite a single operator is that task-definition revisions are immutable and kept indefinitely, so every deployment leaves another copy of the current password in the account's history. Rotating the database password would not retract the old one; the retired value stays readable in older revisions until they are deregistered by hand. That is the reason this becomes worth doing the moment the credentials stop being disposable, rather than the moment a checklist mentions it.
 
+**The AI key is not, and that is the line between the two.** `GEMINI_API_KEY` is injected through the deploy action's `secrets` input from an SSM Parameter Store `SecureString`, so the task definition holds the parameter's ARN and never the key itself. The reasoning above does not carry over to it, for two reasons. The database password and the signing key are disposable: they protect data the seed recreates in two minutes, they are reachable only from inside the VPC, and rotating them costs one deploy. A Gemini key is a credential for somebody else's billed account, it works from any machine on the internet, and a copy of it that leaks is spent by whoever holds it. The second reason is the one the trade-off above already names as the moment to move: task-definition revisions are immutable and kept indefinitely, so a plaintext key would leave a working copy of itself in every revision ever deployed, and rotating it would retract none of them.
+
+Parameter Store rather than Secrets Manager because the standard tier is free and the rotation Secrets Manager sells cannot be automated against Google's key issuance anyway, which leaves the two products separated by cost alone at this size.
+
 **The database has no backups.** Automated backups are switched off, so there is no point-in-time recovery. The only data here is the demo campaign, which the seed recreates in two minutes, and paying for backups of regenerable data would be theatre. Any real content would flip this immediately.
 
 ---
@@ -122,6 +126,22 @@ Repository secrets, same page:
 | --- | --- |
 | `DATABASE_URL` | full connection string; the TLS parameters are added by the application, not stored here |
 | `JWT_SECRET` | the token signing key |
+
+The AI key is deliberately not in this table. It lives in SSM Parameter Store, and the workflow passes only its ARN:
+
+```powershell
+aws ssm put-parameter `
+  --name /dnd-campaign-manager/GEMINI_API_KEY `
+  --type SecureString `
+  --value "THE-KEY" `
+  --region eu-north-1
+```
+
+The `deploy` IAM user cannot run this: its policy covers ECR and ECS and nothing else, which is the point of a deployment identity. Creating and rotating the parameter is an operator action, done from the console or with admin credentials, and the deployment identity is never given `ssm:PutParameter` — a workflow that can rewrite the secret it reads is a workflow that can exfiltrate it.
+
+Rotating it later is the same command with `--overwrite`, and the next task to start picks up the new value; nothing in the repository or in any task definition changes. The execution role (`ecsTaskExecutionRole`, not the task role — the agent reads secrets before the container exists) needs `ssm:GetParameters` on `arn:aws:ssm:eu-north-1:<account>:parameter/dnd-campaign-manager/*`. A `SecureString` under the AWS-managed key needs no extra `kms:Decrypt` grant; a customer-managed key would.
+
+The failure mode to know: a parameter the execution role cannot read makes the task fail to start rather than start without the key, which is the right way round.
 
 Region, repository name, service name, cluster and the public application URL are plain `env` entries in the workflow, since none of them is sensitive.
 
