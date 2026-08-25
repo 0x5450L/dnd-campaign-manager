@@ -82,7 +82,11 @@ ECS Express Mode places the task in a public subnet with an address that is neit
 
 Mitigations: a 32-character random password, TLS required for every connection, and nothing but regenerable demo data in the database. The correct fix is a NAT instance on a `t4g.nano` at roughly $5 a month, which also lets the database go private. It is deferred, not forgotten.
 
-**Connection secrets are plain environment variables.** `DATABASE_URL` and `JWT_SECRET` live in GitHub Secrets and are injected into the task definition by the deployment workflow, where they end up as plaintext visible to anyone with console access to the AWS account. The deploy action accepts a `secrets` input that takes Secrets Manager ARNs instead, which is the right answer for a system with more than one operator.
+**Connection secrets are plain environment variables.** `DATABASE_URL` and `JWT_SECRET` live in GitHub Secrets and are injected into the task definition by the deployment workflow, where they end up as plaintext readable by anyone holding `ecs:DescribeTaskDefinition`. The deploy action accepts a `secrets` input taking Secrets Manager or SSM Parameter Store ARNs instead, and moving to it is roughly twenty minutes of work.
+
+It is deferred on purpose, because the threat it answers does not exist here. A secret store separates people who may run the service from people who may read its credentials, and this account has one operator. It does nothing against an attacker who already holds credentials for the account: that attacker calls `GetSecretValue`, or reads the environment of a running task, or replaces the image outright.
+
+The part that does bite a single operator is that task-definition revisions are immutable and kept indefinitely, so every deployment leaves another copy of the current password in the account's history. Rotating the database password would not retract the old one; the retired value stays readable in older revisions until they are deregistered by hand. That is the reason this becomes worth doing the moment the credentials stop being disposable, rather than the moment a checklist mentions it.
 
 **The database has no backups.** Automated backups are switched off, so there is no point-in-time recovery. The only data here is the demo campaign, which the seed recreates in two minutes, and paying for backups of regenerable data would be theatre. Any real content would flip this immediately.
 
