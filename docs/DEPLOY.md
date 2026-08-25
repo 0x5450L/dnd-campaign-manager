@@ -29,7 +29,13 @@ The image is built locally, pushed to **ECR**, and pulled from there by ECS. The
 
 **Migrations are not run on container start.** They are applied deliberately from a workstation with `prisma migrate deploy`. Running them at boot means the schema changes at the moment a task happens to restart, including during an autoscaling event or a rollback, which is precisely when a schema change is least welcome.
 
-**The database connection is verified, not merely encrypted.** `sslmode=require` on its own encrypts the traffic and then accepts whatever certificate the other end presents: protection against listening, none against a man in the middle, which matters more than usual while the database is still reachable from the internet. The image ships Amazon's public RDS root certificates for `eu-north-1` in `server/certs`, the task definition points `DATABASE_CA_PATH` at them, and the configuration rewrites the connection string to `sslmode=verify-full` against that bundle. The bundle is a public file, so the deployment learns a path, not a password, and the secret is untouched.
+**The database is not addressable from the internet, and closing it cost nothing.** Its security group admits 5432 from exactly two sources: the security group attached to the ECS task, and a single `/32` for the operator's workstation, which is how migrations and the seed are applied. Neither source is an address range, and there is no rule an internet scanner can match.
+
+The plan this replaced was a NAT instance and private subnets, about $5 a month and an afternoon of work. Its premise was that the task's address is neither stable nor published and therefore cannot be allowed, which is true, and its conclusion did not follow: a security group rule can name another security group as its source and needs no address at all. Private subnets answer a different question, namely what the container may reach on its way out, and here that traffic is wanted, since the app fetches SRD content from public APIs.
+
+The cost of the cheap version is a coupling worth writing down. The rule points at the security group Express Mode created for this service, so recreating the service would leave the rule pointing at a group nothing belongs to. The deployment would then fail its readiness check rather than fail quietly, which is the failure mode to prefer, but the rule is the thing to fix first if that ever happens.
+
+**The database connection is verified, not merely encrypted.** `sslmode=require` on its own encrypts the traffic and then accepts whatever certificate the other end presents: protection against listening, none against a man in the middle, which is worth closing even now that nothing outside the VPC can open a connection at all. The image ships Amazon's public RDS root certificates for `eu-north-1` in `server/certs`, the task definition points `DATABASE_CA_PATH` at them, and the configuration rewrites the connection string to `sslmode=verify-full` against that bundle. The bundle is a public file, so the deployment learns a path, not a password, and the secret is untouched.
 
 Rewriting the string rather than handing TLS options to the driver is deliberate. `node-postgres` merges the parsed connection string over any options passed beside it, so an `sslmode` inside `DATABASE_URL` silently overrides an `ssl` object set in code. Keeping the parameter in the string it belongs to removes that ambiguity, and the unit tests assert that a weaker `sslmode` is replaced rather than appended.
 
@@ -75,12 +81,6 @@ The load balancer is the largest single line. Moving to a single EC2 instance wi
 ## Known trade-offs
 
 These are deliberate, and each one has a reason and a cost.
-
-**The database is reachable from the internet.** Its security group allows `0.0.0.0/0` on 5432.
-
-ECS Express Mode places the task in a public subnet with an address that is neither stable nor published, so it cannot be allowed by IP. The clean alternative, a private database plus a VPC-internal path, requires NAT for the container's own outbound traffic, because the app fetches SRD content from public APIs. A managed NAT Gateway costs about $35 a month, more than everything else here combined.
-
-Mitigations: a 32-character random password, TLS required for every connection, and nothing but regenerable demo data in the database. The correct fix is a NAT instance on a `t4g.nano` at roughly $5 a month, which also lets the database go private. It is deferred, not forgotten.
 
 **Connection secrets are plain environment variables.** `DATABASE_URL` and `JWT_SECRET` live in GitHub Secrets and are injected into the task definition by the deployment workflow, where they end up as plaintext readable by anyone holding `ecs:DescribeTaskDefinition`. The deploy action accepts a `secrets` input taking Secrets Manager or SSM Parameter Store ARNs instead, and moving to it is roughly twenty minutes of work.
 
@@ -158,9 +158,11 @@ Then point the service at that tag from the ECS console. Doing this bypasses eve
 ### Apply migrations
 
 ```powershell
-$env:DATABASE_URL = "postgresql://postgres:PASSWORD@HOST:5432/dnd?uselibpqcompat=true&sslmode=require"
+$env:DATABASE_URL = "postgresql://postgres:PASSWORD@HOST:5432/dnd?sslmode=require"
 npm run db:migrate:deploy -w server
 ```
+
+This works because the database's security group holds a `/32` rule for the workstation. Home addresses change, and when this command hangs on connect rather than failing on credentials, that rule is the first thing to check: the console's `My IP` option rewrites it in one click.
 
 Migrations are applied by Prisma's own engine, which reads `DATABASE_URL` exactly as given and does not pass through the application configuration. The `verify-full` rewrite therefore does not apply here, and the workstation connection is as verified as whatever the operator typed. An asymmetry worth knowing about rather than being surprised by.
 
@@ -185,7 +187,7 @@ Delete in this order: ECS Express service, ECR repository, RDS instance, then th
 Roughly in order of how much each one matters:
 
 1. Secrets in Secrets Manager rather than the task definition
-2. A private database, reached through a NAT instance
+2. The database in private subnets, so that one wrong security group rule cannot undo the isolation
 3. Automated backups and a restore that has actually been rehearsed
 4. A required reviewer on the `production` GitHub environment, so a merge is not by itself a deploy
 5. Multi-AZ for the database, and more than one task for the service

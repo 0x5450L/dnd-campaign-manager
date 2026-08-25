@@ -119,7 +119,7 @@ The demo runs on AWS: the image lives in **ECR**, an **ECS Express Mode** servic
 
 Two things about running Node behind a load balancer are worth knowing, because neither shows up in local development. Node closes idle connections sooner than the balancer does, which produces sporadic 502s until the server is told to hold them longer. And an SSE stream with nothing to say gets cut at the idle timeout unless it sends a heartbeat.
 
-The full walkthrough, the cost breakdown and the trade-offs taken knowingly, including a database reachable from the internet, are in **[docs/DEPLOY.md](docs/DEPLOY.md)**.
+The full walkthrough, the cost breakdown and the trade-offs taken knowingly, including credentials that live in the task definition rather than in a secret store, are in **[docs/DEPLOY.md](docs/DEPLOY.md)**.
 
 ---
 
