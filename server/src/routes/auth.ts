@@ -3,6 +3,7 @@ import type { Response } from "express";
 import { config } from "../config";
 import type { ParamsDictionary } from "express-serve-static-core";
 import { asyncHandler } from "../utils/asyncHandler";
+import { createRateLimit } from "../middleware/rateLimit";
 import { validateBody } from "../middleware/validateBody";
 import {
   loginSchema,
@@ -16,6 +17,28 @@ const router = Router();
 
 const AUTH_COOKIE_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 
+const FIFTEEN_MINUTES_MS = 15 * 60 * 1000;
+const ONE_HOUR_MS = 60 * 60 * 1000;
+
+const failedLoginRateLimit = createRateLimit({
+  windowMs: FIFTEEN_MINUTES_MS,
+  max: 10,
+  message: "Too many failed sign-in attempts, try again later",
+  countWhen: (res) => res.statusCode === 401,
+});
+
+const loginFloodRateLimit = createRateLimit({
+  windowMs: FIFTEEN_MINUTES_MS,
+  max: 60,
+  message: "Too many sign-in attempts, wait a moment",
+});
+
+const registerRateLimit = createRateLimit({
+  windowMs: ONE_HOUR_MS,
+  max: 10,
+  message: "Too many accounts created from here, try again later",
+});
+
 const setAuthCookie = (res: Response, token: string) => {
   res.cookie("token", token, {
     httpOnly: true,
@@ -25,13 +48,13 @@ const setAuthCookie = (res: Response, token: string) => {
   });
 };
 
-router.post("/register", validateBody(registerSchema), asyncHandler<ParamsDictionary, unknown, RegisterBody>(async (req, res) => {
+router.post("/register", registerRateLimit, validateBody(registerSchema), asyncHandler<ParamsDictionary, unknown, RegisterBody>(async (req, res) => {
   const { user, token } = await authService.register(req.body);
   setAuthCookie(res, token);
   res.json({ status: "ok", message: "User created successfully", user, token });
 }));
 
-router.post("/login", validateBody(loginSchema), asyncHandler<ParamsDictionary, unknown, LoginBody>(async (req, res) => {
+router.post("/login", loginFloodRateLimit, failedLoginRateLimit, validateBody(loginSchema), asyncHandler<ParamsDictionary, unknown, LoginBody>(async (req, res) => {
   const { user, token } = await authService.login(req.body);
   setAuthCookie(res, token);
   res.json({ status: "ok", message: "Login successful", user, token });
