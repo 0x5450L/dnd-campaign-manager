@@ -4,6 +4,7 @@ import { config } from "../config";
 import type { ParamsDictionary } from "express-serve-static-core";
 import { asyncHandler } from "../utils/asyncHandler";
 import { validateBody } from "../middleware/validateBody";
+import { SESSION_TTL_SECONDS } from "../constants/session";
 import {
   loginSchema,
   registerSchema,
@@ -14,7 +15,7 @@ import * as authService from "../services/auth/authService";
 
 const router = Router();
 
-const AUTH_COOKIE_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
+const AUTH_COOKIE_MAX_AGE_MS = SESSION_TTL_SECONDS * 1000;
 
 const setAuthCookie = (res: Response, token: string) => {
   res.cookie("token", token, {
