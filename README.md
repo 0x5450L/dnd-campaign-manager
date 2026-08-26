@@ -49,6 +49,8 @@ The demo data is shared and can be reset with `npm run db:seed -w server`.
 
 **One origin in production.** The server hands out the built client itself, which means no CORS and an auth cookie that keeps `SameSite=Lax`. Setting `CORS_ORIGINS` switches the whole thing, CORS and cookie flags together, to a two-origin deployment.
 
+**The browser never holds the token.** It lives in an httpOnly cookie no script on the page can read, and the socket handshake authenticates with that same cookie rather than a copy of its own: one credential in one place cannot drift out of sync with itself. The API still accepts `Authorization: Bearer`, which is how the Postman collection and the integration tests reach it.
+
 ---
 
 ## Stack

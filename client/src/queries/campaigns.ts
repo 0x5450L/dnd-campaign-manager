@@ -7,7 +7,7 @@ import {
   updateCampaign,
 } from "../services/api/campaigns";
 import type { Campaign, CreateCampaignInput, UpdateCampaignPayload } from "../types/campaigns";
-import { useAuthStore } from "../state/auth/authStore";
+import { useIsSignedIn } from "./auth";
 
 export const campaignKeys = {
   all: ["campaigns"] as const,
@@ -17,21 +17,21 @@ export const campaignKeys = {
 };
 
 export const useCampaignsQuery = () => {
-  const token = useAuthStore((s) => s.token);
+  const signedIn = useIsSignedIn();
   return useQuery({
     queryKey: campaignKeys.lists(),
     queryFn: async () => (await getCampaigns()).campaigns,
-    enabled: !!token,
+    enabled: signedIn,
     refetchOnWindowFocus: true,
   });
 };
 
 export const useCampaignQuery = (id: string | undefined) => {
-  const token = useAuthStore((s) => s.token);
+  const signedIn = useIsSignedIn();
   return useQuery({
     queryKey: campaignKeys.detail(id ?? ""),
     queryFn: async () => (await getCampaign(id as string)).campaign,
-    enabled: !!token && !!id,
+    enabled: signedIn && !!id,
   });
 };
 

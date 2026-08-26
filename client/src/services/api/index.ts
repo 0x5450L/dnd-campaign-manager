@@ -13,16 +13,8 @@ const readBody = async (response: Response): Promise<unknown> => {
 };
 
 export const apiClient = async <T>(url: string, options: RequestInit): Promise<T> => {
-  const token = localStorage.getItem('dndCampaignManagerJWT');
-
-  if (token) {
-    options.headers = {
-      ...options.headers,
-      Authorization: `Bearer ${token}`,
-    };
-  }
-
   options.headers = { ...options.headers, 'Content-Type': 'application/json' };
+  options.credentials = 'include';
 
   let response: Response;
   try {
