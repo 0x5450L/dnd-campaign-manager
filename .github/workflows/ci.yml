@@ -65,9 +65,49 @@ jobs:
       - name: Production build
         run: npm run build
 
+  image:
+    name: Build and smoke-test the container image
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build the image
+        run: docker build -t dnd-campaign-manager:ci .
+
+      - name: Start the container
+        run: |
+          docker run -d --name dnd-ci -p 3001:3001 \
+            -e DATABASE_URL="postgresql://unused:unused@127.0.0.1:5432/unused" \
+            -e JWT_SECRET="ci-smoke-test" \
+            dnd-campaign-manager:ci
+
+      - name: Wait for it to answer
+        run: |
+          for attempt in $(seq 1 30); do
+            if curl -fsS localhost:3001/api/health > /dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          docker logs dnd-ci
+          exit 1
+
+      - name: Refuse an image that runs as root
+        run: |
+          uid="$(docker exec dnd-ci id -u)"
+          if [ "$uid" = "0" ]; then
+            echo "the container runs as root"
+            exit 1
+          fi
+
+      - name: Stop the container
+        if: always()
+        run: docker rm -f dnd-ci
+
   deploy:
     name: Build image and deploy
-    needs: verify
+    needs: [verify, image]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: production
