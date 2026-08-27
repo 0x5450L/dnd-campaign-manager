@@ -21,8 +21,8 @@
     "db:migrate:deploy": "prisma migrate deploy"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Oleg (0x5450L)",
+  "license": "MIT",
   "dependencies": {
     "@dnd/shared": "*",
     "@prisma/adapter-pg": "^7.4.1",
