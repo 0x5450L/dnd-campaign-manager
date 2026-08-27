@@ -2,6 +2,13 @@
   "name": "dnd-campaign-manager",
   "version": "1.0.0",
   "private": true,
+  "description": "A campaign manager for D&D 5e: character sheets, live sessions and a real-time combat tracker.",
+  "author": "Oleg (0x5450L)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/0x5450L/dnd-campaign-manager.git"
+  },
   "workspaces": [
     "shared",
     "server",
