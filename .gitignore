@@ -32,7 +32,6 @@ pnpm-debug.log*
 *.sln
 *.sw?
 CHEATSHEET.md
-BACKLOG.md
 
 # Scripts
 server/scripts/
