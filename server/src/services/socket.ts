@@ -133,12 +133,6 @@ export type AppIo = Server<
 
 let io: AppIo | null = null;
 
-/**
- * Mirrors authMiddleware: the bearer token the client already holds wins, and the
- * cookie is the fallback. Reading only the cookie let HTTP and the socket
- * authenticate as different users, which showed up as a page that loaded fine
- * while every socket call answered "forbidden".
- */
 const handshakeToken = (socket: { handshake: { auth: Record<string, unknown>; headers: { cookie?: string } } }) => {
   const fromAuth = socket.handshake.auth?.token;
   if (typeof fromAuth === 'string' && fromAuth.length > 0) {
