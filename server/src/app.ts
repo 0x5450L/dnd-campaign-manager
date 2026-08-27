@@ -18,6 +18,8 @@ import aiRoutes from './routes/ai';
 
 import { errorMiddleware } from './middleware/errors';
 
+const TRUSTED_PROXY_HOPS = 1;
+
 const serveClient = (app: Express, clientDistPath: string) => {
   const indexHtml = path.join(clientDistPath, 'index.html');
 
@@ -33,6 +35,8 @@ const serveClient = (app: Express, clientDistPath: string) => {
 
 export const createApp = (): Express => {
   const app = express();
+
+  app.set('trust proxy', config.isProduction ? TRUSTED_PROXY_HOPS : false);
 
   if (config.allowedOrigins.length > 0) {
     app.use(cors({ origin: config.allowedOrigins, credentials: true }));
