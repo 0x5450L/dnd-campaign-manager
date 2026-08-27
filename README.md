@@ -65,11 +65,11 @@ The demo data is shared and can be reset with `npm run db:seed -w server`.
 
 ## Tests
 
-238 tests across three levels, all run on CI.
+246 tests across three levels, all run on CI.
 
 **Unit.** The pure rules: turn order when the acting participant is removed mid-encounter, the four ability cost types and their bounds, spell slot upcasting, the live-session reducer, environment parsing, SRD source fallback, the rate limiter in both of its counting modes, and the dice formula parser down to the boundaries it refuses.
 
-**Component.** The role model as the player actually meets it, rendered in jsdom: a participant the DM has hidden does not reach the player's screen, and the control that hides one is offered to nobody but the DM. The server refuses those things too, but the two sides filter independently, and only a component test notices when the client stops.
+**Component.** The role model as the player actually meets it, rendered in jsdom: a participant the DM has hidden does not reach the player's screen, and the control that hides one is offered to nobody but the DM. The server refuses those things too, but the two sides filter independently, and only a component test notices when the client stops. Alongside it, the two screens a visitor meets before any of that: the route guard waits for the session rather than flashing the sign-in page at someone who is already signed in, and the error boundary turns a render failure into a page with a way out.
 
 **Integration.** The app over HTTP against a real Postgres: authentication, and the DM/player permissions that unit tests structurally cannot reach. They assert the stored row is untouched on refusal, so "returned 403 but wrote anyway" cannot pass.
 

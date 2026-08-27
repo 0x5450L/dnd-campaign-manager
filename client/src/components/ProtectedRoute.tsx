@@ -1,5 +1,6 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useMeQuery } from "../queries/auth";
+import AppLoading from "./app/AppLoading";
 import Header from "./app/AppHeader";
 import DiceRoller from "./dice/DiceRoller";
 import { LiveSessionSocketBridge } from "./app/LiveSessionSocketBridge";
@@ -7,7 +8,7 @@ import { LiveSessionSocketBridge } from "./app/LiveSessionSocketBridge";
 function ProtectedRoute() {
   const { data: user, isLoading } = useMeQuery();
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <AppLoading />;
   }
   if (!user) return <Navigate to="/auth" replace />;
 
