@@ -57,7 +57,7 @@ The demo data is shared and can be reset with `npm run db:seed -w server`.
 
 **Backend:** Node.js, Express 5, TypeScript, Prisma 7, PostgreSQL 16, socket.io, JWT, zod
 **Frontend:** React 19, TypeScript, Vite 7, React Router 7, Tailwind CSS 4, TanStack Query, Zustand
-**Testing:** Vitest, Supertest
+**Testing:** Vitest, Testing Library, Supertest
 **Tooling:** npm workspaces, ESLint 9, Docker, GitHub Actions
 **Infrastructure:** AWS ECS Express Mode on Fargate, ECR, RDS PostgreSQL
 
@@ -65,14 +65,16 @@ The demo data is shared and can be reset with `npm run db:seed -w server`.
 
 ## Tests
 
-159 tests across three levels, all run on CI.
+238 tests across three levels, all run on CI.
 
-**Unit.** The pure rules: turn order when the acting participant is removed mid-encounter, the four ability cost types and their bounds, spell slot upcasting, the live-session reducer, environment parsing, and SRD source fallback.
+**Unit.** The pure rules: turn order when the acting participant is removed mid-encounter, the four ability cost types and their bounds, spell slot upcasting, the live-session reducer, environment parsing, SRD source fallback, the rate limiter in both of its counting modes, and the dice formula parser down to the boundaries it refuses.
+
+**Component.** The role model as the player actually meets it, rendered in jsdom: a participant the DM has hidden does not reach the player's screen, and the control that hides one is offered to nobody but the DM. The server refuses those things too, but the two sides filter independently, and only a component test notices when the client stops.
 
 **Integration.** The app over HTTP against a real Postgres: authentication, and the DM/player permissions that unit tests structurally cannot reach. They assert the stored row is untouched on refusal, so "returned 403 but wrote anyway" cannot pass.
 
 ```bash
-npm test                          # unit
+npm test                          # unit and component
 docker compose up -d postgres_test
 npm run test:integration -w server
 ```
@@ -81,7 +83,7 @@ npm run test:integration -w server
 
 ## Running it locally
 
-Requires Node 22 and Docker.
+Requires Node 22.22.2 or newer, and Docker.
 
 ```bash
 git clone https://github.com/0x5450L/dnd-campaign-manager.git
@@ -90,12 +92,22 @@ cd dnd-campaign-manager
 npm install
 cp server/.env.example server/.env      # set JWT_SECRET
 
+npm run db:generate -w server           # writes the typed Prisma client
+npm run build -w shared                 # both sides import it as a package
+
 docker compose up -d postgres
 npm run db:migrate -w server
 npm run db:seed -w server
 
 npm run dev
 ```
+
+The two steps before Docker are the ones a fresh clone forgets. Neither the
+Prisma client nor `@dnd/shared` is installed by `npm install` — one is generated
+from the schema and the other is built from source — so `npm test` and
+`npm run typecheck` fail against a tree that has never run them. `npm run dev`
+builds `shared` on its own, which is why the gap only shows up when you reach
+for the tests first.
 
 The client is on `http://localhost:5173`, the API on `3001`.
 
