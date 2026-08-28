@@ -7,16 +7,19 @@ import "./index.css";
 import App from "./App";
 import { queryClient } from "./lib/queryClient";
 import { SSEProvider } from "./context/SSEContext/SSEProvider";
+import ErrorBoundary from "./components/app/ErrorBoundary";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <SSEProvider>
-          <App />
-        </SSEProvider>
-      </BrowserRouter>
-      <ReactQueryDevtools initialIsOpen={false} />
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <SSEProvider>
+            <App />
+          </SSEProvider>
+        </BrowserRouter>
+        <ReactQueryDevtools initialIsOpen={false} />
+      </QueryClientProvider>
+    </ErrorBoundary>
   </StrictMode>
 );

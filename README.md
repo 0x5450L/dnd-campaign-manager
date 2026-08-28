@@ -67,11 +67,11 @@ The demo data is shared and can be reset with `npm run db:seed -w server`.
 
 ## Tests
 
-249 tests across three levels, all run on CI.
+246 tests across three levels, all run on CI.
 
 **Unit.** The pure rules: turn order when the acting participant is removed mid-encounter, the four ability cost types and their bounds, spell slot upcasting, the live-session reducer, environment parsing, SRD source fallback, the rate limiter in both of its counting modes, every directive of the content security policy, and the dice formula parser down to the boundaries it refuses.
 
-**Component.** The role model as the player actually meets it, rendered in jsdom: a participant the DM has hidden does not reach the player's screen, and the control that hides one is offered to nobody but the DM. The server refuses those things too, but the two sides filter independently, and only a component test notices when the client stops.
+**Component.** The role model as the player actually meets it, rendered in jsdom: a participant the DM has hidden does not reach the player's screen, and the control that hides one is offered to nobody but the DM. The server refuses those things too, but the two sides filter independently, and only a component test notices when the client stops. Alongside it, the two screens a visitor meets before any of that: the route guard waits for the session rather than flashing the sign-in page at someone who is already signed in, and the error boundary turns a render failure into a page with a way out.
 
 **Integration.** The app over HTTP against a real Postgres: authentication, and the DM/player permissions that unit tests structurally cannot reach. They assert the stored row is untouched on refusal, so "returned 403 but wrote anyway" cannot pass.
 
@@ -161,4 +161,6 @@ shared/     @dnd/shared, DTOs and game rules used by both
 
 ## Status
 
-A portfolio project, built to be read as much as used. Known gaps and deferred decisions are tracked as I go: NPCs currently render the full player sheet, magic item mechanics are text only, and the legacy `cs-*` styles still await migration to Tailwind utilities.
+A portfolio project, built to be read as much as used.
+
+What it does not do yet, and what was deferred on purpose, is written down in **[BACKLOG.md](BACKLOG.md)** rather than kept quiet: NPCs render the full player sheet, magic item mechanics are text only, sessions cannot be revoked before their token expires, and the legacy `cs-*` styles still await Tailwind. Each entry names the trade-off and the options considered, because a decision postponed on purpose is worth more written down than rediscovered.
