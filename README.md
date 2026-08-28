@@ -159,4 +159,6 @@ shared/     @dnd/shared, DTOs and game rules used by both
 
 ## Status
 
-A portfolio project, built to be read as much as used. Known gaps and deferred decisions are tracked as I go: NPCs currently render the full player sheet, magic item mechanics are text only, and the legacy `cs-*` styles still await migration to Tailwind utilities.
+A portfolio project, built to be read as much as used.
+
+What it does not do yet, and what was deferred on purpose, is written down in **[BACKLOG.md](BACKLOG.md)** rather than kept quiet: NPCs render the full player sheet, magic item mechanics are text only, sessions cannot be revoked before their token expires, and the legacy `cs-*` styles still await Tailwind. Each entry names the trade-off and the options considered, because a decision postponed on purpose is worth more written down than rediscovered.
