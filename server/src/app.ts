@@ -2,6 +2,7 @@ import path from 'node:path';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express, { type Express } from 'express';
+import helmet from 'helmet';
 
 import { config } from './config';
 
@@ -20,6 +21,30 @@ import { errorMiddleware } from './middleware/errors';
 
 const TRUSTED_PROXY_HOPS = 1;
 
+const GOOGLE_FONTS_STYLESHEET = 'https://fonts.googleapis.com';
+const GOOGLE_FONTS_FILES = 'https://fonts.gstatic.com';
+
+const securityHeaders = (allowedOrigins: readonly string[]) =>
+  helmet({
+    contentSecurityPolicy: {
+      useDefaults: false,
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'", GOOGLE_FONTS_STYLESHEET],
+        fontSrc: ["'self'", GOOGLE_FONTS_FILES],
+        imgSrc: ["'self'", 'data:'],
+        connectSrc: ["'self'", ...allowedOrigins],
+        objectSrc: ["'none'"],
+        frameAncestors: ["'none'"],
+        baseUri: ["'self'"],
+        formAction: ["'self'"],
+        upgradeInsecureRequests: [],
+      },
+    },
+    crossOriginEmbedderPolicy: false,
+  });
+
 const serveClient = (app: Express, clientDistPath: string) => {
   const indexHtml = path.join(clientDistPath, 'index.html');
 
@@ -37,6 +62,8 @@ export const createApp = (): Express => {
   const app = express();
 
   app.set('trust proxy', config.isProduction ? TRUSTED_PROXY_HOPS : false);
+
+  app.use(securityHeaders(config.allowedOrigins));
 
   if (config.allowedOrigins.length > 0) {
     app.use(cors({ origin: config.allowedOrigins, credentials: true }));
