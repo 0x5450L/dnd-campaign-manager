@@ -36,5 +36,7 @@ COPY server/certs ./certs
 ARG BUILD_VERSION=""
 ENV BUILD_VERSION=$BUILD_VERSION
 
+USER node
+
 EXPOSE 3001
 CMD ["node", "server/dist/index.js"]

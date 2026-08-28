@@ -49,13 +49,17 @@ The demo data is shared and can be reset with `npm run db:seed -w server`.
 
 **One origin in production.** The server hands out the built client itself, which means no CORS and an auth cookie that keeps `SameSite=Lax`. Setting `CORS_ORIGINS` switches the whole thing, CORS and cookie flags together, to a two-origin deployment.
 
+**The page is told what it may load.** The server hands out HTML, not only JSON, so it sends the headers that let a browser refuse on its behalf: a content security policy naming the two Google Fonts hosts and nothing else off-origin, `nosniff`, `frame-ancestors 'none'`, and HSTS. The policy keeps `'unsafe-inline'` for styles because React writes them onto elements, which is a real hole and the reason it is written down here rather than left to be found. A test pins every directive, and the image job refuses a build that serves the client without them.
+
+**The browser never holds the token.** It lives in an httpOnly cookie no script on the page can read, and the socket handshake authenticates with that same cookie rather than a copy of its own: one credential in one place cannot drift out of sync with itself. The API still accepts `Authorization: Bearer`, which is how the Postman collection and the integration tests reach it.
+
 ---
 
 ## Stack
 
 **Backend:** Node.js, Express 5, TypeScript, Prisma 7, PostgreSQL 16, socket.io, JWT, zod
 **Frontend:** React 19, TypeScript, Vite 7, React Router 7, Tailwind CSS 4, TanStack Query, Zustand
-**Testing:** Vitest, Supertest
+**Testing:** Vitest, Testing Library, Supertest
 **Tooling:** npm workspaces, ESLint 9, Docker, GitHub Actions
 **Infrastructure:** AWS ECS Express Mode on Fargate, ECR, RDS PostgreSQL
 
@@ -63,14 +67,16 @@ The demo data is shared and can be reset with `npm run db:seed -w server`.
 
 ## Tests
 
-159 tests across three levels, all run on CI.
+246 tests across three levels, all run on CI.
 
-**Unit.** The pure rules: turn order when the acting participant is removed mid-encounter, the four ability cost types and their bounds, spell slot upcasting, the live-session reducer, environment parsing, and SRD source fallback.
+**Unit.** The pure rules: turn order when the acting participant is removed mid-encounter, the four ability cost types and their bounds, spell slot upcasting, the live-session reducer, environment parsing, SRD source fallback, the rate limiter in both of its counting modes, every directive of the content security policy, and the dice formula parser down to the boundaries it refuses.
+
+**Component.** The role model as the player actually meets it, rendered in jsdom: a participant the DM has hidden does not reach the player's screen, and the control that hides one is offered to nobody but the DM. The server refuses those things too, but the two sides filter independently, and only a component test notices when the client stops. Alongside it, the two screens a visitor meets before any of that: the route guard waits for the session rather than flashing the sign-in page at someone who is already signed in, and the error boundary turns a render failure into a page with a way out.
 
 **Integration.** The app over HTTP against a real Postgres: authentication, and the DM/player permissions that unit tests structurally cannot reach. They assert the stored row is untouched on refusal, so "returned 403 but wrote anyway" cannot pass.
 
 ```bash
-npm test                          # unit
+npm test                          # unit and component
 docker compose up -d postgres_test
 npm run test:integration -w server
 ```
@@ -79,7 +85,7 @@ npm run test:integration -w server
 
 ## Running it locally
 
-Requires Node 22 and Docker.
+Requires Node 22.22.2 or newer, and Docker.
 
 ```bash
 git clone https://github.com/0x5450L/dnd-campaign-manager.git
@@ -88,12 +94,22 @@ cd dnd-campaign-manager
 npm install
 cp server/.env.example server/.env      # set JWT_SECRET
 
+npm run db:generate -w server           # writes the typed Prisma client
+npm run build -w shared                 # both sides import it as a package
+
 docker compose up -d postgres
 npm run db:migrate -w server
 npm run db:seed -w server
 
 npm run dev
 ```
+
+The two steps before Docker are the ones a fresh clone forgets. Neither the
+Prisma client nor `@dnd/shared` is installed by `npm install` — one is generated
+from the schema and the other is built from source — so `npm test` and
+`npm run typecheck` fail against a tree that has never run them. `npm run dev`
+builds `shared` on its own, which is why the gap only shows up when you reach
+for the tests first.
 
 The client is on `http://localhost:5173`, the API on `3001`.
 
@@ -145,4 +161,6 @@ shared/     @dnd/shared, DTOs and game rules used by both
 
 ## Status
 
-A portfolio project, built to be read as much as used. Known gaps and deferred decisions are tracked as I go: NPCs currently render the full player sheet, magic item mechanics are text only, and the legacy `cs-*` styles still await migration to Tailwind utilities.
+A portfolio project, built to be read as much as used.
+
+What it does not do yet, and what was deferred on purpose, is written down in **[BACKLOG.md](BACKLOG.md)** rather than kept quiet: NPCs render the full player sheet, magic item mechanics are text only, sessions cannot be revoked before their token expires, and the legacy `cs-*` styles still await Tailwind. Each entry names the trade-off and the options considered, because a decision postponed on purpose is worth more written down than rediscovered.

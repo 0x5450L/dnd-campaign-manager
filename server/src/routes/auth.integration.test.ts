@@ -31,6 +31,18 @@ describe("POST /api/auth/register", () => {
     expect(cookie).toContain("HttpOnly");
   });
 
+  it("stops the cookie at the moment the token inside it stops being valid", async () => {
+    const response = await request(app).post("/api/auth/register").send(credentials());
+
+    const cookie = response.headers["set-cookie"][0];
+    const maxAgeSeconds = Number(/Max-Age=(\d+)/.exec(cookie)?.[1]);
+    const claims = JSON.parse(
+      Buffer.from(response.body.token.split(".")[1], "base64url").toString(),
+    ) as { iat: number; exp: number };
+
+    expect(maxAgeSeconds).toBe(claims.exp - claims.iat);
+  });
+
   it("never returns the password hash", async () => {
     const response = await request(app).post("/api/auth/register").send(credentials());
 

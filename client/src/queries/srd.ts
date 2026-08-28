@@ -6,7 +6,7 @@ import {
   searchSrdCreatures,
 } from "../services/api/srd";
 import { buildSpellIndex } from "../utils/srd/spellIndex";
-import { useAuthStore } from "../state/auth/authStore";
+import { useIsSignedIn } from "./auth";
 
 export const srdKeys = {
   all: ["srd"] as const,
@@ -25,43 +25,43 @@ const ITEM_STALE_MS = 60 * 60 * 1000;
 const SPELL_POOL_STALE_MS = 60 * 60 * 1000;
 
 export const useSrdSpellIndexQuery = (enabled = true) => {
-  const token = useAuthStore((s) => s.token);
+  const signedIn = useIsSignedIn();
   return useQuery({
     queryKey: srdKeys.spellPool(),
     queryFn: () => listSrdSpells(),
-    enabled: enabled && !!token,
+    enabled: enabled && signedIn,
     staleTime: SPELL_POOL_STALE_MS,
     select: (page) => buildSpellIndex(page.results),
   });
 };
 
 export const useSrdCreatureSearchQuery = (search: string) => {
-  const token = useAuthStore((s) => s.token);
+  const signedIn = useIsSignedIn();
   const trimmed = search.trim();
   return useQuery({
     queryKey: srdKeys.creatureSearch(trimmed),
     queryFn: () => searchSrdCreatures(trimmed),
-    enabled: !!token && trimmed.length > 0,
+    enabled: signedIn && trimmed.length > 0,
     staleTime: 5 * 60 * 1000,
   });
 };
 
 export const useSrdItemQuery = (slug: string | null) => {
-  const token = useAuthStore((s) => s.token);
+  const signedIn = useIsSignedIn();
   return useQuery({
     queryKey: srdKeys.item(slug ?? ""),
     queryFn: () => getSrdItem(slug as string),
-    enabled: !!token && !!slug,
+    enabled: signedIn && !!slug,
     staleTime: ITEM_STALE_MS,
   });
 };
 
 export const useSrdCreatureQuery = (slug: string | null) => {
-  const token = useAuthStore((s) => s.token);
+  const signedIn = useIsSignedIn();
   return useQuery({
     queryKey: srdKeys.creature(slug ?? ""),
     queryFn: () => getSrdCreature(slug as string),
-    enabled: !!token && !!slug,
+    enabled: signedIn && !!slug,
     staleTime: 5 * 60 * 1000,
   });
 };

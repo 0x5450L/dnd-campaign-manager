@@ -12,8 +12,8 @@ import type {
   CreateCharacterPayload,
   UpdateCharacterPayload,
 } from "../types/characters/characters";
-import { useAuthStore } from "../state/auth/authStore";
 import { useSSE } from "../hooks/useSSE";
+import { useIsSignedIn } from "./auth";
 
 export const characterKeys = {
   all: ["characters"] as const,
@@ -24,20 +24,20 @@ export const characterKeys = {
 };
 
 export const useCampaignCharactersQuery = (campaignId: string | undefined) => {
-  const token = useAuthStore((s) => s.token);
+  const signedIn = useIsSignedIn();
   return useQuery({
     queryKey: characterKeys.list(campaignId ?? ""),
     queryFn: async () => (await getCampaignCharacters(campaignId as string)).characters,
-    enabled: !!token && !!campaignId,
+    enabled: signedIn && !!campaignId,
   });
 };
 
 export const useCharacterQuery = (id: string | undefined) => {
-  const token = useAuthStore((s) => s.token);
+  const signedIn = useIsSignedIn();
   return useQuery({
     queryKey: characterKeys.detail(id ?? ""),
     queryFn: async () => (await getCharacter(id as string)).character,
-    enabled: !!token && !!id,
+    enabled: signedIn && !!id,
   });
 };
 

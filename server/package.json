@@ -21,18 +21,19 @@
     "db:migrate:deploy": "prisma migrate deploy"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Oleg (0x5450L)",
+  "license": "MIT",
   "dependencies": {
     "@dnd/shared": "*",
     "@prisma/adapter-pg": "^7.4.1",
     "@prisma/client": "^7.4.1",
     "@types/cookie-parser": "^1.4.10",
-    "bcrypt": "^5.1.1",
+    "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^5.2.1",
+    "helmet": "^8.3.0",
     "ioredis": "^5.4.1",
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.18.0",
@@ -40,7 +41,7 @@
     "zod": "^3.24.4"
   },
   "devDependencies": {
-    "@types/bcrypt": "^5.0.2",
+    "@types/bcrypt": "^6.0.0",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.2",
     "@types/jsonwebtoken": "^9.0.9",

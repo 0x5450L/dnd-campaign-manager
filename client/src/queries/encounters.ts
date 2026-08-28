@@ -13,7 +13,6 @@ import {
   updateEncounter as updateEncounterRequest,
   updateParticipant as updateParticipantRequest,
 } from "../services/api/encounters";
-import { useAuthStore } from "../state/auth/authStore";
 import { getSocket } from "../services/socket";
 import type {
   AbilityUsageAction,
@@ -36,6 +35,7 @@ import {
   setParticipants,
   type EncounterList,
 } from "../utils/encounterCache";
+import { useIsSignedIn } from "./auth";
 
 export const encounterKeys = {
   all: ["encounters"] as const,
@@ -46,11 +46,11 @@ export const encounterKeys = {
 };
 
 export const useActiveEncounterQuery = (campaignSessionId: string | undefined) => {
-  const token = useAuthStore((s) => s.token);
+  const signedIn = useIsSignedIn();
   return useQuery({
     queryKey: encounterKeys.list(campaignSessionId ?? ""),
     queryFn: async () => (await listEncounters(campaignSessionId as string)).encounters,
-    enabled: !!token && !!campaignSessionId,
+    enabled: signedIn && !!campaignSessionId,
     select: (encounters) =>
       encounters.find((e) => e.status === "active") ??
       encounters.find((e) => e.status === "setup") ??
