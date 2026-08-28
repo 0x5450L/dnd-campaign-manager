@@ -101,6 +101,17 @@ jobs:
             exit 1
           fi
 
+      - name: Refuse an image that serves the client without security headers
+        run: |
+          headers="$(curl -fsS -D - -o /dev/null localhost:3001/)"
+          for header in content-security-policy x-content-type-options strict-transport-security; do
+            if ! printf '%s' "$headers" | grep -qi "^$header:"; then
+              echo "missing $header"
+              printf '%s' "$headers"
+              exit 1
+            fi
+          done
+
       - name: Stop the container
         if: always()
         run: docker rm -f dnd-ci

@@ -49,6 +49,8 @@ The demo data is shared and can be reset with `npm run db:seed -w server`.
 
 **One origin in production.** The server hands out the built client itself, which means no CORS and an auth cookie that keeps `SameSite=Lax`. Setting `CORS_ORIGINS` switches the whole thing, CORS and cookie flags together, to a two-origin deployment.
 
+**The page is told what it may load.** The server hands out HTML, not only JSON, so it sends the headers that let a browser refuse on its behalf: a content security policy naming the two Google Fonts hosts and nothing else off-origin, `nosniff`, `frame-ancestors 'none'`, and HSTS. The policy keeps `'unsafe-inline'` for styles because React writes them onto elements, which is a real hole and the reason it is written down here rather than left to be found. A test pins every directive, and the image job refuses a build that serves the client without them.
+
 **The browser never holds the token.** It lives in an httpOnly cookie no script on the page can read, and the socket handshake authenticates with that same cookie rather than a copy of its own: one credential in one place cannot drift out of sync with itself. The API still accepts `Authorization: Bearer`, which is how the Postman collection and the integration tests reach it.
 
 ---
@@ -67,7 +69,7 @@ The demo data is shared and can be reset with `npm run db:seed -w server`.
 
 246 tests across three levels, all run on CI.
 
-**Unit.** The pure rules: turn order when the acting participant is removed mid-encounter, the four ability cost types and their bounds, spell slot upcasting, the live-session reducer, environment parsing, SRD source fallback, the rate limiter in both of its counting modes, and the dice formula parser down to the boundaries it refuses.
+**Unit.** The pure rules: turn order when the acting participant is removed mid-encounter, the four ability cost types and their bounds, spell slot upcasting, the live-session reducer, environment parsing, SRD source fallback, the rate limiter in both of its counting modes, every directive of the content security policy, and the dice formula parser down to the boundaries it refuses.
 
 **Component.** The role model as the player actually meets it, rendered in jsdom: a participant the DM has hidden does not reach the player's screen, and the control that hides one is offered to nobody but the DM. The server refuses those things too, but the two sides filter independently, and only a component test notices when the client stops. Alongside it, the two screens a visitor meets before any of that: the route guard waits for the session rather than flashing the sign-in page at someone who is already signed in, and the error boundary turns a render failure into a page with a way out.
 
